@@ -1,0 +1,11 @@
+apply plugin: 'java'
+apply plugin: 'application'
+
+dependencies {
+    compile fileTree(dir: 'vendor/main', include: '*.jar')
+    testCompile fileTree(dir: 'vendor/test', include: '*.jar')
+}
+
+mainClassName = "App"
+
+task stage(dependsOn: ['clean', 'installApp'])
