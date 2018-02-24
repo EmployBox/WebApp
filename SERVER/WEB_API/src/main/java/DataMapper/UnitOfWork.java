@@ -1,12 +1,15 @@
 package DataMapper;
 
+import Model.DomainObject;
+
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 public class UnitOfWork {
-    private List<DomainObject> newObjects = new ArrayList();
-    private List<DomainObject> dirtyObjects = new ArrayList();
-    private List<DomainObject> removedObjects = new ArrayList();
+    private List<DomainObject> newObjects = new ArrayList<>();
+    private List<DomainObject> dirtyObjects = new ArrayList<>();
+    private List<DomainObject> removedObjects = new ArrayList<>();
 
     //TODO register with Identity Map
     public void registerNew(DomainObject obj) {
@@ -57,14 +60,20 @@ public class UnitOfWork {
     }
 
     private void insertNew() {
-
+        for (DomainObject obj : newObjects) {
+            MapperRegistry.getMapper(obj.getClass()).insert(obj);
+        }
     }
 
     private void updateDirty() {
-
+        for (DomainObject obj : newObjects) {
+            MapperRegistry.getMapper(obj.getClass()).update(obj);
+        }
     }
 
     private void deleteRemoved() {
-
+        for (DomainObject obj : newObjects) {
+            MapperRegistry.getMapper(obj.getClass()).delete(obj);
+        }
     }
 }
