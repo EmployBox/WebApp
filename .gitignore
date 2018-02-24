@@ -9,28 +9,28 @@
 # Reference: https://intellij-support.jetbrains.com/hc/en-us/articles/206544839
 
 # User-specific stuff:
-.idea/**/workspace.xml
-.idea/**/tasks.xml
-.idea/dictionaries
+SERVER/WEB_API/.idea/**/workspace.xml
+SERVER/WEB_API/.idea/**/tasks.xml
+SERVER/WEB_API/.idea/dictionaries
 
 # Sensitive or high-churn files:
-.idea/**/dataSources/
-.idea/**/dataSources.ids
-.idea/**/dataSources.xml
-.idea/**/dataSources.local.xml
-.idea/**/sqlDataSources.xml
-.idea/**/dynamic.xml
-.idea/**/uiDesigner.xml
+SERVER/WEB_API/.idea/**/dataSources/
+SERVER/WEB_API/.idea/**/dataSources.ids
+SERVER/WEB_API/.idea/**/dataSources.xml
+SERVER/WEB_API/.idea/**/dataSources.local.xml
+SERVER/WEB_API/.idea/**/sqlDataSources.xml
+SERVER/WEB_API/.idea/**/dynamic.xml
+SERVER/WEB_API/.idea/**/uiDesigner.xml
 
 # Gradle:
-.idea/**/gradle.xml
-.idea/**/libraries
+SERVER/WEB_API/.idea/**/gradle.xml
+SERVER/WEB_API/.idea/**/libraries
 
 # CMake
-cmake-build-debug/
+SERVER/WEB_API/cmake-build-debug/
 
 # Mongo Explorer plugin:
-.idea/**/mongoSettings.xml
+SERVER/WEB_API/.idea/**/mongoSettings.xml
 
 ## File-based project format:
 *.iws
@@ -38,16 +38,16 @@ cmake-build-debug/
 ## Plugin-specific files:
 
 # IntelliJ
-/out/
+SERVER/WEB_API/out/
 
 # mpeltonen/sbt-idea plugin
-.idea_modules/
+SERVER/WEB_API/.idea_modules/
 
 # JIRA plugin
-atlassian-ide-plugin.xml
+SERVER/WEB_API/atlassian-ide-plugin.xml
 
 # Cursive Clojure plugin
-.idea/replstate.xml
+SERVER/WEB_API/.idea/replstate.xml
 
 # Ruby plugin and RubyMine
 /.rakeTasks
@@ -61,16 +61,16 @@ fabric.properties
 ### Intellij Patch ###
 # Comment Reason: https://github.com/joeblau/gitignore.io/issues/186#issuecomment-215987721
 
-# *.iml
-# modules.xml
-# .idea/misc.xml
-# *.ipr
+*.iml
+SERVER/WEB_API/modules.xml
+SERVER/WEB_API/.idea/misc.xml
+*.ipr
 
 # Sonarlint plugin
-.idea/sonarlint
+SERVER/WEB_API/.idea/sonarlint
 
 ### Gradle ###
-.gradle
+SERVER/WEB_API/.gradle
 **/build/
 
 # Ignore Gradle GUI config
@@ -87,3 +87,4 @@ gradle-app.setting
 
 
 # End of https://www.gitignore.io/api/git,gradle,intellij
+/SERVER/WEB_API/.idea/vcs.xml
