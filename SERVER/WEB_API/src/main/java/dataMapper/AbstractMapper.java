@@ -1,4 +1,4 @@
-package DataMapper;
+package dataMapper;
 
 public class AbstractMapper {
 }

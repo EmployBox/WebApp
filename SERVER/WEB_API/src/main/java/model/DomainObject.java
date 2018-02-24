@@ -1,4 +1,6 @@
-package Model;
+package model;
+
+import dataMapper.UnitOfWork;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -22,6 +24,12 @@ public abstract class DomainObject {
      */
     public abstract DomainObject load(ResultSet rs);
 
+    /**
+     * Query the DB for the object with ID passed in the parameters
+     * @param id
+     * @return the object queried
+     * @throws SQLException
+     */
     public DomainObject find(String id) throws SQLException {
         /*SQLServerDataSource dc = new SQLServerDataSource();
         Config config = new Config();
@@ -41,5 +49,40 @@ public abstract class DomainObject {
         statement.setString(1, id);
 
         return load(statement.executeQuery());
+    }
+
+    /**
+     * Always called when creating new object
+     */
+    protected void markNew() {
+        UnitOfWork.getCurrent().registerNew(this);
+    }
+
+    /**
+     * Always called when reading an object from DB
+     */
+    protected void markClean() {
+        UnitOfWork.getCurrent().registerClean(this);
+    }
+
+    /**
+     * To be always called before making any changes to the object and calling markDirty()
+     */
+    protected void markToBeDirty(){
+        UnitOfWork.getCurrent().registerClone(this);
+    }
+
+    /**
+     * Always called when altering an object
+     */
+    protected void markDirty() {
+        UnitOfWork.getCurrent().registerDirty(this);
+    }
+
+    /**
+     * Always called when removing an object
+     */
+    protected void markRemoved() {
+        UnitOfWork.getCurrent().registerRemoved(this);
     }
 }

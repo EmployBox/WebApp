@@ -1,6 +1,6 @@
-package DataMapper;
+package dataMapper;
 
-import Model.DomainObject;
+import model.DomainObject;
 
 public interface Mapper {
     void insert(DomainObject obj);

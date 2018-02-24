@@ -1,13 +1,13 @@
-package DataMapper;
+package dataMapper;
 
-import Model.DomainObject;
+import model.DomainObject;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 public class UnitOfWork {
     private List<DomainObject> newObjects = new ArrayList<>();
+    private List<DomainObject> clonedObjects = new ArrayList<>();
     private List<DomainObject> dirtyObjects = new ArrayList<>();
     private List<DomainObject> removedObjects = new ArrayList<>();
 
@@ -22,6 +22,13 @@ public class UnitOfWork {
         assert !newObjects.contains(obj);
         newObjects.add(obj);
         obj.getIdentityMap().put(obj.getId(), obj);
+    }
+
+    public void registerClone(DomainObject obj) {
+        assert obj.getId()!= null;
+        assert !removedObjects.contains(obj);
+        if(!clonedObjects.contains(obj) && !newObjects.contains(obj))
+            clonedObjects.add(obj);
     }
 
     /**
@@ -74,6 +81,7 @@ public class UnitOfWork {
         return current.get();
     }
 
+    //TODO check versions
     public void commit() {
         insertNew();
         updateDirty();
@@ -106,13 +114,14 @@ public class UnitOfWork {
     public void rollback(){
         for (DomainObject obj : newObjects)
             obj.getIdentityMap().remove(obj.getId());
-        for(DomainObject obj : removedObjects) {
-            if(dirtyObjects.contains(obj)){
-                //Rollsback the alterations
-            }
-            else{
-                obj.getIdentityMap().put(obj.getId(), obj);
-            }
+
+        for(DomainObject obj : dirtyObjects){
+            DomainObject clone = clonedObjects.stream().filter(domainObject -> domainObject.getId().equals(obj.getId())).iterator().next();
+            obj.getIdentityMap().put(clone.getId(), clone);
         }
+
+        for(DomainObject obj : removedObjects)
+            if(!dirtyObjects.contains(obj))
+                obj.getIdentityMap().put(obj.getId(), obj);
     }
 }
