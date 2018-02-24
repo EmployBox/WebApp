@@ -7,7 +7,7 @@ import java.sql.SQLException;
 import java.util.Map;
 
 public abstract class DomainObject {
-    public abstract Map<String, DomainObject> getLoadedMap();
+    public abstract Map<String, DomainObject> getIdentityMap();
     public abstract String getId();
 
     /**
@@ -20,9 +20,9 @@ public abstract class DomainObject {
      * Inserts the objects read into the LoadedMap
      * @param rs - ResultSet with the result of the DB
      */
-    public abstract void load(ResultSet rs);
+    public abstract DomainObject load(ResultSet rs);
 
-    public DomainObject find(String id){
+    public DomainObject find(String id) throws SQLException {
         /*SQLServerDataSource dc = new SQLServerDataSource();
         Config config = new Config();
         dc.setDatabaseName(config.DB_NAME);
@@ -30,20 +30,16 @@ public abstract class DomainObject {
         dc.setPassword(config.PASSWORD);
         dc.setServerName(config.SERVER_NAME);
         return dc.getConnection();*/
-        Connection con;
+        Connection con = null;
         /*con.setAutoCommit(false);
         if(con.getMetaData().supportsTransactionIsolationLevel(TRANSACTION_SERIALIZABLE))
             con.setTransactionIsolation(TRANSACTION_SERIALIZABLE);*/
 
-        DomainObject result = getLoadedMap().get(id);
+        DomainObject result = getIdentityMap().get(id);
         if(result != null) return result;
-        try{
-            PreparedStatement statement = con.prepareStatement(findStatement());
-            statement.setString(1, id);
+        PreparedStatement statement = con.prepareStatement(findStatement());
+        statement.setString(1, id);
 
-            load(statement.executeQuery());
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+        return load(statement.executeQuery());
     }
 }
