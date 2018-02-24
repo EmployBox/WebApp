@@ -1,4 +1,4 @@
-package pt.isel.ps.server.servlet;
+package servlet;
 
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;

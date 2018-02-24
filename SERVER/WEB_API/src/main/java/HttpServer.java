@@ -5,7 +5,7 @@ import org.eclipse.jetty.servlet.ServletHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import pt.isel.ps.server.servlet.ApiServlet;
+import servlet.ApiServlet;
 
 public class HttpServer {
 
