@@ -6,6 +6,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class UnitOfWork {
+    /**
+     * Private for each transaction
+     */
     private List<DomainObject> newObjects = new ArrayList<>();
     private List<DomainObject> clonedObjects = new ArrayList<>();
     private List<DomainObject> dirtyObjects = new ArrayList<>();
@@ -16,16 +19,16 @@ public class UnitOfWork {
      * @param obj
      */
     public void registerNew(DomainObject obj) {
-        assert obj.getId() != null;
+        assert obj.getIdentityKey() != null;
         assert !dirtyObjects.contains(obj);
         assert !removedObjects.contains(obj);
         assert !newObjects.contains(obj);
         newObjects.add(obj);
-        obj.getIdentityMap().put(obj.getId(), obj);
+        MapperRegistry.getMapper(obj).getIdentityMap().put(obj.getIdentityKey(), obj);
     }
 
     public void registerClone(DomainObject obj) {
-        assert obj.getId()!= null;
+        assert obj.getIdentityKey()!= null;
         assert !removedObjects.contains(obj);
         if(!clonedObjects.contains(obj) && !newObjects.contains(obj))
             clonedObjects.add(obj);
@@ -36,7 +39,7 @@ public class UnitOfWork {
      * @param obj
      */
     public void registerDirty(DomainObject obj){
-        assert obj.getId()!= null;
+        assert obj.getIdentityKey()!= null;
         assert !removedObjects.contains(obj);
         if(!dirtyObjects.contains(obj) && !newObjects.contains(obj))
             dirtyObjects.add(obj);
@@ -47,8 +50,8 @@ public class UnitOfWork {
      * @param obj
      */
     public void registerRemoved(DomainObject obj){
-        assert obj.getId()!= null;
-        obj.getIdentityMap().remove(obj.getId(), obj);
+        assert obj.getIdentityKey()!= null;
+        MapperRegistry.getMapper(obj).getIdentityMap().remove(obj.getIdentityKey(), obj);
         if(newObjects.remove(obj)) return;
         dirtyObjects.remove(obj);
         if(!removedObjects.contains(obj))
@@ -60,8 +63,8 @@ public class UnitOfWork {
      * @param obj
      */
     public void registerClean(DomainObject obj){
-        assert obj.getId()!= null;
-        obj.getIdentityMap().put(obj.getId(), obj);
+        assert obj.getIdentityKey()!= null;
+        MapperRegistry.getMapper(obj).getIdentityMap().put(obj.getIdentityKey(), obj);
     }
 
     private static ThreadLocal<UnitOfWork> current = new ThreadLocal<>();
@@ -90,19 +93,19 @@ public class UnitOfWork {
 
     private void insertNew() {
         for (DomainObject obj : newObjects) {
-            MapperRegistry.getMapper(obj.getClass()).insert(obj);
+            MapperRegistry.getMapper(obj).insert(obj);
         }
     }
 
     private void updateDirty() {
         for (DomainObject obj : newObjects) {
-            MapperRegistry.getMapper(obj.getClass()).update(obj);
+            MapperRegistry.getMapper(obj).update(obj);
         }
     }
 
     private void deleteRemoved() {
         for (DomainObject obj : newObjects) {
-            MapperRegistry.getMapper(obj.getClass()).delete(obj);
+            MapperRegistry.getMapper(obj).delete(obj);
         }
     }
 
@@ -113,15 +116,21 @@ public class UnitOfWork {
      */
     public void rollback(){
         for (DomainObject obj : newObjects)
-            obj.getIdentityMap().remove(obj.getId());
+            MapperRegistry.getMapper(obj).getIdentityMap().remove(obj.getIdentityKey());
 
         for(DomainObject obj : dirtyObjects){
-            DomainObject clone = clonedObjects.stream().filter(domainObject -> domainObject.getId().equals(obj.getId())).iterator().next();
-            obj.getIdentityMap().put(clone.getId(), clone);
+            clonedObjects
+                    .stream()
+                    .filter(domainObject -> domainObject.getIdentityKey().equals(obj.getIdentityKey()))
+                    .findFirst()
+                    .ifPresent(
+                            (clone) -> MapperRegistry.getMapper(obj).getIdentityMap().put(clone.getIdentityKey(), clone)
+                    );
+
         }
 
         for(DomainObject obj : removedObjects)
             if(!dirtyObjects.contains(obj))
-                obj.getIdentityMap().put(obj.getId(), obj);
+                MapperRegistry.getMapper(obj).getIdentityMap().put(obj.getIdentityKey(), obj);
     }
 }

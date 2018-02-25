@@ -6,6 +6,7 @@ public class Account extends DomainObject{
     private Double rate;
 
     private Account(String email, String password, Double rate){
+        super(email);
         this.email = email;
         this.password = password;
         this.rate = rate;
@@ -32,6 +33,7 @@ public class Account extends DomainObject{
     }
 
     public void setPassword(String password) {
+        markToBeDirty();
         this.password = password;
         markDirty();
     }
@@ -41,6 +43,7 @@ public class Account extends DomainObject{
     }
 
     public void setRate(Double rate) {
+        markToBeDirty();
         this.rate = rate;
         markDirty();
     }

@@ -2,13 +2,20 @@ package model;
 
 import dataMapper.UnitOfWork;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.Map;
-
 public abstract class DomainObject {
+
+    /**
+     * The key to find the object on the Identity Map
+     */
+    private final String identityKey;
+
+    public DomainObject(String identityKey) {
+        this.identityKey = identityKey;
+    }
+
+    public String getIdentityKey() {
+        return identityKey;
+    }
 
     /**
      * Always called when creating new object

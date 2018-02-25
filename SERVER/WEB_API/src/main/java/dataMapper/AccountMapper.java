@@ -13,7 +13,7 @@ public class AccountMapper extends AbstractMapper<Account> {
         super(identityMap);
     }
 
-    public Optional<Account> findByEmail(String email) throws SQLException {
+    public Optional<Account> findByEmail(String email) throws DataMapperException {
         return findByPK(email);
     }
 
@@ -23,15 +23,20 @@ public class AccountMapper extends AbstractMapper<Account> {
     }
 
     @Override
-    protected Optional<Account> load(ResultSet rs) throws SQLException {
-        if(rs.next()){
-            String email = rs.getString("Email");
-            String password = rs.getString("Password");
-            Double rate = rs.getDouble("Rate");
+    protected Optional<Account> load(ResultSet rs) throws DataMapperException {
+        try {
+            if(rs.next()){
+                String email = rs.getString("Email");
+                String password = rs.getString("Password");
+                Double rate = rs.getDouble("Rate");
 
-            Account account = Account.load(email, password, rate);
+                Account account = Account.load(email, password, rate);
+                getIdentityMap().put(email, account);
 
-            return Optional.of(account);
+                return Optional.of(account);
+            }
+        } catch (SQLException e) {
+            throw new DataMapperException(e.getMessage(), e);
         }
         return Optional.empty();
     }

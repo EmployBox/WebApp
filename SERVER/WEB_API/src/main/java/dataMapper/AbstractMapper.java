@@ -30,7 +30,7 @@ public abstract class AbstractMapper<T extends DomainObject> implements Mapper<T
      * Inserts the objects read into the LoadedMap
      * @param rs - ResultSet with the result of the DB
      */
-    protected abstract Optional<T> load(ResultSet rs) throws SQLException;
+    protected abstract Optional<T> load(ResultSet rs) throws DataMapperException;
 
     /**
      * Gets the object from Identity Map or queries the DB for it
@@ -38,7 +38,7 @@ public abstract class AbstractMapper<T extends DomainObject> implements Mapper<T
      * @return the object queried
      * @throws SQLException
      */
-    public Optional<T> findByPK(String primaryKey) throws SQLException {
+    public Optional<T> findByPK(String primaryKey) throws DataMapperException {
         T result = getIdentityMap().get(primaryKey);
         if(result != null) return Optional.of(result);
 
@@ -53,9 +53,15 @@ public abstract class AbstractMapper<T extends DomainObject> implements Mapper<T
         /*con.setAutoCommit(false);
         if(con.getMetaData().supportsTransactionIsolationLevel(TRANSACTION_SERIALIZABLE))
             con.setTransactionIsolation(TRANSACTION_SERIALIZABLE);*/
-        PreparedStatement statement = con.prepareStatement(findByPKStatement());
-        statement.setString(1, primaryKey);
+        PreparedStatement statement;
+        try {
+            statement = con.prepareStatement(findByPKStatement());
 
-        return load(statement.executeQuery());
+            statement.setString(1, primaryKey);
+
+            return load(statement.executeQuery());
+        } catch (SQLException e) {
+            throw new DataMapperException(e.getMessage(), e);
+        }
     }
 }
