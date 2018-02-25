@@ -2,8 +2,8 @@ package dataMapper;
 
 import model.DomainObject;
 
-public interface Mapper {
-    void insert(DomainObject obj);
-    void update(DomainObject obj);
-    void delete(DomainObject obj);
+public interface Mapper<T extends DomainObject> {
+    void insert(T obj);
+    void update(T obj);
+    void delete(T obj);
 }
