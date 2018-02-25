@@ -129,8 +129,13 @@ public class UnitOfWork {
 
         }
 
-        for(DomainObject obj : removedObjects)
+        removedObjects
+                .stream()
+                .filter(obj -> !dirtyObjects.contains(obj))
+                .forEach(obj -> MapperRegistry.getMapper(obj).getIdentityMap().put(obj.getIdentityKey(), obj));
+        /*for(DomainObject obj : removedObjects)
             if(!dirtyObjects.contains(obj))
                 MapperRegistry.getMapper(obj).getIdentityMap().put(obj.getIdentityKey(), obj);
+                */
     }
 }

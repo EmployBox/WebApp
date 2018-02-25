@@ -6,6 +6,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 public class AccountMapper extends AbstractMapper<Account> {
 
@@ -23,23 +24,35 @@ public class AccountMapper extends AbstractMapper<Account> {
     }
 
     @Override
-    protected Optional<Account> load(ResultSet rs) throws DataMapperException {
+    protected Account mapper(ResultSet rs) throws DataMapperException {
         try {
-            if(rs.next()){
-                String email = rs.getString("Email");
-                String password = rs.getString("Password");
-                Double rate = rs.getDouble("Rate");
+            String email = rs.getString("Email");
+            String password = rs.getString("Password");
+            Double rate = rs.getDouble("Rate");
 
-                Account account = Account.load(email, password, rate);
-                getIdentityMap().put(email, account);
+            Account account = Account.load(email, password, rate);
+            getIdentityMap().put(email, account);
 
-                return Optional.of(account);
-            }
+            return account;
         } catch (SQLException e) {
             throw new DataMapperException(e.getMessage(), e);
         }
-        return Optional.empty();
     }
+
+//    private Account load(ResultSet rs) throws DataMapperException {
+//        try {
+//                String email = rs.getString("Email");
+//                String password = rs.getString("Password");
+//                Double rate = rs.getDouble("Rate");
+//
+//                Account account = Account.load(email, password, rate);
+//                getIdentityMap().put(email, account);
+//
+//                return account;
+//        } catch (SQLException e) {
+//            throw new DataMapperException(e.getMessage(), e);
+//        }
+//    }
 
     @Override
     public void insert(Account obj) {
