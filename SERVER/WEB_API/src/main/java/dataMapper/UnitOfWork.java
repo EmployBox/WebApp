@@ -51,7 +51,6 @@ public class UnitOfWork {
      */
     public void registerRemoved(DomainObject obj){
         assert obj.getIdentityKey()!= null;
-        MapperRegistry.getMapper(obj).getIdentityMap().remove(obj.getIdentityKey(), obj);
         if(newObjects.remove(obj)) return;
         dirtyObjects.remove(obj);
         if(!removedObjects.contains(obj))
@@ -84,11 +83,22 @@ public class UnitOfWork {
         return current.get();
     }
 
-    //TODO check versions
     public void commit() {
-        insertNew();
-        updateDirty();
-        deleteRemoved();
+        try {
+            updateVersionsOfDityObjects();
+            insertNew();
+            deleteRemoved();
+            updateDirty();
+        } catch (ConcurrencyException e) {
+            rollback();
+            throw e;
+        }
+    }
+
+    private void updateVersionsOfDityObjects() {
+        for(DomainObject obj : dirtyObjects){
+            obj.updateVersion();
+        }
     }
 
     private void insertNew() {

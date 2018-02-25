@@ -1,27 +1,33 @@
 package model;
 
 public class Account extends DomainObject{
+    private final long accountID;
     private final String email;
     private String password;
     private Double rate;
 
-    private Account(String email, String password, Double rate){
-        super(email);
+    private Account(long accountID, String email, String password, Double rate, long version){
+        super(email, version);
+        this.accountID = accountID;
         this.email = email;
         this.password = password;
         this.rate = rate;
     }
 
-    public static Account create(String email, String password, Double rate){
-        Account account = new Account(email, password, rate);
+    public static Account create(long accountID, String email, String password, Double rate){
+        Account account = new Account(accountID, email, password, rate, 0);
         account.markNew();
         return account;
     }
 
-    public static Account load(String email, String password, Double rate){
-        Account account = new Account(email, password, rate);
+    public static Account load(long accountID, String email, String password, Double rate, long version){
+        Account account = new Account(accountID, email, password, rate, version);
         account.markClean();
         return account;
+    }
+
+    public long getAccountID() {
+        return accountID;
     }
 
     public String getEmail() {

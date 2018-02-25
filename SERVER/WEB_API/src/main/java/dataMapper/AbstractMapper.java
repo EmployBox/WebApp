@@ -10,15 +10,16 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Spliterator;
 import java.util.Spliterators;
+import java.util.concurrent.ConcurrentMap;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 public abstract class AbstractMapper<T extends DomainObject> implements Mapper<T> {
-    private final Map<String, T> identityMap;
+    private final ConcurrentMap<String, T> identityMap;
 
-    public AbstractMapper(Map<String, T> identityMap) {
+    public AbstractMapper(ConcurrentMap<String, T> identityMap) {
         this.identityMap = identityMap;
     }
 
@@ -31,7 +32,15 @@ public abstract class AbstractMapper<T extends DomainObject> implements Mapper<T
      * @return select query of the DomainObject
      */
     protected abstract String findByPKStatement();
+
+    /**
+     * Converts the current row from result set into an object
+     * @param set
+     * @return DomainObject
+     * @throws DataMapperException
+     */
     protected abstract T mapper(ResultSet set) throws DataMapperException;
+
     /**
      * Inserts the objects read into the LoadedMap
      * @param rs - ResultSet with the result of the DB
