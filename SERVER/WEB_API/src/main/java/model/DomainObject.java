@@ -8,13 +8,23 @@ public abstract class DomainObject {
      * The key to find the object on the Identity Map
      */
     private final String identityKey;
+    private long version;
 
-    public DomainObject(String identityKey) {
+    public DomainObject(String identityKey, long version) {
         this.identityKey = identityKey;
+        this.version = version;
     }
 
     public String getIdentityKey() {
         return identityKey;
+    }
+
+    public long getVersion() {
+        return version;
+    }
+
+    public long updateVersion(){
+        return ++version;
     }
 
     /**
