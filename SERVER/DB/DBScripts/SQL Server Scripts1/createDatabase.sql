@@ -1,5 +1,4 @@
 
-
 IF DB_ID ('PS_API_DATABASE') IS NULL
 	CREATE DATABASE PS_API_DATABASE;
 GO
@@ -25,7 +24,7 @@ CREATE TABLE ApiDatabase.Account (
 CREATE TABLE ApiDatabase.Account_version(
 	accountId BIGINT IDENTITY PRIMARY KEY references ApiDatabase.Account,
 	[version] BIGINT default(0) 
-	CONSTRAINT version_minimun check([version] >= 0)
+	CONSTRAINT version_minimun_account check([version] >= 0)
 )
 
 CREATE TABLE ApiDatabase.Company (
@@ -100,8 +99,9 @@ CREATE TABLE ApiDatabase.Job(
 
 CREATE TABLE ApiDatabase.Job_version(
 	jobId BIGINT references ApiDatabase.Job,
-	[version] BIGINT default(0) CONSTRAINT version_minimun
+	[version] BIGINT default(0)
 
+	CONSTRAINT version_minimun_job check([version] >= 0)
 )
 
 CREATE TABLE Apidatabase.Experience(
@@ -115,6 +115,23 @@ CREATE TABLE Apidatabase.Experience(
 	foreign key(userId,curriculumId) references ApiDatabase.Curriculum,
 	foreign key(jobId) references ApiDatabase.Job
 )
+
+CREATE TABLE Apidatabase.Curriculum_Experience(
+	accountId BIGINT,
+	curriculumId BIGINT,
+	experienceId BIGINT references ApiDatabase.Experience,
+
+	foreign key(accountId,curriculumId) references ApiDatabase.Curriculum,
+	primary key(accountId, curriculumId, experienceId)
+)
+
+CREATE TABLE Apidatabase.Job_Experience(
+	jobId BIGINT references ApiDatabase.Job,
+	experienceId BIGINT references ApiDatabase.Experience
+
+	primary key(jobId, experienceId)
+)
+
 
 CREATE TABLE ApiDatabase.Rating(
 	AccountIdFrom BIGINT references ApiDatabase.Account,
@@ -134,7 +151,8 @@ CREATE TABLE ApiDatabase.Chat(
 CREATE TABLE ApiDatabase.Chat_version(
 	curriculumId BIGINT PRIMARY KEY references ApiDatabase.Chat,
 	[version] BIGINT default(0) 
-	CONSTRAINT version_minimun check([version] >= 0)
+
+	CONSTRAINT version_minimun_chat check([version] >= 0)
 )
 
 CREATE TABLE ApiDatabase.[MESSAGE](
