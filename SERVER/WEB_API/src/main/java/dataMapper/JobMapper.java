@@ -1,11 +1,11 @@
 package dataMapper;
 
+import model.Experience;
 import model.Job;
 
-import java.sql.Date;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.concurrent.ConcurrentMap;
+import java.util.stream.Stream;
 
 public class JobMapper extends AbstractMapper<Job> {
     private final String SELECT_QUERY = "SELECT JobID, AccountID, Wage, Description, Schedule, OfferBeginDate, OfferEndDate, OfferType, Version FROM Job WHERE JobID = ?";
@@ -13,13 +13,24 @@ public class JobMapper extends AbstractMapper<Job> {
     private final String UPDATE_QUERY = "UPDATE Job SET Wage = ?, Description = ?, Schedule = ?, OfferBeginDate = ?, OfferEndDate = ?, OfferType = ?, Version = ? WHERE JobID = ? AND Version = ?";
     private final String DELETE_QUERY = "DELETE FROM Job WHERE JobID = ? AND Version = ?";
 
-    public JobMapper(ConcurrentMap<Object, Job> identityMap) {
-        super(identityMap);
-    }
-
     @Override
     protected String findByPKStatement() {
         return SELECT_QUERY;
+    }
+
+    //TODO finish this
+    public Stream<Experience> findExperiences(Job job){
+        Connection con = null;
+        PreparedStatement statement;
+        try {
+            statement = con.prepareStatement("SELECT experienceId FROM JobExperience WHERE jobId = ?");
+
+            statement.setLong(1, (Long) job.getIdentityKey());
+
+            stream(statement.executeQuery(), resultSet -> resultSet.getLong("experienceId"));
+        } catch (SQLException e) {
+            throw new DataMapperException(e.getMessage(), e);
+        }
     }
 
     @Override
@@ -36,7 +47,7 @@ public class JobMapper extends AbstractMapper<Job> {
             long version = rs.getLong("Version");
 
             Job job = Job.load(jobID, accountID, wage, description, schedule, offerBeginDate, offerEndDate, offerType, version);
-            getIdentityMap().put("" + jobID, job);
+            getIdentityMap().put(jobID, job);
 
             return job;
         } catch (SQLException e) {

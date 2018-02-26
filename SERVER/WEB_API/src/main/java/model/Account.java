@@ -4,24 +4,24 @@ public class Account extends DomainObject{
     private final long accountID;
     private final String email;
     private String password;
-    private Double rate;
+    private double rating;
 
-    private Account(long accountID, String email, String password, Double rate, long version){
+    private Account(long accountID, String email, String password, double rating, long version){
         super(accountID, version);
         this.accountID = accountID;
         this.email = email;
         this.password = password;
-        this.rate = rate;
+        this.rating = rating;
     }
 
-    public static Account create(long accountID, String email, String password, Double rate){
-        Account account = new Account(accountID, email, password, rate, 0);
+    public static Account create(long accountID, String email, String password, double rating){
+        Account account = new Account(accountID, email, password, rating, 0);
         account.markNew();
         return account;
     }
 
-    public static Account load(long accountID, String email, String password, Double rate, long version){
-        Account account = new Account(accountID, email, password, rate, version);
+    public static Account load(long accountID, String email, String password, double rating, long version){
+        Account account = new Account(accountID, email, password, rating, version);
         account.markClean();
         return account;
     }
@@ -44,13 +44,13 @@ public class Account extends DomainObject{
         markDirty();
     }
 
-    public Double getRate() {
-        return rate;
+    public double getRating() {
+        return rating;
     }
 
-    public void setRate(Double rate) {
+    public void setRating(double rating) {
         markToBeDirty();
-        this.rate = rate;
+        this.rating = rating;
         markDirty();
     }
 }

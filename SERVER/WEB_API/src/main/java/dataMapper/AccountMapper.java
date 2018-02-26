@@ -2,22 +2,15 @@ package dataMapper;
 
 import model.Account;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Optional;
-import java.util.concurrent.ConcurrentMap;
 
 public class AccountMapper extends AbstractMapper<Account> {
     private final String SELECT_QUERY = "SELECT AccountID, Email, Password, Rating FROM Account WHERE AccountID = ?";
     private final String INSERT_QUERY = "INSERT INTO Account (Email, Password, Rating, Version) VALUES (?, ?, ?, ?)";
     private final String UPDATE_QUERY = "UPDATE Account SET Password = ?, Rating = ?, Version = ? WHERE AccountID = ? AND Version = ?";
     private final String DELETE_QUERY = "DELETE FROM Account WHERE AccountID = ? AND Version = ?";
-
-    public AccountMapper(ConcurrentMap<Object, Account> identityMap) {
-        super(identityMap);
-    }
 
     public Optional<Account> findByEmail(String email) throws DataMapperException {
         return findByPK(email);
@@ -70,7 +63,7 @@ public class AccountMapper extends AbstractMapper<Account> {
                     try {
                         stmt.setString(1, obj.getEmail());
                         stmt.setString(2, obj.getPassword());
-                        stmt.setDouble(3, obj.getRate());
+                        stmt.setDouble(3, obj.getRating());
                         stmt.setLong(4, obj.getVersion());
                     } catch (SQLException e) {
                        sqlException = e;
@@ -89,7 +82,7 @@ public class AccountMapper extends AbstractMapper<Account> {
                     SQLException sqlException = null;
                     try{
                         stmt.setString(1, obj.getPassword());
-                        stmt.setDouble(2, obj.getRate());
+                        stmt.setDouble(2, obj.getRating());
                         stmt.setLong(3, obj.getVersion());
                         stmt.setLong(4, obj.getAccountID());
                         stmt.setLong(5, obj.getVersion()-1);

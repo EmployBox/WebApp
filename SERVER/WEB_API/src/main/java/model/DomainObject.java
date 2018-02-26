@@ -15,6 +15,10 @@ public abstract class DomainObject {
         this.version = version;
     }
 
+    public DomainObject(Object identityKey){
+        this.identityKey = identityKey;
+    }
+
     public Object getIdentityKey() {
         return identityKey;
     }
