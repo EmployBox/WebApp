@@ -2,10 +2,7 @@ package dataMapper;
 
 import model.DomainObject;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Spliterator;
@@ -17,13 +14,13 @@ import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 public abstract class AbstractMapper<T extends DomainObject> implements Mapper<T> {
-    private final ConcurrentMap<String, T> identityMap;
+    private final ConcurrentMap<Object, T> identityMap;
 
-    public AbstractMapper(ConcurrentMap<String, T> identityMap) {
+    public AbstractMapper(ConcurrentMap<Object, T> identityMap) {
         this.identityMap = identityMap;
     }
 
-    public Map<String, T> getIdentityMap() {
+    public Map<Object, T> getIdentityMap() {
         return identityMap;
     }
 
@@ -35,11 +32,11 @@ public abstract class AbstractMapper<T extends DomainObject> implements Mapper<T
 
     /**
      * Converts the current row from result set into an object
-     * @param set
+     * @param rs
      * @return DomainObject
      * @throws DataMapperException
      */
-    protected abstract T mapper(ResultSet set) throws DataMapperException;
+    protected abstract T mapper(ResultSet rs) throws DataMapperException;
 
     /**
      * Inserts the objects read into the LoadedMap
@@ -91,6 +88,28 @@ public abstract class AbstractMapper<T extends DomainObject> implements Mapper<T
             return stream(statement.executeQuery(), this::mapper).findFirst();
         } catch (SQLException e) {
             throw new DataMapperException(e.getMessage(), e);
+        }
+    }
+
+    protected void DBHelper(String query, Function<PreparedStatement, SQLException> prepareStatement, Runnable handleIdentityMap){
+        Connection conn = null;
+        PreparedStatement stmt;
+        try {
+            //conn = ConnectionManager.INSTANCE.getConnection();
+            stmt = conn.prepareStatement(query);
+
+            SQLException exception = prepareStatement.apply(stmt);
+            if(exception != null) throw exception;
+
+            int rowCount = stmt.executeUpdate();
+            if (rowCount == 0) {
+                throw new ConcurrencyException("Concurrency problem found");
+            }
+            else {
+                handleIdentityMap.run();
+            }
+        } catch (SQLException e) {
+            throw new DataMapperException("unexpected error", e);
         }
     }
 }

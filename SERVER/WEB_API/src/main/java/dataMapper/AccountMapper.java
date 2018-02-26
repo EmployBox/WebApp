@@ -10,8 +10,12 @@ import java.util.Optional;
 import java.util.concurrent.ConcurrentMap;
 
 public class AccountMapper extends AbstractMapper<Account> {
+    private final String SELECT_QUERY = "SELECT AccountID, Email, Password, Rating FROM Account WHERE AccountID = ?";
+    private final String INSERT_QUERY = "INSERT INTO Account (Email, Password, Rating, Version) VALUES (?, ?, ?, ?)";
+    private final String UPDATE_QUERY = "UPDATE Account SET Password = ?, Rating = ?, Version = ? WHERE AccountID = ? AND Version = ?";
+    private final String DELETE_QUERY = "DELETE FROM Account WHERE AccountID = ? AND Version = ?";
 
-    public AccountMapper(ConcurrentMap<String, Account> identityMap) {
+    public AccountMapper(ConcurrentMap<Object, Account> identityMap) {
         super(identityMap);
     }
 
@@ -21,7 +25,7 @@ public class AccountMapper extends AbstractMapper<Account> {
 
     @Override
     protected String findByPKStatement() {
-        return "SELECT AccountID, Email, Password, Rating FROM Account WHERE AccountID = ?";
+        return SELECT_QUERY;
     }
 
     @Override
@@ -58,71 +62,61 @@ public class AccountMapper extends AbstractMapper<Account> {
 //    }
 
     @Override
-    public void insert(Account obj) throws DataMapperException {
-        Connection conn = null;
-        PreparedStatement stmt;
-        try {
-            //conn = ConnectionManager.INSTANCE.getConnection();
-            stmt = conn.prepareStatement("INSERT INTO Account (Email, Password, Rating, Version)\n" +
-                    "VALUES (?, ?, ?, ?)");
-            stmt.setString(1, obj.getEmail());
-            stmt.setString(2, obj.getPassword());
-            stmt.setDouble(3, obj.getRate());
-            stmt.setLong(4, obj.getVersion());
-            int rowCount = stmt.executeUpdate();
-            if (rowCount == 0) {
-                throw new ConcurrencyException("Concurrency on deleting the Account with Email being " + obj.getEmail());
-            }
-            else {
-                getIdentityMap().put(obj.getIdentityKey(), obj);
-            }
-        } catch (SQLException e) {
-            throw new DataMapperException("unexpected error inserting", e);
-        }
+    public void insert(Account obj) {
+        DBHelper(
+                INSERT_QUERY,
+                stmt -> {
+                    SQLException sqlException = null;
+                    try {
+                        stmt.setString(1, obj.getEmail());
+                        stmt.setString(2, obj.getPassword());
+                        stmt.setDouble(3, obj.getRate());
+                        stmt.setLong(4, obj.getVersion());
+                    } catch (SQLException e) {
+                       sqlException = e;
+                    }
+                    return sqlException;
+                },
+                () -> getIdentityMap().put(obj.getIdentityKey(), obj)
+        );
     }
 
     @Override
-    public void update(Account obj) throws DataMapperException, ConcurrencyException{
-        Connection conn = null;
-        PreparedStatement stmt;
-        try {
-            //conn = ConnectionManager.INSTANCE.getConnection();
-            stmt = conn.prepareStatement("UPDATE Account SET password = ?, Rating = ?, Version = ? where AccountID = ? AND Version = ?");
-            stmt.setString(1, obj.getPassword());
-            stmt.setDouble(2, obj.getRate());
-            stmt.setLong(3, obj.getVersion());
-            stmt.setLong(4, obj.getAccountID());
-            stmt.setLong(5, obj.getVersion()-1);
-            int rowCount = stmt.executeUpdate();
-            if (rowCount == 0) {
-                throw new ConcurrencyException("Concurrency on deleting the Account with Email being " + obj.getEmail());
-            }
-            else {
-                getIdentityMap().put(obj.getIdentityKey(), obj);
-            }
-        } catch (SQLException e) {
-            throw new DataMapperException("unexpected error updating", e);
-        }
+    public void update(Account obj) {
+        DBHelper(
+                UPDATE_QUERY,
+                stmt -> {
+                    SQLException sqlException = null;
+                    try{
+                        stmt.setString(1, obj.getPassword());
+                        stmt.setDouble(2, obj.getRate());
+                        stmt.setLong(3, obj.getVersion());
+                        stmt.setLong(4, obj.getAccountID());
+                        stmt.setLong(5, obj.getVersion()-1);
+                    }catch (SQLException e){
+                        sqlException = e;
+                    }
+                    return sqlException;
+                },
+                () -> getIdentityMap().put(obj.getIdentityKey(), obj)
+        );
     }
 
     @Override
-    public void delete(Account obj) throws DataMapperException, ConcurrencyException{
-        Connection conn = null;
-        PreparedStatement stmt;
-        try {
-            //conn = ConnectionManager.INSTANCE.getConnection();
-            stmt = conn.prepareStatement("DELETE FROM Account where Email = ? AND Version = ?");
-            stmt.setString(1, obj.getEmail());
-            stmt.setLong(2, obj.getVersion());
-            int rowCount = stmt.executeUpdate();
-            if (rowCount == 0) {
-                throw new ConcurrencyException("Concurrency on deleting the Account with Email being " + obj.getEmail());
-            }
-            else {
-                getIdentityMap().remove(obj.getIdentityKey());
-            }
-        } catch (SQLException e) {
-            throw new DataMapperException("unexpected error deleting", e);
-        }
+    public void delete(Account obj) {
+        DBHelper(
+                DELETE_QUERY,
+                stmt -> {
+                    SQLException sqlException = null;
+                    try{
+                        stmt.setLong(1, obj.getAccountID());
+                        stmt.setLong(2, obj.getVersion());
+                    } catch (SQLException e) {
+                        sqlException = e;
+                    }
+                    return sqlException;
+                },
+                () -> getIdentityMap().remove(obj.getIdentityKey())
+        );
     }
 }

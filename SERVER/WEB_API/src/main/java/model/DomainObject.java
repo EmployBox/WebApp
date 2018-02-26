@@ -7,15 +7,15 @@ public abstract class DomainObject {
     /**
      * The key to find the object on the Identity Map
      */
-    private final String identityKey;
+    private final Object identityKey;
     private long version;
 
-    public DomainObject(String identityKey, long version) {
+    public DomainObject(Object identityKey, long version) {
         this.identityKey = identityKey;
         this.version = version;
     }
 
-    public String getIdentityKey() {
+    public Object getIdentityKey() {
         return identityKey;
     }
 
