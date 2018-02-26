@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Spliterator;
 import java.util.Spliterators;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -14,11 +15,7 @@ import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 public abstract class AbstractMapper<T extends DomainObject> implements Mapper<T> {
-    private final ConcurrentMap<Object, T> identityMap;
-
-    public AbstractMapper(ConcurrentMap<Object, T> identityMap) {
-        this.identityMap = identityMap;
-    }
+    private final ConcurrentMap<Object, T> identityMap = new ConcurrentHashMap<>();
 
     public Map<Object, T> getIdentityMap() {
         return identityMap;
@@ -42,7 +39,7 @@ public abstract class AbstractMapper<T extends DomainObject> implements Mapper<T
      * Inserts the objects read into the LoadedMap
      * @param rs - ResultSet with the result of the DB
      */
-    private Stream<T> stream(ResultSet rs, Function<ResultSet, T> func) throws DataMapperException{
+    protected Stream<T> stream(ResultSet rs, Function<ResultSet, T> func) throws DataMapperException{
         return StreamSupport.stream(new Spliterators.AbstractSpliterator<T>(
                 Long.MAX_VALUE, Spliterator.ORDERED) {
             @Override
