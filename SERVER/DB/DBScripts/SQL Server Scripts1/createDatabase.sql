@@ -12,7 +12,6 @@ GO
 USE PS_API_DATABASE
 GO
 
-
 CREATE TABLE ApiDatabase.Account (
 	accountId BIGINT IDENTITY PRIMARY KEY,
 	email NVARCHAR UNIQUE NOT NULL,
@@ -21,6 +20,12 @@ CREATE TABLE ApiDatabase.Account (
 	salt UNIQUEIDENTIFIER NOT NULL,
 
 	CONSTRAINT rate_const CHECK (rating >= 0.0 AND rating <= 5.0)
+)
+
+CREATE TABLE ApiDatabase.Account_version(
+	accountId BIGINT IDENTITY PRIMARY KEY references ApiDatabase.Account,
+	[version] BIGINT default(0) 
+	CONSTRAINT version_minimun check([version] >= 0)
 )
 
 CREATE TABLE ApiDatabase.Company (
@@ -54,17 +59,17 @@ CREATE TABLE ApiDatabase.AcademicBackground(
 	endDate DATETIME,
 	studyArea NVARCHAR(40),
 	institution NVARCHAR(40),
-	degree NVARCHAR(10),
+	degreeObtained NVARCHAR(10),
 
 	FOREIGN KEY(userId,curriculumId) REFERENCES ApiDatabase.Curriculum,
 	CONSTRAINT endDate_check check (endDate < beginDate),
-	CONSTRAINT degree check (degree = 'basic level 1' 
-						OR degree = 'basic level 2' 
-						OR degree = 'basic level 3'
-						OR degree = 'secundary'
-						OR degree = 'bachelor'
-						OR degree = 'master'
-						OR degree = 'PHD')
+	CONSTRAINT degree check (degreeObtained = 'basic level 1' 
+						OR degreeObtained = 'basic level 2' 
+						OR degreeObtained = 'basic level 3'
+						OR degreeObtained = 'secundary'
+						OR degreeObtained = 'bachelor'
+						OR degreeObtained = 'master'
+						OR degreeObtained = 'PHD')
 )
 
 CREATE TABLE Apidatabase.PreviousJobs(
@@ -84,10 +89,19 @@ CREATE TABLE ApiDatabase.Job(
 	accountId BIGINT references ApiDatabase.Account,
 	userId BIGINT references ApiDatabase.[User],
 	schedule NVARCHAR(20),
-	wage SMALLINT check(wage > 0),
+	wage INT check(wage > 0),
 	[description] NVARCHAR(50),
 	offerBeginDate DATETIME DEFAULT(GETDATE()),
-	offerEndDate DATETIME NOT NULL
+	offerEndDate DATETIME NOT NULL,
+	offerType NVARCHAR(30)
+
+	CONSTRAINT offerTypes check(offerType = 'Looking for work' OR offerType = 'Looking for Worker')
+)
+
+CREATE TABLE ApiDatabase.Job_version(
+	jobId BIGINT references ApiDatabase.Job,
+	[version] BIGINT default(0) CONSTRAINT version_minimun
+
 )
 
 CREATE TABLE Apidatabase.Experience(
@@ -96,7 +110,7 @@ CREATE TABLE Apidatabase.Experience(
 	curriculumId BIGINT,
 	jobId BIGINT,
 	years SMALLINT,
-	Competences NVARCHAR(200)
+	Competences NVARCHAR(200),
 
 	foreign key(userId,curriculumId) references ApiDatabase.Curriculum,
 	foreign key(jobId) references ApiDatabase.Job
@@ -117,8 +131,40 @@ CREATE TABLE ApiDatabase.Chat(
 	AccountIdSecond BIGINT references ApiDatabase.Account,
 )
 
+CREATE TABLE ApiDatabase.Chat_version(
+	curriculumId BIGINT PRIMARY KEY references ApiDatabase.Chat,
+	[version] BIGINT default(0) 
+	CONSTRAINT version_minimun check([version] >= 0)
+)
+
 CREATE TABLE ApiDatabase.[MESSAGE](
 	chatId BIGINT REFERENCES ApiDatabase.Chat,
 	[text] NVARCHAR(200),
-	data datetime default(getdate()),
+	[date] datetime default(getdate()),
+)
+
+CREATE TABLE ApiDatabase.[Local] (
+	latitude DECIMAL(9,6),
+	longitude DECIMAL(9,6),
+	Country NVARCHAR(15),
+	Street NVARCHAR(40),
+	ZIPCode NVARCHAR(40)
+
+	primary key( latitude, longitude )
+)
+
+CREATE TABLE ApiDatabase.Comment (
+	CommentId BIGINT identity primary key,
+	AccountIdFrom BIGINT references ApiDatabase.Account,
+	AccountIdDest BIGINT references ApiDatabase.Account,
+	[date] DATETIME default(getdate()),
+	[text] NVARCHAR(300),
+	MainCommentId BIGINT REFERENCES ApiDatabase.Comment
+)
+
+CREATE TABLE ApiDatabase.Follows (
+	AccountIdFrom BIGINT references ApiDatabase.Account,
+	AccountIdDest BIGINT references ApiDatabase.Account,
+
+	primary key (AccountIdFrom,AccountIdDest)
 )

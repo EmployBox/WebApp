@@ -1,5 +1,5 @@
 GO
-USE 'PS_API_DATABASE'
+USE PS_API_DATABASE
 GO
 
 CREATE PROCEDURE dbo.AddAccount
@@ -16,8 +16,8 @@ BEGIN
     DECLARE @salt UNIQUEIDENTIFIER=NEWID()
     BEGIN TRY
 
-        INSERT INTO dbo.[Account] (accountId,email, rating, passwordHash, salt)
-        VALUES(@pLogin, HASHBYTES('SHA2_512', @password+CAST(@salt AS NVARCHAR(36))), @salt)
+        INSERT INTO ApiDatabase.Account (accountId,email, rating, passwordHash, salt)
+        VALUES(@accountId, HASHBYTES('SHA2_512', @password+CAST(@salt AS NVARCHAR(36))), @salt)
 
        SET @responseMessage='Success'
 
