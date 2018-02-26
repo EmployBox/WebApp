@@ -83,21 +83,15 @@ public class UnitOfWork {
         return current.get();
     }
 
+    //TODO does it catch the concurrentyException?
     public void commit() {
         try {
-            updateVersionsOfDityObjects();
             insertNew();
-            deleteRemoved();
             updateDirty();
+            deleteRemoved();
         } catch (ConcurrencyException e) {
             rollback();
             throw e;
-        }
-    }
-
-    private void updateVersionsOfDityObjects() {
-        for(DomainObject obj : dirtyObjects){
-            obj.updateVersion();
         }
     }
 
@@ -108,13 +102,21 @@ public class UnitOfWork {
     }
 
     private void updateDirty() {
-        for (DomainObject obj : newObjects) {
+        /*for (DomainObject obj : dirtyObjects) {
+            obj.updateVersion();
             MapperRegistry.getMapper(obj).update(obj);
-        }
+        }*/
+        dirtyObjects
+                .stream()
+                .filter(domainObject -> !removedObjects.contains(domainObject))
+                .forEach(domainObject -> {
+                    domainObject.updateVersion();
+                    MapperRegistry.getMapper(domainObject).update(domainObject);
+                });
     }
 
     private void deleteRemoved() {
-        for (DomainObject obj : newObjects) {
+        for (DomainObject obj : removedObjects) {
             MapperRegistry.getMapper(obj).delete(obj);
         }
     }
@@ -124,7 +126,7 @@ public class UnitOfWork {
      * Puts the objects in removedObjects into the IdentityMap
      * The objects in dirtyObjects need to go back as before
      */
-    public void rollback(){
+    private void rollback(){
         for (DomainObject obj : newObjects)
             MapperRegistry.getMapper(obj).getIdentityMap().remove(obj.getIdentityKey());
 

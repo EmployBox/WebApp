@@ -2,10 +2,7 @@ package dataMapper;
 
 import model.DomainObject;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Spliterator;
@@ -91,6 +88,28 @@ public abstract class AbstractMapper<T extends DomainObject> implements Mapper<T
             return stream(statement.executeQuery(), this::mapper).findFirst();
         } catch (SQLException e) {
             throw new DataMapperException(e.getMessage(), e);
+        }
+    }
+
+    protected void DBHelper(String query, Function<PreparedStatement, SQLException> prepareStatement, Runnable handleIdentityMap){
+        Connection conn = null;
+        PreparedStatement stmt;
+        try {
+            //conn = ConnectionManager.INSTANCE.getConnection();
+            stmt = conn.prepareStatement(query);
+
+            SQLException exception = prepareStatement.apply(stmt);
+            if(exception != null) throw exception;
+
+            int rowCount = stmt.executeUpdate();
+            if (rowCount == 0) {
+                throw new ConcurrencyException("Concurrency problem found");
+            }
+            else {
+                handleIdentityMap.run();
+            }
+        } catch (SQLException e) {
+            throw new DataMapperException("unexpected error", e);
         }
     }
 }
