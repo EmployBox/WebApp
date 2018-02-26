@@ -14,13 +14,13 @@ import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 public abstract class AbstractMapper<T extends DomainObject> implements Mapper<T> {
-    private final ConcurrentMap<String, T> identityMap;
+    private final ConcurrentMap<Object, T> identityMap;
 
-    public AbstractMapper(ConcurrentMap<String, T> identityMap) {
+    public AbstractMapper(ConcurrentMap<Object, T> identityMap) {
         this.identityMap = identityMap;
     }
 
-    public Map<String, T> getIdentityMap() {
+    public Map<Object, T> getIdentityMap() {
         return identityMap;
     }
 
@@ -32,11 +32,11 @@ public abstract class AbstractMapper<T extends DomainObject> implements Mapper<T
 
     /**
      * Converts the current row from result set into an object
-     * @param set
+     * @param rs
      * @return DomainObject
      * @throws DataMapperException
      */
-    protected abstract T mapper(ResultSet set) throws DataMapperException;
+    protected abstract T mapper(ResultSet rs) throws DataMapperException;
 
     /**
      * Inserts the objects read into the LoadedMap

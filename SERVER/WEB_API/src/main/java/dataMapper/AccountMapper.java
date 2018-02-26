@@ -11,11 +11,11 @@ import java.util.concurrent.ConcurrentMap;
 
 public class AccountMapper extends AbstractMapper<Account> {
     private final String SELECT_QUERY = "SELECT AccountID, Email, Password, Rating FROM Account WHERE AccountID = ?";
-    private final String UPDATE_QUERY = "UPDATE Account SET password = ?, Rating = ?, Version = ? where AccountID = ? AND Version = ?";
     private final String INSERT_QUERY = "INSERT INTO Account (Email, Password, Rating, Version) VALUES (?, ?, ?, ?)";
-    private final String DELETE_QUERY = "DELETE FROM Account where AccountID = ? AND Version = ?";
+    private final String UPDATE_QUERY = "UPDATE Account SET Password = ?, Rating = ?, Version = ? WHERE AccountID = ? AND Version = ?";
+    private final String DELETE_QUERY = "DELETE FROM Account WHERE AccountID = ? AND Version = ?";
 
-    public AccountMapper(ConcurrentMap<String, Account> identityMap) {
+    public AccountMapper(ConcurrentMap<Object, Account> identityMap) {
         super(identityMap);
     }
 

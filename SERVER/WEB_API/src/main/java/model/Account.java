@@ -7,7 +7,7 @@ public class Account extends DomainObject{
     private Double rate;
 
     private Account(long accountID, String email, String password, Double rate, long version){
-        super(email, version);
+        super(accountID, version);
         this.accountID = accountID;
         this.email = email;
         this.password = password;
