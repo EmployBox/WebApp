@@ -3,7 +3,19 @@
   <Items>
     <LogicalFolder Name="Connections" Type="2" Sorted="true">
       <Items>
-        <ConnectionNode Name="NEO\SQLEXPRESS:Neo\MATRIX">
+        <ConnectionNode Name="(local):ASUS-JOAO\JonyM">
+          <Created>2018-02-27T17:04:08.5548379+00:00</Created>
+          <Type>SQL</Type>
+          <Server>(local)</Server>
+          <UserName />
+          <Authentication>Windows Authentication</Authentication>
+          <InitialDB />
+          <LoginTimeout>15</LoginTimeout>
+          <ExecutionTimeout>0</ExecutionTimeout>
+          <ConnectionProtocol>NotSpecified</ConnectionProtocol>
+          <ApplicationName>Microsoft SQL Server Management Studio - Query</ApplicationName>
+        </ConnectionNode>
+        <ConnectionNode Name="NEO\SQLEXPRESS:ASUS-JOAO\JonyM">
           <Created>2018-02-25T19:31:47.0818784+00:00</Created>
           <Type>SQL</Type>
           <Server>NEO\SQLEXPRESS</Server>
@@ -20,10 +32,22 @@
     <LogicalFolder Name="Queries" Type="0" Sorted="true">
       <Items>
         <FileNode Name="createDatabase.sql">
-          <AssociatedConnectionMoniker>8c91a03d-f9b4-46c0-a305-b5dcc79ff907:NEO\SQLEXPRESS:True</AssociatedConnectionMoniker>
-          <AssociatedConnSrvName>NEO\SQLEXPRESS</AssociatedConnSrvName>
+          <AssociatedConnectionMoniker>8c91a03d-f9b4-46c0-a305-b5dcc79ff907:(local):True</AssociatedConnectionMoniker>
+          <AssociatedConnSrvName>(local)</AssociatedConnSrvName>
           <AssociatedConnUserName />
           <FullPath>createDatabase.sql</FullPath>
+        </FileNode>
+        <FileNode Name="dropDatabase.sql">
+          <AssociatedConnectionMoniker>8c91a03d-f9b4-46c0-a305-b5dcc79ff907:(local):True</AssociatedConnectionMoniker>
+          <AssociatedConnSrvName>(local)</AssociatedConnSrvName>
+          <AssociatedConnUserName />
+          <FullPath>dropDatabase.sql</FullPath>
+        </FileNode>
+        <FileNode Name="procedures.sql">
+          <AssociatedConnectionMoniker>8c91a03d-f9b4-46c0-a305-b5dcc79ff907:(local):True</AssociatedConnectionMoniker>
+          <AssociatedConnSrvName>(local)</AssociatedConnSrvName>
+          <AssociatedConnUserName />
+          <FullPath>procedures.sql</FullPath>
         </FileNode>
       </Items>
     </LogicalFolder>

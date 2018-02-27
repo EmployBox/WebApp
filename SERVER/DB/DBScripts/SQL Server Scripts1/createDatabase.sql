@@ -105,15 +105,9 @@ CREATE TABLE ApiDatabase.Job_version(
 )
 
 CREATE TABLE Apidatabase.Experience(
-	experienceId BIGINT IDENTITY PRIMARY KEY, 
-	userId BIGINT,
-	curriculumId BIGINT,
-	jobId BIGINT,
+	experienceId BIGINT IDENTITY PRIMARY KEY,
 	years SMALLINT,
-	Competences NVARCHAR(200),
-
-	foreign key(userId,curriculumId) references ApiDatabase.Curriculum,
-	foreign key(jobId) references ApiDatabase.Job
+	Competence NVARCHAR(200),
 )
 
 CREATE TABLE Apidatabase.Curriculum_Experience(
