@@ -182,8 +182,11 @@ CREATE TABLE ApiDatabase.Follows (
 )
 
 GO
+if object_id('dbo.Account') is not null
+	drop view dbo.Account
+go
 CREATE VIEW dbo.Account AS
-SELECT accountId,email,rating FROM ApiDatabase.Account
+SELECT accountId,email,passwordHash,rating FROM ApiDatabase.Account
 GO
 
 GO

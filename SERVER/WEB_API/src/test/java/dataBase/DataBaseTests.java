@@ -1,3 +1,5 @@
+package dataBase;
+
 import com.microsoft.sqlserver.jdbc.SQLServerDataSource;
 import com.microsoft.sqlserver.jdbc.SQLServerException;
 import org.junit.After;

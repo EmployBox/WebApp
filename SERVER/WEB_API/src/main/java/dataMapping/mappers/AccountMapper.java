@@ -1,14 +1,14 @@
 package dataMapping.mappers;
 
 import dataMapping.exceptions.DataMapperException;
+import dataMapping.utils.ConnectionManager;
 import model.Account;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.Optional;
 
 public class AccountMapper extends AbstractMapper<Account> {
-    private final String SELECT_QUERY = "SELECT AccountID, Email, Password, Rating FROM Account WHERE AccountID = ?";
+    private final String SELECT_QUERY = "SELECT AccountID, Email, passwordHash, Rating FROM Account WHERE AccountID = ?";
     private final String INSERT_QUERY = "INSERT INTO Account (Email, Password, Rating, Version) VALUES (?, ?, ?, ?)";
     private final String UPDATE_QUERY = "UPDATE Account SET Password = ?, Rating = ?, Version = ? WHERE AccountID = ? AND Version = ?";
     private final String DELETE_QUERY = "DELETE FROM Account WHERE AccountID = ? AND Version = ?";
@@ -27,11 +27,11 @@ public class AccountMapper extends AbstractMapper<Account> {
         try {
             long accountID = rs.getLong("AccountID");
             String email = rs.getString("Email");
-            String password = rs.getString("Password");
+            String password = rs.getString("PasswordHash");
             Double rate = rs.getDouble("Rating");
-            long version = rs.getLong("Version");
+            //long version = rs.getLong("Version");
 
-            Account account = Account.load(accountID, email, password, rate, version);
+            Account account = Account.load(accountID, email, password, rate, 0);
             getIdentityMap().put(email, account);
 
             return account;
@@ -57,7 +57,7 @@ public class AccountMapper extends AbstractMapper<Account> {
 
     @Override
     public void insert(Account obj) {
-        DBHelper(
+        /*DBHelper(
                 INSERT_QUERY,
                 stmt -> {
                     SQLException sqlException = null;
@@ -71,8 +71,43 @@ public class AccountMapper extends AbstractMapper<Account> {
                     }
                     return sqlException;
                 },
-                () -> getIdentityMap().put(obj.getIdentityKey(), obj)
-        );
+                stmt -> {
+                    SQLException sqlException = null;
+                    try {
+                        ResultSet rs = stmt.getGeneratedKeys();
+                        rs.next();
+                        Account account = Account.load(rs.getLong(1), obj.getEmail(), obj.getPassword(), obj.getRating(), obj.getVersion());
+                        getIdentityMap().put(account.getIdentityKey(), account);
+                    } catch (SQLException e) {
+                        sqlException = e;
+                    }
+                    return sqlException;
+                }
+        );*/
+
+        /*cs = this.con.prepareCall("{call GET_SUPPLIER_OF_COFFEE(?, ?)}");
+        cs.setString(1, coffeeNameArg);
+        cs.registerOutParameter(2, Types.VARCHAR);
+        cs.executeQuery();
+
+        String supplierName = cs.getString(2);*/
+
+
+        Connection con = ConnectionManager.getConnectionManager().getCon();
+        try{
+            CallableStatement cs = con.prepareCall("{call AddAccount(?, ?, ?, ?)}");
+            cs.setString(1, obj.getEmail());
+            cs.setDouble(2, obj.getRating());
+            cs.setString(3, obj.getPassword());
+            cs.registerOutParameter(4, Types.BIGINT);
+            cs.execute();
+            long accountId = cs.getLong(4);
+
+            Account account = Account.load(accountId, obj.getEmail(), obj.getPassword(), obj.getRating(), obj.getVersion());
+            getIdentityMap().put(account.getIdentityKey(), account);
+        } catch (SQLException e) {
+            throw new DataMapperException(e.getMessage(), e);
+        }
     }
 
     @Override

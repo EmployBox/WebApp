@@ -14,8 +14,8 @@ public class Account extends DomainObject{
         this.rating = rating;
     }
 
-    public static Account create(long accountID, String email, String password, double rating){
-        Account account = new Account(accountID, email, password, rating, 0);
+    public static Account create(String email, String password, double rating){
+        Account account = new Account(-1, email, password, rating, 0);
         account.markNew();
         return account;
     }

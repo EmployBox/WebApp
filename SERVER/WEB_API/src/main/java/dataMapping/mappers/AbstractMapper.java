@@ -3,6 +3,7 @@ package dataMapping.mappers;
 import dataMapping.Mapper;
 import dataMapping.exceptions.ConcurrencyException;
 import dataMapping.exceptions.DataMapperException;
+import dataMapping.utils.ConnectionManager;
 import model.DomainObject;
 
 import java.sql.Connection;
@@ -78,7 +79,7 @@ public abstract class AbstractMapper<T extends DomainObject> implements Mapper<T
         dc.setPassword(config.PASSWORD);
         dc.setServerName(config.SERVER_NAME);
         return dc.getConnection();*/
-        Connection con = null;
+        Connection con = ConnectionManager.getConnectionManager().getCon();
         /*con.setAutoCommit(false);
         if(con.getMetaData().supportsTransactionIsolationLevel(TRANSACTION_SERIALIZABLE))
             con.setTransactionIsolation(TRANSACTION_SERIALIZABLE);*/
