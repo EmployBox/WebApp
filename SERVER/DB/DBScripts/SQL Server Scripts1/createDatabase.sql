@@ -24,7 +24,7 @@ CREATE TABLE ApiDatabase.Account (
 CREATE TABLE ApiDatabase.Account_version(
 	accountId BIGINT IDENTITY PRIMARY KEY references ApiDatabase.Account,
 	[version] BIGINT default(0) 
-	CONSTRAINT version_minimun_account check([version] >= 0)
+	CONSTRAINT account_version_minimun check([version] >= 0)
 )
 
 CREATE TABLE ApiDatabase.Company (
@@ -101,7 +101,7 @@ CREATE TABLE ApiDatabase.Job_version(
 	jobId BIGINT references ApiDatabase.Job,
 	[version] BIGINT default(0)
 
-	CONSTRAINT version_minimun_job check([version] >= 0)
+	CONSTRAINT job_version_minimun check([version] >= 0)
 )
 
 CREATE TABLE Apidatabase.Experience(
@@ -152,7 +152,7 @@ CREATE TABLE ApiDatabase.Chat_version(
 	curriculumId BIGINT PRIMARY KEY references ApiDatabase.Chat,
 	[version] BIGINT default(0) 
 
-	CONSTRAINT version_minimun_chat check([version] >= 0)
+	CONSTRAINT chat_version_minimun check([version] >= 0)
 )
 
 CREATE TABLE ApiDatabase.[MESSAGE](
@@ -213,6 +213,11 @@ SELECT * FROM ApiDatabase.Curriculum
 GO
 
 GO
+CREATE VIEW dbo.AcademicBackground AS
+SELECT * FROM ApiDatabase.AcademicBackground
+GO
+
+GO
 CREATE VIEW dbo.Experience AS
 SELECT * FROM ApiDatabase.Experience
 GO
@@ -228,11 +233,6 @@ SELECT * FROM ApiDatabase.Job_Experience
 GO
 
 GO
-CREATE VIEW dbo.[Local] AS
-SELECT * FROM ApiDatabase.[Local]
-GO
-
-GO
 CREATE VIEW dbo.Comment AS
 SELECT * FROM ApiDatabase.Comment
 GO
@@ -240,6 +240,11 @@ GO
 GO
 CREATE VIEW dbo.Chat AS
 SELECT * FROM ApiDatabase.Chat
+GO
+
+GO
+CREATE VIEW dbo.[Local] AS
+SELECT * FROM ApiDatabase.[Local]
 GO
 
 GO
