@@ -1,7 +1,7 @@
 package dataMapping.mappers;
 
-import dataMapping.AbstractMapper;
 import dataMapping.exceptions.DataMapperException;
+import dataMapping.utils.MapperRegistry;
 import model.Experience;
 import model.Job;
 
@@ -19,23 +19,23 @@ public class JobMapper extends AbstractMapper<Job> {
         return SELECT_QUERY;
     }
 
-    //TODO finish this
     public Stream<Experience> findExperiences(Job job){
         Connection con = null;
         PreparedStatement statement;
         try {
-            statement = con.prepareStatement("SELECT experienceId FROM JobExperience WHERE jobId = ?");
+            statement = con.prepareStatement("Select experienceId, competence, years from Experience where experienceId in (Select experienceId from Job_Experience where jobId = ?)");
 
             statement.setLong(1, (Long) job.getIdentityKey());
 
-            stream(statement.executeQuery(), resultSet -> resultSet.getLong("experienceId"));
+            ExperienceMapper experienceMapper = (ExperienceMapper) MapperRegistry.getMapper(Experience.class);
+            return experienceMapper.stream(statement.executeQuery(), experienceMapper::mapper);
         } catch (SQLException e) {
             throw new DataMapperException(e.getMessage(), e);
         }
     }
 
     @Override
-    protected Job mapper(ResultSet rs) throws DataMapperException {
+    public Job mapper(ResultSet rs) throws DataMapperException {
         try {
             long jobID = rs.getLong("JobID");
             long accountID = rs.getLong("AccountID");

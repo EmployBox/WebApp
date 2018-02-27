@@ -1,6 +1,5 @@
 package dataMapping.mappers;
 
-import dataMapping.AbstractMapper;
 import dataMapping.exceptions.DataMapperException;
 import model.Account;
 
@@ -24,7 +23,7 @@ public class AccountMapper extends AbstractMapper<Account> {
     }
 
     @Override
-    protected Account mapper(ResultSet rs) throws DataMapperException {
+    public Account mapper(ResultSet rs) throws DataMapperException {
         try {
             long accountID = rs.getLong("AccountID");
             String email = rs.getString("Email");

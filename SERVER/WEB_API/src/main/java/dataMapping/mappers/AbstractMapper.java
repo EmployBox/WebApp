@@ -1,5 +1,6 @@
-package dataMapping;
+package dataMapping.mappers;
 
+import dataMapping.Mapper;
 import dataMapping.exceptions.ConcurrencyException;
 import dataMapping.exceptions.DataMapperException;
 import model.DomainObject;
@@ -38,13 +39,13 @@ public abstract class AbstractMapper<T extends DomainObject> implements Mapper<T
      * @return DomainObject
      * @throws DataMapperException
      */
-    protected abstract T mapper(ResultSet rs) throws DataMapperException;
+    abstract T mapper(ResultSet rs) throws DataMapperException;
 
     /**
      * Inserts the objects read into the LoadedMap
      * @param rs - ResultSet with the result of the DB
      */
-    protected Stream<T> stream(ResultSet rs, Function<ResultSet, T> func) throws DataMapperException{
+    Stream<T> stream(ResultSet rs, Function<ResultSet, T> func) throws DataMapperException{
         return StreamSupport.stream(new Spliterators.AbstractSpliterator<T>(
                 Long.MAX_VALUE, Spliterator.ORDERED) {
             @Override
