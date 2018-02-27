@@ -1,5 +1,6 @@
-package dataMapper;
+package dataMapping.utils;
 
+import dataMapping.exceptions.ConcurrencyException;
 import model.DomainObject;
 
 import java.util.ArrayList;

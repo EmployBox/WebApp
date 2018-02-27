@@ -1,4 +1,4 @@
-package dataMapper;
+package dataMapping;
 
 import model.DomainObject;
 

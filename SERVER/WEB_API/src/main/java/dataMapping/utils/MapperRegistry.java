@@ -1,5 +1,6 @@
-package dataMapper;
+package dataMapping.utils;
 
+import dataMapping.AbstractMapper;
 import model.DomainObject;
 
 import java.util.HashMap;

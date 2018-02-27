@@ -1,5 +1,7 @@
-package dataMapper;
+package dataMapping.mappers;
 
+import dataMapping.AbstractMapper;
+import dataMapping.exceptions.DataMapperException;
 import model.Account;
 
 import java.sql.ResultSet;

@@ -1,10 +1,11 @@
-package dataMapper;
+package dataMapping.mappers;
 
+import dataMapping.AbstractMapper;
+import dataMapping.exceptions.DataMapperException;
 import model.Experience;
 import model.Job;
 
 import java.sql.*;
-import java.util.concurrent.ConcurrentMap;
 import java.util.stream.Stream;
 
 public class JobMapper extends AbstractMapper<Job> {

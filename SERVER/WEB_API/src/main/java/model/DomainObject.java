@@ -1,6 +1,6 @@
 package model;
 
-import dataMapper.UnitOfWork;
+import dataMapping.utils.UnitOfWork;
 
 public abstract class DomainObject {
 
