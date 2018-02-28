@@ -38,7 +38,7 @@ CREATE TABLE ApiDatabase.Company (
 )
 
 CREATE TABLE ApiDatabase.[User] (
-	accountId BIGINT IDENTITY primary key references ApiDatabase.Account,
+	accountId BIGINT primary key references ApiDatabase.Account,
 	name NVARCHAR(40),
 	summary NVARCHAR(1500),
 	PhotoUrl NVARCHAR(100)

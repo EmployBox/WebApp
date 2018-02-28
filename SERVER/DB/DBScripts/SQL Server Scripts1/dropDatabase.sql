@@ -71,6 +71,10 @@ IF DB_ID ('PS_API_DATABASE') IS NOT NULL
 		IF OBJECT_ID(N'ApiDatabase.Account') IS NOT NULL
 			DROP TABLE ApiDatabase.Account;
 
+		IF OBJECT_ID(N'dbo.AddAccount') IS NOT NULL
+			DROP PROC dbo.AddAccount;
+		IF OBJECT_ID(N'dbo.AddUser') IS NOT NULL
+			DROP PROC dbo.AddUser;
 
 		IF OBJECT_ID ('ApiDatabase') IS NOT NULL
 			DROP SCHEMA ApiDatabase;
