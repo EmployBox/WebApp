@@ -29,7 +29,7 @@ public abstract class AbstractMapper<T extends DomainObject> implements Mapper<T
     }
 
     /**
-     * Returns a string to findByPK a DomainObject by its ID
+     * Returns a string to findByPrimaryKey a DomainObject by its ID
      * @return select query of the DomainObject
      */
     protected abstract String findByPKStatement();
@@ -68,21 +68,11 @@ public abstract class AbstractMapper<T extends DomainObject> implements Mapper<T
      * @return the object queried
      * @throws SQLException
      */
-    public Optional<T> findByPK(String primaryKey) throws DataMapperException {
+    public Optional<T> findByPrimaryKey(String primaryKey) throws DataMapperException {
         T result = getIdentityMap().get(primaryKey);
         if(result != null) return Optional.of(result);
 
-        /*SQLServerDataSource dc = new SQLServerDataSource();
-        Config config = new Config();
-        dc.setDatabaseName(config.DB_NAME);
-        dc.setUser(config.USER);
-        dc.setPassword(config.PASSWORD);
-        dc.setServerName(config.SERVER_NAME);
-        return dc.getConnection();*/
-        Connection con = ConnectionManager.getConnectionManager().getCon();
-        /*con.setAutoCommit(false);
-        if(con.getMetaData().supportsTransactionIsolationLevel(TRANSACTION_SERIALIZABLE))
-            con.setTransactionIsolation(TRANSACTION_SERIALIZABLE);*/
+        Connection con = ConnectionManager.getConnectionManager().getConnection();
         PreparedStatement statement;
         try {
             statement = con.prepareStatement(findByPKStatement());
@@ -96,10 +86,10 @@ public abstract class AbstractMapper<T extends DomainObject> implements Mapper<T
     }
 
     protected void DBHelper(String query, Function<PreparedStatement, SQLException> prepareStatement, Runnable handleIdentityMap){
-        Connection conn = null;
+        Connection conn;
         PreparedStatement stmt;
         try {
-            //conn = ConnectionManager.INSTANCE.getConnection();
+            conn = ConnectionManager.getConnectionManager().getConnection();
             stmt = conn.prepareStatement(query);
 
             SQLException exception = prepareStatement.apply(stmt);

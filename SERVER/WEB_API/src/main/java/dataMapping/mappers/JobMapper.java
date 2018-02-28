@@ -28,7 +28,9 @@ public class JobMapper extends AbstractMapper<Job> {
             statement.setLong(1, (Long) job.getIdentityKey());
 
             ExperienceMapper experienceMapper = (ExperienceMapper) MapperRegistry.getMapper(Experience.class);
-            return experienceMapper.stream(statement.executeQuery(), experienceMapper::mapper);
+            Stream<Experience> experiences = experienceMapper.stream(statement.executeQuery(), experienceMapper::mapper);
+            job.setExperiences(experiences);
+            return experiences;
         } catch (SQLException e) {
             throw new DataMapperException(e.getMessage(), e);
         }

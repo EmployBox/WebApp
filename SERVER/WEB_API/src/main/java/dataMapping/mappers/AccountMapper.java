@@ -8,13 +8,13 @@ import java.sql.*;
 import java.util.Optional;
 
 public class AccountMapper extends AbstractMapper<Account> {
-    private final String SELECT_QUERY = "SELECT AccountID, Email, passwordHash, Rating FROM Account WHERE AccountID = ?";
+    private final String SELECT_QUERY = "SELECT AccountID, Email, passwordHash, Rating FROM Account WHERE Email = ?";
     private final String INSERT_QUERY = "INSERT INTO Account (Email, Password, Rating, Version) VALUES (?, ?, ?, ?)";
     private final String UPDATE_QUERY = "UPDATE Account SET Password = ?, Rating = ?, Version = ? WHERE AccountID = ? AND Version = ?";
     private final String DELETE_QUERY = "DELETE FROM Account WHERE AccountID = ? AND Version = ?";
 
     public Optional<Account> findByEmail(String email) throws DataMapperException {
-        return findByPK(email);
+        return findByPrimaryKey(email);
     }
 
     @Override
@@ -29,7 +29,6 @@ public class AccountMapper extends AbstractMapper<Account> {
             String email = rs.getString("Email");
             String password = rs.getString("PasswordHash");
             Double rate = rs.getDouble("Rating");
-            //long version = rs.getLong("Version");
 
             Account account = Account.load(accountID, email, password, rate, 0);
             getIdentityMap().put(email, account);
@@ -93,13 +92,14 @@ public class AccountMapper extends AbstractMapper<Account> {
         String supplierName = cs.getString(2);*/
 
 
-        Connection con = ConnectionManager.getConnectionManager().getCon();
+        Connection con = ConnectionManager.getConnectionManager().getConnection();
         try{
-            CallableStatement cs = con.prepareCall("{call AddAccount(?, ?, ?, ?)}");
+            CallableStatement cs = con.prepareCall("{call AddAccount(?, ?, ?, ?, ?)}");
             cs.setString(1, obj.getEmail());
             cs.setDouble(2, obj.getRating());
             cs.setString(3, obj.getPassword());
             cs.registerOutParameter(4, Types.BIGINT);
+            cs.registerOutParameter(5, Types.NVARCHAR);
             cs.execute();
             long accountId = cs.getLong(4);
 

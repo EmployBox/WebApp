@@ -1,6 +1,7 @@
 package model;
 
 import java.sql.Date;
+import java.util.stream.Stream;
 
 public class Job extends DomainObject {
     private long accountID;
@@ -10,6 +11,8 @@ public class Job extends DomainObject {
     private Date offerBeginDate;
     private Date offerEndDate;
     private String offerType; //TODO change to enum
+
+    private Stream<Experience> experiences;
 
     private Job(long id, long accountID, int wage, String description, String schedule, Date offerBeginDate, Date offerEndDate, String offerType, long version) {
         super(id, version);
@@ -102,5 +105,13 @@ public class Job extends DomainObject {
         markToBeDirty();
         this.offerType = offerType;
         markDirty();
+    }
+
+    public Stream<Experience> getExperiences() {
+        return experiences;
+    }
+
+    public void setExperiences(Stream<Experience> experiences) {
+        this.experiences = experiences;
     }
 }

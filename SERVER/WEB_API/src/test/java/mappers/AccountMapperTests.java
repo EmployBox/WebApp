@@ -37,11 +37,12 @@ public class AccountMapperTests {
         AccountMapper mapper = (AccountMapper) MapperRegistry.getMapper(Account.class);
 
         UnitOfWork.newCurrent();
-        UnitOfWork unit = UnitOfWork.getCurrent();
         Account.create("Test@gmail.com", "1234", 0);
-        unit.commit();
+        UnitOfWork.getCurrent().commit();
 
         Optional<Account> accountOptional = mapper.findByEmail("Test@gmail.com");
         assertTrue(accountOptional.isPresent());
     }
+
+    //TODO Finish or make tests only for extending members
 }

@@ -11,6 +11,10 @@ GO
 USE PS_API_DATABASE
 GO
 
+if object_id('ApiDatabase.Account') is not null
+	drop table ApiDatabase.Account
+go
+
 CREATE TABLE ApiDatabase.Account (
 	accountId BIGINT IDENTITY PRIMARY KEY,
 	email NVARCHAR(25) UNIQUE NOT NULL,
