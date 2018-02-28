@@ -21,11 +21,10 @@ CREATE TABLE ApiDatabase.Account (
 	rating decimal(2,1) default(0.0),
 	passwordHash NVARCHAR(50) NOT NULL,
 	salt UNIQUEIDENTIFIER NOT NULL,
-	[version] rowversion
+	[version] rowversion,
 
 	CONSTRAINT rate_const CHECK (rating >= 0.0 AND rating <= 5.0)
 )
-
 
 CREATE TABLE ApiDatabase.Company (
 	accountId BIGINT IDENTITY primary key references ApiDatabase.Account,
@@ -46,7 +45,7 @@ CREATE TABLE ApiDatabase.[User] (
 
 CREATE TABLE ApiDatabase.Curriculum(
 	userId BIGINT references ApiDatabase.[User],
-	curriculumId BIGINT IDENTITY
+	curriculumId BIGINT IDENTITY,
 
 	primary key(userId,curriculumId)
 )
@@ -58,7 +57,7 @@ CREATE TABLE ApiDatabase.AcademicBackground(
 	endDate DATETIME,
 	studyArea NVARCHAR(40),
 	institution NVARCHAR(40),
-	degreeObtained NVARCHAR(10)
+	degreeObtained NVARCHAR(10),
 
 	FOREIGN KEY(userId,curriculumId) REFERENCES ApiDatabase.Curriculum,
 	CONSTRAINT endDate_check check (endDate < beginDate),
@@ -79,10 +78,17 @@ CREATE TABLE Apidatabase.PreviousJobs(
 	companyName NVARCHAR(20),
 	[workload] NVARCHAR(20),
 	[role] NVARCHAR(20),
-	[version] rowversion
 
 	FOREIGN KEY(accountId,curriculumId) REFERENCES ApiDatabase.Curriculum,
 )
+
+CREATE TABLE ApiDatabase.[Local] (
+	[Address] NVARCHAR(50) primary key,
+	Country NVARCHAR(15),
+	Street NVARCHAR(40),
+	ZIPCode NVARCHAR(40)
+)
+
 
 CREATE TABLE ApiDatabase.Job(
 	jobId BIGINT identity primary key,
@@ -94,7 +100,8 @@ CREATE TABLE ApiDatabase.Job(
 	offerBeginDate DATETIME DEFAULT(GETDATE()),
 	offerEndDate DATETIME NOT NULL,
 	offerType NVARCHAR(30),
-	[version] rowversion
+	[Address] NVARCHAR(50) references ApiDatabase.[Local],
+	[version] rowversion,
 
 	CONSTRAINT offerTypes check(offerType = 'Looking for work' OR offerType = 'Looking for Worker')
 )
@@ -102,7 +109,7 @@ CREATE TABLE ApiDatabase.Job(
 CREATE TABLE Apidatabase.Experience(
 	experienceId BIGINT IDENTITY PRIMARY KEY,
 	years SMALLINT,
-	Competence NVARCHAR(200),
+	Competence NVARCHAR(200)
 )
 
 CREATE TABLE Apidatabase.Curriculum_Experience(
@@ -116,18 +123,27 @@ CREATE TABLE Apidatabase.Curriculum_Experience(
 
 CREATE TABLE Apidatabase.Job_Experience(
 	jobId BIGINT references ApiDatabase.Job,
-	experienceId BIGINT references ApiDatabase.Experience
+	experienceId BIGINT references ApiDatabase.Experience,
 
 	primary key(jobId, experienceId)
 )
 
+CREATE TABLE ApiDatabase.[Application](
+	UserId BIGINT,
+	CurriculumId BIGINT,
+	JobId BIGINT references ApiDatabase.Job,
+	[date] datetime default(GETDATE()),
+	
+	foreign key (UserId,CurriculumId) references ApiDatabase.Curriculum,
+	primary key (UserId, JobId)
+)
 
 CREATE TABLE ApiDatabase.Rating(
 	AccountIdFrom BIGINT references ApiDatabase.Account,
 	AccountIdTo BIGINT references ApiDatabase.Account,
-	ratingValue decimal(2,1) DEFAULT 0.0
+	ratingValue decimal(2,1) DEFAULT 0.0,
 	
-	constraint rating_interval check (ratingValue >= 0.0 AND ratingValue <= 5.0)
+	constraint rating_interval check (ratingValue >= 0.0 AND ratingValue <= 5.0),
 	PRIMARY KEY(AccountIdFrom , AccountIdTo)
 )
 
@@ -143,16 +159,6 @@ CREATE TABLE ApiDatabase.[MESSAGE](
 	chatId BIGINT REFERENCES ApiDatabase.Chat,
 	[text] NVARCHAR(200),
 	[date] datetime default(getdate()),
-)
-
-CREATE TABLE ApiDatabase.[Local] (
-	latitude DECIMAL(9,6),
-	longitude DECIMAL(9,6),
-	Country NVARCHAR(15),
-	Street NVARCHAR(40),
-	ZIPCode NVARCHAR(40)
-
-	primary key( latitude, longitude )
 )
 
 CREATE TABLE ApiDatabase.Comment (
