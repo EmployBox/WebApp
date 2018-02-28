@@ -117,7 +117,9 @@ public class Job extends DomainObject {
     }
 
     public void setAddress(String address) {
+        markToBeDirty();
         this.address = address;
+        markDirty();
     }
 
     public Stream<Experience> getExperiences() {
