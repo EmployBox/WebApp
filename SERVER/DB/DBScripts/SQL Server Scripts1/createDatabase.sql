@@ -11,10 +11,6 @@ GO
 USE PS_API_DATABASE
 GO
 
-if object_id('ApiDatabase.Account') is not null
-	drop table ApiDatabase.Account
-go
-
 CREATE TABLE ApiDatabase.Account (
 	accountId BIGINT IDENTITY PRIMARY KEY,
 	email NVARCHAR(25) UNIQUE NOT NULL,
@@ -45,7 +41,7 @@ CREATE TABLE ApiDatabase.[User] (
 
 CREATE TABLE ApiDatabase.Curriculum(
 	userId BIGINT references ApiDatabase.[User],
-	curriculumId BIGINT IDENTITY,
+	curriculumId BIGINT,
 
 	primary key(userId,curriculumId)
 )
@@ -179,9 +175,8 @@ CREATE TABLE ApiDatabase.Follows (
 )
 
 GO
-if object_id('dbo.Account') is not null
-	drop view dbo.Account
-go
+
+
 CREATE VIEW dbo.Account AS
 SELECT accountId,email,passwordHash,rating FROM ApiDatabase.Account
 GO

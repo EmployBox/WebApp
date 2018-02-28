@@ -2,10 +2,6 @@ GO
 USE PS_API_DATABASE
 GO
 
-if object_id('dbo.AddAccount') is not null
-	drop procedure dbo.AddAccount
-go
-
 CREATE PROCEDURE dbo.AddAccount
     @email NVARCHAR(50),
 	@rating decimal(2,1),
@@ -19,7 +15,7 @@ BEGIN
     DECLARE @salt UNIQUEIDENTIFIER=NEWID()
     BEGIN TRY
 
-        INSERT INTO ApiDatabase.Account
+        INSERT INTO ApiDatabase.Account(email, rating, passwordHash, salt)
         VALUES(@email, @rating, HASHBYTES('SHA2_512', @password+CAST(@salt AS NVARCHAR(36))), @salt)
 
 	   SET @accountId = SCOPE_IDENTITY()
@@ -27,11 +23,10 @@ BEGIN
 
     END TRY
     BEGIN CATCH
-        SET @responseMessage = ERROR_MESSAGE() 
+        SELECT ERROR_MESSAGE() 
     END CATCH
-
 END
-GO
+
 
 GO
 CREATE PROCEDURE dbo.AddUser
@@ -41,7 +36,7 @@ CREATE PROCEDURE dbo.AddUser
 	@name NVARCHAR(40),
 	@summary NVARCHAR(1500),
 	@PhotoUrl NVARCHAR(100),
-	@accountId BIGINT,
+	@accountId BIGINT OUTPUT,
     @responseMessage NVARCHAR(250) OUTPUT
 AS
 	BEGIN
