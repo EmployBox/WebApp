@@ -21,15 +21,11 @@ CREATE TABLE ApiDatabase.Account (
 	rating decimal(2,1) default(0.0),
 	passwordHash NVARCHAR(50) NOT NULL,
 	salt UNIQUEIDENTIFIER NOT NULL,
+	[version] rowversion
 
 	CONSTRAINT rate_const CHECK (rating >= 0.0 AND rating <= 5.0)
 )
 
-CREATE TABLE ApiDatabase.Account_version(
-	accountId BIGINT IDENTITY PRIMARY KEY references ApiDatabase.Account,
-	[version] BIGINT default(0) 
-	CONSTRAINT account_version_minimun check([version] >= 0)
-)
 
 CREATE TABLE ApiDatabase.Company (
 	accountId BIGINT IDENTITY primary key references ApiDatabase.Account,
@@ -50,7 +46,7 @@ CREATE TABLE ApiDatabase.[User] (
 
 CREATE TABLE ApiDatabase.Curriculum(
 	userId BIGINT references ApiDatabase.[User],
-	curriculumId BIGINT IDENTITY,
+	curriculumId BIGINT IDENTITY
 
 	primary key(userId,curriculumId)
 )
@@ -62,7 +58,7 @@ CREATE TABLE ApiDatabase.AcademicBackground(
 	endDate DATETIME,
 	studyArea NVARCHAR(40),
 	institution NVARCHAR(40),
-	degreeObtained NVARCHAR(10),
+	degreeObtained NVARCHAR(10)
 
 	FOREIGN KEY(userId,curriculumId) REFERENCES ApiDatabase.Curriculum,
 	CONSTRAINT endDate_check check (endDate < beginDate),
@@ -82,7 +78,8 @@ CREATE TABLE Apidatabase.PreviousJobs(
 	endDate DATETIME,
 	companyName NVARCHAR(20),
 	[workload] NVARCHAR(20),
-	[role] NVARCHAR(20)
+	[role] NVARCHAR(20),
+	[version] rowversion
 
 	FOREIGN KEY(accountId,curriculumId) REFERENCES ApiDatabase.Curriculum,
 )
@@ -96,16 +93,10 @@ CREATE TABLE ApiDatabase.Job(
 	[description] NVARCHAR(50),
 	offerBeginDate DATETIME DEFAULT(GETDATE()),
 	offerEndDate DATETIME NOT NULL,
-	offerType NVARCHAR(30)
+	offerType NVARCHAR(30),
+	[version] rowversion
 
 	CONSTRAINT offerTypes check(offerType = 'Looking for work' OR offerType = 'Looking for Worker')
-)
-
-CREATE TABLE ApiDatabase.Job_version(
-	jobId BIGINT references ApiDatabase.Job,
-	[version] BIGINT default(0)
-
-	CONSTRAINT job_version_minimun check([version] >= 0)
 )
 
 CREATE TABLE Apidatabase.Experience(
@@ -144,14 +135,9 @@ CREATE TABLE ApiDatabase.Chat(
 	chatId BIGINT IDENTITY PRIMARY KEY,
 	AccountIdFirst BIGINT references ApiDatabase.Account,
 	AccountIdSecond BIGINT references ApiDatabase.Account,
+	[version] rowversion
 )
 
-CREATE TABLE ApiDatabase.Chat_version(
-	curriculumId BIGINT PRIMARY KEY references ApiDatabase.Chat,
-	[version] BIGINT default(0) 
-
-	CONSTRAINT chat_version_minimun check([version] >= 0)
-)
 
 CREATE TABLE ApiDatabase.[MESSAGE](
 	chatId BIGINT REFERENCES ApiDatabase.Chat,
@@ -175,7 +161,8 @@ CREATE TABLE ApiDatabase.Comment (
 	AccountIdDest BIGINT references ApiDatabase.Account,
 	[date] DATETIME default(getdate()),
 	[text] NVARCHAR(300),
-	MainCommentId BIGINT REFERENCES ApiDatabase.Comment
+	MainCommentId BIGINT REFERENCES ApiDatabase.Comment,
+	[version] rowversion
 )
 
 CREATE TABLE ApiDatabase.Follows (
