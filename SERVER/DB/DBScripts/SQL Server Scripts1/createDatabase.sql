@@ -13,7 +13,7 @@ GO
 
 CREATE TABLE ApiDatabase.Account (
 	accountId BIGINT IDENTITY PRIMARY KEY,
-	email NVARCHAR UNIQUE NOT NULL,
+	email NVARCHAR(25) UNIQUE NOT NULL,
 	rating decimal(2,1) default(0.0),
 	passwordHash NVARCHAR(50) NOT NULL,
 	salt UNIQUEIDENTIFIER NOT NULL,
