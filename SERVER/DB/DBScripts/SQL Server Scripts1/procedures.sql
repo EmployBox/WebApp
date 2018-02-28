@@ -27,13 +27,11 @@ BEGIN
 
     END TRY
     BEGIN CATCH
-        SELECT ERROR_MESSAGE() 
+        SET @responseMessage = ERROR_MESSAGE() 
     END CATCH
 
 END
-
-
-
+GO
 
 GO
 CREATE PROCEDURE dbo.AddUser
