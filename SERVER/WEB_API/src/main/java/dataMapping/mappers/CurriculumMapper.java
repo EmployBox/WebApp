@@ -22,7 +22,7 @@ public class CurriculumMapper extends AbstractMapper<Curriculum>{
             long accountId = rs.getLong("AccountId");
             long curriculumId = rs.getLong("CurriculumId");
 
-            Curriculum curriculum = Curriculum.load(accountId, curriculumId);
+            Curriculum curriculum = Curriculum.load(accountId, curriculumId, null, null);
             getIdentityMap().put(curriculum.getIdentityKey(), curriculum);
 
             return curriculum;

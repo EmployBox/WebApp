@@ -94,7 +94,7 @@ CREATE TABLE ApiDatabase.Job(
 	wage INT check(wage > 0),
 	[description] NVARCHAR(50),
 	offerBeginDate DATETIME DEFAULT(GETDATE()),
-	offerEndDate DATETIME NOT NULL,
+	offerEndDate DATETIME,
 	offerType NVARCHAR(30),
 	[Address] NVARCHAR(50) references ApiDatabase.[Local],
 	[version] rowversion,

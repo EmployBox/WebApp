@@ -103,7 +103,7 @@ public abstract class AbstractMapper<T extends DomainObject> implements Mapper<T
                 handleIdentityMap.run();
             }
         } catch (SQLException e) {
-            throw new DataMapperException("unexpected error", e);
+            throw new DataMapperException(e.getMessage(), e);
         }
     }
 }

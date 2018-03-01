@@ -13,6 +13,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.sql.Connection;
+import java.sql.Date;
 import java.sql.SQLException;
 
 public class JobMapperTests {
@@ -34,15 +35,13 @@ public class JobMapperTests {
     @Test
     public void insertTest(){
         JobMapper jobMapper = (JobMapper) MapperRegistry.getMapper(Job.class);
-        AccountMapper accountMapper = (AccountMapper) MapperRegistry.getMapper(Account.class);
 
         UnitOfWork.newCurrent();
 
-        User user = (User) Account.create("Test@gmail.com", "1234", 0);
+        Job.create(1, null, 0, null, null, null, null, null, 0, null, null);
 
         UnitOfWork.getCurrent().commit();
 
-        user = accountMapper.findByPrimaryKey()
-
+        
     }
 }

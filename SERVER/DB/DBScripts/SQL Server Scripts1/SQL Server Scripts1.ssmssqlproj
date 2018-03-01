@@ -43,6 +43,12 @@
           <AssociatedConnUserName />
           <FullPath>dropDatabase.sql</FullPath>
         </FileNode>
+        <FileNode Name="populateTestDatabase.sql">
+          <AssociatedConnectionMoniker>8c91a03d-f9b4-46c0-a305-b5dcc79ff907:(local):True</AssociatedConnectionMoniker>
+          <AssociatedConnSrvName>(local)</AssociatedConnSrvName>
+          <AssociatedConnUserName />
+          <FullPath>populateTestDatabase.sql</FullPath>
+        </FileNode>
         <FileNode Name="procedure_tests(junk version).sql">
           <AssociatedConnectionMoniker>8c91a03d-f9b4-46c0-a305-b5dcc79ff907:(local):True</AssociatedConnectionMoniker>
           <AssociatedConnSrvName>(local)</AssociatedConnSrvName>
