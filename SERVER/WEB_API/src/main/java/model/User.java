@@ -1,9 +1,14 @@
 package model;
 
+import java.util.stream.Stream;
+
 public class User extends Account {
     private String name;
     private String summary;
     private String photoUrl;
+
+    private Stream<Curriculum> curriculums;
+    private Stream<Application> applications;
 
     public User(long accountID,
                 String email,
@@ -75,5 +80,21 @@ public class User extends Account {
 
     public void setPhotoUrl(String photoUrl){
         this.photoUrl = photoUrl;
+    }
+
+    public Stream<Curriculum> getExperiences(){
+        return this.curriculums;
+    }
+
+    public void setCurriculums(){
+        this.curriculums = curriculums;
+    }
+
+    public Stream<Application> getApplications() {
+        return applications;
+    }
+
+    public void setApplications(Stream<Application> applications) {
+        this.applications = applications;
     }
 }

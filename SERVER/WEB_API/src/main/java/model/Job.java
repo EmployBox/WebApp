@@ -18,7 +18,17 @@ public class Job extends DomainObject {
     private Stream<Experience> experiences;
     private Stream<Pair<User, Curriculum>> applications;
 
-    private Job(long id, long accountID, String address, int wage, String description, String schedule, Date offerBeginDate, Date offerEndDate, String offerType, long version) {
+    private Job(long id,
+                long accountID,
+                String address,
+                int wage,
+                String description,
+                String schedule,
+                Date offerBeginDate,
+                Date offerEndDate,
+                String offerType,
+                long version)
+    {
         super(id, version);
         this.accountID = accountID;
         this.address = address;
@@ -30,13 +40,34 @@ public class Job extends DomainObject {
         this.offerType = offerType;
     }
 
-    public static Job create(long accountID, String address, int wage, String description, String schedule, Date offerBeginDate, Date offerEndDate, String offerType, long version){
+    public static Job create(
+            long accountID,
+            String address,
+            int wage,
+            String description,
+            String schedule,
+            Date offerBeginDate,
+            Date offerEndDate,
+            String offerType,
+            long version)
+    {
         Job job = new Job(-1, accountID, address, wage, description, schedule, offerBeginDate, offerEndDate, offerType, version);
         job.markNew();
         return job;
     }
 
-    public static Job load(long id, long accountID, String address, int wage, String description, String schedule, Date offerBeginDate, Date offerEndDate, String offerType, long version){
+    public static Job load(
+            long id,
+            long accountID,
+            String address,
+            int wage,
+            String description,
+            String schedule,
+            Date offerBeginDate,
+            Date offerEndDate,
+            String offerType,
+            long version)
+    {
         Job job = new Job(id, accountID, address, wage, description, schedule, offerBeginDate, offerEndDate, offerType, version);
         job.markClean();
         return job;
