@@ -37,7 +37,20 @@ public class JobMapper extends AbstractMapper<Job> {
 
             ExperienceMapper experienceMapper = (ExperienceMapper) MapperRegistry.getMapper(Experience.class);
             Stream<Experience> experiences = experienceMapper.stream(statement.executeQuery(), experienceMapper::mapper);
-            job.setExperiences(experiences);
+            getIdentityMap().replace(job.getIdentityKey(), job, Job.load(
+                    job.getAccountID(),
+                    job.getAccountID(),
+                    job.getAddress(),
+                    job.getWage(),
+                    job.getDescription(),
+                    job.getSchedule(),
+                    job.getOfferBeginDate(),
+                    job.getOfferEndDate(),
+                    job.getOfferType(),
+                    job.getVersion(),
+                    experiences,
+                    job.getApplications()
+            ));
             return experiences;
         } catch (SQLException e) {
             throw new DataMapperException(e.getMessage(), e);
@@ -73,7 +86,20 @@ public class JobMapper extends AbstractMapper<Job> {
                 }
             }, false);
 
-            job.setApplications(applicants);
+            getIdentityMap().replace(job.getIdentityKey(), job, Job.load(
+                    job.getAccountID(),
+                    job.getAccountID(),
+                    job.getAddress(),
+                    job.getWage(),
+                    job.getDescription(),
+                    job.getSchedule(),
+                    job.getOfferBeginDate(),
+                    job.getOfferEndDate(),
+                    job.getOfferType(),
+                    job.getVersion(),
+                    job.getExperiences(),
+                    applicants
+            ));
             return applicants;
         } catch (SQLException e) {
             throw new DataMapperException(e.getMessage(), e);
@@ -94,7 +120,7 @@ public class JobMapper extends AbstractMapper<Job> {
             String offerType = rs.getString("OfferType");
             long version = rs.getLong("Version");
 
-            Job job = Job.load(jobID, accountID, address, wage, description, schedule, offerBeginDate, offerEndDate, offerType, version);
+            Job job = Job.load(jobID, accountID, address, wage, description, schedule, offerBeginDate, offerEndDate, offerType, version, null, null);
             getIdentityMap().put(jobID, job);
 
             return job;
