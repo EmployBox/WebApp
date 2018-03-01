@@ -48,11 +48,11 @@ public class JobMapper extends AbstractMapper<Job> {
         Connection con = ConnectionManager.getConnectionManager().getConnection();
         PreparedStatement statement;
         try {
-            statement = con.prepareStatement("SELECT [User].accountId, [User].name, [User].summary, [User].photourl, Application.curriculumId, Application.Date \n" +
-                    "FROM Application\n" +
-                    "INNER JOIN [User] \n" +
-                    "ON Application.accountId = [User].accountId\n" +
-                    "AND Application.JobId = ?");
+            statement = con.prepareStatement("SELECT [User].accountId, [User].name, [User].summary, [User].photourl, ApiDataBase.[Application].curriculumId, ApiDataBase.[Application].[Date]\n" +
+                    "FROM [User]\n" +
+                    "INNER JOIN ApiDataBase.[Application]\n" +
+                    "ON ApiDataBase.[Application].UserId = [User].accountId\n" +
+                    "AND ApiDataBase.[Application].JobId = ?");
 
             statement.setLong(1, (Long) job.getIdentityKey());
             ResultSet rs = statement.executeQuery();
