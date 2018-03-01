@@ -3,8 +3,8 @@ package model;
 public class Account extends DomainObject{
     private final long accountID;
     private final String email;
-    private String password;
-    private double rating;
+    private final String password;
+    private final double rating;
 
     protected Account(long accountID, String email, String password, double rating, long version){
         super(accountID, version);
@@ -38,19 +38,7 @@ public class Account extends DomainObject{
         return password;
     }
 
-    public void setPassword(String password) {
-        markToBeDirty();
-        this.password = password;
-        markDirty();
-    }
-
     public double getRating() {
         return rating;
-    }
-
-    public void setRating(double rating) {
-        markToBeDirty();
-        this.rating = rating;
-        markDirty();
     }
 }

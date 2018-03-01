@@ -16,7 +16,6 @@ public class UserMapper extends AccountMapper<User> {
         return SELECT_QUERY;
     }
 
-
     @Override
     public User mapper(ResultSet rs) throws DataMapperException {
         try {

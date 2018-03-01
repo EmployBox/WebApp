@@ -7,23 +7,25 @@ public class Curriculum extends DomainObject{
     private final long accountId;
     private final long curriculumId;
 
-    private Stream<PreviousJobs> previousJobs;
-    private Stream<AcademicBackground> academicBackground;
+    private final Stream<PreviousJobs> previousJobs;
+    private final Stream<AcademicBackground> academicBackground;
 
-    private Curriculum(long accountId, long curriculumId) {
+    private Curriculum(long accountId, long curriculumId, Stream<PreviousJobs> previousJobs, Stream<AcademicBackground> academicBackground) {
         super(String.format("%d%n-%d%n", accountId, curriculumId));
         this.accountId = accountId;
         this.curriculumId = curriculumId;
+        this.previousJobs = previousJobs;
+        this.academicBackground = academicBackground;
     }
 
-    public static Curriculum create(long accountId){
-        Curriculum curriculum = new Curriculum(accountId, -1);
+    public static Curriculum create(long accountId, Stream<PreviousJobs> previousJobs, Stream<AcademicBackground> academicBackground){
+        Curriculum curriculum = new Curriculum(accountId, -1, previousJobs, academicBackground);
         curriculum.markNew();
         return curriculum;
     }
 
-    public static Curriculum load(long accountId, long curriculumId){
-        Curriculum curriculum = new Curriculum(accountId, curriculumId);
+    public static Curriculum load(long accountId, long curriculumId, Stream<PreviousJobs> previousJobs, Stream<AcademicBackground> academicBackground){
+        Curriculum curriculum = new Curriculum(accountId, curriculumId, previousJobs, academicBackground);
         curriculum.markClean();
         return curriculum;
     }
@@ -40,15 +42,7 @@ public class Curriculum extends DomainObject{
         return previousJobs;
     }
 
-    public void setPreviousJobs(Stream<PreviousJobs> previousJobs) {
-        this.previousJobs = previousJobs;
-    }
-
     public Stream<AcademicBackground> getAcademicBackground() {
         return academicBackground;
-    }
-
-    public void setAcademicBackground(Stream<AcademicBackground> academicBackground) {
-        this.academicBackground = academicBackground;
     }
 }
