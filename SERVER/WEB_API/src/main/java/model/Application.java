@@ -3,9 +3,9 @@ package model;
 import java.sql.Date;
 
 public class Application extends DomainObject {
-    private long userId;
-    private long jobId;
-    private long curriculumId;
+    private final long userId;
+    private final long jobId;
+    private final long curriculumId;
     private Date date;
 
     public Application(long userId, long jobId,long curriculumId, Date date) {
@@ -40,23 +40,11 @@ public class Application extends DomainObject {
         return curriculumId;
     }
 
-    public void setCurriculumId(long curriculumId) {
-        this.curriculumId = curriculumId;
-    }
-
     public long getJobId() {
         return jobId;
     }
 
-    public void setJobId(long jobId) {
-        this.jobId = jobId;
-    }
-
     public long getUserId() {
         return userId;
-    }
-
-    public void setUserId(long userId) {
-        this.userId = userId;
     }
 }
