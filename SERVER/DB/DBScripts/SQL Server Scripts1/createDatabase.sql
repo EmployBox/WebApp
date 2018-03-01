@@ -19,17 +19,25 @@ CREATE TABLE ApiDatabase.Account (
 	salt UNIQUEIDENTIFIER NOT NULL,
 	[version] rowversion,
 
-	CONSTRAINT rate_const CHECK (rating >= 0.0 AND rating <= 5.0)
+	CHECK (rating >= 0.0 AND rating <= 5.0)
 )
 
 CREATE TABLE ApiDatabase.Company (
-	accountId BIGINT IDENTITY primary key references ApiDatabase.Account,
+	accountId BIGINT primary key references ApiDatabase.Account,
 	name NVARCHAR(40),
 	yearFounded SMALLINT,
 	Specialization NVARCHAR(20),
 	WebPageUrl NVARCHAR(50),
 	LogoUrl NVARCHAR(100),
-	[description] NVARCHAR(50)
+	[description] NVARCHAR(50),
+
+	FOREIGN KEY (accountID) REFERENCES ApiDatabase.Account(accountID) ON DELETE CASCADE	
+)
+
+CREATE TABLE ApiDatabase.Moderator (
+	accountID BIGINT primary key references ApiDatabase.Account,
+
+	FOREIGN KEY (accountID) REFERENCES ApiDatabase.Account(accountID) ON DELETE CASCADE	
 )
 
 CREATE TABLE ApiDatabase.[User] (
@@ -37,13 +45,26 @@ CREATE TABLE ApiDatabase.[User] (
 	name NVARCHAR(40),
 	summary NVARCHAR(1500),
 	PhotoUrl NVARCHAR(100)
+
+	FOREIGN KEY (accountID) REFERENCES ApiDatabase.Account(accountID) ON DELETE CASCADE		
 )
 
 CREATE TABLE ApiDatabase.Curriculum(
 	userId BIGINT references ApiDatabase.[User],
 	curriculumId BIGINT,
 
+	FOREIGN KEY (userId) REFERENCES ApiDatabase.[User] ( accountId) ON DELETE CASCADE,	
 	primary key(userId,curriculumId)
+)
+
+CREATE TABLE ApiDatabase.Project (
+	userId BIGINT,
+	curriculumId BIGINT,
+	name NVARCHAR(15),
+	[description] NVARCHAR(50),
+
+	PRIMARY KEY (userId,curriculumID),
+	FOREIGN KEY (userId,curriculumId) REFERENCES ApiDatabase.Curriculum(userId,curriculumId) ON DELETE CASCADE
 )
 
 CREATE TABLE ApiDatabase.AcademicBackground(
@@ -55,19 +76,20 @@ CREATE TABLE ApiDatabase.AcademicBackground(
 	institution NVARCHAR(40),
 	degreeObtained NVARCHAR(10),
 
-	FOREIGN KEY(userId,curriculumId) REFERENCES ApiDatabase.Curriculum,
-	CONSTRAINT endDate_check check (endDate < beginDate),
-	CONSTRAINT degree check (degreeObtained = 'basic level 1' 
+	FOREIGN KEY (userId,curriculumId) REFERENCES ApiDatabase.Curriculum(userId,curriculumId) ON DELETE CASCADE,
+	PRIMARY KEY(userId,curriculumId),
+	check (endDate < beginDate),
+	check (degreeObtained = 'basic level 1' 
 						OR degreeObtained = 'basic level 2' 
 						OR degreeObtained = 'basic level 3'
 						OR degreeObtained = 'secundary'
 						OR degreeObtained = 'bachelor'
 						OR degreeObtained = 'master'
-						OR degreeObtained = 'PHD')
+						OR degreeObtained = 'PHD')				
 )
 
 CREATE TABLE Apidatabase.PreviousJobs(
-	accountId BIGINT,
+	userId BIGINT,
 	curriculumId BIGINT,
 	beginDate DATETIME DEFAULT(GETDATE()),
 	endDate DATETIME,
@@ -75,7 +97,10 @@ CREATE TABLE Apidatabase.PreviousJobs(
 	[workload] NVARCHAR(20),
 	[role] NVARCHAR(20),
 
-	FOREIGN KEY(accountId,curriculumId) REFERENCES ApiDatabase.Curriculum,
+	PRIMARY KEY(userId,curriculumId),
+	
+	FOREIGN KEY (userId,curriculumId) REFERENCES ApiDatabase.Curriculum(userId,curriculumId) ON DELETE CASCADE,
+	CHECK([workLoad] = 'partial' OR [workLoad] = 'total')
 )
 
 CREATE TABLE ApiDatabase.[Local] (
@@ -88,18 +113,19 @@ CREATE TABLE ApiDatabase.[Local] (
 
 CREATE TABLE ApiDatabase.Job(
 	jobId BIGINT identity primary key,
-	accountId BIGINT references ApiDatabase.Account,
-	userId BIGINT references ApiDatabase.[User],
+	accountId BIGINT,
 	schedule NVARCHAR(20),
 	wage INT check(wage > 0),
 	[description] NVARCHAR(50),
 	offerBeginDate DATETIME DEFAULT(GETDATE()),
 	offerEndDate DATETIME NOT NULL,
 	offerType NVARCHAR(30),
-	[Address] NVARCHAR(50) references ApiDatabase.[Local],
+	[Address] NVARCHAR(50),
 	[version] rowversion,
 
-	CONSTRAINT offerTypes check(offerType = 'Looking for work' OR offerType = 'Looking for Worker')
+	FOREIGN KEY (accountID) REFERENCES ApiDatabase.Account(accountID) ON DELETE CASCADE,
+	FOREIGN KEY ([Address]) REFERENCES ApiDatabase.[Local]([Address]) ON DELETE CASCADE,
+	check(offerType = 'Looking for work' OR offerType = 'Looking for Worker')
 )
 
 CREATE TABLE Apidatabase.Experience(
@@ -109,17 +135,22 @@ CREATE TABLE Apidatabase.Experience(
 )
 
 CREATE TABLE Apidatabase.Curriculum_Experience(
-	accountId BIGINT,
+	userId BIGINT,
 	curriculumId BIGINT,
-	experienceId BIGINT references ApiDatabase.Experience,
+	experienceId BIGINT,
 
-	foreign key(accountId,curriculumId) references ApiDatabase.Curriculum,
-	primary key(accountId, curriculumId, experienceId)
+	FOREIGN KEY (userId,curriculumId) REFERENCES ApiDatabase.Curriculum(userId,curriculumId) ON DELETE CASCADE,
+	FOREIGN KEY (experienceId) REFERENCES ApiDatabase.Experience(experienceId) ON DELETE CASCADE,
+
+	primary key(userId, curriculumId, experienceId)
 )
 
 CREATE TABLE Apidatabase.Job_Experience(
-	jobId BIGINT references ApiDatabase.Job,
-	experienceId BIGINT references ApiDatabase.Experience,
+	jobId BIGINT,
+	experienceId BIGINT,
+
+	FOREIGN KEY (jobId) REFERENCES ApiDatabase.Job(jobId) ON DELETE CASCADE,
+	FOREIGN KEY (experienceId) REFERENCES ApiDatabase.Experience(experienceId) ON DELETE CASCADE,
 
 	primary key(jobId, experienceId)
 )
@@ -127,27 +158,35 @@ CREATE TABLE Apidatabase.Job_Experience(
 CREATE TABLE ApiDatabase.[Application](
 	UserId BIGINT,
 	CurriculumId BIGINT,
-	JobId BIGINT references ApiDatabase.Job,
+	JobId BIGINT,
 	[date] datetime default(GETDATE()),
-	
-	foreign key (UserId,CurriculumId) references ApiDatabase.Curriculum,
+
+	FOREIGN KEY (userId,curriculumId) REFERENCES ApiDatabase.Curriculum(userId,curriculumId),
+	FOREIGN KEY (jobId) REFERENCES ApiDatabase.Job(jobId),
 	primary key (UserId, JobId)
 )
 
 CREATE TABLE ApiDatabase.Rating(
-	AccountIdFrom BIGINT references ApiDatabase.Account,
-	AccountIdTo BIGINT references ApiDatabase.Account,
-	ratingValue decimal(2,1) DEFAULT 0.0,
+	AccountIdFrom BIGINT,
+	AccountIdTo BIGINT,
+	moderatorId BIGINT references ApiDatabase.Moderator,
+	ratingValue decimal(2,1) DEFAULT 0.0
 	
+	FOREIGN KEY (accountIdFrom) REFERENCES ApiDatabase.Account(accountID),
+	FOREIGN KEY (accountIdTo) REFERENCES ApiDatabase.Account(accountID),
+
 	constraint rating_interval check (ratingValue >= 0.0 AND ratingValue <= 5.0),
 	PRIMARY KEY(AccountIdFrom , AccountIdTo)
 )
 
 CREATE TABLE ApiDatabase.Chat(
 	chatId BIGINT IDENTITY PRIMARY KEY,
-	AccountIdFirst BIGINT references ApiDatabase.Account,
-	AccountIdSecond BIGINT references ApiDatabase.Account,
+	AccountIdFirst BIGINT,
+	AccountIdSecond BIGINT,
 	[version] rowversion
+
+	FOREIGN KEY (accountIdFirst) REFERENCES ApiDatabase.Account(accountID),
+	FOREIGN KEY (accountIdSecond) REFERENCES ApiDatabase.Account(accountID),
 )
 
 
@@ -155,28 +194,36 @@ CREATE TABLE ApiDatabase.[MESSAGE](
 	chatId BIGINT REFERENCES ApiDatabase.Chat,
 	[text] NVARCHAR(200),
 	[date] datetime default(getdate()),
+
+	FOREIGN KEY (chatId) REFERENCES ApiDatabase.Chat(chatId),
 )
 
 CREATE TABLE ApiDatabase.Comment (
 	CommentId BIGINT identity primary key,
-	AccountIdFrom BIGINT references ApiDatabase.Account,
-	AccountIdDest BIGINT references ApiDatabase.Account,
+	AccountIdFrom BIGINT,
+	AccountIdDest BIGINT,
 	[date] DATETIME default(getdate()),
 	[text] NVARCHAR(300),
-	MainCommentId BIGINT REFERENCES ApiDatabase.Comment,
+	MainCommentId BIGINT,
+	[status] bit,
 	[version] rowversion
+
+	FOREIGN KEY (accountIdFrom) REFERENCES ApiDatabase.Account(accountID),
+	FOREIGN KEY (accountIdDest) REFERENCES ApiDatabase.Account(accountID),
+	FOREIGN KEY (MainCommentId) REFERENCES ApiDatabase.Comment(commentId),
 )
 
 CREATE TABLE ApiDatabase.Follows (
 	AccountIdFrom BIGINT references ApiDatabase.Account,
 	AccountIdDest BIGINT references ApiDatabase.Account,
 
+	FOREIGN KEY (accountIdFrom) REFERENCES ApiDatabase.Account(accountID),
+	FOREIGN KEY (accountIdDest) REFERENCES ApiDatabase.Account(accountID),
 	primary key (AccountIdFrom,AccountIdDest)
 )
 
+
 GO
-
-
 CREATE VIEW dbo.Account AS
 SELECT accountId,email,passwordHash,rating FROM ApiDatabase.Account
 GO
@@ -184,6 +231,11 @@ GO
 GO
 CREATE VIEW dbo.[User] AS
 SELECT * FROM ApiDatabase.[User]
+GO
+
+GO
+CREATE VIEW dbo.Moderator AS
+SELECT * FROM ApiDatabase.Moderator
 GO
 
 GO
@@ -239,6 +291,11 @@ GO
 GO
 CREATE VIEW dbo.[Message] AS
 SELECT * FROM ApiDatabase.[Message]
+GO
+
+GO
+CREATE VIEW dbo.Project AS
+SELECT * FROM ApiDatabase.Project
 GO
 
 GO
