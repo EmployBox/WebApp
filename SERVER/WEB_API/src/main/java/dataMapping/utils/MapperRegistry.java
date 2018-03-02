@@ -13,7 +13,7 @@ public class MapperRegistry {
         return map.get(domainObject);
     }
 
-    public static <T extends DomainObject> void addEntry(Class<T> domainObjectClass, AbstractMapper<T> abstractMapper) {
+    public static <T extends DomainObject<K>, K> void addEntry(Class<T> domainObjectClass, AbstractMapper<T, K> abstractMapper) {
         map.put(domainObjectClass, abstractMapper);
     }
 }

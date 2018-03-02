@@ -16,7 +16,7 @@ import java.util.function.Consumer;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
-public class JobMapper extends AbstractMapper<Job> {
+public class JobMapper extends AbstractMapper<Job, Long> {
     private final String SELECT_QUERY = "SELECT JobID, AccountID, Address, Wage, Description, Schedule, OfferBeginDate, OfferEndDate, OfferType, Version FROM Job WHERE JobID = ?";
     private final String INSERT_QUERY = "INSERT INTO Job (AccountID, Address, Wage, Description, Schedule, OfferBeginDate, OfferEndDate, OfferType, Version) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
     private final String UPDATE_QUERY = "UPDATE Job SET Address = ?, Wage = ?, Description = ?, Schedule = ?, OfferBeginDate = ?, OfferEndDate = ?, OfferType = ?, Version = ? WHERE JobID = ? AND Version = ?";
@@ -25,85 +25,6 @@ public class JobMapper extends AbstractMapper<Job> {
     @Override
     protected String findByPKStatement() {
         return SELECT_QUERY;
-    }
-
-    public Stream<Experience> findExperiences(Job job){
-        Connection con = ConnectionManager.getConnectionManager().getConnection();
-        PreparedStatement statement;
-        try {
-            statement = con.prepareStatement("Select experienceId, competence, years from Experience where experienceId in (Select experienceId from Job_Experience where jobId = ?)");
-
-            statement.setLong(1, (Long) job.getIdentityKey());
-
-            ExperienceMapper experienceMapper = (ExperienceMapper) MapperRegistry.getMapper(Experience.class);
-            Stream<Experience> experiences = experienceMapper.stream(statement.executeQuery(), experienceMapper::mapper);
-            getIdentityMap().replace(job.getIdentityKey(), job, Job.load(
-                    job.getAccountID(),
-                    job.getAccountID(),
-                    job.getAddress(),
-                    job.getWage(),
-                    job.getDescription(),
-                    job.getSchedule(),
-                    job.getOfferBeginDate(),
-                    job.getOfferEndDate(),
-                    job.getOfferType(),
-                    job.getVersion(),
-                    experiences,
-                    job.getApplications()
-            ));
-            return experiences;
-        } catch (SQLException e) {
-            throw new DataMapperException(e.getMessage(), e);
-        }
-    }
-
-    public Stream<Pair<User, Curriculum>> findApplications(Job job){
-        Connection con = ConnectionManager.getConnectionManager().getConnection();
-        PreparedStatement statement;
-        try {
-            statement = con.prepareStatement("SELECT [User].accountId, [User].name, [User].summary, [User].photourl, ApiDataBase.[Application].curriculumId, ApiDataBase.[Application].[Date]\n" +
-                    "FROM [User]\n" +
-                    "INNER JOIN ApiDataBase.[Application]\n" +
-                    "ON ApiDataBase.[Application].UserId = [User].accountId\n" +
-                    "AND ApiDataBase.[Application].JobId = ?");
-
-            statement.setLong(1, (Long) job.getIdentityKey());
-            ResultSet rs = statement.executeQuery();
-
-            UserMapper userMapper = (UserMapper) MapperRegistry.getMapper(User.class);
-            CurriculumMapper curriculumMapper = (CurriculumMapper) MapperRegistry.getMapper(Curriculum.class);
-            Stream<Pair<User, Curriculum>> applicants = StreamSupport.stream(new Spliterators.AbstractSpliterator<Pair<User, Curriculum>>(
-                    Long.MAX_VALUE, Spliterator.ORDERED) {
-                @Override
-                public boolean tryAdvance(Consumer<? super Pair<User, Curriculum>> action) {
-                    try {
-                        if(!rs.next())return false;
-                        action.accept(new Pair<>(userMapper.mapper(rs), curriculumMapper.mapper(rs)));
-                        return true;
-                    } catch (SQLException e) {
-                        throw new DataMapperException(e.getMessage(), e);
-                    }
-                }
-            }, false);
-
-            getIdentityMap().replace(job.getIdentityKey(), job, Job.load(
-                    job.getAccountID(),
-                    job.getAccountID(),
-                    job.getAddress(),
-                    job.getWage(),
-                    job.getDescription(),
-                    job.getSchedule(),
-                    job.getOfferBeginDate(),
-                    job.getOfferEndDate(),
-                    job.getOfferType(),
-                    job.getVersion(),
-                    job.getExperiences(),
-                    applicants
-            ));
-            return applicants;
-        } catch (SQLException e) {
-            throw new DataMapperException(e.getMessage(), e);
-        }
     }
 
     @Override

@@ -1,6 +1,6 @@
 package model;
 
-public class Experience extends DomainObject {
+public class Experience extends DomainObject<Long> {
 
     private final String competence;
     private final short years;

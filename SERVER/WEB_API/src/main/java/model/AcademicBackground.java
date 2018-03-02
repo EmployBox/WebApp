@@ -2,7 +2,7 @@ package model;
 
 import java.sql.Date;
 
-public class AcademicBackground extends DomainObject {
+public class AcademicBackground extends DomainObject<String> {
     private final long accountID;
     private final long curriculumId;
     private Date beginDate;

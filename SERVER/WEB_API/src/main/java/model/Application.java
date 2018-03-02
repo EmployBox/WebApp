@@ -2,7 +2,7 @@ package model;
 
 import java.sql.Date;
 
-public class Application extends DomainObject {
+public class Application extends DomainObject<String> {
     private final long userId;
     private final long jobId;
     private final long curriculumId;

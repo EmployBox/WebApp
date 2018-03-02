@@ -21,10 +21,10 @@ import java.util.function.Function;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
-public abstract class AbstractMapper<T extends DomainObject> implements Mapper<T> {
-    private final ConcurrentMap<Object, T> identityMap = new ConcurrentHashMap<>();
+public abstract class AbstractMapper<T extends DomainObject<K>, K> implements Mapper<T, K> {
+    private final ConcurrentMap<K, T> identityMap = new ConcurrentHashMap<>();
 
-    public Map<Object, T> getIdentityMap() {
+    public Map<K, T> getIdentityMap() {
         return identityMap;
     }
 
@@ -59,7 +59,7 @@ public abstract class AbstractMapper<T extends DomainObject> implements Mapper<T
                     throw new DataMapperException(e.getMessage(), e);
                 }
             }
-        }, false);
+        }, false)/*.onClose(() -> rs.close())*/;
     }
 
     /**

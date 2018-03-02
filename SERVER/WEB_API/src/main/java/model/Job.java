@@ -5,7 +5,7 @@ import javafx.util.Pair;
 import java.sql.Date;
 import java.util.stream.Stream;
 
-public class Job extends DomainObject {
+public class Job extends DomainObject<Long> {
     private final long accountID;
     private final String address;
     private final int wage;

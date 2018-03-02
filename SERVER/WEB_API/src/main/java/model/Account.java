@@ -1,6 +1,6 @@
 package model;
 
-public class Account extends DomainObject{
+public class Account extends DomainObject<Long>{
     private final long accountID;
     private final String email;
     private final String password;

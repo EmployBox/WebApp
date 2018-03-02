@@ -2,7 +2,7 @@ package model;
 
 import java.sql.Date;
 
-public class Message extends DomainObject {
+public class Message extends DomainObject<Long> {
     private final long chadId;
     private final String text;
     private final Date date;

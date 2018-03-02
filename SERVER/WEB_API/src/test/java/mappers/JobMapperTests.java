@@ -42,6 +42,6 @@ public class JobMapperTests {
 
         UnitOfWork.getCurrent().commit();
 
-        
+
     }
 }
