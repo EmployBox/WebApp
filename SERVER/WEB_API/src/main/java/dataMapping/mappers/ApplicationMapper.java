@@ -1,19 +1,12 @@
 package dataMapping.mappers;
 
+
 import dataMapping.exceptions.DataMapperException;
-import dataMapping.utils.ConnectionManager;
-import dataMapping.utils.MapperRegistry;
-import javafx.util.Pair;
+
 import model.Application;
-import model.Curriculum;
-import model.User;
 
 import java.sql.*;
-import java.util.Spliterator;
-import java.util.Spliterators;
-import java.util.function.Consumer;
 import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
 
 public class ApplicationMapper extends AbstractMapper<Application, String> {
     private String SELECT_QUERY =  "select UserId, CurriculumId, JobId, [date] from [Application] where userId = ? AND JobId = ? ";

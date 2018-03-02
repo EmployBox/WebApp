@@ -1,5 +1,7 @@
 package model;
 
+import util.Streamable;
+
 public class Curriculum extends DomainObject<String>{
 
     private final long accountId;
@@ -53,10 +55,10 @@ public class Curriculum extends DomainObject<String>{
     }
 
     public Iterable<PreviousJobs> getPreviousJobs() {
-        return previousJobs;
+        return previousJobs.get();
     }
 
     public Iterable<AcademicBackground> getAcademicBackground() {
-        return academicBackground;
+        return academicBackground.get();
     }
 }

@@ -3,6 +3,7 @@ package dataMapping.mappers;
 
 import dataMapping.exceptions.DataMapperException;
 import dataMapping.utils.ConnectionManager;
+import model.DomainObject;
 import model.User;
 
 import java.sql.*;
