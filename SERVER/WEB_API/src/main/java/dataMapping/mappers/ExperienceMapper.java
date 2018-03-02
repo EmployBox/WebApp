@@ -1,8 +1,9 @@
 package dataMapping.mappers;
 
-import dataMapping.exceptions.DataMapperException;
-import model.Experience;
 
+import dataMapping.exceptions.DataMapperException;
+
+import model.Experience;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.stream.Stream;

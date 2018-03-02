@@ -21,7 +21,9 @@ import java.util.function.Supplier;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
+
 public abstract class AbstractMapper<T extends DomainObject<K>, K> implements Mapper<T, K> {
+
     private final ConcurrentMap<K, T> identityMap = new ConcurrentHashMap<>();
 
     public Map<K, T> getIdentityMap() {
@@ -50,7 +52,7 @@ public abstract class AbstractMapper<T extends DomainObject<K>, K> implements Ma
                     action.accept(func.apply(rs));
                     return true;
                 } catch (SQLException e) {
-                    throw new DataMapperException(e.getMessage(), e);
+                    throw new DataMapperException(e);
                 }
             }
         }, false).onClose(() -> { try { rs.close(); } catch (SQLException e) { throw new DataMapperException(e.getMessage(), e); } });
@@ -76,6 +78,7 @@ public abstract class AbstractMapper<T extends DomainObject<K>, K> implements Ma
      * @param prepareStatement
      * @return
      */
+
     public Stream<T> executeQuery(String query, K key, Function<PreparedStatement, SQLException> prepareStatement){
         Map<K, T> identityMap = getIdentityMap();
         if(identityMap.containsKey(key))

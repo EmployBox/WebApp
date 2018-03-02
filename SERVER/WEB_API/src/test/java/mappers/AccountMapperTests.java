@@ -11,9 +11,7 @@ import org.junit.Test;
 
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.Optional;
 
-import static junit.framework.TestCase.assertTrue;
 
 public class AccountMapperTests {
 

@@ -14,7 +14,7 @@ public class Local extends DomainObject<String> {
         this.zipCode = zipCode;
     }
 
-    public static Local create(String address, String country, String district, String zipCode){
+    public static Local create(String address, String country, String district, String zipCode, long version){
         Local local = new Local(address, country, district, zipCode, 0);
         local.markNew();
         return local;

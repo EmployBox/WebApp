@@ -1,34 +1,34 @@
 package model;
 
-import java.util.stream.Stream;
+import util.Streamable;
 
 public class Curriculum extends DomainObject<String>{
 
     private final long accountId;
     private final long curriculumId;
 
-    private final Stream<PreviousJobs> previousJobs;
-    private final Stream<AcademicBackground> academicBackground;
-    private final Stream<Project> projects;
+    private final Iterable<PreviousJobs> previousJobs;
+    private final Iterable<AcademicBackground> academicBackground;
+    private final Iterable<Project> projects;
 
     private Curriculum(long accountId,
                        long curriculumId,
                        long version,
-                       Stream<PreviousJobs> previousJobs,
-                       Stream<AcademicBackground> academicBackground,
-                       Stream<Project> projects) {
+                       Iterable<AcademicBackground> academicBackground,
+                       Iterable<Project> projects) {
         super(String.format("%d%n-%d%n", accountId, curriculumId), "", version);
         this.accountId = accountId;
         this.curriculumId = curriculumId;
-        this.previousJobs = previousJobs;
+        this.previousJobs =  previousJobs;
         this.academicBackground = academicBackground;
         this.projects = projects;
     }
 
     public static Curriculum create(long accountId,
-                                    Stream<PreviousJobs> previousJobs,
-                                    Stream<AcademicBackground> academicBackground,
-                                    Stream<Project> projects)
+                                    Iterable<PreviousJobs> previousJobs,
+                                    Iterable<AcademicBackground> academicBackground,
+                                    Iterable<Project> projects,
+                                    long version)
     {
         Curriculum curriculum = new Curriculum(accountId, -1, 0, previousJobs, academicBackground, projects);
         curriculum.markNew();
@@ -38,9 +38,8 @@ public class Curriculum extends DomainObject<String>{
     public static Curriculum load(long accountId,
                                   long curriculumId,
                                   long version,
-                                  Stream<PreviousJobs> previousJobs,
-                                  Stream<AcademicBackground> academicBackground,
-                                  Stream<Project> projects)
+                                  Iterable<AcademicBackground> academicBackground,
+                                  Iterable<Project> projects)
     {
         Curriculum curriculum = new Curriculum(accountId, curriculumId, version, previousJobs, academicBackground, projects);
         curriculum.markClean();
@@ -55,11 +54,11 @@ public class Curriculum extends DomainObject<String>{
         return curriculumId;
     }
 
-    public Stream<PreviousJobs> getPreviousJobs() {
-        return previousJobs;
+    public Iterable<PreviousJobs> getPreviousJobs() {
+        return previousJobs.get();
     }
 
-    public Stream<AcademicBackground> getAcademicBackground() {
-        return academicBackground;
+    public Iterable<AcademicBackground> getAcademicBackground() {
+        return academicBackground.get();
     }
 }
