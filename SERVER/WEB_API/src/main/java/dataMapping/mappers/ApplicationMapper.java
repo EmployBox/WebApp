@@ -1,20 +1,34 @@
 package dataMapping.mappers;
 
+
+import dataMapping.exceptions.DataMapperException;
+
 import model.Application;
 
-import java.sql.Date;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
+import java.util.stream.Stream;
 
-public class ApplicationMapper extends AbstractMapper<Application> {
+public class ApplicationMapper extends AbstractMapper<Application, String> {
     private String SELECT_QUERY =  "select UserId, CurriculumId, JobId, [date] from [Application] where userId = ? AND JobId = ? ";
     private String INSERT_QUERY =  "INSERT INTO [Application](userId, jobId, curriculumId, [date]) values (? , ? , ? , ?)";
     private String UPDATE_QUERY =  "UPDATE [Application] SET [date] = ? where where userId = ? AND JobId = ?";
     private String DELETE_QUERY =  "DELETE [Application] where userId = ? AND jobId = ?";
 
-    @Override
-    protected String findByPKStatement() {
-        return SELECT_QUERY;
+    public Stream<Application> findJobApplications(long jobId){
+        String query = "SELECT UserId, CurriculumId, JobId, [date] from [Application] WHERE JobId = ?";
+        return executeQuery(
+                query,
+                null,
+                preparedStatement -> {
+                    SQLException sqlException = null;
+                    try{
+                        preparedStatement.setLong(1, jobId);
+                    } catch (SQLException e) {
+                        sqlException = e;
+                    }
+                    return sqlException;
+                }
+        );
     }
 
     @Override
@@ -36,8 +50,9 @@ public class ApplicationMapper extends AbstractMapper<Application> {
 
     @Override
     public void insert(Application obj) {
-        DBHelper(
+        executeSQLUpdate(
                 INSERT_QUERY,
+                obj,
                 preparedStatement -> {
                     SQLException sqlException = null;
                     try{
@@ -49,15 +64,15 @@ public class ApplicationMapper extends AbstractMapper<Application> {
                         sqlException = e;
                     }
                     return sqlException;
-                },
-                () -> getIdentityMap().put(obj.getIdentityKey(), obj)
+                }
         );
     }
 
     @Override
     public void update(Application obj) {
-        DBHelper(
+        executeSQLUpdate(
                 UPDATE_QUERY,
+                obj,
                 preparedStatement -> {
                     SQLException sqlException = null;
                     try{
@@ -66,15 +81,15 @@ public class ApplicationMapper extends AbstractMapper<Application> {
                         sqlException = e;
                     }
                     return sqlException;
-                },
-                () -> getIdentityMap().put(obj.getIdentityKey(), obj)
+                }
         );
     }
 
     @Override
     public void delete(Application obj) {
-        DBHelper(
+        executeSQLUpdate(
                 DELETE_QUERY,
+                obj,
                 preparedStatement -> {
                     SQLException sqlException = null;
                     try{
@@ -84,8 +99,7 @@ public class ApplicationMapper extends AbstractMapper<Application> {
                         sqlException = e;
                     }
                     return sqlException;
-                },
-                () -> getIdentityMap().remove(obj.getIdentityKey(), obj)
+                }
         );
     }
 }

@@ -2,7 +2,7 @@ package model;
 
 import java.sql.Date;
 
-public class Comment extends DomainObject {
+public class Comment extends DomainObject<Long> {
     private final long commentID;
     private final long accountIdFrom;
     private final long accountIdTo;

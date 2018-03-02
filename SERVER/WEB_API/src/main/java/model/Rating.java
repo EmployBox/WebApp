@@ -1,6 +1,6 @@
 package model;
 
-public class Rating extends DomainObject {
+public class Rating extends DomainObject<String> {
     private final long accountIdFrom;
     private final long accountIdTo;
     private final long moderatorId; // can be null

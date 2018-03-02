@@ -1,6 +1,6 @@
 package model;
 
-public class Project extends DomainObject {
+public class Project extends DomainObject<String> {
     private final long userId;
     private final long curriculumId;
     private final String name;

@@ -2,7 +2,7 @@ package model;
 
 import java.util.stream.Stream;
 
-public class Chat extends DomainObject{
+public class Chat extends DomainObject<Long>{
     private final long chadId;
     private final long accountIdFirst;
     private final long accountIdSecond;

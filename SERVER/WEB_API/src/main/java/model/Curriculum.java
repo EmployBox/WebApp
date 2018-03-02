@@ -4,7 +4,7 @@ import util.Streamable;
 
 import java.util.stream.Stream;
 
-public class Curriculum extends DomainObject{
+public class Curriculum extends DomainObject<String>{
 
     private final long accountId;
     private final long curriculumId;

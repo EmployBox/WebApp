@@ -3,7 +3,7 @@
   <Items>
     <LogicalFolder Name="Connections" Type="2" Sorted="true">
       <Items>
-        <ConnectionNode Name="(local):ASUS-JOAO\JonyM">
+        <ConnectionNode Name="(local):Neo\MATRIX">
           <Created>2018-02-27T17:04:08.5548379+00:00</Created>
           <Type>SQL</Type>
           <Server>(local)</Server>
@@ -15,7 +15,7 @@
           <ConnectionProtocol>NotSpecified</ConnectionProtocol>
           <ApplicationName>Microsoft SQL Server Management Studio - Query</ApplicationName>
         </ConnectionNode>
-        <ConnectionNode Name="NEO\SQLEXPRESS:ASUS-JOAO\JonyM">
+        <ConnectionNode Name="NEO\SQLEXPRESS:Neo\MATRIX">
           <Created>2018-02-25T19:31:47.0818784+00:00</Created>
           <Type>SQL</Type>
           <Server>NEO\SQLEXPRESS</Server>
@@ -38,16 +38,10 @@
           <FullPath>createDatabase.sql</FullPath>
         </FileNode>
         <FileNode Name="dropDatabase.sql">
-          <AssociatedConnectionMoniker>8c91a03d-f9b4-46c0-a305-b5dcc79ff907:(local):True</AssociatedConnectionMoniker>
-          <AssociatedConnSrvName>(local)</AssociatedConnSrvName>
+          <AssociatedConnectionMoniker>8c91a03d-f9b4-46c0-a305-b5dcc79ff907:NEO\SQLEXPRESS:True</AssociatedConnectionMoniker>
+          <AssociatedConnSrvName>NEO\SQLEXPRESS</AssociatedConnSrvName>
           <AssociatedConnUserName />
           <FullPath>dropDatabase.sql</FullPath>
-        </FileNode>
-        <FileNode Name="populateTestDatabase.sql">
-          <AssociatedConnectionMoniker>8c91a03d-f9b4-46c0-a305-b5dcc79ff907:(local):True</AssociatedConnectionMoniker>
-          <AssociatedConnSrvName>(local)</AssociatedConnSrvName>
-          <AssociatedConnUserName />
-          <FullPath>populateTestDatabase.sql</FullPath>
         </FileNode>
         <FileNode Name="procedure_tests(junk version).sql">
           <AssociatedConnectionMoniker>8c91a03d-f9b4-46c0-a305-b5dcc79ff907:(local):True</AssociatedConnectionMoniker>

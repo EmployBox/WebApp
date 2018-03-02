@@ -5,13 +5,8 @@ import model.Local;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-public class LocalMapper extends AbstractMapper<Local>{
+public class LocalMapper extends AbstractMapper<Local, String>{
     private final String SELECT_QUERY = "SELECT Address, Country, District, ZIPCode FROM Local WHERE Address = ?";
-
-    @Override
-    protected String findByPKStatement() {
-        return SELECT_QUERY;
-    }
 
     @Override
     Local mapper(ResultSet rs) throws DataMapperException {
