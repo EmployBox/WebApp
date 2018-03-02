@@ -1,6 +1,5 @@
 package dataMapping.mappers;
 
-import dataMapping.exceptions.DataMapperException;
 import dataMapping.utils.ConnectionManager;
 import dataMapping.utils.MapperRegistry;
 import javafx.util.Pair;

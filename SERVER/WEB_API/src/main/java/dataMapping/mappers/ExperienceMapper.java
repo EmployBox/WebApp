@@ -1,6 +1,5 @@
 package dataMapping.mappers;
 
-import dataMapping.exceptions.DataMapperException;
 import model.Experience;
 
 import java.sql.ResultSet;

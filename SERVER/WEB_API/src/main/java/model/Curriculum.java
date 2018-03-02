@@ -1,5 +1,7 @@
 package model;
 
+import util.Streamable;
+
 import java.util.stream.Stream;
 
 public class Curriculum extends DomainObject{
@@ -7,15 +9,15 @@ public class Curriculum extends DomainObject{
     private final long accountId;
     private final long curriculumId;
 
-    private final Stream<PreviousJobs> previousJobs;
-    private final Stream<AcademicBackground> academicBackground;
-    private final Stream<Project> projects;
+    private final Streamable<PreviousJobs> previousJobs;
+    private final Streamable<AcademicBackground> academicBackground;
+    private final Streamable<Project> projects;
 
     private Curriculum(long accountId,
                        long curriculumId,
-                       Stream<PreviousJobs> previousJobs,
-                       Stream<AcademicBackground> academicBackground,
-                       Stream<Project> projects) {
+                       Streamable<PreviousJobs> previousJobs,
+                       Streamable<AcademicBackground> academicBackground,
+                       Streamable<Project> projects) {
         super(String.format("%d%n-%d%n", accountId, curriculumId));
         this.accountId = accountId;
         this.curriculumId = curriculumId;
@@ -54,10 +56,10 @@ public class Curriculum extends DomainObject{
     }
 
     public Stream<PreviousJobs> getPreviousJobs() {
-        return previousJobs;
+        return previousJobs.get();
     }
 
     public Stream<AcademicBackground> getAcademicBackground() {
-        return academicBackground;
+        return academicBackground.get();
     }
 }

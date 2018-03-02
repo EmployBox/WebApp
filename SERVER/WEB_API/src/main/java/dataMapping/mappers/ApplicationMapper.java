@@ -1,6 +1,5 @@
 package dataMapping.mappers;
 
-import dataMapping.exceptions.DataMapperException;
 import model.Application;
 
 import java.sql.Date;

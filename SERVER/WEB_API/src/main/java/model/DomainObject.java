@@ -2,24 +2,24 @@ package model;
 
 import dataMapping.utils.UnitOfWork;
 
-public abstract class DomainObject {
+public abstract class DomainObject<K> {
 
     /**
      * The key to find the object on the Identity Map
      */
-    private final Object identityKey;
+    private final K identityKey;
     private long version;
 
-    public DomainObject(Object identityKey, long version) {
+    public DomainObject(K identityKey, long version) {
         this.identityKey = identityKey;
         this.version = version;
     }
 
-    public DomainObject(Object identityKey){
+    public DomainObject(K identityKey){
         this.identityKey = identityKey;
     }
 
-    public Object getIdentityKey() {
+    public K getIdentityKey() {
         return identityKey;
     }
 

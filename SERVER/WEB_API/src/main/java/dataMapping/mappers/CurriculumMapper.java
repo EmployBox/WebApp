@@ -27,7 +27,7 @@ public class CurriculumMapper extends AbstractMapper<Curriculum>{
 
             return curriculum;
         } catch (SQLException e) {
-            throw new DataMapperException(e.getMessage(), e);
+            throw new DataMapperException(e);
         }
     }
 

@@ -1,6 +1,7 @@
 package model;
 
 import javafx.util.Pair;
+import util.Streamable;
 
 import java.sql.Date;
 import java.util.stream.Stream;
@@ -15,8 +16,8 @@ public class Job extends DomainObject {
     private final Date offerEndDate;
     private final String offerType; //TODO change to enum
 
-    private final Stream<Experience> experiences;
-    private final Stream<Pair<User, Curriculum>> applications;
+    private final Streamable<Experience> experiences;
+    private final Streamable<Pair<User, Curriculum>> applications;
 
     private Job(long id,
                 long accountID,
@@ -28,8 +29,8 @@ public class Job extends DomainObject {
                 Date offerEndDate,
                 String offerType,
                 long version,
-                Stream<Experience> experiences,
-                Stream<Pair<User, Curriculum>> applications)
+                Streamable<Experience> experiences,
+                Streamable<Pair<User, Curriculum>> applications)
     {
         super(id, version);
         this.accountID = accountID;
