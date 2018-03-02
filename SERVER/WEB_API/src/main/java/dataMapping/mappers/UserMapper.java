@@ -21,8 +21,9 @@ public class UserMapper extends AccountMapper<User> {
             String name = rs.getString ("Name");
             String summary = rs.getString ("Summary");
             String photoUrl = rs.getString ("PhotoUrl");
+            long version = rs.getLong("[version]");
 
-            User user = User.load(accountID, email, passwordHash, rating, 0,name ,summary, photoUrl, null, null );
+            User user = User.load(accountID, email, passwordHash, rating, version,name ,summary, photoUrl, null, null );
             getIdentityMap().put(accountID, user);
 
             return user;

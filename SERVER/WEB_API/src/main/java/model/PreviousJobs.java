@@ -11,8 +11,8 @@ public class PreviousJobs extends DomainObject<String> {
     private final String workLoad;
     private final String role;
 
-    public PreviousJobs(long userId, long curriculumId, Date beginDate,Date endDate, String companyName, String workLoad, String role) {
-        super(String.format("PreviousJobsPK: %d %d",userId,curriculumId));
+    public PreviousJobs(long userId, long curriculumId, Date beginDate,Date endDate, String companyName, String workLoad, String role, long version) {
+        super(String.format("PreviousJobsPK: %d %d",userId,curriculumId), "", version);
         this.userId = userId;
         this.curriculumId = curriculumId;
         this.beginDate = beginDate;
@@ -23,13 +23,13 @@ public class PreviousJobs extends DomainObject<String> {
     }
 
     public static PreviousJobs create(long userId, long curriculumId, Date beginDate, Date endDate, String companyName, String workLoad, String role){
-        PreviousJobs previousJobs = new PreviousJobs(userId, curriculumId, beginDate , endDate,companyName, workLoad, role);
+        PreviousJobs previousJobs = new PreviousJobs(userId, curriculumId, beginDate , endDate,companyName, workLoad, role, 0);
         previousJobs.markNew();
         return previousJobs;
     }
 
-    public static PreviousJobs load(long userId, long curriculumId, Date beginDate, Date endDate, String companyName, String workLoad, String role){
-        PreviousJobs previousJobs = new PreviousJobs(userId, curriculumId, beginDate , endDate, companyName, workLoad, role);
+    public static PreviousJobs load(long userId, long curriculumId, Date beginDate, Date endDate, String companyName, String workLoad, String role, long version){
+        PreviousJobs previousJobs = new PreviousJobs(userId, curriculumId, beginDate , endDate, companyName, workLoad, role, version);
         previousJobs.markClean();
         return previousJobs;
     }

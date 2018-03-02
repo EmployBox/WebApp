@@ -16,8 +16,9 @@ public class CurriculumMapper extends AbstractMapper<Curriculum, String>{
         try{
             long accountId = rs.getLong("AccountId");
             long curriculumId = rs.getLong("CurriculumId");
+            long version = rs.getLong("[version]");
 
-            Curriculum curriculum = Curriculum.load(accountId, curriculumId, null, null, null);
+            Curriculum curriculum = Curriculum.load(accountId, curriculumId, version, null, null, null);
             getIdentityMap().put(curriculum.getIdentityKey(), curriculum);
 
             return curriculum;

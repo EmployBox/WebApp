@@ -13,10 +13,11 @@ public class Curriculum extends DomainObject<String>{
 
     private Curriculum(long accountId,
                        long curriculumId,
+                       long version,
                        Stream<PreviousJobs> previousJobs,
                        Stream<AcademicBackground> academicBackground,
                        Stream<Project> projects) {
-        super(String.format("%d%n-%d%n", accountId, curriculumId));
+        super(String.format("%d%n-%d%n", accountId, curriculumId), "", version);
         this.accountId = accountId;
         this.curriculumId = curriculumId;
         this.previousJobs = previousJobs;
@@ -29,18 +30,19 @@ public class Curriculum extends DomainObject<String>{
                                     Stream<AcademicBackground> academicBackground,
                                     Stream<Project> projects)
     {
-        Curriculum curriculum = new Curriculum(accountId, -1, previousJobs, academicBackground, projects);
+        Curriculum curriculum = new Curriculum(accountId, -1, 0, previousJobs, academicBackground, projects);
         curriculum.markNew();
         return curriculum;
     }
 
     public static Curriculum load(long accountId,
                                   long curriculumId,
+                                  long version,
                                   Stream<PreviousJobs> previousJobs,
                                   Stream<AcademicBackground> academicBackground,
                                   Stream<Project> projects)
     {
-        Curriculum curriculum = new Curriculum(accountId, curriculumId, previousJobs, academicBackground, projects);
+        Curriculum curriculum = new Curriculum(accountId, curriculumId, version, previousJobs, academicBackground, projects);
         curriculum.markClean();
         return curriculum;
     }

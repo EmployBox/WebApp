@@ -6,8 +6,8 @@ public class Project extends DomainObject<String> {
     private final String name;
     private final String description;
 
-    public Project(long userId, long curriculumId, String name, String description){
-        super(String.format("ProjectPK: %d %d",userId,curriculumId));
+    public Project(long userId, long curriculumId, String name, String description, long version){
+        super(String.format("ProjectPK: %d %d",userId,curriculumId), "", version);
         this.userId = userId;
         this.curriculumId = curriculumId;
         this.name = name;
@@ -15,13 +15,13 @@ public class Project extends DomainObject<String> {
     }
 
     public static Project create(long userId, long curriculumId, String name, String description){
-        Project project = new Project(userId,curriculumId,name, description);
+        Project project = new Project(userId,curriculumId,name, description, 0);
         project.markNew();
         return project;
     }
 
-    public static Project load(long userId, long curriculumId, String name, String description){
-        Project project = new Project(userId,curriculumId,name, description);
+    public static Project load(long userId, long curriculumId, String name, String description, long version){
+        Project project = new Project(userId,curriculumId,name, description, version);
         project.markClean();
         return project;
     }

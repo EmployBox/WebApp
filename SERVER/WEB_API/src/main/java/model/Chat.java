@@ -11,7 +11,7 @@ public class Chat extends DomainObject<Long>{
     private final Stream<Comment> replies;
 
     public Chat(long chatId, long accountIdFirst, long accountIdSecond,Stream<Message> messages,Stream<Comment> replies, long version) {
-        super(chatId,version);
+        super(chatId, (long) -1, version);
         this.chadId = chatId;
         this.accountIdFirst = accountIdFirst;
         this.accountIdSecond = accountIdSecond;

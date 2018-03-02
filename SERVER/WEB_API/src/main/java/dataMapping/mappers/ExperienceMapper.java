@@ -1,13 +1,8 @@
 package dataMapping.mappers;
 
 import dataMapping.exceptions.DataMapperException;
-import dataMapping.utils.ConnectionManager;
-import dataMapping.utils.MapperRegistry;
 import model.Experience;
-import model.Job;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.stream.Stream;
@@ -37,8 +32,9 @@ public class ExperienceMapper extends AbstractMapper<Experience, Long> {
             long experienceId = rs.getLong("experienceId");
             String competence = rs.getString("Competence");
             short years = rs.getShort("years");
+            long version = rs.getLong("[version]");
 
-            Experience experience = Experience.load(experienceId, competence, years);
+            Experience experience = Experience.load(experienceId, competence, years, version);
             getIdentityMap().put(experienceId, experience);
 
             return experience;

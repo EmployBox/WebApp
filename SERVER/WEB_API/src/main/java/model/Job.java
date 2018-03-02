@@ -31,7 +31,7 @@ public class Job extends DomainObject<Long> {
                 Stream<Experience> experiences,
                 Stream<Pair<User, Curriculum>> applications)
     {
-        super(id, version);
+        super(id, (long) -1, version);
         this.accountID = accountID;
         this.address = address;
         this.wage = wage;

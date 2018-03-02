@@ -10,10 +10,9 @@ public class Comment extends DomainObject<Long> {
     private final Date date;
     private final String text;
     private final boolean status; //moderated or not
-    private final long version;
 
     public Comment(long commentID, long accountIdFrom ,long accountIdTo, long parentCommendID, Date date, String text, boolean status, long version){
-        super(commentID);
+        super(commentID, (long) -1, version);
         this.commentID = commentID;
         this.accountIdFrom = accountIdFrom;
         this.accountIdTo = accountIdTo;
@@ -21,7 +20,6 @@ public class Comment extends DomainObject<Long> {
         this.date = date;
         this.text = text;
         this.status = status;
-        this.version = version;
     }
 
 
@@ -31,10 +29,9 @@ public class Comment extends DomainObject<Long> {
                                 long parentCommendID,
                                 Date date,
                                 String text,
-                                boolean status,
-                                long version)
+                                boolean status)
     {
-        Comment comment = new Comment(-1, accountIdFrom, accountIdTo, parentCommendID, date , text, status, version);
+        Comment comment = new Comment(-1, accountIdFrom, accountIdTo, parentCommendID, date , text, status, 0);
         comment.markNew();
         return comment;
     }
@@ -80,10 +77,5 @@ public class Comment extends DomainObject<Long> {
 
     public boolean isStatus() {
         return status;
-    }
-
-    @Override
-    public long getVersion() {
-        return version;
     }
 }

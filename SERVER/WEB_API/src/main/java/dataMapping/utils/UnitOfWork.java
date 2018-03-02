@@ -110,10 +110,7 @@ public class UnitOfWork {
         dirtyObjects
                 .stream()
                 .filter(domainObject -> !removedObjects.contains(domainObject))
-                .forEach(domainObject -> {
-                    domainObject.updateVersion();
-                    MapperRegistry.getMapper(domainObject.getClass()).update(domainObject);
-                });
+                .forEach(domainObject -> MapperRegistry.getMapper(domainObject.getClass()).update(domainObject));
     }
 
     private void deleteRemoved() {

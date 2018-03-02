@@ -6,8 +6,8 @@ public class Rating extends DomainObject<String> {
     private final long moderatorId; // can be null
     private final double ratingValue;
 
-    public Rating(long accountIdFrom,long accountIdTo, long moderatorId, double ratingValue ) {
-        super(String.format("RatingPK: %d, %d",accountIdFrom,accountIdTo));
+    public Rating(long accountIdFrom,long accountIdTo, long moderatorId, double ratingValue, long version) {
+        super(String.format("RatingPK: %d, %d",accountIdFrom,accountIdTo), "", version);
         this.accountIdFrom = accountIdFrom;
         this.accountIdTo = accountIdTo;
         this.moderatorId = moderatorId;
@@ -15,13 +15,13 @@ public class Rating extends DomainObject<String> {
     }
 
     public static Rating create(long accountIdFrom,long accountIdTo, long moderatorId, double ratingValue ) {
-        Rating rating = new Rating(accountIdFrom,accountIdTo, moderatorId, ratingValue);
+        Rating rating = new Rating(accountIdFrom,accountIdTo, moderatorId, ratingValue, 0);
         rating.markNew();
         return rating;
     }
 
-    public static Rating load(long accountIdFrom,long accountIdTo, long moderatorId, double ratingValue ) {
-        Rating rating = new Rating(accountIdFrom,accountIdTo, moderatorId, ratingValue);
+    public static Rating load(long accountIdFrom,long accountIdTo, long moderatorId, double ratingValue, long version ) {
+        Rating rating = new Rating(accountIdFrom,accountIdTo, moderatorId, ratingValue, version);
         rating.markClean();
         return rating;
     }

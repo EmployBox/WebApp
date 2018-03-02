@@ -7,28 +7,31 @@ public abstract class DomainObject<K> {
     /**
      * The key to find the object on the Identity Map
      */
-    private final K identityKey;
-    private long version;
+    private K identityKey;
+    private final K defaultKey;
+    private final long version;
 
-    public DomainObject(K identityKey, long version) {
+    public DomainObject(K identityKey, K defaultKey, long version) {
         this.identityKey = identityKey;
+        this.defaultKey = defaultKey;
         this.version = version;
-    }
-
-    public DomainObject(K identityKey){
-        this.identityKey = identityKey;
     }
 
     public K getIdentityKey() {
         return identityKey;
     }
 
+    public void setIdentityKey(K key){
+        if(identityKey == defaultKey)
+            identityKey = key;
+    }
+
     public long getVersion() {
         return version;
     }
 
-    public long updateVersion(){
-        return ++version;
+    public K getDefaultKey() {
+        return defaultKey;
     }
 
     /**

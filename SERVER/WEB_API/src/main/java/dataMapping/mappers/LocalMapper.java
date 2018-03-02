@@ -16,8 +16,9 @@ public class LocalMapper extends AbstractMapper<Local, String>{
             String country = rs.getString("Country");
             String district = rs.getString("District");
             String zipCode = rs.getString("ZIPCode");
+            long version = rs.getLong("[version]");
 
-            Local local = Local.load(address, country, district, zipCode);
+            Local local = Local.load(address, country, district, zipCode, version);
             getIdentityMap().put(local.getIdentityKey(), local);
 
             return local;

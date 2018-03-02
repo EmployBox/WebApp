@@ -8,8 +8,8 @@ public class Application extends DomainObject<String> {
     private final long curriculumId;
     private Date date;
 
-    public Application(long userId, long jobId,long curriculumId, Date date) {
-        super(String.format("ApplicationPK %d %d",userId,jobId));
+    public Application(long userId, long jobId,long curriculumId, Date date, long version) {
+        super(String.format("ApplicationPK %d %d",userId,jobId), "", version);
         this.userId = userId;
         this.jobId = jobId;
         this.curriculumId = curriculumId;
@@ -17,13 +17,13 @@ public class Application extends DomainObject<String> {
     }
 
     public static Application create(long userId, long jobId,long curriculumId, Date date){
-        Application application = new Application(userId,jobId,curriculumId, date);
+        Application application = new Application(userId,jobId,curriculumId, date, 0);
         application.markNew();
         return application;
     }
 
-    public static Application load(long userId, long jobId,long curriculumId, Date date){
-        Application application = new Application(userId,jobId,curriculumId, date);
+    public static Application load(long userId, long jobId,long curriculumId, Date date, long version){
+        Application application = new Application(userId,jobId,curriculumId, date, version);
         application.markClean();
         return application;
     }
