@@ -1,16 +1,14 @@
 package model;
 
-import java.util.stream.Stream;
-
 public class Chat extends DomainObject<Long>{
     private final long chadId;
     private final long accountIdFirst;
     private final long accountIdSecond;
 
-    private final Stream<Message> messages;
-    private final Stream<Comment> replies;
+    private final Iterable<Message> messages;
+    private final Iterable<Comment> replies;
 
-    public Chat(long chatId, long accountIdFirst, long accountIdSecond,Stream<Message> messages,Stream<Comment> replies, long version) {
+    public Chat(long chatId, long accountIdFirst, long accountIdSecond, Iterable<Message> messages, Iterable<Comment> replies, long version) {
         super(chatId,version);
         this.chadId = chatId;
         this.accountIdFirst = accountIdFirst;
@@ -19,13 +17,13 @@ public class Chat extends DomainObject<Long>{
         this.messages = messages;
     }
 
-    public static Chat create(  long accountIdFirst, long accountIdSecond,Stream<Message> messages,Stream<Comment> replies, long version){
+    public static Chat create(  long accountIdFirst, long accountIdSecond, Iterable<Message> messages, Iterable<Comment> replies, long version){
         Chat chat = new Chat(-1, accountIdFirst, accountIdSecond, messages, replies, version);
         chat.markNew();
         return chat;
     }
 
-    public static Chat load( long chatId, long accountIdFirst, long accountIdSecond,Stream<Message> messages,Stream<Comment> replies, long version){
+    public static Chat load( long chatId, long accountIdFirst, long accountIdSecond, Iterable<Message> messages, Iterable<Comment> replies, long version){
         Chat chat = new Chat(chatId,accountIdFirst,accountIdSecond,messages, replies, version);
         chat.markClean();
         return chat;
