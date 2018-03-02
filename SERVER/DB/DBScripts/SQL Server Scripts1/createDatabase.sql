@@ -30,6 +30,7 @@ CREATE TABLE ApiDatabase.Company (
 	WebPageUrl NVARCHAR(50),
 	LogoUrl NVARCHAR(100),
 	[description] NVARCHAR(50),
+	[version] rowversion,
 
 	FOREIGN KEY (accountID) REFERENCES ApiDatabase.Account(accountID) ON DELETE CASCADE	
 )
@@ -44,7 +45,8 @@ CREATE TABLE ApiDatabase.[User] (
 	accountId BIGINT primary key references ApiDatabase.Account,
 	name NVARCHAR(40),
 	summary NVARCHAR(1500),
-	PhotoUrl NVARCHAR(100)
+	PhotoUrl NVARCHAR(100),
+	[version] rowversion
 
 	FOREIGN KEY (accountID) REFERENCES ApiDatabase.Account(accountID) ON DELETE CASCADE		
 )
@@ -62,6 +64,7 @@ CREATE TABLE ApiDatabase.Project (
 	curriculumId BIGINT,
 	name NVARCHAR(15),
 	[description] NVARCHAR(50),
+	[version] rowversion
 
 	PRIMARY KEY (userId,curriculumID),
 	FOREIGN KEY (userId,curriculumId) REFERENCES ApiDatabase.Curriculum(userId,curriculumId) ON DELETE CASCADE
@@ -75,6 +78,7 @@ CREATE TABLE ApiDatabase.AcademicBackground(
 	studyArea NVARCHAR(40),
 	institution NVARCHAR(40),
 	degreeObtained NVARCHAR(10),
+	[version] rowversion,
 
 	FOREIGN KEY (userId,curriculumId) REFERENCES ApiDatabase.Curriculum(userId,curriculumId) ON DELETE CASCADE,
 	PRIMARY KEY(userId,curriculumId),
@@ -96,6 +100,7 @@ CREATE TABLE Apidatabase.PreviousJobs(
 	companyName NVARCHAR(20),
 	[workload] NVARCHAR(20),
 	[role] NVARCHAR(20),
+	[version] rowversion,
 
 	PRIMARY KEY(userId,curriculumId),
 	
@@ -107,7 +112,8 @@ CREATE TABLE ApiDatabase.[Local] (
 	[Address] NVARCHAR(50) primary key,
 	Country NVARCHAR(15),
 	Street NVARCHAR(40),
-	ZIPCode NVARCHAR(40)
+	ZIPCode NVARCHAR(40),
+	[version] rowversion
 )
 
 
@@ -131,13 +137,14 @@ CREATE TABLE ApiDatabase.Job(
 CREATE TABLE Apidatabase.Experience(
 	experienceId BIGINT IDENTITY PRIMARY KEY,
 	years SMALLINT,
-	Competence NVARCHAR(200)
+	Competence NVARCHAR(200),
+	[version] rowversion,
 )
 
 CREATE TABLE Apidatabase.Curriculum_Experience(
 	userId BIGINT,
 	curriculumId BIGINT,
-	experienceId BIGINT,
+	experienceId BIGINT
 
 	FOREIGN KEY (userId,curriculumId) REFERENCES ApiDatabase.Curriculum(userId,curriculumId) ON DELETE CASCADE,
 	FOREIGN KEY (experienceId) REFERENCES ApiDatabase.Experience(experienceId) ON DELETE CASCADE,
@@ -160,6 +167,7 @@ CREATE TABLE ApiDatabase.[Application](
 	CurriculumId BIGINT,
 	JobId BIGINT,
 	[date] datetime default(GETDATE()),
+	[version] rowversion,
 
 	FOREIGN KEY (userId,curriculumId) REFERENCES ApiDatabase.Curriculum(userId,curriculumId),
 	FOREIGN KEY (jobId) REFERENCES ApiDatabase.Job(jobId),
@@ -170,7 +178,8 @@ CREATE TABLE ApiDatabase.Rating(
 	AccountIdFrom BIGINT,
 	AccountIdTo BIGINT,
 	moderatorId BIGINT references ApiDatabase.Moderator,
-	ratingValue decimal(2,1) DEFAULT 0.0
+	ratingValue decimal(2,1) DEFAULT 0.0,
+	[version] rowversion,
 	
 	FOREIGN KEY (accountIdFrom) REFERENCES ApiDatabase.Account(accountID),
 	FOREIGN KEY (accountIdTo) REFERENCES ApiDatabase.Account(accountID),
@@ -194,6 +203,7 @@ CREATE TABLE ApiDatabase.[MESSAGE](
 	chatId BIGINT REFERENCES ApiDatabase.Chat,
 	[text] NVARCHAR(200),
 	[date] datetime default(getdate()),
+	[version] rowversion,
 
 	FOREIGN KEY (chatId) REFERENCES ApiDatabase.Chat(chatId),
 )

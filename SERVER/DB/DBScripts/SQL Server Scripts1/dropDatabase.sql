@@ -4,7 +4,7 @@ IF DB_ID ('PS_API_DATABASE') IS NOT NULL
 		USE PS_API_DATABASE;
 
 		IF OBJECT_ID(N'dbo.Project') IS NOT NULL
-			DROP VIEW dbo.Project,
+			DROP VIEW dbo.Project;
 		IF OBJECT_ID(N'dbo.Follows') IS NOT NULL
 			DROP VIEW dbo.Follows;
 		IF OBJECT_ID(N'dbo.[Message]') IS NOT NULL
