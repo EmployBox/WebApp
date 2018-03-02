@@ -30,7 +30,7 @@ public class User extends Account {
     }
 
 
-    public static User create(long accountID,
+    public static User create(
                             String email,
                             String password,
                             double rating,
@@ -41,7 +41,7 @@ public class User extends Account {
                             Stream<Curriculum> curriculums,
                             Stream<Application> applications
     ){
-        User user = new User(accountID,email,password,rating,version,name,summary,photoUrl, curriculums, applications);
+        User user = new User(-1 ,email,password,rating,version,name,summary,photoUrl, curriculums, applications);
         user.markNew();
         return user;
     }

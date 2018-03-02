@@ -225,7 +225,7 @@ CREATE TABLE ApiDatabase.Follows (
 
 GO
 CREATE VIEW dbo.Account AS
-SELECT accountId,email,passwordHash,rating FROM ApiDatabase.Account
+SELECT accountId,email,rating FROM ApiDatabase.Account
 GO
 
 GO

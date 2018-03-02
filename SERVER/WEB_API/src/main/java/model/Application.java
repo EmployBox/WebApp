@@ -9,7 +9,7 @@ public class Application extends DomainObject {
     private Date date;
 
     public Application(long userId, long jobId,long curriculumId, Date date) {
-        super(String.format("ApplicationPK %s %s",userId,jobId));
+        super(String.format("ApplicationPK %d %d",userId,jobId));
         this.userId = userId;
         this.jobId = jobId;
         this.curriculumId = curriculumId;
