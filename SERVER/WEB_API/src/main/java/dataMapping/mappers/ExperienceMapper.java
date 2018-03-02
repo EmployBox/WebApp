@@ -14,24 +14,21 @@ import java.util.stream.Stream;
 
 public class ExperienceMapper extends AbstractMapper<Experience, Long> {
 
-    public Stream<Experience> findJobExperiences(Object jobId){
-        Connection con = ConnectionManager.getConnectionManager().getConnection();
-        PreparedStatement statement;
-        try {
-            statement = con.prepareStatement("Select experienceId, competence, years from Experience where experienceId in (Select experienceId from Job_Experience where jobId = ?)");
-
-            statement.setLong(1, (Long) jobId);
-
-            ExperienceMapper experienceMapper = (ExperienceMapper) MapperRegistry.getMapper(Experience.class);
-            return experienceMapper.stream(statement.executeQuery(), experienceMapper::mapper);
-        } catch (SQLException e) {
-            throw new DataMapperException(e.getMessage(), e);
-        }
-    }
-
-    @Override
-    protected String findByPKStatement() {
-        return null;
+    public Stream<Experience> findJobExperiences(long jobId){
+        String query = "Select experienceId, competence, years from Experience where experienceId in (Select experienceId from Job_Experience where jobId = ?)";
+        return executeQuery(
+                query,
+                null,
+                statement -> {
+                    SQLException sqlException = null;
+                    try{
+                        statement.setLong(1, jobId);
+                    } catch (SQLException e) {
+                        sqlException = e;
+                    }
+                    return sqlException;
+                }
+        );
     }
 
     @Override

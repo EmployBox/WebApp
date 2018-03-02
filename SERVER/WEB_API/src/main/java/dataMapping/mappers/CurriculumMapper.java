@@ -12,11 +12,6 @@ public class CurriculumMapper extends AbstractMapper<Curriculum, String>{
     private final String DELETE_QUERY = "DELETE FROM Curriculum WHERE AccountId = ? AND CurriculumId = ?";
 
     @Override
-    protected String findByPKStatement() {
-        return null;
-    }
-
-    @Override
     Curriculum mapper(ResultSet rs) throws DataMapperException {
         try{
             long accountId = rs.getLong("AccountId");

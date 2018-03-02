@@ -29,12 +29,6 @@ public abstract class AbstractMapper<T extends DomainObject<K>, K> implements Ma
     }
 
     /**
-     * Returns a string to findByPrimaryKey a DomainObject by its ID
-     * @return select query of the DomainObject
-     */
-    protected abstract String findByPKStatement();
-
-    /**
      * Converts the current row from result set into an object
      * @param rs
      * @return DomainObject
@@ -63,47 +57,47 @@ public abstract class AbstractMapper<T extends DomainObject<K>, K> implements Ma
     }
 
     /**
-     * Gets the object from Identity Map or queries the DB for it
-     * @param primaryKey
-     * @return the object queried
-     * @throws SQLException
+     * Gets the object from IdentityMap or queries the DB for it
+     * @param query
+     * @param key
+     * @param prepareStatement
+     * @return
      */
-    public Optional<T> findByPrimaryKey(String primaryKey) throws DataMapperException {
-        T result = getIdentityMap().get(primaryKey);
-        if(result != null) return Optional.of(result);
+    public Stream<T> executeQuery(String query, K key, Function<PreparedStatement, SQLException> prepareStatement){
+        Map<K, T> identityMap = getIdentityMap();
+        if(identityMap.containsKey(key))
+            return Stream.of(identityMap.get(key));
 
         Connection con = ConnectionManager.getConnectionManager().getConnection();
-        PreparedStatement statement;
-        try {
-            statement = con.prepareStatement(findByPKStatement());
+        try(PreparedStatement statement = con.prepareStatement(query)) {
+            SQLException exception = prepareStatement.apply(statement);
+            if(exception != null) throw exception;
 
-            statement.setString(1, primaryKey);
-
-            return stream(statement.executeQuery(), this::mapper).findFirst();
+            return stream(statement.executeQuery(), this::mapper);
         } catch (SQLException e) {
             throw new DataMapperException(e.getMessage(), e);
         }
+        //TODO Alert ConnectionManager we finished using conn
     }
 
-    protected void DBHelper(String query, Function<PreparedStatement, SQLException> prepareStatement, Runnable handleIdentityMap){
-        Connection conn;
-        PreparedStatement stmt;
-        try {
-            conn = ConnectionManager.getConnectionManager().getConnection();
-            stmt = conn.prepareStatement(query);
-
+    /**
+     * Executes a sql update and saves the obj in the IdentityMap if successful else throws ConcurrencyException
+     * @param query
+     * @param obj
+     * @param prepareStatement
+     */
+    protected void executeSQLUpdate(String query, T obj, Function<PreparedStatement, SQLException> prepareStatement){
+        Connection conn = ConnectionManager.getConnectionManager().getConnection();
+        try(PreparedStatement stmt = conn.prepareStatement(query)) {
             SQLException exception = prepareStatement.apply(stmt);
             if(exception != null) throw exception;
 
             int rowCount = stmt.executeUpdate();
-            if (rowCount == 0) {
-                throw new ConcurrencyException("Concurrency problem found");
-            }
-            else {
-                handleIdentityMap.run();
-            }
+            if (rowCount == 0) throw new ConcurrencyException("Concurrency problem found");
+            else getIdentityMap().put(obj.getIdentityKey(), obj);
         } catch (SQLException e) {
             throw new DataMapperException(e.getMessage(), e);
         }
+        //TODO Alert ConnectionManager we finished using conn
     }
 }

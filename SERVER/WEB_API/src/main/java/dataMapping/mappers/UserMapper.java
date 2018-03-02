@@ -12,11 +12,6 @@ public class UserMapper extends AccountMapper<User> {
     private final String SELECT_QUERY = "SELECT AccountId, Name, Summary, PhotoUrl FROM User WHERE AccountId = ?";
 
     @Override
-    protected String findByPKStatement() {
-        return SELECT_QUERY;
-    }
-
-    @Override
     public User mapper(ResultSet rs) throws DataMapperException {
         try {
             long accountID = rs.getLong("AccountID");

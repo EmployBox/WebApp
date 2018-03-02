@@ -6,7 +6,6 @@ import dataMapping.utils.MapperRegistry;
 import javafx.util.Pair;
 import model.Application;
 import model.Curriculum;
-import model.Job;
 import model.User;
 
 import java.sql.*;
@@ -22,42 +21,21 @@ public class ApplicationMapper extends AbstractMapper<Application, String> {
     private String UPDATE_QUERY =  "UPDATE [Application] SET [date] = ? where where userId = ? AND JobId = ?";
     private String DELETE_QUERY =  "DELETE [Application] where userId = ? AND jobId = ?";
 
-    public Stream<Pair<User, Curriculum>> findJobApplications(Object jobId){
-        Connection con = ConnectionManager.getConnectionManager().getConnection();
-        PreparedStatement statement;
-        try {
-            statement = con.prepareStatement("SELECT [User].accountId, [User].name, [User].summary, [User].photourl, ApiDataBase.[Application].curriculumId, ApiDataBase.[Application].[Date]\n" +
-                    "FROM [User]\n" +
-                    "INNER JOIN ApiDataBase.[Application]\n" +
-                    "ON ApiDataBase.[Application].UserId = [User].accountId\n" +
-                    "AND ApiDataBase.[Application].JobId = ?");
-
-            statement.setLong(1, (Long) jobId);
-            ResultSet rs = statement.executeQuery();
-
-            UserMapper userMapper = (UserMapper) MapperRegistry.getMapper(User.class);
-            CurriculumMapper curriculumMapper = (CurriculumMapper) MapperRegistry.getMapper(Curriculum.class);
-            return StreamSupport.stream(new Spliterators.AbstractSpliterator<Pair<User, Curriculum>>(
-                    Long.MAX_VALUE, Spliterator.ORDERED) {
-                @Override
-                public boolean tryAdvance(Consumer<? super Pair<User, Curriculum>> action) {
-                    try {
-                        if(!rs.next())return false;
-                        action.accept(new Pair<>(userMapper.mapper(rs), curriculumMapper.mapper(rs)));
-                        return true;
+    public Stream<Application> findJobApplications(long jobId){
+        String query = "SELECT UserId, CurriculumId, JobId, [date] from [Application] WHERE JobId = ?";
+        return executeQuery(
+                query,
+                null,
+                preparedStatement -> {
+                    SQLException sqlException = null;
+                    try{
+                        preparedStatement.setLong(1, jobId);
                     } catch (SQLException e) {
-                        throw new DataMapperException(e.getMessage(), e);
+                        sqlException = e;
                     }
+                    return sqlException;
                 }
-            }, false);
-        } catch (SQLException e) {
-            throw new DataMapperException(e.getMessage(), e);
-        }
-    }
-
-    @Override
-    protected String findByPKStatement() {
-        return SELECT_QUERY;
+        );
     }
 
     @Override
@@ -79,8 +57,9 @@ public class ApplicationMapper extends AbstractMapper<Application, String> {
 
     @Override
     public void insert(Application obj) {
-        DBHelper(
+        executeSQLUpdate(
                 INSERT_QUERY,
+                obj,
                 preparedStatement -> {
                     SQLException sqlException = null;
                     try{
@@ -92,15 +71,15 @@ public class ApplicationMapper extends AbstractMapper<Application, String> {
                         sqlException = e;
                     }
                     return sqlException;
-                },
-                () -> getIdentityMap().put(obj.getIdentityKey(), obj)
+                }
         );
     }
 
     @Override
     public void update(Application obj) {
-        DBHelper(
+        executeSQLUpdate(
                 UPDATE_QUERY,
+                obj,
                 preparedStatement -> {
                     SQLException sqlException = null;
                     try{
@@ -109,15 +88,15 @@ public class ApplicationMapper extends AbstractMapper<Application, String> {
                         sqlException = e;
                     }
                     return sqlException;
-                },
-                () -> getIdentityMap().put(obj.getIdentityKey(), obj)
+                }
         );
     }
 
     @Override
     public void delete(Application obj) {
-        DBHelper(
+        executeSQLUpdate(
                 DELETE_QUERY,
+                obj,
                 preparedStatement -> {
                     SQLException sqlException = null;
                     try{
@@ -127,8 +106,7 @@ public class ApplicationMapper extends AbstractMapper<Application, String> {
                         sqlException = e;
                     }
                     return sqlException;
-                },
-                () -> getIdentityMap().remove(obj.getIdentityKey(), obj)
+                }
         );
     }
 }

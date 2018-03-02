@@ -10,11 +10,6 @@ public class LocalMapper extends AbstractMapper<Local, String>{
     private final String SELECT_QUERY = "SELECT Address, Country, District, ZIPCode FROM Local WHERE Address = ?";
 
     @Override
-    protected String findByPKStatement() {
-        return SELECT_QUERY;
-    }
-
-    @Override
     Local mapper(ResultSet rs) throws DataMapperException {
         try{
             String address = rs.getString("Address");
