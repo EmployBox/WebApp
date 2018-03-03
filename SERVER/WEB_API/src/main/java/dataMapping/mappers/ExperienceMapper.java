@@ -16,13 +16,11 @@ public class ExperienceMapper extends AbstractMapper<Experience, Long> {
                 query,
                 null,
                 statement -> {
-                    SQLException sqlException = null;
                     try{
                         statement.setLong(1, jobId);
                     } catch (SQLException e) {
-                        sqlException = e;
+                        throw new DataMapperException(e);
                     }
-                    return sqlException;
                 }
         );
     }

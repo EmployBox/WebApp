@@ -19,13 +19,11 @@ public class ApplicationMapper extends AbstractMapper<Application, String> {
             query,
             null,
             preparedStatement -> {
-                SQLException sqlException = null;
                 try{
                     preparedStatement.setLong(1, jobId);
                 } catch (SQLException e) {
-                    sqlException = e;
+                    throw new DataMapperException(e);
                 }
-                return sqlException;
             }
     );
     }
@@ -55,16 +53,14 @@ public class ApplicationMapper extends AbstractMapper<Application, String> {
                 obj,
                 false,
                 preparedStatement -> {
-                    SQLException sqlException = null;
                     try{
                         preparedStatement.setLong(1, obj.getUserId());
                         preparedStatement.setLong(2, obj.getCurriculumId());
                         preparedStatement.setLong(3, obj.getJobId());
                         preparedStatement.setDate(4, obj.getDate());
                     } catch (SQLException e) {
-                        sqlException = e;
+                        throw new DataMapperException(e);
                     }
-                    return sqlException;
                 }
         );
     }
@@ -76,13 +72,11 @@ public class ApplicationMapper extends AbstractMapper<Application, String> {
                 obj,
                 false,
                 preparedStatement -> {
-                    SQLException sqlException = null;
                     try{
                         preparedStatement.setDate(4, obj.getDate());
                     } catch (SQLException e) {
-                        sqlException = e;
+                        throw new DataMapperException(e);
                     }
-                    return sqlException;
                 }
         );
     }
@@ -94,14 +88,12 @@ public class ApplicationMapper extends AbstractMapper<Application, String> {
                 obj,
                 true,
                 preparedStatement -> {
-                    SQLException sqlException = null;
                     try{
                         preparedStatement.setLong(1, obj.getUserId());
                         preparedStatement.setLong(2, obj.getCurriculumId());
                     } catch (SQLException e) {
-                        sqlException = e;
+                        throw new DataMapperException(e);
                     }
-                    return sqlException;
                 }
         );
     }

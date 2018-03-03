@@ -41,7 +41,6 @@ public class JobMapper extends AbstractMapper<Job, Long> {
                 obj,
                 false,
                 preparedStatement -> {
-                    SQLException sqlException = null;
                     try{
                         preparedStatement.setLong(1, obj.getAccountID());
                         preparedStatement.setString(2, obj.getAddress());
@@ -53,9 +52,8 @@ public class JobMapper extends AbstractMapper<Job, Long> {
                         preparedStatement.setString(8, obj.getOfferType());
                         preparedStatement.setLong(9, obj.getVersion());
                     } catch (SQLException e) {
-                        sqlException = e;
+                        throw new DataMapperException(e);
                     }
-                    return sqlException;
                 }
         );
     }
@@ -67,7 +65,6 @@ public class JobMapper extends AbstractMapper<Job, Long> {
                 obj,
                 false,
                 preparedStatement -> {
-                    SQLException sqlException = null;
                     try{
                         preparedStatement.setString(1, obj.getAddress());
                         preparedStatement.setInt(2, obj.getWage());
@@ -78,9 +75,8 @@ public class JobMapper extends AbstractMapper<Job, Long> {
                         preparedStatement.setString(7, obj.getOfferType());
                         preparedStatement.setLong(8, obj.getVersion());
                     } catch (SQLException e) {
-                        sqlException = e;
+                        throw new DataMapperException(e);
                     }
-                    return sqlException;
                 }
         );
     }
@@ -92,14 +88,12 @@ public class JobMapper extends AbstractMapper<Job, Long> {
                 obj,
                 true,
                 preparedStatement -> {
-                    SQLException sqlException = null;
                     try{
                         preparedStatement.setLong(1, obj.getIdentityKey());
                         preparedStatement.setLong(2, obj.getVersion());
                     } catch (SQLException e) {
-                        sqlException = e;
+                        throw new DataMapperException(e);
                     }
-                    return sqlException;
                 }
         );
     }

@@ -6,6 +6,7 @@ import dataMapping.utils.ConnectionManager;
 import model.User;
 
 import java.sql.*;
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 //todo i must finish this
@@ -33,9 +34,8 @@ public class UserMapper extends AccountMapper<User> {
         }
     }
 
-    private Function<CallableStatement, SQLException> updatePrepareStatement(User obj) {
+    private Consumer<CallableStatement> updatePrepareStatement(User obj) {
         return cs -> {
-            SQLException sqlException = null;
             try {
                 cs.setString(1, obj.getEmail());
                 cs.setDouble(2, obj.getRating());
@@ -45,10 +45,11 @@ public class UserMapper extends AccountMapper<User> {
                 cs.setString(6, obj.getPhotoUrl());
                 cs.registerOutParameter(7, Types.BIGINT);
                 cs.registerOutParameter(8, Types.NVARCHAR);
+                cs.execute();
+                identityMap.put(obj.getIdentityKey(), obj);
             } catch (SQLException e) {
-                sqlException = e;
+                throw new DataMapperException(e);
             }
-            return sqlException;
         };
     }
 
@@ -56,8 +57,7 @@ public class UserMapper extends AccountMapper<User> {
     public void insert(User obj) {
         executeSQLProcedure(
                 "{call AddUser(?, ?, ?, ?, ?, ?, ?, ?)}",
-                updatePrepareStatement(obj),
-                callableStatement -> identityMap.put(obj.getIdentityKey(), obj)
+                updatePrepareStatement(obj)
         );
     }
 
@@ -65,8 +65,7 @@ public class UserMapper extends AccountMapper<User> {
     public void update(User obj) {
         executeSQLProcedure(
                 "{call UpdateUser(?, ?, ?, ?, ?, ?, ?, ?)}",
-                updatePrepareStatement(obj),
-                callableStatement -> identityMap.put(obj.getIdentityKey(), obj)
+                updatePrepareStatement(obj)
         );
     }
 
@@ -75,16 +74,15 @@ public class UserMapper extends AccountMapper<User> {
         executeSQLProcedure(
                 "{call DeleteUser(?, ?)}",
                 callableStatement -> {
-                    SQLException sqlException = null;
                     try {
                         callableStatement.setString(1, obj.getEmail());
                         callableStatement.registerOutParameter(2, Types.NVARCHAR);
+                        callableStatement.execute();
+                        identityMap.remove(obj.getIdentityKey());
                     } catch (SQLException e) {
-                        sqlException = e;
+                        throw new DataMapperException(e);
                     }
-                    return sqlException;
-                },
-                callableStatement -> identityMap.remove(obj.getIdentityKey())
+                }
         );
     }
 }

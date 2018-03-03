@@ -55,13 +55,10 @@ public abstract class AbstractMapper<T extends DomainObject<K>, K> implements Ma
         }, false).onClose(() -> { try { rs.close(); } catch (SQLException e) { throw new DataMapperException(e.getMessage(), e); } });
     }
 
-    private<R> R handleSQLStatement(String query, boolean isProcedure, Function<Statement, SQLException> prepareStatement, Function<Statement, R> handleStatement){
+    private void handleSQLStatement(String query, boolean isProcedure, Consumer<Statement> handleStatement){
         Connection connection = ConnectionManager.getConnectionManagerOfDefaultDB().getConnection();
         try(Statement statement = isProcedure ? connection.prepareCall(query) : connection.prepareStatement(query)) {
-            SQLException exception = prepareStatement.apply(statement);
-            if(exception != null) throw new DataMapperException(exception.getMessage(), exception);
-
-            return handleStatement.apply(statement);
+            handleStatement.accept(statement);
         } catch (SQLException e) {
             throw new DataMapperException(e);
         }
@@ -75,22 +72,24 @@ public abstract class AbstractMapper<T extends DomainObject<K>, K> implements Ma
      * @param prepareStatement
      * @return
      */
-    public Stream<T> executeQuery(String query, K key, Function<PreparedStatement, SQLException> prepareStatement){
+    public Stream<T> executeQuery(String query, K key, Consumer<PreparedStatement> prepareStatement){
         if(identityMap.containsKey(key))
             return Stream.of(identityMap.get(key));
 
-        return handleSQLStatement(
+        Object[] result = new Object[1];
+        handleSQLStatement(
                 query,
                 false,
-                statement -> prepareStatement.apply((PreparedStatement) statement),
                 statement -> {
+                    prepareStatement.accept((PreparedStatement) statement);
                     try {
-                        return stream(((PreparedStatement) statement).executeQuery(), this::mapper);
+                        result[0] = stream(((PreparedStatement) statement).executeQuery(), this::mapper);
                     } catch (SQLException e) {
                         throw new DataMapperException(e);
                     }
                 }
         );
+        return (Stream<T>) result[0];
     }
 
     /**
@@ -99,11 +98,11 @@ public abstract class AbstractMapper<T extends DomainObject<K>, K> implements Ma
      * @param obj
      * @param prepareStatement
      */
-    protected void executeSQLUpdate(String query, T obj, boolean isDeleteCommand, Function<PreparedStatement, SQLException> prepareStatement){
+    protected void executeSQLUpdate(String query, T obj, boolean isDeleteCommand, Consumer<PreparedStatement> prepareStatement){
         handleSQLStatement(query,
                 false,
-                statement -> prepareStatement.apply((PreparedStatement) statement),
                 statement -> {
+                    prepareStatement.accept((PreparedStatement) statement);
                     try{
                         int rowCount = ((PreparedStatement) statement).executeUpdate();
                         if (rowCount == 0) throw new ConcurrencyException("Concurrency problem found");
@@ -117,23 +116,19 @@ public abstract class AbstractMapper<T extends DomainObject<K>, K> implements Ma
                         }
 
                         if (isDeleteCommand) identityMap.remove(obj.getIdentityKey());
-                        else {
-                            if(!tryReplace(obj, 5000)) throw new ConcurrencyException("Concurrency problem found, could not update IdentityMap");
-                        }
+                        else if(!tryReplace(obj, 5000)) throw new ConcurrencyException("Concurrency problem found, could not update IdentityMap");
                     } catch (SQLException e) {
                         throw new DataMapperException(e.getMessage(), e);
                     }
-                    return null;
                 }
         );
     }
 
-    protected<R> R executeSQLProcedure(String call, Function<CallableStatement, SQLException> prepareStatement, Function<CallableStatement, R> handleProcedure){
-        return handleSQLStatement(
+    protected void executeSQLProcedure(String call, Consumer<CallableStatement> handleStatement){
+        handleSQLStatement(
                 call,
                 true,
-                statement -> prepareStatement.apply((CallableStatement) statement),
-                statement -> handleProcedure.apply((CallableStatement) statement)
+                statement -> handleStatement.accept((CallableStatement) statement)
         );
     }
 
