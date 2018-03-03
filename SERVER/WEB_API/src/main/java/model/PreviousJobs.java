@@ -12,7 +12,7 @@ public class PreviousJobs extends DomainObject<String> {
     private final String role;
 
     public PreviousJobs(long userId, long curriculumId, Date beginDate,Date endDate, String companyName, String workLoad, String role, long version) {
-        super(String.format("PreviousJobsPK: %d %d",userId,curriculumId), "", version);
+        super(String.format("PreviousJobsPK: %d %d",userId,curriculumId), version);
         this.userId = userId;
         this.curriculumId = curriculumId;
         this.beginDate = beginDate;

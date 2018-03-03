@@ -19,7 +19,7 @@ public class Curriculum extends DomainObject<String>{
                        Streamable<AcademicBackground> academicBackground,
                        Streamable<Project> projects,
                        long version) {
-        super(String.format("%d%n-%d%n", accountId, curriculumId), "", version);
+        super(String.format("%d%n-%d%n", accountId, curriculumId), version);
         this.accountId = accountId;
         this.curriculumId = curriculumId;
         this.previousJobs =  previousJobs;

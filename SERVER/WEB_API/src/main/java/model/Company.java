@@ -8,9 +8,7 @@ public class Company extends Account {
     private final String webPageUrl;
     private final String description;
 
-
-
-    public Company(long accountID,
+    private Company(long accountID,
                 String email,
                 String password,
                 double rating,
@@ -44,7 +42,7 @@ public class Company extends Account {
             String webPageUrl,
             String description
     ){
-        Company company = new Company(-1 ,email,password,rating,version,name, specialization,yearFounded, logoUrl, webPageUrl, description);
+        Company company = new Company(defaultKey, email, password, rating, version, name, specialization, yearFounded, logoUrl, webPageUrl, description);
         company.markNew();
         return company;
     }

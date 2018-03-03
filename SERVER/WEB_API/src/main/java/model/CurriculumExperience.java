@@ -1,12 +1,12 @@
 package model;
 
-public class CurriculumExperience extends DomainObject {
+public class CurriculumExperience extends DomainObject<String> {
     private final long userId;
     private final long curriculumId;
     private final long experienceId;
 
-    public CurriculumExperience(long userId, long curriculumId, long experienceId, long version){
-        super(String.format("CEPK: %s %s %s",userId,curriculumId,experienceId),"",version);
+    private CurriculumExperience(long userId, long curriculumId, long experienceId, long version){
+        super(String.format("CEPK: %s %s %s",userId,curriculumId,experienceId), version);
         this.userId = userId;
         this.curriculumId = curriculumId;
         this.experienceId = experienceId;

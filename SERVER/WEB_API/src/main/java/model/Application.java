@@ -8,8 +8,8 @@ public class Application extends DomainObject<String> {
     private final long curriculumId;
     private Date date;
 
-    public Application(long userId, long jobId,long curriculumId, Date date, long version) {
-        super(String.format("ApplicationPK %d %d",userId,jobId), "", version);
+    private Application(long userId, long jobId,long curriculumId, Date date, long version) {
+        super(String.format("ApplicationPK %d %d",userId,jobId), version);
         this.userId = userId;
         this.jobId = jobId;
         this.curriculumId = curriculumId;

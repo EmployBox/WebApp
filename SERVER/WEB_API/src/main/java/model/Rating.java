@@ -7,7 +7,7 @@ public class Rating extends DomainObject<String> {
     private final double ratingValue;
 
     public Rating(long accountIdFrom,long accountIdTo, long moderatorId, double ratingValue, long version) {
-        super(String.format("RatingPK: %d, %d",accountIdFrom,accountIdTo), "", version);
+        super(String.format("RatingPK: %d, %d",accountIdFrom,accountIdTo), version);
         this.accountIdFrom = accountIdFrom;
         this.accountIdTo = accountIdTo;
         this.moderatorId = moderatorId;

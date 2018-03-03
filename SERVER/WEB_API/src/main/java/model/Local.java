@@ -7,7 +7,7 @@ public class Local extends DomainObject<String> {
     private final String zipCode;
 
     private Local(String address, String country, String district, String zipCode, long version) {
-        super(address, "", version);
+        super(address, version);
         this.address = address;
         this.country = country;
         this.district = district;
