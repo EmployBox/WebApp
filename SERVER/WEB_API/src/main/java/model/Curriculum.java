@@ -1,7 +1,5 @@
 package model;
 
-import util.Streamable;
-
 public class Curriculum extends DomainObject<String>{
 
     private final long accountId;
@@ -13,9 +11,10 @@ public class Curriculum extends DomainObject<String>{
 
     private Curriculum(long accountId,
                        long curriculumId,
-                       long version,
+                       Iterable<PreviousJobs> previousJobs,
                        Iterable<AcademicBackground> academicBackground,
-                       Iterable<Project> projects) {
+                       Iterable<Project> projects,
+                       long version) {
         super(String.format("%d%n-%d%n", accountId, curriculumId), "", version);
         this.accountId = accountId;
         this.curriculumId = curriculumId;
@@ -30,7 +29,7 @@ public class Curriculum extends DomainObject<String>{
                                     Iterable<Project> projects,
                                     long version)
     {
-        Curriculum curriculum = new Curriculum(accountId, -1, 0, previousJobs, academicBackground, projects);
+        Curriculum curriculum = new Curriculum(accountId, -1,  previousJobs, academicBackground, projects,version);
         curriculum.markNew();
         return curriculum;
     }
@@ -38,10 +37,11 @@ public class Curriculum extends DomainObject<String>{
     public static Curriculum load(long accountId,
                                   long curriculumId,
                                   long version,
+                                  Iterable<PreviousJobs> previousJobs,
                                   Iterable<AcademicBackground> academicBackground,
                                   Iterable<Project> projects)
     {
-        Curriculum curriculum = new Curriculum(accountId, curriculumId, version, previousJobs, academicBackground, projects);
+        Curriculum curriculum = new Curriculum(accountId, curriculumId,  previousJobs, academicBackground, projects, version);
         curriculum.markClean();
         return curriculum;
     }
@@ -55,10 +55,14 @@ public class Curriculum extends DomainObject<String>{
     }
 
     public Iterable<PreviousJobs> getPreviousJobs() {
-        return previousJobs.get();
+        return previousJobs;
     }
 
     public Iterable<AcademicBackground> getAcademicBackground() {
-        return academicBackground.get();
+        return academicBackground;
+    }
+
+    public Iterable<Project> getProjects() {
+        return projects;
     }
 }

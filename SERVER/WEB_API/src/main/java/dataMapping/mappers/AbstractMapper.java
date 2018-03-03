@@ -17,7 +17,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.function.Consumer;
 import java.util.function.Function;
-import java.util.function.Supplier;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
@@ -59,7 +58,7 @@ public abstract class AbstractMapper<T extends DomainObject<K>, K> implements Ma
     }
 
     private<R> R executeSQLAux(String query, Function<PreparedStatement, SQLException> prepareStatement, Function<PreparedStatement, R> function){
-        Connection con = ConnectionManager.getConnectionManager().getConnection();
+        Connection con = ConnectionManager.getConnectionManagerOfDefaultDB().getConnection();
         try(PreparedStatement statement = con.prepareStatement(query)) {
             SQLException exception = prepareStatement.apply(statement);
             if(exception != null) throw new DataMapperException(exception.getMessage(), exception);

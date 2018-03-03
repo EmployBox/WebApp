@@ -16,18 +16,18 @@ public class ApplicationMapper extends AbstractMapper<Application, String> {
     public Stream<Application> findJobApplications(long jobId){
         String query = "SELECT UserId, CurriculumId, JobId, [date] from [Application] WHERE JobId = ?";
         return executeQuery(
-                query,
-                null,
-                preparedStatement -> {
-                    SQLException sqlException = null;
-                    try{
-                        preparedStatement.setLong(1, jobId);
-                    } catch (SQLException e) {
-                        sqlException = e;
-                    }
-                    return sqlException;
+            query,
+            null,
+            preparedStatement -> {
+                SQLException sqlException = null;
+                try{
+                    preparedStatement.setLong(1, jobId);
+                } catch (SQLException e) {
+                    sqlException = e;
                 }
-        );
+                return sqlException;
+            }
+    );
     }
 
     @Override

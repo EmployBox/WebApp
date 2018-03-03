@@ -1,41 +1,55 @@
 package dataMapping.utils;
 
-import com.microsoft.sqlserver.jdbc.SQLServerDataSource;
+import com.microsoft.sqlserver.jdbc.SQLServerConnectionPoolDataSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.sql.ConnectionPoolDataSource;
 import java.sql.Connection;
-import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
 
 //TODO Apply a connection pool
 public class ConnectionManager {
+    private static ConnectionManager connectionManager = new ConnectionManager(null);
 
-    private Connection conn;
+    public static ConnectionManager getConnectionManagerOfDefaultDB(){
+        return connectionManager;
+    }
 
-    public ConnectionManager() {
-        Logger logger = LoggerFactory.getLogger(ConnectionManager.class);
+    /**CONNECTION STRING FORMAT: SERVERNAME;DATABASE;USER;PASSWORD*/
+    private final ConnectionPoolDataSource dataSource;
 
-        SQLServerDataSource dataSource = new SQLServerDataSource();
-        dataSource.setDatabaseName("PS_TEST_API_DATABASE");
-        dataSource.setServerName("localhost");
-        dataSource.setUser("PSG15");
-        dataSource.setPassword("projectoSeminario");
-        try {
-            conn = dataSource.getConnection();
-            conn.setAutoCommit(false);
-        } catch (SQLException e) {
-            logger.info("Error on stablishing connection to the DB \n" + e.getMessage());
-        }
+    public ConnectionManager (String envVarName){
+        if(envVarName != null )
+            dataSource = getDataSource(envVarName);
+        else
+            dataSource = getDataSource("DB_CONNECTION_STRING");
     }
 
     public Connection getConnection() {
-        return conn;
+        Logger logger = LoggerFactory.getLogger(ConnectionManager.class);
+        try {
+            return dataSource
+                    .getPooledConnection()
+                    .getConnection();
+
+        } catch (SQLException e) {
+            logger.info("Error on stablishing connection to the DB \n" + e.getMessage());
+        }
+        return null;
     }
 
-    private static ConnectionManager connectionManager = new ConnectionManager();
+    private ConnectionPoolDataSource getDataSource(String envVar){
+        String connectionString = System.getenv(envVar);
+        String [] connectionStringParts = connectionString.split(";");
 
-    public static ConnectionManager getConnectionManager(){
-        return connectionManager;
+
+        SQLServerConnectionPoolDataSource dataSource = new SQLServerConnectionPoolDataSource();
+        dataSource.setServerName(connectionStringParts[0]);
+        dataSource.setDatabaseName(connectionStringParts[1]);
+        dataSource.setUser(connectionStringParts[2]);
+        dataSource.setPassword(connectionStringParts[3]);
+
+        return dataSource;
     }
 }

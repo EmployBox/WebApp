@@ -146,7 +146,7 @@ CREATE TABLE Apidatabase.Curriculum_Experience(
 	curriculumId BIGINT,
 	experienceId BIGINT
 
-	FOREIGN KEY (userId,curriculumId) REFERENCES ApiDatabase.Curriculum(userId,curriculumId) ON DELETE CASCADE,
+	FOREIGN KEY (userId,curriculumId) REFERENCES ApiDatabase.Curriculum ON DELETE CASCADE,
 	FOREIGN KEY (experienceId) REFERENCES ApiDatabase.Experience(experienceId) ON DELETE CASCADE,
 
 	primary key(userId, curriculumId, experienceId)

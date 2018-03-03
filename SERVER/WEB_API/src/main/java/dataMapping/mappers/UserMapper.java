@@ -3,7 +3,6 @@ package dataMapping.mappers;
 
 import dataMapping.exceptions.DataMapperException;
 import dataMapping.utils.ConnectionManager;
-import model.DomainObject;
 import model.User;
 
 import java.sql.*;
@@ -44,7 +43,7 @@ public class UserMapper extends AccountMapper<User> {
     }
 
     private  void writeUser(User obj,String procedureToUse){
-        Connection con = ConnectionManager.getConnectionManager().getConnection();
+        Connection con = ConnectionManager.getConnectionManagerOfDefaultDB().getConnection();
         try{
             CallableStatement cs = con.prepareCall(procedureToUse);
             cs.setString(1, obj.getEmail());
@@ -66,7 +65,7 @@ public class UserMapper extends AccountMapper<User> {
 
     @Override
     public void delete(User obj) {
-        Connection con = ConnectionManager.getConnectionManager().getConnection();
+        Connection con = ConnectionManager.getConnectionManagerOfDefaultDB().getConnection();
         try{
             CallableStatement cs = con.prepareCall("{call DeleteUser(?, ?)}");
             cs.setString(1, obj.getEmail());
