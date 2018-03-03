@@ -19,7 +19,7 @@ public class CurriculumMapper extends AbstractMapper<Curriculum, String>{
             long version = rs.getLong("[version]");
 
             Curriculum curriculum = Curriculum.load(accountId, curriculumId, version, null, null, null);
-            getIdentityMap().put(curriculum.getIdentityKey(), curriculum);
+            identityMap.put(curriculum.getIdentityKey(), curriculum);
 
             return curriculum;
         } catch (SQLException e) {

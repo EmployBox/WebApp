@@ -40,7 +40,7 @@ public class ApplicationMapper extends AbstractMapper<Application, String> {
             long version = rs.getLong("[version]");
 
             Application application = Application.load(userId,jobId,curriculumId,date, version);
-            getIdentityMap().put(String.format("ApplicationPK %s %s",userId,jobId), application);
+            identityMap.put(String.format("ApplicationPK %s %s",userId,jobId), application);
 
             return application;
         } catch (SQLException e) {
@@ -53,6 +53,7 @@ public class ApplicationMapper extends AbstractMapper<Application, String> {
         executeSQLUpdate(
                 INSERT_QUERY,
                 obj,
+                false,
                 preparedStatement -> {
                     SQLException sqlException = null;
                     try{
@@ -73,6 +74,7 @@ public class ApplicationMapper extends AbstractMapper<Application, String> {
         executeSQLUpdate(
                 UPDATE_QUERY,
                 obj,
+                false,
                 preparedStatement -> {
                     SQLException sqlException = null;
                     try{
@@ -90,6 +92,7 @@ public class ApplicationMapper extends AbstractMapper<Application, String> {
         executeSQLUpdate(
                 DELETE_QUERY,
                 obj,
+                true,
                 preparedStatement -> {
                     SQLException sqlException = null;
                     try{

@@ -26,7 +26,7 @@ public class JobMapper extends AbstractMapper<Job, Long> {
             long version = rs.getLong("Version");
 
             Job job = Job.load(jobID, accountID, address, wage, description, schedule, offerBeginDate, offerEndDate, offerType, version, null, null);
-            getIdentityMap().put(jobID, job);
+            identityMap.put(jobID, job);
 
             return job;
         } catch (SQLException e) {
@@ -39,6 +39,7 @@ public class JobMapper extends AbstractMapper<Job, Long> {
         executeSQLUpdate(
                 INSERT_QUERY,
                 obj,
+                false,
                 preparedStatement -> {
                     SQLException sqlException = null;
                     try{
@@ -64,6 +65,7 @@ public class JobMapper extends AbstractMapper<Job, Long> {
         executeSQLUpdate(
                 UPDATE_QUERY,
                 obj,
+                false,
                 preparedStatement -> {
                     SQLException sqlException = null;
                     try{
@@ -88,6 +90,7 @@ public class JobMapper extends AbstractMapper<Job, Long> {
         executeSQLUpdate(
                 DELETE_QUERY,
                 obj,
+                true,
                 preparedStatement -> {
                     SQLException sqlException = null;
                     try{

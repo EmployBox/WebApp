@@ -19,7 +19,7 @@ public class LocalMapper extends AbstractMapper<Local, String>{
             long version = rs.getLong("[version]");
 
             Local local = Local.load(address, country, district, zipCode, version);
-            getIdentityMap().put(local.getIdentityKey(), local);
+            identityMap.put(local.getIdentityKey(), local);
 
             return local;
         } catch (SQLException e) {

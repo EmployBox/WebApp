@@ -36,7 +36,7 @@ public class ExperienceMapper extends AbstractMapper<Experience, Long> {
             long version = rs.getLong("[version]");
 
             Experience experience = Experience.load(experienceId, competence, years, version);
-            getIdentityMap().put(experienceId, experience);
+            identityMap.put(experienceId, experience);
 
             return experience;
         } catch (SQLException e) {
