@@ -1,12 +1,16 @@
 package model;
 
+import util.Streamable;
+
+import java.util.stream.Stream;
+
 public class User extends Account {
     private final String name;
     private final String summary;
     private final String photoUrl;
 
-    private final Iterable<Curriculum> curriculums;
-    private final Iterable<Application> applications;
+    private final Streamable<Curriculum> curriculums;
+    private final Streamable<Application> applications;
 
     public User(long accountID,
                 String email,
@@ -16,8 +20,8 @@ public class User extends Account {
                 String name,
                 String summary,
                 String photoUrl,
-                Iterable<Curriculum> curriculums,
-                Iterable<Application> applications
+                Streamable<Curriculum> curriculums,
+                Streamable<Application> applications
     ){
         super(accountID,email,password,rating,version);
         this.name = name;
@@ -35,8 +39,8 @@ public class User extends Account {
                             String name,
                             String summary,
                             String photoUrl,
-                            Iterable<Curriculum> curriculums,
-                            Iterable<Application> applications
+                            Streamable<Curriculum> curriculums,
+                            Streamable<Application> applications
     ){
         User user = new User(-1 ,email,password,rating,version,name,summary,photoUrl, curriculums, applications);
         user.markNew();
@@ -51,8 +55,8 @@ public class User extends Account {
                             String name,
                             String summary,
                             String photoUrl,
-                            Iterable<Curriculum> curriculums,
-                            Iterable<Application> applications
+                            Streamable<Curriculum> curriculums,
+                            Streamable<Application> applications
     ){
         User user = new User(accountID, email, password, rating, version, name, summary, photoUrl, curriculums, applications);
         user.markClean();
@@ -71,12 +75,12 @@ public class User extends Account {
         return photoUrl;
     }
 
-    public Iterable<Curriculum> getExperiences(){
-        return this.curriculums;
+    public Stream<Curriculum> getExperiences(){
+        return this.curriculums.get();
     }
 
-    public Iterable<Application> getApplications() {
-        return applications;
+    public Stream<Application> getApplications() {
+        return applications.get();
     }
 
 }

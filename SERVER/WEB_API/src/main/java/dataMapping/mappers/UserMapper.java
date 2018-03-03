@@ -3,6 +3,7 @@ package dataMapping.mappers;
 
 import dataMapping.exceptions.DataMapperException;
 import dataMapping.utils.ConnectionManager;
+import model.Curriculum;
 import model.User;
 
 import java.sql.*;
@@ -23,7 +24,7 @@ public class UserMapper extends AccountMapper<User> {
             String photoUrl = rs.getString ("PhotoUrl");
             long version = rs.getLong("[version]");
 
-            User user = User.load(accountID, email, passwordHash, rating, version,name ,summary, photoUrl, null, null );
+            User user = User.load(accountID, email, passwordHash, rating, version,name ,summary, photoUrl, null , null );
             getIdentityMap().put(accountID, user);
 
             return user;

@@ -1,8 +1,10 @@
 package model;
 
 import javafx.util.Pair;
+import util.Streamable;
 
 import java.sql.Date;
+import java.util.stream.Stream;
 
 public class Job extends DomainObject<Long> {
     private final long accountID;
@@ -14,8 +16,8 @@ public class Job extends DomainObject<Long> {
     private final Date offerEndDate;
     private final String offerType; //TODO change to enum
 
-    private final Iterable<Experience> experiences;
-    private final Iterable<Pair<User, Curriculum>> applications;
+    private final Streamable<Experience> experiences;
+    private final Streamable<Pair<User, Curriculum>> applications;
 
     private Job(long id,
                 long accountID,
@@ -27,8 +29,8 @@ public class Job extends DomainObject<Long> {
                 Date offerEndDate,
                 String offerType,
                 long version,
-                Iterable<Experience> experiences,
-                Iterable<Pair<User, Curriculum>> applications)
+                Streamable<Experience> experiences,
+                Streamable<Pair<User, Curriculum>> applications)
     {
         super(id, (long) -1, version);
         this.accountID = accountID;
@@ -53,8 +55,8 @@ public class Job extends DomainObject<Long> {
             Date offerEndDate,
             String offerType,
             long version,
-            Iterable<Experience> experiences,
-            Iterable<Pair<User, Curriculum>> applications)
+            Streamable<Experience> experiences,
+            Streamable<Pair<User, Curriculum>> applications)
     {
         Job job = new Job(-1, accountID, address, wage, description, schedule, offerBeginDate, offerEndDate, offerType, version, experiences, applications);
         job.markNew();
@@ -72,8 +74,8 @@ public class Job extends DomainObject<Long> {
             Date offerEndDate,
             String offerType,
             long version,
-            Iterable<Experience> experiences,
-            Iterable<Pair<User, Curriculum>> applications)
+            Streamable<Experience> experiences,
+            Streamable<Pair<User, Curriculum>> applications)
     {
         Job job = new Job(id, accountID, address, wage, description, schedule, offerBeginDate, offerEndDate, offerType, version, experiences, applications);
         job.markClean();
@@ -112,11 +114,11 @@ public class Job extends DomainObject<Long> {
         return address;
     }
 
-    public Iterable<Experience> getExperiences() {
-        return experiences;
+    public Stream<Experience> getExperiences() {
+        return experiences.get();
     }
 
-    public Iterable<Pair<User, Curriculum>> getApplications() {
-        return applications;
+    public Stream<Pair<User, Curriculum>> getApplications() {
+        return applications.get();
     }
 }
