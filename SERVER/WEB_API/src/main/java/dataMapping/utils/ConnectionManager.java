@@ -8,9 +8,9 @@ import javax.sql.ConnectionPoolDataSource;
 import java.sql.Connection;
 import java.sql.SQLException;
 
-//TODO Apply a connection pool
+
 public class ConnectionManager {
-    private static ConnectionManager connectionManager = new ConnectionManager(null);
+    private static ConnectionManager connectionManager = new ConnectionManager();
 
     public static ConnectionManager getConnectionManagerOfDefaultDB(){
         return connectionManager;
@@ -20,11 +20,13 @@ public class ConnectionManager {
     private final ConnectionPoolDataSource dataSource;
 
     public ConnectionManager (String envVarName){
-        if(envVarName != null )
-            dataSource = getDataSource(envVarName);
-        else
-            dataSource = getDataSource("DB_CONNECTION_STRING");
+        dataSource = getDataSource(envVarName);
     }
+
+    public ConnectionManager (){
+        dataSource = getDataSource("DB_CONNECTION_STRING");//default enviroment variable name
+    }
+
 
     public Connection getConnection() {
         Logger logger = LoggerFactory.getLogger(ConnectionManager.class);
