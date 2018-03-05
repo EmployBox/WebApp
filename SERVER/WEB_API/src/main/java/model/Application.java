@@ -6,7 +6,7 @@ public class Application extends DomainObject<String> {
     private final long userId;
     private final long jobId;
     private final long curriculumId;
-    private Date date;
+    private final Date date;
 
     private Application(long userId, long jobId,long curriculumId, Date date, long version) {
         super(String.format("ApplicationPK %d %d",userId,jobId), version);
@@ -30,10 +30,6 @@ public class Application extends DomainObject<String> {
 
     public Date getDate() {
         return date;
-    }
-
-    public void setDate(Date date) {
-        this.date = date;
     }
 
     public long getCurriculumId() {

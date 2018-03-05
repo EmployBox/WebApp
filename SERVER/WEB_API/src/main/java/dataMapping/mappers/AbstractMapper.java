@@ -59,10 +59,10 @@ public abstract class AbstractMapper<T extends DomainObject<K>, K> implements Ma
         Connection connection = ConnectionManager.getConnectionManagerOfDefaultDB().getConnection();
         try(Statement statement = isProcedure ? connection.prepareCall(query) : connection.prepareStatement(query)) {
             handleStatement.accept(statement);
+            connection.close();
         } catch (SQLException e) {
             throw new DataMapperException(e);
         }
-        //TODO Alert ConnectionManager we finished using conn
     }
 
     /**
@@ -72,7 +72,7 @@ public abstract class AbstractMapper<T extends DomainObject<K>, K> implements Ma
      * @param prepareStatement
      * @return
      */
-    public Stream<T> executeQuery(String query, K key, Consumer<PreparedStatement> prepareStatement){
+    protected Stream<T> executeQuery(String query, K key, Consumer<PreparedStatement> prepareStatement){
         if(identityMap.containsKey(key))
             return Stream.of(identityMap.get(key));
 
@@ -132,6 +132,7 @@ public abstract class AbstractMapper<T extends DomainObject<K>, K> implements Ma
         );
     }
 
+    //TODO Does it work with Inserts?
     private boolean tryReplace(T obj, long timeout){
         long target = System.currentTimeMillis() +  timeout;
         long remaining = target - System.currentTimeMillis();

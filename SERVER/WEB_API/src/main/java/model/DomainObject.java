@@ -23,6 +23,10 @@ public abstract class DomainObject<K> {
         return version;
     }
 
+    public long getNextVersion() {
+        return version + 1;
+    }
+
     /**
      * Always called when creating new object
      */

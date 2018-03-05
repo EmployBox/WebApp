@@ -103,10 +103,6 @@ public class UnitOfWork {
     }
 
     private void updateDirty() {
-        /*for (DomainObject obj : dirtyObjects) {
-            obj.updateVersion();
-            MapperRegistry.getMapper(obj).update(obj);
-        }*/
         dirtyObjects
                 .stream()
                 .filter(domainObject -> !removedObjects.contains(domainObject))
@@ -125,8 +121,13 @@ public class UnitOfWork {
      * The objects in dirtyObjects need to go back as before
      */
     private void rollback(){
-        for (DomainObject obj : newObjects)
-            MapperRegistry.getMapper(obj.getClass()).getIdentityMap().remove(obj.getIdentityKey());
+        /*for (DomainObject obj : newObjects)
+            MapperRegistry.getMapper(obj.getClass()).getIdentityMap().remove(obj.getIdentityKey());*/
+
+        newObjects
+                .stream()
+                .filter(domainObject -> MapperRegistry.getMapper(domainObject.getClass()).getIdentityMap().containsKey(domainObject.getIdentityKey()))
+                .forEach(domainObject -> MapperRegistry.getMapper(domainObject.getClass()).getIdentityMap().remove(domainObject.getIdentityKey(), domainObject));
 
         for(DomainObject obj : dirtyObjects){
             clonedObjects
@@ -134,18 +135,13 @@ public class UnitOfWork {
                     .filter(domainObject -> domainObject.getIdentityKey().equals(obj.getIdentityKey()))
                     .findFirst()
                     .ifPresent(
-                            (clone) -> MapperRegistry.getMapper(obj.getClass()).getIdentityMap().put(clone.getIdentityKey(), clone)
+                            clone -> MapperRegistry.getMapper(obj.getClass()).getIdentityMap().put(clone.getIdentityKey(), clone)
                     );
-
         }
 
         removedObjects
                 .stream()
                 .filter(obj -> !dirtyObjects.contains(obj))
                 .forEach(obj -> MapperRegistry.getMapper(obj.getClass()).getIdentityMap().put(obj.getIdentityKey(), obj));
-        /*for(DomainObject obj : removedObjects)
-            if(!dirtyObjects.contains(obj))
-                MapperRegistry.getMapper(obj).getIdentityMap().put(obj.getIdentityKey(), obj);
-                */
     }
 }
