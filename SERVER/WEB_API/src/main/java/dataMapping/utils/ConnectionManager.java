@@ -45,8 +45,8 @@ public class ConnectionManager {
         String connectionString = System.getenv(envVar);
         String [] connectionStringParts = connectionString.split(";");
 
-
         SQLServerConnectionPoolDataSource dataSource = new SQLServerConnectionPoolDataSource();
+
         dataSource.setServerName(connectionStringParts[0]);
         dataSource.setDatabaseName(connectionStringParts[1]);
         dataSource.setUser(connectionStringParts[2]);

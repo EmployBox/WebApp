@@ -59,10 +59,13 @@ public abstract class AbstractMapper<T extends DomainObject<K>, K> implements Ma
         Connection connection = ConnectionManager.getConnectionManagerOfDefaultDB().getConnection();
         try(Statement statement = isProcedure ? connection.prepareCall(query) : connection.prepareStatement(query)) {
             handleStatement.accept(statement);
+            statement.close();
         } catch (SQLException e) {
             throw new DataMapperException(e);
         }
-        //TODO Alert ConnectionManager we finished using conn
+        finally{
+            try{ connection.close(); } catch(SQLException e) {}
+        }
     }
 
     /**
