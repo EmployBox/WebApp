@@ -59,13 +59,14 @@ public abstract class AbstractMapper<T extends DomainObject<K>, K> implements Ma
         Connection connection = ConnectionManager.getConnectionManagerOfDefaultDB().getConnection();
         try(Statement statement = isProcedure ? connection.prepareCall(query) : connection.prepareStatement(query)) {
             handleStatement.accept(statement);
-            connection.close();
         } catch (SQLException e) {
             throw new DataMapperException(e);
         }
+        finally {
             try{ connection.close(); } catch(SQLException e) {}
         }
     }
+
 
     /**
      * Gets the object from IdentityMap or queries the DB for it

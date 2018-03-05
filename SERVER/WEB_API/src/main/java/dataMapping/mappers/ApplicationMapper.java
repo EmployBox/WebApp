@@ -25,7 +25,7 @@ public class ApplicationMapper extends AbstractMapper<Application, String> {
                     throw new DataMapperException(e);
                 }
             }
-    );
+        );
     }
 
     @Override

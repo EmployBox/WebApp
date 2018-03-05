@@ -25,7 +25,6 @@ public class UnitOfWork {
         assert !removedObjects.contains(obj);
         assert !newObjects.contains(obj);
         newObjects.add(obj);
-        MapperRegistry.getMapper(obj.getClass()).getIdentityMap().put(obj.getIdentityKey(), obj);
     }
 
     public void registerClone(DomainObject obj) {

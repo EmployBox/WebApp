@@ -25,7 +25,7 @@ public class JobMapper extends AbstractMapper<Job, Long> {
             String offerType = rs.getString("OfferType");
             long version = rs.getLong("Version");
 
-            Job job = Job.load(jobID, accountID, address, wage, description, schedule, offerBeginDate, offerEndDate, offerType, version, null, null);
+            Job job = Job.load(jobID, accountID, address, wage, description, schedule, offerBeginDate, offerEndDate, offerType, version, null);
             identityMap.put(jobID, job);
 
             return job;

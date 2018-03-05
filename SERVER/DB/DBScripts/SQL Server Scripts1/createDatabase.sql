@@ -196,6 +196,7 @@ CREATE TABLE ApiDatabase.Chat(
 
 	FOREIGN KEY (accountIdFirst) REFERENCES ApiDatabase.Account(accountID),
 	FOREIGN KEY (accountIdSecond) REFERENCES ApiDatabase.Account(accountID),
+	UNIQUE (AccountIdFirst, AccountIdSecond)
 )
 
 

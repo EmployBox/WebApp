@@ -3,25 +3,13 @@
   <Items>
     <LogicalFolder Name="Connections" Type="2" Sorted="true">
       <Items>
-        <ConnectionNode Name="(local):Neo\MATRIX">
-          <Created>2018-02-27T17:04:08.5548379+00:00</Created>
+        <ConnectionNode Name="(local):PSG15">
+          <Created>2018-03-05T17:25:32.7553186+00:00</Created>
           <Type>SQL</Type>
           <Server>(local)</Server>
-          <UserName />
-          <Authentication>Windows Authentication</Authentication>
+          <UserName>PSG15</UserName>
+          <Authentication>SQL</Authentication>
           <InitialDB />
-          <LoginTimeout>15</LoginTimeout>
-          <ExecutionTimeout>0</ExecutionTimeout>
-          <ConnectionProtocol>NotSpecified</ConnectionProtocol>
-          <ApplicationName>Microsoft SQL Server Management Studio - Query</ApplicationName>
-        </ConnectionNode>
-        <ConnectionNode Name="NEO\SQLEXPRESS:Neo\MATRIX">
-          <Created>2018-02-25T19:31:47.0818784+00:00</Created>
-          <Type>SQL</Type>
-          <Server>NEO\SQLEXPRESS</Server>
-          <UserName />
-          <Authentication>Windows Authentication</Authentication>
-          <InitialDB>SI2_1617SV_G6</InitialDB>
           <LoginTimeout>15</LoginTimeout>
           <ExecutionTimeout>0</ExecutionTimeout>
           <ConnectionProtocol>NotSpecified</ConnectionProtocol>
@@ -32,26 +20,26 @@
     <LogicalFolder Name="Queries" Type="0" Sorted="true">
       <Items>
         <FileNode Name="createDatabase.sql">
-          <AssociatedConnectionMoniker>8c91a03d-f9b4-46c0-a305-b5dcc79ff907:(local):True</AssociatedConnectionMoniker>
-          <AssociatedConnSrvName>(local)</AssociatedConnSrvName>
+          <AssociatedConnectionMoniker />
+          <AssociatedConnSrvName />
           <AssociatedConnUserName />
           <FullPath>createDatabase.sql</FullPath>
         </FileNode>
         <FileNode Name="dropDatabase.sql">
-          <AssociatedConnectionMoniker>8c91a03d-f9b4-46c0-a305-b5dcc79ff907:NEO\SQLEXPRESS:True</AssociatedConnectionMoniker>
-          <AssociatedConnSrvName>NEO\SQLEXPRESS</AssociatedConnSrvName>
-          <AssociatedConnUserName />
+          <AssociatedConnectionMoniker>8c91a03d-f9b4-46c0-a305-b5dcc79ff907:(local):False:PSG15</AssociatedConnectionMoniker>
+          <AssociatedConnSrvName>(local)</AssociatedConnSrvName>
+          <AssociatedConnUserName>PSG15</AssociatedConnUserName>
           <FullPath>dropDatabase.sql</FullPath>
         </FileNode>
         <FileNode Name="procedure_tests(junk version).sql">
-          <AssociatedConnectionMoniker>8c91a03d-f9b4-46c0-a305-b5dcc79ff907:(local):True</AssociatedConnectionMoniker>
-          <AssociatedConnSrvName>(local)</AssociatedConnSrvName>
+          <AssociatedConnectionMoniker />
+          <AssociatedConnSrvName />
           <AssociatedConnUserName />
           <FullPath>procedure_tests(junk version).sql</FullPath>
         </FileNode>
         <FileNode Name="procedures.sql">
-          <AssociatedConnectionMoniker>8c91a03d-f9b4-46c0-a305-b5dcc79ff907:(local):True</AssociatedConnectionMoniker>
-          <AssociatedConnSrvName>(local)</AssociatedConnSrvName>
+          <AssociatedConnectionMoniker />
+          <AssociatedConnSrvName />
           <AssociatedConnUserName />
           <FullPath>procedures.sql</FullPath>
         </FileNode>
