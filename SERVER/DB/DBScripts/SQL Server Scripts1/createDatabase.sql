@@ -11,7 +11,7 @@ GO
 USE PS_API_DATABASE
 GO
 
-CREATE TABLE ApiDatabase.Account (
+CREATE TABLE ApiDatabase.[Account] (
 	accountId BIGINT IDENTITY PRIMARY KEY,
 	email NVARCHAR(25) UNIQUE NOT NULL,
 	rating decimal(2,1) default(0.0),
@@ -22,7 +22,7 @@ CREATE TABLE ApiDatabase.Account (
 	CHECK (rating >= 0.0 AND rating <= 5.0)
 )
 
-CREATE TABLE ApiDatabase.Company (
+CREATE TABLE ApiDatabase.[Company] (
 	accountId BIGINT primary key references ApiDatabase.Account,
 	name NVARCHAR(40),
 	yearFounded SMALLINT,
@@ -35,7 +35,7 @@ CREATE TABLE ApiDatabase.Company (
 	FOREIGN KEY (accountID) REFERENCES ApiDatabase.Account(accountID) ON DELETE CASCADE	
 )
 
-CREATE TABLE ApiDatabase.Moderator (
+CREATE TABLE ApiDatabase.[Moderator] (
 	accountID BIGINT primary key references ApiDatabase.Account,
 
 	FOREIGN KEY (accountID) REFERENCES ApiDatabase.Account(accountID) ON DELETE CASCADE	
@@ -51,7 +51,7 @@ CREATE TABLE ApiDatabase.[User] (
 	FOREIGN KEY (accountID) REFERENCES ApiDatabase.Account(accountID) ON DELETE CASCADE		
 )
 
-CREATE TABLE ApiDatabase.Curriculum(
+CREATE TABLE ApiDatabase.[Curriculum](
 	userId BIGINT references ApiDatabase.[User],
 	curriculumId BIGINT,
 
@@ -59,7 +59,7 @@ CREATE TABLE ApiDatabase.Curriculum(
 	primary key(userId,curriculumId)
 )
 
-CREATE TABLE ApiDatabase.Project (
+CREATE TABLE ApiDatabase.[Project] (
 	userId BIGINT,
 	curriculumId BIGINT,
 	name NVARCHAR(15),
@@ -70,7 +70,7 @@ CREATE TABLE ApiDatabase.Project (
 	FOREIGN KEY (userId,curriculumId) REFERENCES ApiDatabase.Curriculum(userId,curriculumId) ON DELETE CASCADE
 )
 
-CREATE TABLE ApiDatabase.AcademicBackground(
+CREATE TABLE ApiDatabase.[AcademicBackground](
 	userId BIGINT,
 	curriculumId BIGINT,
 	beginDate DATETIME DEFAULT(GETDATE()),
@@ -92,7 +92,7 @@ CREATE TABLE ApiDatabase.AcademicBackground(
 						OR degreeObtained = 'PHD')				
 )
 
-CREATE TABLE Apidatabase.PreviousJobs(
+CREATE TABLE Apidatabase.[PreviousJobs](
 	userId BIGINT,
 	curriculumId BIGINT,
 	beginDate DATETIME DEFAULT(GETDATE()),
@@ -117,7 +117,7 @@ CREATE TABLE ApiDatabase.[Local] (
 )
 
 
-CREATE TABLE ApiDatabase.Job(
+CREATE TABLE ApiDatabase.[Job](
 	jobId BIGINT identity primary key,
 	accountId BIGINT,
 	schedule NVARCHAR(20),
@@ -134,32 +134,26 @@ CREATE TABLE ApiDatabase.Job(
 	check(offerType = 'Looking for work' OR offerType = 'Looking for Worker')
 )
 
-CREATE TABLE Apidatabase.Experience(
-	experienceId BIGINT IDENTITY PRIMARY KEY,
+CREATE TABLE Apidatabase.[Curriculum_Experience](
+	curriculumExperienceId BIGINT identity primary key,
+	userId BIGINT,
 	years SMALLINT,
 	Competence NVARCHAR(200),
-	[version] rowversion,
-)
-
-CREATE TABLE Apidatabase.Curriculum_Experience(
-	userId BIGINT,
 	curriculumId BIGINT,
-	experienceId BIGINT
+	[version] rowversion,
 
 	FOREIGN KEY (userId,curriculumId) REFERENCES ApiDatabase.Curriculum ON DELETE CASCADE,
-	FOREIGN KEY (experienceId) REFERENCES ApiDatabase.Experience(experienceId) ON DELETE CASCADE,
 
 	primary key(userId, curriculumId, experienceId)
 )
 
-CREATE TABLE Apidatabase.Job_Experience(
+CREATE TABLE Apidatabase.[Job_Experience](
+	jobExperienceId BIGINT identity primary key,
 	jobId BIGINT,
-	experienceId BIGINT,
+	[version] rowversion,
 
 	FOREIGN KEY (jobId) REFERENCES ApiDatabase.Job(jobId) ON DELETE CASCADE,
-	FOREIGN KEY (experienceId) REFERENCES ApiDatabase.Experience(experienceId) ON DELETE CASCADE,
 
-	primary key(jobId, experienceId)
 )
 
 CREATE TABLE ApiDatabase.[Application](
@@ -174,7 +168,7 @@ CREATE TABLE ApiDatabase.[Application](
 	primary key (UserId, JobId)
 )
 
-CREATE TABLE ApiDatabase.Rating(
+CREATE TABLE ApiDatabase.[Rating](
 	AccountIdFrom BIGINT,
 	AccountIdTo BIGINT,
 	moderatorId BIGINT references ApiDatabase.Moderator,
@@ -188,7 +182,7 @@ CREATE TABLE ApiDatabase.Rating(
 	PRIMARY KEY(AccountIdFrom , AccountIdTo)
 )
 
-CREATE TABLE ApiDatabase.Chat(
+CREATE TABLE ApiDatabase.[Chat](
 	chatId BIGINT IDENTITY PRIMARY KEY,
 	AccountIdFirst BIGINT,
 	AccountIdSecond BIGINT,
@@ -209,7 +203,7 @@ CREATE TABLE ApiDatabase.[MESSAGE](
 	FOREIGN KEY (chatId) REFERENCES ApiDatabase.Chat(chatId),
 )
 
-CREATE TABLE ApiDatabase.Comment (
+CREATE TABLE ApiDatabase.[Comment] (
 	CommentId BIGINT identity primary key,
 	AccountIdFrom BIGINT,
 	AccountIdDest BIGINT,
@@ -224,7 +218,7 @@ CREATE TABLE ApiDatabase.Comment (
 	FOREIGN KEY (MainCommentId) REFERENCES ApiDatabase.Comment(commentId),
 )
 
-CREATE TABLE ApiDatabase.Follows (
+CREATE TABLE ApiDatabase.[Follows] (
 	AccountIdFrom BIGINT references ApiDatabase.Account,
 	AccountIdDest BIGINT references ApiDatabase.Account,
 
@@ -235,7 +229,7 @@ CREATE TABLE ApiDatabase.Follows (
 
 
 GO
-CREATE VIEW dbo.Account AS
+CREATE VIEW dbo.[Account] AS
 SELECT accountId,email,rating FROM ApiDatabase.Account
 GO
 
@@ -245,52 +239,52 @@ SELECT * FROM ApiDatabase.[User]
 GO
 
 GO
-CREATE VIEW dbo.Moderator AS
+CREATE VIEW dbo.[Moderator] AS
 SELECT * FROM ApiDatabase.Moderator
 GO
 
 GO
-CREATE VIEW dbo.Company AS
+CREATE VIEW dbo.[Company] AS
 SELECT * FROM ApiDatabase.Company
 GO
 
 GO
-CREATE VIEW dbo.Job AS
+CREATE VIEW dbo.[Job] AS
 SELECT * FROM ApiDatabase.Job
 GO
 
 GO
-CREATE VIEW dbo.Curriculum AS
+CREATE VIEW dbo.[Curriculum] AS
 SELECT * FROM ApiDatabase.Curriculum
 GO
 
 GO
-CREATE VIEW dbo.AcademicBackground AS
+CREATE VIEW dbo.[AcademicBackground] AS
 SELECT * FROM ApiDatabase.AcademicBackground
 GO
 
 GO
-CREATE VIEW dbo.Experience AS
+CREATE VIEW dbo.[Experience] AS
 SELECT * FROM ApiDatabase.Experience
 GO
 
 GO
-CREATE VIEW dbo.Curriculum_Experience AS
+CREATE VIEW dbo.[Curriculum_Experience] AS
 SELECT * FROM ApiDatabase.Curriculum_Experience
 GO
 
 GO
-CREATE VIEW dbo.Job_Experience AS
+CREATE VIEW dbo.[Job_Experience] AS
 SELECT * FROM ApiDatabase.Job_Experience
 GO
 
 GO
-CREATE VIEW dbo.Comment AS
+CREATE VIEW dbo.[Comment] AS
 SELECT * FROM ApiDatabase.Comment
 GO
 
 GO
-CREATE VIEW dbo.Chat AS
+CREATE VIEW dbo.[Chat] AS
 SELECT * FROM ApiDatabase.Chat
 GO
 
@@ -305,11 +299,11 @@ SELECT * FROM ApiDatabase.[Message]
 GO
 
 GO
-CREATE VIEW dbo.Project AS
+CREATE VIEW dbo.[Project] AS
 SELECT * FROM ApiDatabase.Project
 GO
 
 GO
-CREATE VIEW dbo.Follows AS
+CREATE VIEW dbo.[Follows] AS
 SELECT * FROM ApiDatabase.Follows
 GO
