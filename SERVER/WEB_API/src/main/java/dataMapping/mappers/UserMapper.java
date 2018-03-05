@@ -11,7 +11,10 @@ import java.util.function.Function;
 
 //todo i must finish this
 public class UserMapper extends AccountMapper<User> {
-    private final String SELECT_QUERY = "SELECT AccountId, Name, Summary, PhotoUrl FROM User WHERE AccountId = ?";
+    public UserMapper() {
+        super(User.class);
+    }
+//    private final String SELECT_QUERY = "SELECT AccountId, Name, Summary, PhotoUrl FROM User WHERE AccountId = ?";
 
     @Override
     public User mapper(ResultSet rs) throws DataMapperException {

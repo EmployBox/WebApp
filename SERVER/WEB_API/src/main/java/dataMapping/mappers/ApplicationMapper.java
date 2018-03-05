@@ -8,10 +8,13 @@ import java.sql.*;
 import java.util.stream.Stream;
 
 public class ApplicationMapper extends AbstractMapper<Application, String> {
-    private String SELECT_QUERY =  "select UserId, CurriculumId, JobId, [date] from [Application] where userId = ? AND JobId = ? ";
-    private String INSERT_QUERY =  "INSERT INTO [Application](userId, jobId, curriculumId, [date]) values (? , ? , ? , ?)";
-    private String UPDATE_QUERY =  "UPDATE [Application] SET [date] = ? where where userId = ? AND JobId = ?";
-    private String DELETE_QUERY =  "DELETE [Application] where userId = ? AND jobId = ?";
+    public ApplicationMapper() {
+        super(Application.class);
+    }
+//    private String SELECT_QUERY =  "select UserId, CurriculumId, JobId, [date] from [Application] where userId = ? AND JobId = ? ";
+//    private String INSERT_QUERY =  "INSERT INTO [Application](userId, jobId, curriculumId, [date]) values (? , ? , ? , ?)";
+//    private String UPDATE_QUERY =  "UPDATE [Application] SET [date] = ? where where userId = ? AND JobId = ?";
+//    private String DELETE_QUERY =  "DELETE [Application] where userId = ? AND jobId = ?";
 
     public Stream<Application> findJobApplications(long jobId){
         String query = "SELECT UserId, CurriculumId, JobId, [date] from [Application] WHERE JobId = ?";

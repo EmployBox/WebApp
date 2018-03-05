@@ -10,6 +10,10 @@ import java.util.stream.Stream;
 
 public class ExperienceMapper extends AbstractMapper<Experience, Long> {
 
+    public ExperienceMapper() {
+        super(Experience.class);
+    }
+
     public Stream<Experience> findJobExperiences(long jobId){
         String query = "Select experienceId, competence, years from Experience where experienceId in (Select experienceId from Job_Experience where jobId = ?)";
         return executeQuery(

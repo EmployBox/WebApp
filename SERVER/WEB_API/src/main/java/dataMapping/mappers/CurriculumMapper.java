@@ -7,9 +7,12 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public class CurriculumMapper extends AbstractMapper<Curriculum, String>{
-    private final String SELECT_QUERY = "SELECT AccountId, CurriculumId FROM Curriculum WHERE AccountId = ? AND CurriculumId = ?";
-    private final String INSERT_QUERY = "INSERT INTO Curriculum (AccountId, CurriculumId) VALUES (?, ?)";
-    private final String DELETE_QUERY = "DELETE FROM Curriculum WHERE AccountId = ? AND CurriculumId = ?";
+    public CurriculumMapper() {
+        super(Curriculum.class);
+    }
+//    private final String SELECT_QUERY = "SELECT AccountId, CurriculumId FROM Curriculum WHERE AccountId = ? AND CurriculumId = ?";
+//    private final String INSERT_QUERY = "INSERT INTO Curriculum (AccountId, CurriculumId) VALUES (?, ?)";
+//    private final String DELETE_QUERY = "DELETE FROM Curriculum WHERE AccountId = ? AND CurriculumId = ?";
 
     @Override
     Curriculum mapper(ResultSet rs) throws DataMapperException {
