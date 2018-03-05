@@ -63,6 +63,8 @@ public abstract class AbstractMapper<T extends DomainObject<K>, K> implements Ma
         } catch (SQLException e) {
             throw new DataMapperException(e);
         }
+            try{ connection.close(); } catch(SQLException e) {}
+        }
     }
 
     /**

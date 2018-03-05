@@ -6,30 +6,31 @@ import java.sql.Date;
 public class AcademicBackground extends DomainObject<String> {
     private final long accountID;
     private final long curriculumId;
-    private Date beginDate;
-    private Date endDate;
-    private String studyArea;
-    private String institution;
-    private String degreeObtained;
+    private final Date beginDate;
+    private final Date endDate;
+    private final String studyArea;
+    private final String institution;
+    private final String degreeObtained;
 
-    public AcademicBackground(long userId, long curriculumId, Date beginDate, String studyArea, String institution, String degreeObtained, long version) {
+    public AcademicBackground(long userId, long curriculumId, Date beginDate, Date endDate, String studyArea, String institution, String degreeObtained, long version) {
         super(String.format("AcademicBackgroundPK: %d %d",userId,curriculumId), version);
         this.accountID = userId;
         this.curriculumId = curriculumId;
         this.beginDate = beginDate;
+        this.endDate = endDate;
         this.studyArea = studyArea;
         this.institution = institution;
         this.degreeObtained = degreeObtained;
     }
 
-    public static AcademicBackground create(long userId, long curriculumId, Date beginDate, String studyArea, String institution, String degreeObtained){
-        AcademicBackground academicBackground = new AcademicBackground(userId, curriculumId, beginDate , studyArea, institution, degreeObtained, 0);
+    public static AcademicBackground create(long userId, long curriculumId, Date beginDate, Date endDate, String companyName, String workLoad, String role){
+        AcademicBackground academicBackground = new AcademicBackground(userId, curriculumId, beginDate , endDate, companyName, workLoad, role, 0);
         academicBackground.markNew();
         return academicBackground;
     }
 
-    public static AcademicBackground load(long userId, long curriculumId, Date beginDate, String studyArea, String institution, String degreeObtained, long version){
-        AcademicBackground academicBackground = new AcademicBackground(userId, curriculumId, beginDate , studyArea, institution, degreeObtained, version);
+    public static AcademicBackground load(long userId, long curriculumId, Date beginDate, Date endDate, String companyName, String workLoad, String role, long version){
+        AcademicBackground academicBackground = new AcademicBackground(userId, curriculumId, beginDate , endDate, companyName, workLoad, role, version);
         academicBackground.markClean();
         return academicBackground;
     }
@@ -53,39 +54,19 @@ public class AcademicBackground extends DomainObject<String> {
         return beginDate;
     }
 
-    public void setBeginDate(Date beginDate) {
-        this.beginDate = beginDate;
-    }
-
     public Date getEndDate() {
         return endDate;
-    }
-
-    public void setEndDate(Date endDate) {
-        this.endDate = endDate;
     }
 
     public String getStudyArea() {
         return studyArea;
     }
 
-    public void setStudyArea(String studyArea) {
-        this.studyArea = studyArea;
-    }
-
     public String getDegreeObtained() {
         return degreeObtained;
     }
 
-    public void setDegreeObtained(String degreeObtained) {
-        this.degreeObtained = degreeObtained;
-    }
-
     public String getInstitution() {
         return institution;
-    }
-
-    public void setInstitution(String institution) {
-        this.institution = institution;
     }
 }

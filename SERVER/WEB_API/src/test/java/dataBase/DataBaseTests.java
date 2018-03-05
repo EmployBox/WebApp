@@ -1,6 +1,5 @@
 package dataBase;
 
-import com.microsoft.sqlserver.jdbc.SQLServerException;
 import dataMapping.utils.ConnectionManager;
 import org.junit.After;
 import org.junit.Before;
@@ -16,7 +15,7 @@ import static org.junit.Assert.assertEquals;
 
 public class DataBaseTests {
 
-    public static Connection getConnection() throws SQLServerException {
+    public static Connection getConnection() {
         ConnectionManager manager = new ConnectionManager("DB_TEST_CONNECTION_STRING");
         return manager.getConnection();
     }
