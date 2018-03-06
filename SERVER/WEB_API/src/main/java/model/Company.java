@@ -1,5 +1,7 @@
 package model;
 
+import util.Streamable;
+
 public class Company extends Account {
     private final String name;
     private final String Specialization;
@@ -19,9 +21,10 @@ public class Company extends Account {
             short yearFounded,
             String logoUrl,
             String webPageUrl,
-            String description
+            String description,
+            Streamable<Job> offeredJobs
     ){
-        super(accountID,email,password,rating,version);
+        super(accountID, email, password, rating, version, offeredJobs);
         this.name = name;
         this.Specialization = Specialization;
         this.logoUrl = logoUrl;
@@ -41,9 +44,10 @@ public class Company extends Account {
             short  yearFounded,
             String logoUrl,
             String webPageUrl,
-            String description
+            String description,
+            Streamable<Job> offeredJobs
     ){
-        Company company = new Company(defaultKey, email, password, rating, version, name, specialization, yearFounded, logoUrl, webPageUrl, description);
+        Company company = new Company(defaultKey, email, password, rating, version, name, specialization, yearFounded, logoUrl, webPageUrl, description, offeredJobs);
         company.markNew();
         return company;
     }
@@ -59,9 +63,10 @@ public class Company extends Account {
             short  yearFounded,
             String logoUrl,
             String webPageUrl,
-            String description
+            String description,
+            Streamable<Job> offeredJobs
     ){
-        Company company = new Company(accountID, email, password, rating, version, name, specialization, yearFounded, logoUrl, webPageUrl, description);
+        Company company = new Company(accountID, email, password, rating, version, name, specialization, yearFounded, logoUrl, webPageUrl, description, offeredJobs);
         company.markClean();
         return company;
     }
@@ -76,10 +81,11 @@ public class Company extends Account {
            short  yearFounded,
            String logoUrl,
            String webPageUrl,
-           String description
+           String description,
+           Streamable<Job> offeredJobs
     ){
         company.markToBeDirty();
-        Company newCompany = new Company(company.getIdentityKey(), email, password, rating, company.getNextVersion(), name, specialization, yearFounded, logoUrl, webPageUrl, description);
+        Company newCompany = new Company(company.getIdentityKey(), email, password, rating, company.getNextVersion(), name, specialization, yearFounded, logoUrl, webPageUrl, description, offeredJobs);
         newCompany.markDirty();
         return newCompany;
     }

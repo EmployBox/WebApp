@@ -1,15 +1,21 @@
 package dataMapping.mappers;
 
 import dataMapping.exceptions.DataMapperException;
+import javafx.util.Pair;
 import model.Job;
+import util.Streamable;
 
 import java.sql.*;
 
 public class JobMapper extends AbstractMapper<Job, Long> {
-    private final String SELECT_QUERY = "SELECT JobID, AccountID, Address, Wage, Description, Schedule, OfferBeginDate, OfferEndDate, OfferType, Version FROM Job WHERE JobID = ?";
-    private final String INSERT_QUERY = "INSERT INTO Job (AccountID, Address, Wage, Description, Schedule, OfferBeginDate, OfferEndDate, OfferType, Version) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
-    private final String UPDATE_QUERY = "UPDATE Job SET Address = ?, Wage = ?, Description = ?, Schedule = ?, OfferBeginDate = ?, OfferEndDate = ?, OfferType = ?, Version = ? WHERE JobID = ? AND Version = ?";
-    private final String DELETE_QUERY = "DELETE FROM Job WHERE JobID = ? AND Version = ?";
+    private final String SELECT_QUERY = "SELECT JobID, AccountID, Address, Wage, Description, Schedule, OfferBeginDate, OfferEndDate, OfferType, [version] FROM Job";
+    private final String INSERT_QUERY = "INSERT INTO Job (AccountID, Address, Wage, Description, Schedule, OfferBeginDate, OfferEndDate, OfferType, [version]) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+    private final String UPDATE_QUERY = "UPDATE Job SET Address = ?, Wage = ?, Description = ?, Schedule = ?, OfferBeginDate = ?, OfferEndDate = ?, OfferType = ? WHERE JobID = ? AND [version] = ?";
+    private final String DELETE_QUERY = "DELETE FROM Job WHERE JobID = ? AND [version] = ?";
+
+    public Streamable<Job> findForAccount(long accountID){
+        return findWhere(new Pair<>("accountId", accountID));
+    }
 
     @Override
     public Job mapper(ResultSet rs) throws DataMapperException {
@@ -32,6 +38,11 @@ public class JobMapper extends AbstractMapper<Job, Long> {
         } catch (SQLException e) {
             throw new DataMapperException(e.getMessage(), e);
         }
+    }
+
+    @Override
+    String getSelectQuery() {
+        return SELECT_QUERY;
     }
 
     @Override

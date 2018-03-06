@@ -12,18 +12,20 @@ public class User extends Account {
     private final Streamable<Curriculum> curriculums;
     private final Streamable<Application> applications;
 
-    public User(long accountID,
-                String email,
-                String password,
-                double rating,
-                long version,
-                String name,
-                String summary,
-                String photoUrl,
-                Streamable<Curriculum> curriculums,
-                Streamable<Application> applications
+    private User(
+            long accountID,
+            String email,
+            String password,
+            double rating,
+            long version,
+            String name,
+            String summary,
+            String photoUrl,
+            Streamable<Job> offeredJobs,
+            Streamable<Curriculum> curriculums,
+            Streamable<Application> applications
     ){
-        super(accountID,email,password,rating,version);
+        super(accountID, email, password, rating, version, offeredJobs);
         this.name = name;
         this.summary = summary;
         this.photoUrl = photoUrl;
@@ -32,33 +34,36 @@ public class User extends Account {
     }
 
     public static User create(
-                            String email,
-                            String password,
-                            double rating,
-                            long version,
-                            String name,
-                            String summary,
-                            String photoUrl,
-                            Streamable<Curriculum> curriculums,
-                            Streamable<Application> applications
+            String email,
+            String password,
+            double rating,
+            long version,
+            String name,
+            String summary,
+            String photoUrl,
+            Streamable<Job> offeredJobs,
+            Streamable<Curriculum> curriculums,
+            Streamable<Application> applications
     ){
-        User user = new User(-1 ,email,password,rating,version,name,summary,photoUrl, curriculums, applications);
+        User user = new User(defaultKey, email, password, rating, version, name, summary, photoUrl, offeredJobs, curriculums, applications);
         user.markNew();
         return user;
     }
 
-    public static User load(long accountID,
-                            String email,
-                            String password,
-                            double rating,
-                            long version,
-                            String name,
-                            String summary,
-                            String photoUrl,
-                            Streamable<Curriculum> curriculums,
-                            Streamable<Application> applications
+    public static User load(
+            long accountID,
+            String email,
+            String password,
+            double rating,
+            long version,
+            String name,
+            String summary,
+            String photoUrl,
+            Streamable<Job> offeredJobs,
+            Streamable<Curriculum> curriculums,
+            Streamable<Application> applications
     ){
-        User user = new User(accountID, email, password, rating, version, name, summary, photoUrl, curriculums, applications);
+        User user = new User(accountID, email, password, rating, version, name, summary, photoUrl, offeredJobs, curriculums, applications);
         user.markClean();
         return user;
     }
@@ -75,12 +80,11 @@ public class User extends Account {
         return photoUrl;
     }
 
-    public Stream<Curriculum> getExperiences(){
-        return this.curriculums.get();
-    }
-
     public Stream<Application> getApplications() {
         return applications.get();
     }
 
+    public Stream<Curriculum> getCurriculums() {
+        return curriculums.get();
+    }
 }

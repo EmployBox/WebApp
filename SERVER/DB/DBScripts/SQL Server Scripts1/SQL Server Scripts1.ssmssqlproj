@@ -4,7 +4,7 @@
     <LogicalFolder Name="Connections" Type="2" Sorted="true">
       <Items>
         <ConnectionNode Name="(local):PSG15">
-          <Created>2018-03-05T17:25:32.7553186+00:00</Created>
+          <Created>2018-03-06T12:25:54.6625474+00:00</Created>
           <Type>SQL</Type>
           <Server>(local)</Server>
           <UserName>PSG15</UserName>
@@ -20,10 +20,16 @@
     <LogicalFolder Name="Queries" Type="0" Sorted="true">
       <Items>
         <FileNode Name="createDatabase.sql">
-          <AssociatedConnectionMoniker />
-          <AssociatedConnSrvName />
-          <AssociatedConnUserName />
+          <AssociatedConnectionMoniker>8c91a03d-f9b4-46c0-a305-b5dcc79ff907:(local):False:PSG15</AssociatedConnectionMoniker>
+          <AssociatedConnSrvName>(local)</AssociatedConnSrvName>
+          <AssociatedConnUserName>PSG15</AssociatedConnUserName>
           <FullPath>createDatabase.sql</FullPath>
+        </FileNode>
+        <FileNode Name="createViews.sql">
+          <AssociatedConnectionMoniker>8c91a03d-f9b4-46c0-a305-b5dcc79ff907:(local):False:PSG15</AssociatedConnectionMoniker>
+          <AssociatedConnSrvName>(local)</AssociatedConnSrvName>
+          <AssociatedConnUserName>PSG15</AssociatedConnUserName>
+          <FullPath>createViews.sql</FullPath>
         </FileNode>
         <FileNode Name="dropDatabase.sql">
           <AssociatedConnectionMoniker>8c91a03d-f9b4-46c0-a305-b5dcc79ff907:(local):False:PSG15</AssociatedConnectionMoniker>
@@ -32,15 +38,15 @@
           <FullPath>dropDatabase.sql</FullPath>
         </FileNode>
         <FileNode Name="procedure_tests(junk version).sql">
-          <AssociatedConnectionMoniker />
-          <AssociatedConnSrvName />
-          <AssociatedConnUserName />
+          <AssociatedConnectionMoniker>8c91a03d-f9b4-46c0-a305-b5dcc79ff907:(local):False:PSG15</AssociatedConnectionMoniker>
+          <AssociatedConnSrvName>(local)</AssociatedConnSrvName>
+          <AssociatedConnUserName>PSG15</AssociatedConnUserName>
           <FullPath>procedure_tests(junk version).sql</FullPath>
         </FileNode>
         <FileNode Name="procedures.sql">
-          <AssociatedConnectionMoniker />
-          <AssociatedConnSrvName />
-          <AssociatedConnUserName />
+          <AssociatedConnectionMoniker>8c91a03d-f9b4-46c0-a305-b5dcc79ff907:(local):False:PSG15</AssociatedConnectionMoniker>
+          <AssociatedConnSrvName>(local)</AssociatedConnSrvName>
+          <AssociatedConnUserName>PSG15</AssociatedConnUserName>
           <FullPath>procedures.sql</FullPath>
         </FileNode>
       </Items>

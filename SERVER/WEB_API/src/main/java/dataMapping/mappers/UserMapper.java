@@ -1,17 +1,21 @@
 package dataMapping.mappers;
 
-
 import dataMapping.exceptions.DataMapperException;
 import dataMapping.utils.ConnectionManager;
+import dataMapping.utils.MapperRegistry;
+import model.Curriculum;
+import model.Job;
 import model.User;
+import util.Streamable;
 
 import java.sql.*;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-//todo i must finish this
 public class UserMapper extends AccountMapper<User> {
-    private final String SELECT_QUERY = "SELECT AccountId, Name, Summary, PhotoUrl FROM User WHERE AccountId = ?";
+    private final String SELECT_QUERY = "SELECT a.email, a.passwordHash, a.rating, u.accountId, u.name, u.summary, u.PhotoUrl, u.[version]\n" +
+            "FROM ApiDatabase.[User] u inner join ApiDatabase.Account a\n" +
+            "ON u.accountId = a.accountId AND a.accountId = ?";
 
     @Override
     public User mapper(ResultSet rs) throws DataMapperException {
@@ -25,13 +29,20 @@ public class UserMapper extends AccountMapper<User> {
             String photoUrl = rs.getString ("PhotoUrl");
             long version = rs.getLong("[version]");
 
-            User user = User.load(accountID, email, passwordHash, rating, version,name ,summary, photoUrl, null , null );
+            Streamable<Job> offeredJobs = ((JobMapper) MapperRegistry.getMapper(Job.class)).findForAccount(accountID);
+
+            User user = User.load(accountID, email, passwordHash, rating, version,name ,summary, photoUrl, offeredJobs, null, null);
             identityMap.put(accountID, user);
 
             return user;
         } catch (SQLException e) {
             throw new DataMapperException(e.getMessage(), e);
         }
+    }
+
+    @Override
+    String getSelectQuery() {
+        return SELECT_QUERY;
     }
 
     private Consumer<CallableStatement> updatePrepareStatement(User obj) {

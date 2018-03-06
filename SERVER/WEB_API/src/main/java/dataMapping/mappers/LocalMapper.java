@@ -7,7 +7,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public class LocalMapper extends AbstractMapper<Local, String>{
-    private final String SELECT_QUERY = "SELECT [Address], Country, District, ZIPCode, [version] FROM [Local] WHERE Address = ?";
+    private final String SELECT_QUERY = "SELECT [Address], Country, District, ZIPCode, [version] FROM [Local]";
     private final String INSERT_QUERY = "INSERT INTO [Local] ([Address], Country, District, ZIPCode) VALUES (?, ?, ?, ?)";
     private final String DELETE_QUERY = "DELETE FROM [Local] WHERE Address = ? AND [version] = ?";
 
@@ -27,6 +27,11 @@ public class LocalMapper extends AbstractMapper<Local, String>{
         } catch (SQLException e) {
             throw new DataMapperException(e.getMessage(), e);
         }
+    }
+
+    @Override
+    String getSelectQuery() {
+        return SELECT_QUERY;
     }
 
     @Override

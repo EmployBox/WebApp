@@ -2,30 +2,21 @@ package dataMapping.mappers;
 
 
 import dataMapping.exceptions.DataMapperException;
+import javafx.util.Pair;
 import model.Application;
+import util.Streamable;
 
 import java.sql.*;
 import java.util.stream.Stream;
 
 public class ApplicationMapper extends AbstractMapper<Application, String> {
-    private String SELECT_QUERY =  "select UserId, CurriculumId, JobId, [date] from [Application] where userId = ? AND JobId = ? ";
+    private String SELECT_QUERY =  "SELECT UserId, CurriculumId, JobId, [date] from [Application]";
     private String INSERT_QUERY =  "INSERT INTO [Application](userId, jobId, curriculumId, [date]) values (? , ? , ? , ?)";
     private String UPDATE_QUERY =  "UPDATE [Application] SET [date] = ? where where userId = ? AND JobId = ?";
     private String DELETE_QUERY =  "DELETE [Application] where userId = ? AND jobId = ?";
 
-    public Stream<Application> findJobApplications(long jobId){
-        String query = "SELECT UserId, CurriculumId, JobId, [date] from [Application] WHERE JobId = ?";
-        return executeQuery(
-            query,
-            null,
-            preparedStatement -> {
-                try{
-                    preparedStatement.setLong(1, jobId);
-                } catch (SQLException e) {
-                    throw new DataMapperException(e);
-                }
-            }
-        );
+    public Streamable<Application> findJobApplications(long jobId){
+        return findWhere(new Pair<>("jobId", jobId));
     }
 
     @Override
@@ -44,6 +35,11 @@ public class ApplicationMapper extends AbstractMapper<Application, String> {
         } catch (SQLException e) {
             throw new DataMapperException(e.getMessage(), e);
         }
+    }
+
+    @Override
+    String getSelectQuery() {
+        return SELECT_QUERY;
     }
 
     @Override

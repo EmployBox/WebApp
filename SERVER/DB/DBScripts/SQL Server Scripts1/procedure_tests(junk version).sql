@@ -9,3 +9,8 @@ exec dbo.AddUser 'test2', 2, '123','firstUser','DO U KNOW THE WEY?','WWW.SLBENFI
 
 SELECT * FROM Account
 SELECT * FROM [User]
+
+
+SELECT a.email, a.passwordHash, a.rating, u.accountId, u.name, u.summary, u.PhotoUrl, u.[version]
+FROM ApiDatabase.[User] u inner join ApiDatabase.Account a
+ON u.accountId = a.accountId AND a.accountId = 1
