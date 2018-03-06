@@ -1,16 +1,17 @@
 package dataMapping.mappers;
 
 import dataMapping.exceptions.DataMapperException;
-import dataMapping.utils.ConnectionManager;
 import dataMapping.utils.MapperRegistry;
 import model.Curriculum;
 import model.Job;
 import model.User;
 import util.Streamable;
 
-import java.sql.*;
+import java.sql.CallableStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Types;
 import java.util.function.Consumer;
-import java.util.function.Function;
 
 public class UserMapper extends AccountMapper<User> {
     private final String SELECT_QUERY = "SELECT a.email, a.passwordHash, a.rating, u.accountId, u.name, u.summary, u.PhotoUrl, u.[version]\n" +
@@ -22,7 +23,7 @@ public class UserMapper extends AccountMapper<User> {
         try {
             long accountID = rs.getLong("AccountID");
             String email = rs.getString("Email");
-            String passwordHash = rs.getString("PasswordHash");
+            String password = rs.getString("Password");
             Double rating = rs.getDouble("Rating");
             String name = rs.getString ("Name");
             String summary = rs.getString ("Summary");

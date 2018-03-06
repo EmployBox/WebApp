@@ -13,6 +13,8 @@ import java.sql.SQLException;
 import static junit.framework.TestCase.assertTrue;
 import static org.junit.Assert.assertEquals;
 
+@Deprecated
+//todo this test with new querys REASON: Experience table is deprecated
 public class DataBaseTests {
 
     public static Connection getConnection() {
