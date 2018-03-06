@@ -1,6 +1,7 @@
 package dataMapping.mappers;
 
 import dataMapping.exceptions.DataMapperException;
+import javafx.util.Pair;
 import model.Curriculum;
 import util.Streamable;
 
@@ -12,19 +13,8 @@ public class CurriculumMapper extends AbstractMapper<Curriculum, String>{
     private final String INSERT_QUERY = "INSERT INTO Curriculum (userId, CurriculumId) VALUES (?, ?)";
     private final String DELETE_QUERY = "DELETE FROM Curriculum WHERE AccountId = ? AND CurriculumId = ?";
 
-    private Streamable<Curriculum> findCurriculumsForAccount(long accountId){
-        String query = "SELECT curriculumId FROM Curriculum WHERE userId = ?";
-        return () -> executeQuery(
-                query,
-                null,
-                statement -> {
-                    try {
-                        statement.setLong(1, accountId);
-                    } catch (SQLException e) {
-                        throw new DataMapperException(e);
-                    }
-                }
-        );
+    public Streamable<Curriculum> findCurriculumsForAccount(long accountId){
+        return findWhere(new Pair<>("userId", accountId));
     }
 
     @Override

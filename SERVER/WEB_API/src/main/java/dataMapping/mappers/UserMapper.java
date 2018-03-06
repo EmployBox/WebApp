@@ -14,16 +14,17 @@ import java.sql.Types;
 import java.util.function.Consumer;
 
 public class UserMapper extends AccountMapper<User> {
-    private final String SELECT_QUERY = "SELECT a.email, a.passwordHash, a.rating, u.accountId, u.name, u.summary, u.PhotoUrl, u.[version]\n" +
+    private final String SELECT_QUERY_WITH_CURRICULUMS = "SELECT a.email, a.passwordHash, a.rating, u.accountId, u.name, u.summary, u.PhotoUrl, u.[version]\n" +
             "FROM ApiDatabase.[User] u inner join ApiDatabase.Account a\n" +
             "ON u.accountId = a.accountId AND a.accountId = ?";
+    private final String SELECT_QUERY = "SELECT accountId, name, summary, photoUrl, [version] FROM [User]";
 
     @Override
     public User mapper(ResultSet rs) throws DataMapperException {
         try {
             long accountID = rs.getLong("AccountID");
             String email = rs.getString("Email");
-            String password = rs.getString("Password");
+            String passwordHash = rs.getString("passwordHash");
             Double rating = rs.getDouble("Rating");
             String name = rs.getString ("Name");
             String summary = rs.getString ("Summary");
@@ -31,8 +32,9 @@ public class UserMapper extends AccountMapper<User> {
             long version = rs.getLong("[version]");
 
             Streamable<Job> offeredJobs = ((JobMapper) MapperRegistry.getMapper(Job.class)).findForAccount(accountID);
+            Streamable<Curriculum> curriculums = ((CurriculumMapper) MapperRegistry.getMapper(Curriculum.class)).findCurriculumsForAccount(accountID);
 
-            User user = User.load(accountID, email, password, rating, version,name ,summary, photoUrl, offeredJobs, null, null);
+            User user = User.load(accountID, email, passwordHash, rating, version,name ,summary, photoUrl, offeredJobs, curriculums, null);
             identityMap.put(accountID, user);
 
             return user;

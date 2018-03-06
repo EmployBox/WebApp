@@ -31,7 +31,7 @@ public abstract class AbstractMapper<T extends DomainObject<K>, K> implements Ma
     /**
      * Converts the current row from result set into an object
      * @param rs
-     * @return DomainObject
+     * @return T
      * @throws DataMapperException
      */
     abstract T mapper(ResultSet rs) throws DataMapperException;
