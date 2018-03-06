@@ -1,7 +1,10 @@
 package dataMapping.mappers;
 
 import dataMapping.exceptions.DataMapperException;
+import dataMapping.utils.MapperRegistry;
 import model.Company;
+import model.Job;
+import util.Streamable;
 
 import java.sql.CallableStatement;
 import java.sql.ResultSet;
@@ -25,11 +28,18 @@ public class CompanyMapper extends AbstractMapper<Company,Long> {
             String description = rs.getString("[description]");
             long version = rs.getLong("version");
 
-            Company company = new Company(accountId, email,null, rating,version, name, specialization, yearFounded,logoUrl, webPageUrl, description);
+            Streamable<Job> offeredJobs = ((JobMapper) MapperRegistry.getMapper(Job.class)).findForAccount(accountId);
+
+            Company company = new Company(accountId, email,null, rating,version, name, specialization, yearFounded,logoUrl, webPageUrl, description, offeredJobs);
             identityMap.put(accountId, company);
         }catch (SQLException e){
             throw new DataMapperException(e.getMessage(), e);
         }
+        return null;
+    }
+
+    @Override
+    String getSelectQuery() {
         return null;
     }
 

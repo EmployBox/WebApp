@@ -32,7 +32,7 @@ public class UserMapper extends AccountMapper<User> {
 
             Streamable<Job> offeredJobs = ((JobMapper) MapperRegistry.getMapper(Job.class)).findForAccount(accountID);
 
-            User user = User.load(accountID, email, passwordHash, rating, version,name ,summary, photoUrl, offeredJobs, null, null);
+            User user = User.load(accountID, email, password, rating, version,name ,summary, photoUrl, offeredJobs, null, null);
             identityMap.put(accountID, user);
 
             return user;
