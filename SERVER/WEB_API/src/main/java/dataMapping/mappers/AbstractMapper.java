@@ -146,8 +146,8 @@ public abstract class AbstractMapper<T extends DomainObject<K>, K> implements Ma
                 if(identityMap.replace(obj.getIdentityKey(), observedObj, obj))
                     return true;
             }
-
             remaining = target - System.currentTimeMillis();
+            Thread.yield();
         }
         return false;
     }
