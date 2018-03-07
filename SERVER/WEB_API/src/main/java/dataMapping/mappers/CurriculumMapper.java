@@ -1,31 +1,27 @@
 package dataMapping.mappers;
 
 import dataMapping.exceptions.DataMapperException;
-import dataMapping.utils.MapperRegistry;
 import dataMapping.utils.MapperSettings;
 import javafx.util.Pair;
-import model.AcademicBackground;
-import model.Curriculum;
-import model.PreviousJobs;
-import model.Project;
+import model.*;
 import util.Streamable;
 
-import java.sql.CallableStatement;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.function.Consumer;
+
+import static dataMapping.utils.MapperRegistry.getMapper;
 
 public class CurriculumMapper extends AbstractMapper<Curriculum, String>{
     private static final String SELECT_QUERY = "SELECT userId, curriculumId, title, [version] FROM Curriculum";
     private static final String INSERT_QUERY = "INSERT INTO Curriculum (userId, CurriculumId) VALUES (?, ?)";
     private static final String DELETE_QUERY = "DELETE FROM Curriculum WHERE AccountId = ? AND CurriculumId = ? AND [version] = ?";
 
-    //TODO Procedures
     public CurriculumMapper() {
         super(
+                new MapperSettings<>(INSERT_QUERY, PreparedStatement.class, CurriculumMapper::prepareInsertStatement),
                 null,
-                null,
-                null
+                new MapperSettings<>(DELETE_QUERY, PreparedStatement.class, CurriculumMapper::prepareDeleteStatement)
         );
     }
 
@@ -41,11 +37,12 @@ public class CurriculumMapper extends AbstractMapper<Curriculum, String>{
             String title = rs.getString("title");
             long version = rs.getLong("[version]");
 
-            Streamable<PreviousJobs> previousJobs = ((PreviousJobsMapper) MapperRegistry.getMapper(PreviousJobs.class)).findForUserAndCurriculum(accountId, curriculumId);
-            Streamable<AcademicBackground> academicBackground = ((AcademicBackgroundMapper) MapperRegistry.getMapper(AcademicBackground.class)).findForUserAndCurriculum(accountId, curriculumId);
-            Streamable<Project> project = ((ProjectMapper) MapperRegistry.getMapper(Project.class)).findForUserAndCurriculum(accountId, curriculumId);
+            Streamable<PreviousJobs> previousJobs = ((PreviousJobsMapper) getMapper(PreviousJobs.class)).findForUserAndCurriculum(accountId, curriculumId);
+            Streamable<AcademicBackground> academicBackground = ((AcademicBackgroundMapper) getMapper(AcademicBackground.class)).findForUserAndCurriculum(accountId, curriculumId);
+            Streamable<Project> project = ((ProjectMapper) getMapper(Project.class)).findForUserAndCurriculum(accountId, curriculumId);
+            Streamable<CurriculumExperience> curriculumExperiences = ((CurriculumExperienceMapper) getMapper(JobExperience.class)).findExperiences(accountId, curriculumId);
 
-            Curriculum curriculum = Curriculum.load(accountId, curriculumId, title, version, previousJobs, academicBackground, project);
+            Curriculum curriculum = Curriculum.load(accountId, curriculumId, title, version, previousJobs, academicBackground, project, curriculumExperiences);
             identityMap.put(curriculum.getIdentityKey(), curriculum);
 
             return curriculum;
@@ -57,5 +54,24 @@ public class CurriculumMapper extends AbstractMapper<Curriculum, String>{
     @Override
     String getSelectQuery() {
         return SELECT_QUERY;
+    }
+
+    private static void prepareInsertStatement(PreparedStatement statement, Curriculum obj){
+        try{
+            statement.setLong(1, obj.getAccountId());
+            statement.setLong(2, obj.getCurriculumId());
+        } catch (SQLException e) {
+            throw new DataMapperException(e);
+        }
+    }
+
+    private static void prepareDeleteStatement(PreparedStatement statement, Curriculum obj){
+        try{
+            statement.setLong(1, obj.getAccountId());
+            statement.setLong(2, obj.getCurriculumId());
+            statement.setLong(3, obj.getVersion());
+        } catch (SQLException e) {
+            throw new DataMapperException(e);
+        }
     }
 }

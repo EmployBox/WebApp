@@ -53,11 +53,10 @@ public class UserMapper extends AccountMapper<User> {
             Streamable<Application> applications = ((ApplicationMapper) getMapper(Application.class)).findUserApplications(accountID);
             Streamable<Chat> chats = ((ChatMapper) getMapper(Chat.class)).findForAccount(accountID);
             Streamable<Rating> ratings = ((RatingMapper) getMapper(Rating.class)).findRatingsForAccount(accountID);
-
+            Streamable<Comment> comments = ((CommentMapper) getMapper(Comment.class)).findCommentsForAccount(accountID);
             Streamable<User> following = findFollowingUsers(accountID);
 
-            //todo finders for comments, ratings and chats
-            User user = User.load(accountID, email, passwordHash, rating, version, name ,summary, photoUrl, offeredJobs, curriculums, applications, chats, null , ratings, following);
+            User user = User.load(accountID, email, passwordHash, rating, version, name ,summary, photoUrl, offeredJobs, curriculums, applications, chats, comments , ratings, following);
             identityMap.put(accountID, user);
 
             return user;
