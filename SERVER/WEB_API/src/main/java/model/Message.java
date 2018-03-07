@@ -8,7 +8,7 @@ public class Message extends DomainObject<String> {
     private final String text;
     private final Date date;
 
-    public Message(long messageId,long chatId, String text, Date date, long version) {
+    private Message(long messageId,long chatId, String text, Date date, long version) {
         super(String.format("%d %d",messageId,chatId), version);
         this.chadId = chatId;
         this.date = date;

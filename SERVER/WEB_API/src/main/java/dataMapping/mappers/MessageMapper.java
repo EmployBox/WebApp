@@ -18,8 +18,8 @@ public class MessageMapper extends AbstractMapper<Message,String> {
             Date date = rs.getDate("date");
             long version = rs.getLong("[version]");
 
-            Message message = new Message(messageId, chatId, text, date, version);
-            identityMap.put(String.format("%d %d",chatId,message),message);
+            Message message = Message.load(messageId, chatId, text, date, version);
+            identityMap.put(String.format("%d %d",chatId,messageId),message);
             return message;
         } catch (SQLException e) {
             throw new DataMapperException(e);

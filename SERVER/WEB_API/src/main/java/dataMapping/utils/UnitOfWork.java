@@ -84,6 +84,7 @@ public class UnitOfWork {
     }
 
     //TODO does it catch the concurrentyException?
+    //TODO update IdentityMaps only after all transactions succeeded?
     public void commit() {
         try {
             insertNew();

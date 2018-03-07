@@ -1,8 +1,11 @@
 package dataMapping.mappers;
 
 import dataMapping.exceptions.DataMapperException;
+import dataMapping.utils.MapperRegistry;
 import javafx.util.Pair;
+import model.AcademicBackground;
 import model.Curriculum;
+import model.PreviousJobs;
 import util.Streamable;
 
 import java.sql.CallableStatement;
@@ -11,9 +14,9 @@ import java.sql.SQLException;
 import java.util.function.Consumer;
 
 public class CurriculumMapper extends MapperByProcedure<Curriculum, String>{
-    private final String SELECT_QUERY = "SELECT userId, CurriculumId FROM Curriculum";
+    private final String SELECT_QUERY = "SELECT userId, CurriculumId, [version] FROM Curriculum";
     private final String INSERT_QUERY = "INSERT INTO Curriculum (userId, CurriculumId) VALUES (?, ?)";
-    private final String DELETE_QUERY = "DELETE FROM Curriculum WHERE AccountId = ? AND CurriculumId = ?";
+    private final String DELETE_QUERY = "DELETE FROM Curriculum WHERE AccountId = ? AND CurriculumId = ? AND [version] = ?";
 
     public Streamable<Curriculum> findCurriculumsForAccount(long accountId){
         return findWhere(new Pair<>("userId", accountId));
@@ -26,7 +29,10 @@ public class CurriculumMapper extends MapperByProcedure<Curriculum, String>{
             long curriculumId = rs.getLong("curriculumId");
             long version = rs.getLong("[version]");
 
-            Curriculum curriculum = Curriculum.load(accountId, curriculumId, version, null, null, null);
+            Streamable<PreviousJobs> previousJobs = ((PreviousJobsMapper) MapperRegistry.getMapper(PreviousJobs.class)).findForUserAndCurriculum(accountId, curriculumId);
+            Streamable<AcademicBackground> academicBackground = ((AcademicBackgroundMapper) MapperRegistry.getMapper(AcademicBackground.class)).findForUserAndCurriculum(accountId, curriculumId);
+
+            Curriculum curriculum = Curriculum.load(accountId, curriculumId, version, previousJobs, academicBackground, null);
             identityMap.put(curriculum.getIdentityKey(), curriculum);
 
             return curriculum;
