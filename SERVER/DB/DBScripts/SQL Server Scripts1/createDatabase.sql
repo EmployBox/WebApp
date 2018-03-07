@@ -54,8 +54,6 @@ CREATE TABLE ApiDatabase.[User] (
 CREATE TABLE ApiDatabase.Curriculum(
 	userId BIGINT references ApiDatabase.[User],
 	curriculumId BIGINT,
-	title NVARCHAR(25),
-	[version] rowversion
 
 	FOREIGN KEY (userId) REFERENCES ApiDatabase.[User] ( accountId) ON DELETE CASCADE,	
 	primary key(userId,curriculumId)
@@ -136,32 +134,21 @@ CREATE TABLE ApiDatabase.Job(
 	check(offerType = 'Looking for work' OR offerType = 'Looking for Worker')
 )
 
-CREATE TABLE Apidatabase.Experience(
-	experienceId BIGINT IDENTITY PRIMARY KEY,
-	years SMALLINT,
-	Competence NVARCHAR(200),
-	[version] rowversion,
-)
-
 CREATE TABLE Apidatabase.Curriculum_Experience(
 	userId BIGINT,
-	curriculumId BIGINT,
-	experienceId BIGINT
+	curriculumId BIGINT
 
 	FOREIGN KEY (userId,curriculumId) REFERENCES ApiDatabase.Curriculum ON DELETE CASCADE,
-	FOREIGN KEY (experienceId) REFERENCES ApiDatabase.Experience(experienceId) ON DELETE CASCADE,
 
-	primary key(userId, curriculumId, experienceId)
+	primary key(userId, curriculumId)
 )
 
 CREATE TABLE Apidatabase.Job_Experience(
-	jobId BIGINT,
-	experienceId BIGINT,
+	jobId BIGINT
 
 	FOREIGN KEY (jobId) REFERENCES ApiDatabase.Job(jobId) ON DELETE CASCADE,
-	FOREIGN KEY (experienceId) REFERENCES ApiDatabase.Experience(experienceId) ON DELETE CASCADE,
 
-	primary key(jobId, experienceId)
+	primary key(jobId)
 )
 
 CREATE TABLE ApiDatabase.[Application](
