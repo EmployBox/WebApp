@@ -19,9 +19,9 @@ public class AcademicBackgroundMapper extends AbstractMapper<AcademicBackground,
 
     public AcademicBackgroundMapper() {
         super(
-                new MapperSettings<>(INSERT_QUERY, PreparedStatement.class, AcademicBackgroundMapper::prepareInsertStatement),
-                new MapperSettings<>(UPDATE_QUERY, PreparedStatement.class, AcademicBackgroundMapper::prepareUpdateStatement),
-                new MapperSettings<>(DELETE_QUERY, PreparedStatement.class, AcademicBackgroundMapper::prepareDeleteStatement));
+            new MapperSettings<>(INSERT_QUERY, PreparedStatement.class, AcademicBackgroundMapper::prepareInsertStatement),
+            new MapperSettings<>(UPDATE_QUERY, PreparedStatement.class, AcademicBackgroundMapper::prepareUpdateStatement),
+            new MapperSettings<>(DELETE_QUERY, PreparedStatement.class, AcademicBackgroundMapper::prepareDeleteStatement));
     }
 
     public Streamable<AcademicBackground> findForUserAndCurriculum(long accountId, long curriculumId){

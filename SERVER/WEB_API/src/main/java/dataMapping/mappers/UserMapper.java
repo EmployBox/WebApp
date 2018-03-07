@@ -12,16 +12,15 @@ import java.sql.CallableStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
-import java.util.function.Consumer;
 
 public class UserMapper extends AccountMapper<User> {
     private static final String SELECT_QUERY = "SELECT accountId, name, summary, photoUrl, [version] FROM [User]";
 
     public UserMapper() {
         super(
-                new MapperSettings<>("{call AddUser(?, ?, ?, ?, ?, ?, ?, ?)}", CallableStatement.class, UserMapper::prepareUpdateProcedureArguments),
-                new MapperSettings<>("{call UpdateUser(?, ?, ?, ?, ?, ?, ?, ?)}", CallableStatement.class, UserMapper::prepareUpdateProcedureArguments),
-                new MapperSettings<>("{call DeleteUser(?, ?)}", CallableStatement.class, UserMapper::prepareDeleteProcedure)
+            new MapperSettings<>("{call AddUser(?, ?, ?, ?, ?, ?, ?, ?)}", CallableStatement.class, UserMapper::prepareWriteProcedure),
+            new MapperSettings<>("{call UpdateUser(?, ?, ?, ?, ?, ?, ?, ?)}", CallableStatement.class, UserMapper::prepareWriteProcedure),
+            new MapperSettings<>("{call DeleteUser(?, ?)}", CallableStatement.class, UserMapper::prepareDeleteProcedure)
         );
     }
 
@@ -56,7 +55,7 @@ public class UserMapper extends AccountMapper<User> {
     }
 
 
-    private static void prepareUpdateProcedureArguments(CallableStatement cs, User obj) {
+    private static void prepareWriteProcedure(CallableStatement cs, User obj) {
         try {
             cs.setString(1, obj.getEmail());
             cs.setDouble(2, obj.getRating());
