@@ -13,10 +13,14 @@ import java.sql.SQLException;
 import java.sql.Types;
 import java.util.function.Consumer;
 
-public class CompanyMapper extends AbstractMapper<Company,Long> {
+public class CompanyMapper extends AccountMapper<Company> {
 
     public CompanyMapper() {
-        super(insertSettings, updateSettings, deleteSettings);
+        super(
+                new MapperSettings<>("{call AddCompany(?, ?, ?, ?, ?, ?, ?, ?, ?, ,? ,?)}", CallableStatement.class, CompanyMapper::prepareUpdateProcedureArguments),
+                new MapperSettings<>("{call UpdateCompany (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)}", CallableStatement.class, CompanyMapper::prepareUpdateProcedureArguments),
+                new MapperSettings<>("{call DeleteCompany (?, ?)}", CallableStatement.class, CompanyMapper::prepareDeleteProcedure)
+        );
     }
 
     @Override
@@ -48,58 +52,32 @@ public class CompanyMapper extends AbstractMapper<Company,Long> {
         return null;
     }
 
-    protected Consumer<CallableStatement> prepareUpdateProcedureArguments(Company obj) {
-        return cs -> {
-            try {
-                cs.setString(1, obj.getEmail());
-                cs.setString(2,obj.getPassword());
-                cs.setDouble(3, obj.getRating());
-                cs.setString(4, obj.getName());
-                cs.setString(5, obj.getSpecialization());
-                cs.setShort(6, obj.getYearFounded());
-                cs.setString(7, obj.getLogoUrl());
-                cs.setString(8, obj.getWebPageUrl());
-                cs.setString(9, obj.getDescription());
-                cs.registerOutParameter(10, Types.BIGINT);
-                cs.registerOutParameter(11, Types.NVARCHAR);
-                cs.execute();
-                identityMap.put(obj.getIdentityKey(), obj);
-            } catch (SQLException e) {
-                throw new DataMapperException(e);
-            }
-        };
+    private static void prepareUpdateProcedureArguments(CallableStatement cs, Company obj) {
+        try {
+            cs.setString(1, obj.getEmail());
+            cs.setString(2,obj.getPassword());
+            cs.setDouble(3, obj.getRating());
+            cs.setString(4, obj.getName());
+            cs.setString(5, obj.getSpecialization());
+            cs.setShort(6, obj.getYearFounded());
+            cs.setString(7, obj.getLogoUrl());
+            cs.setString(8, obj.getWebPageUrl());
+            cs.setString(9, obj.getDescription());
+            cs.registerOutParameter(10, Types.BIGINT);
+            cs.registerOutParameter(11, Types.NVARCHAR);
+            cs.execute();
+        } catch (SQLException e) {
+            throw new DataMapperException(e);
+        }
     }
 
-    @Override
-    public void insert(Company obj) {
-        executeSQLProcedure(
-                "{call AddCompany(?, ?, ?, ?, ?, ?, ?, ?, ?, ,? ,?)}",
-                prepareUpdateProcedureArguments(obj)
-        );
-    }
-
-    @Override
-    public void update(Company obj) {
-        executeSQLProcedure(
-                "{call UpdateCompany (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)}",
-                prepareUpdateProcedureArguments(obj)
-        );
-    }
-
-    @Override
-    public void delete(Company obj) {
-        executeSQLProcedure(
-        "{call DeleteCompany(?, ?)}",
-            callableStatement -> {
-                try {
-                    callableStatement.setString(1, obj.getEmail());
-                    callableStatement.registerOutParameter(2, Types.NVARCHAR);
-                    callableStatement.execute();
-                    identityMap.remove(obj.getIdentityKey());
-                } catch (SQLException e) {
-                    throw new DataMapperException(e);
-                }
-            }
-        );
+    private static void prepareDeleteProcedure(CallableStatement callableStatement, Company obj){
+        try {
+            callableStatement.setString(1, obj.getEmail());
+            callableStatement.registerOutParameter(2, Types.NVARCHAR);
+            callableStatement.execute();
+        } catch (SQLException e) {
+            throw new DataMapperException(e);
+        }
     }
 }

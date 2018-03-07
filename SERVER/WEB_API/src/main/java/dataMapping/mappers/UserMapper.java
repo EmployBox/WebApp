@@ -14,11 +14,8 @@ import java.sql.SQLException;
 import java.sql.Types;
 import java.util.function.Consumer;
 
-public class UserMapper extends AbstractMapper<User,Long> {
-    private final String SELECT_QUERY_WITH_CURRICULUMS = "SELECT a.email, a.passwordHash, a.rating, u.accountId, u.name, u.summary, u.PhotoUrl, u.[version]\n" +
-            "FROM ApiDatabase.[User] u inner join ApiDatabase.Account a\n" +
-            "ON u.accountId = a.accountId AND a.accountId = ?";
-    private final String SELECT_QUERY = "SELECT accountId, name, summary, photoUrl, [version] FROM [User]";
+public class UserMapper extends AccountMapper<User> {
+    private static final String SELECT_QUERY = "SELECT accountId, name, summary, photoUrl, [version] FROM [User]";
 
     public UserMapper() {
         super(

@@ -84,8 +84,10 @@ public abstract class AbstractMapper<T extends DomainObject<K>, K> implements Ma
     }
 
     private void handleCRUD(MapperSettings mapperSettings, T obj){
-        if(mapperSettings.isProcedure()) executeSQLProcedure(mapperSettings.getQuery(), obj, mapperSettings.getStatementConsumer());
-        else executeSQLUpdate(mapperSettings.getQuery(), obj, mapperSettings.getStatementConsumer());
+        if(mapperSettings.isProcedure())
+            executeSQLProcedure(mapperSettings.getQuery(), obj, mapperSettings.getStatementConsumer());
+        else
+            executeSQLUpdate(mapperSettings.getQuery(), obj, mapperSettings.getStatementConsumer());
     }
 
     @Override

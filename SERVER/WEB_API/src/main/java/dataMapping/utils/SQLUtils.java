@@ -14,7 +14,7 @@ import java.util.function.Function;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
-public class SQLUtils<T extends DomainObject> {
+public class SQLUtils {
 
     /**
      * Inserts the objects read into the LoadedMap
