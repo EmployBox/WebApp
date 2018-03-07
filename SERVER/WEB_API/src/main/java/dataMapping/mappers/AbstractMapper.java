@@ -45,11 +45,11 @@ public abstract class AbstractMapper<T extends DomainObject<K>, K> implements Ma
 
         this.SELECT_QUERY = Arrays.stream(fields)
                 .map(Field::getName)
-                .collect(Collectors.joining(", ", "select ", " from "+type.getSimpleName()));
+                .collect(Collectors.joining(", ", "select ", " from ["+type.getSimpleName()+"]"));
 
         this.INSERT_QUERY = Arrays.stream(fields)
                 .map(Field::getName)
-                .collect(Collectors.joining(", ", "insert into" + type.getSimpleName()+ "(",
+                .collect(Collectors.joining(", ", "insert into [" + type.getSimpleName()+ "] (",
                         ") values ("+ Arrays.stream(fields).map(f -> "?").collect(Collectors.joining(","))+")"));
         this.UPDATE_QUERY = "";
         this.DELETE_QUERY = "";
@@ -91,11 +91,10 @@ public abstract class AbstractMapper<T extends DomainObject<K>, K> implements Ma
         Connection connection = ConnectionManager.getConnectionManagerOfDefaultDB().getConnection();
         try(Statement statement = isProcedure ? connection.prepareCall(query) : connection.prepareStatement(query)) {
             handleStatement.accept(statement);
-            statement.close();
+            connection.close();
         } catch (SQLException e) {
             throw new DataMapperException(e);
         }
-        finally{
             try{ connection.close(); } catch(SQLException e) {}
         }
     }
@@ -107,7 +106,7 @@ public abstract class AbstractMapper<T extends DomainObject<K>, K> implements Ma
      * @param prepareStatement
      * @return
      */
-    public Stream<T> executeQuery(String query, K key, Consumer<PreparedStatement> prepareStatement){
+    protected Stream<T> executeQuery(String query, K key, Consumer<PreparedStatement> prepareStatement){
         if(identityMap.containsKey(key))
             return Stream.of(identityMap.get(key));
 
@@ -167,6 +166,7 @@ public abstract class AbstractMapper<T extends DomainObject<K>, K> implements Ma
         );
     }
 
+    //TODO Does it work with Inserts?
     private boolean tryReplace(T obj, long timeout){
         long target = System.currentTimeMillis() +  timeout;
         long remaining = target - System.currentTimeMillis();

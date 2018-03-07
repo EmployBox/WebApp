@@ -7,10 +7,16 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public class LocalMapper extends AbstractMapper<Local, String>{
+
     public LocalMapper() {
         super(Local.class);
     }
 //    private final String SELECT_QUERY = "SELECT Address, Country, District, ZIPCode FROM Local WHERE Address = ?";
+
+//    private final String SELECT_QUERY = "SELECT [Address], Country, District, ZIPCode, [version] FROM [Local] WHERE Address = ?";
+//    private final String INSERT_QUERY = "INSERT INTO [Local] ([Address], Country, District, ZIPCode) VALUES (?, ?, ?, ?)";
+//    private final String DELETE_QUERY = "DELETE FROM [Local] WHERE Address = ? AND [version] = ?";
+
 
     @Override
     Local mapper(ResultSet rs) throws DataMapperException {
@@ -32,7 +38,21 @@ public class LocalMapper extends AbstractMapper<Local, String>{
 
     @Override
     public void insert(Local obj) {
-        //TODO
+        executeSQLUpdate(
+                INSERT_QUERY,
+                obj,
+                false,
+                statement -> {
+                    try {
+                        statement.setString(1, obj.getAddress());
+                        statement.setString(2, obj.getCountry());
+                        statement.setString(3, obj.getDistrict());
+                        statement.setString(4, obj.getZipCode());
+                    } catch (SQLException e) {
+                        throw new DataMapperException(e);
+                    }
+                }
+        );
     }
 
     @Override
@@ -42,6 +62,18 @@ public class LocalMapper extends AbstractMapper<Local, String>{
 
     @Override
     public void delete(Local obj) {
-        //TODO
+        executeSQLUpdate(
+                DELETE_QUERY,
+                obj,
+                true,
+                statement -> {
+                    try {
+                        statement.setString(1, obj.getAddress());
+                        statement.setLong(2, obj.getVersion());
+                    } catch (SQLException e) {
+                        throw new DataMapperException(e);
+                    }
+                }
+        );
     }
 }

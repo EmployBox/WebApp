@@ -11,7 +11,6 @@ public class AcademicBackground extends DomainObject<String> {
     private final String studyArea;
     private final String institution;
     private final String degreeObtained;
-    private final long version;
 
     public AcademicBackground(long userId, long curriculumId, Date beginDate, Date endDate, String studyArea, String institution, String degreeObtained, long version) {
         super(String.format("AcademicBackgroundPK: %d %d",userId,curriculumId), version);
@@ -22,7 +21,6 @@ public class AcademicBackground extends DomainObject<String> {
         this.studyArea = studyArea;
         this.institution = institution;
         this.degreeObtained = degreeObtained;
-        this.version = version;
     }
 
     public static AcademicBackground create(long userId, long curriculumId, Date beginDate, Date endDate, String companyName, String workLoad, String role){
@@ -35,6 +33,13 @@ public class AcademicBackground extends DomainObject<String> {
         AcademicBackground academicBackground = new AcademicBackground(userId, curriculumId, beginDate , endDate, companyName, workLoad, role, version);
         academicBackground.markClean();
         return academicBackground;
+    }
+
+    public static AcademicBackground update(AcademicBackground academicBackground, long userId, long curriculumId, Date beginDate, String studyArea, String institution, String degreeObtained){
+        academicBackground.markToBeDirty();
+        AcademicBackground newAcademic = new AcademicBackground(userId, curriculumId, beginDate, studyArea, institution, degreeObtained, academicBackground.getNextVersion());
+        newAcademic.markDirty();
+        return newAcademic;
     }
 
     public long getAccountID() {
