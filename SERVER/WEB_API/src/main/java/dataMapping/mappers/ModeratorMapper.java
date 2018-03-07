@@ -32,7 +32,6 @@ public class ModeratorMapper extends AccountMapper<Moderator> {
             Streamable<Rating> ratings = ((RatingMapper) MapperRegistry.getMapper(Rating.class)).findRatingsForAccount(accountID);
             Streamable<Rating> ratingsModerated = ((RatingMapper) MapperRegistry.getMapper(Rating.class)).findModeratedRatingsForModerator(accountID);
 
-            //todo finders for comments, ratings and chats
             Moderator moderator = Moderator.load( email, passwordHash, rating, version, comments, chats, ratings, ratingsModerated );
             identityMap.put(accountID, moderator);
 
@@ -55,9 +54,9 @@ public class ModeratorMapper extends AccountMapper<Moderator> {
         }
     }
 
-    private static void prepareDeleteProcedure(CallableStatement callableStatement, User obj){
+    private static void prepareDeleteProcedure(CallableStatement callableStatement, Moderator obj){
         try {
-            callableStatement.setString(1, obj.getEmail());
+            callableStatement.setLong(1, obj.getIdentityKey());
             callableStatement.registerOutParameter(2, Types.NVARCHAR);
             callableStatement.execute();
         } catch (SQLException e) {
