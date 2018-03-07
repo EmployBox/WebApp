@@ -34,7 +34,8 @@ public class UserMapper extends MapperByProcedure<User,Long> {
             Streamable<Job> offeredJobs = ((JobMapper) MapperRegistry.getMapper(Job.class)).findForAccount(accountID);
             Streamable<Curriculum> curriculums = ((CurriculumMapper) MapperRegistry.getMapper(Curriculum.class)).findCurriculumsForAccount(accountID);
 
-            User user = User.load(accountID, email, passwordHash, rating, version,name ,summary, photoUrl, offeredJobs, curriculums, null);
+            //todo finders for comments, ratings and chats
+            User user = User.load(accountID, email, passwordHash, rating, version,name ,summary, photoUrl, offeredJobs, curriculums, null, null, null , null);
             identityMap.put(accountID, user);
 
             return user;
