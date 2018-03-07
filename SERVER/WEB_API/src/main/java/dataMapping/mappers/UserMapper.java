@@ -13,7 +13,7 @@ import java.sql.SQLException;
 import java.sql.Types;
 import java.util.function.Consumer;
 
-public class UserMapper extends AccountMapper<User> {
+public class UserMapper extends MapperByProcedure<User,Long> {
     private final String SELECT_QUERY_WITH_CURRICULUMS = "SELECT a.email, a.passwordHash, a.rating, u.accountId, u.name, u.summary, u.PhotoUrl, u.[version]\n" +
             "FROM ApiDatabase.[User] u inner join ApiDatabase.Account a\n" +
             "ON u.accountId = a.accountId AND a.accountId = ?";
@@ -48,7 +48,8 @@ public class UserMapper extends AccountMapper<User> {
         return SELECT_QUERY;
     }
 
-    private Consumer<CallableStatement> updatePrepareStatement(User obj) {
+    @Override
+    protected Consumer<CallableStatement> prepareUpdateProcedureArguments(User obj) {
         return cs -> {
             try {
                 cs.setString(1, obj.getEmail());
@@ -71,7 +72,7 @@ public class UserMapper extends AccountMapper<User> {
     public void insert(User obj) {
         executeSQLProcedure(
                 "{call AddUser(?, ?, ?, ?, ?, ?, ?, ?)}",
-                updatePrepareStatement(obj)
+                prepareUpdateProcedureArguments(obj)
         );
     }
 
@@ -79,7 +80,7 @@ public class UserMapper extends AccountMapper<User> {
     public void update(User obj) {
         executeSQLProcedure(
                 "{call UpdateUser(?, ?, ?, ?, ?, ?, ?, ?)}",
-                updatePrepareStatement(obj)
+                prepareUpdateProcedureArguments(obj)
         );
     }
 

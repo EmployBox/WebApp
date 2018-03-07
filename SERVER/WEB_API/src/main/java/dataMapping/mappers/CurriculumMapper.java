@@ -5,10 +5,12 @@ import javafx.util.Pair;
 import model.Curriculum;
 import util.Streamable;
 
+import java.sql.CallableStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.function.Consumer;
 
-public class CurriculumMapper extends AbstractMapper<Curriculum, String>{
+public class CurriculumMapper extends MapperByProcedure<Curriculum, String>{
     private final String SELECT_QUERY = "SELECT userId, CurriculumId FROM Curriculum";
     private final String INSERT_QUERY = "INSERT INTO Curriculum (userId, CurriculumId) VALUES (?, ?)";
     private final String DELETE_QUERY = "DELETE FROM Curriculum WHERE AccountId = ? AND CurriculumId = ?";
@@ -36,6 +38,11 @@ public class CurriculumMapper extends AbstractMapper<Curriculum, String>{
     @Override
     String getSelectQuery() {
         return SELECT_QUERY;
+    }
+
+    @Override
+    protected Consumer<CallableStatement> prepareUpdateProcedureArguments(Curriculum obj) {
+        return null;
     }
 
     @Override

@@ -12,7 +12,7 @@ import java.sql.SQLException;
 import java.sql.Types;
 import java.util.function.Consumer;
 
-public class CompanyMapper extends AbstractMapper<Company,Long> {
+public class CompanyMapper extends MapperByProcedure<Company,Long> {
 
     @Override
     Company mapper(ResultSet rs) throws DataMapperException {
@@ -43,7 +43,8 @@ public class CompanyMapper extends AbstractMapper<Company,Long> {
         return null;
     }
 
-    private Consumer<CallableStatement> updatePrepareStatement(Company obj) {
+    @Override
+    protected Consumer<CallableStatement> prepareUpdateProcedureArguments(Company obj) {
         return cs -> {
             try {
                 cs.setString(1, obj.getEmail());
@@ -69,7 +70,7 @@ public class CompanyMapper extends AbstractMapper<Company,Long> {
     public void insert(Company obj) {
         executeSQLProcedure(
                 "{call AddCompany(?, ?, ?, ?, ?, ?, ?, ?, ?, ,? ,?)}",
-                updatePrepareStatement(obj)
+                prepareUpdateProcedureArguments(obj)
         );
     }
 
@@ -77,7 +78,7 @@ public class CompanyMapper extends AbstractMapper<Company,Long> {
     public void update(Company obj) {
         executeSQLProcedure(
                 "{call UpdateCompany (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)}",
-                updatePrepareStatement(obj)
+                prepareUpdateProcedureArguments(obj)
         );
     }
 

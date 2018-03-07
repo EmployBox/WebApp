@@ -1,15 +1,15 @@
 
---IF DB_ID ('PS_API_DATABASE') IS NULL
---	CREATE DATABASE PS_API_DATABASE;
---GO
+IF DB_ID ('PS_API_DATABASE') IS NULL
+	CREATE DATABASE PS_API_DATABASE;
+GO
 IF NOT EXISTS(SELECT * FROM sys.schemas WHERE name = 'ApiDatabase')
 BEGIN
 	EXEC ('CREATE SCHEMA ApiDatabase')
 END
 
---GO
---USE PS_API_DATABASE
---GO
+GO
+USE PS_API_DATABASE
+GO
 
 CREATE TABLE ApiDatabase.Account (
 	accountId BIGINT IDENTITY PRIMARY KEY,
@@ -201,12 +201,14 @@ CREATE TABLE ApiDatabase.Chat(
 
 
 CREATE TABLE ApiDatabase.[MESSAGE](
+	messageId BIGINT,
 	chatId BIGINT REFERENCES ApiDatabase.Chat,
 	[text] NVARCHAR(200),
 	[date] datetime default(getdate()),
 	[version] rowversion,
 
 	FOREIGN KEY (chatId) REFERENCES ApiDatabase.Chat(chatId),
+	PRIMARY KEY(messageId,chatId)
 )
 
 CREATE TABLE ApiDatabase.Comment (

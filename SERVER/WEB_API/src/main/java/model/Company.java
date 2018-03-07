@@ -24,7 +24,7 @@ public class Company extends Account {
             String description,
             Streamable<Job> offeredJobs
     ){
-        super(accountID, email, password, rating, version, offeredJobs);
+        super(accountID, email, password, rating, version, offeredJobs,null, null, null);
         this.name = name;
         this.Specialization = Specialization;
         this.logoUrl = logoUrl;

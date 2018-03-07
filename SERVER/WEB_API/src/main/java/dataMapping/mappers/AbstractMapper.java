@@ -82,7 +82,7 @@ public abstract class AbstractMapper<T extends DomainObject<K>, K> implements Ma
         }, false).onClose(() -> { try { rs.close(); } catch (SQLException e) { throw new DataMapperException(e.getMessage(), e); } });
     }
 
-    private void handleSQLStatement(String query, boolean isProcedure, Consumer<Statement> handleStatement){
+    protected void handleSQLStatement(String query, boolean isProcedure, Consumer<Statement> handleStatement){
         Connection connection = ConnectionManager.getConnectionManagerOfDefaultDB().getConnection();
         try(Statement statement = isProcedure ? connection.prepareCall(query) : connection.prepareStatement(query)) {
             handleStatement.accept(statement);
@@ -154,13 +154,6 @@ public abstract class AbstractMapper<T extends DomainObject<K>, K> implements Ma
         );
     }
 
-    protected void executeSQLProcedure(String call, Consumer<CallableStatement> handleStatement){
-        handleSQLStatement(
-                call,
-                true,
-                statement -> handleStatement.accept((CallableStatement) statement)
-        );
-    }
 
     //TODO Does it work with Inserts?
     private boolean tryReplace(T obj, long timeout){

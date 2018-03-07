@@ -23,9 +23,12 @@ public class User extends Account {
             String photoUrl,
             Streamable<Job> offeredJobs,
             Streamable<Curriculum> curriculums,
-            Streamable<Application> applications
+            Streamable<Application> applications,
+            Streamable<Chat>chats,
+            Streamable<Comment> comments,
+            Streamable<Rating> ratings
     ){
-        super(accountID, email, password, rating, version, offeredJobs);
+        super(accountID, email, password, rating, version, offeredJobs,comments,chats,ratings);
         this.name = name;
         this.summary = summary;
         this.photoUrl = photoUrl;
@@ -43,9 +46,27 @@ public class User extends Account {
             String photoUrl,
             Streamable<Job> offeredJobs,
             Streamable<Curriculum> curriculums,
-            Streamable<Application> applications
+            Streamable<Application> applications,
+            Streamable<Chat>chats,
+            Streamable<Comment> comments,
+            Streamable<Rating> ratings
     ){
-        User user = new User(defaultKey, email, password, rating, version, name, summary, photoUrl, offeredJobs, curriculums, applications);
+        User user = new User(
+                defaultKey,
+                email,
+                password,
+                rating,
+                version,
+                name,
+                summary,
+                photoUrl,
+                offeredJobs,
+                curriculums,
+                applications,
+                chats,
+                comments,
+                ratings
+        );
         user.markNew();
         return user;
     }
@@ -61,9 +82,27 @@ public class User extends Account {
             String photoUrl,
             Streamable<Job> offeredJobs,
             Streamable<Curriculum> curriculums,
-            Streamable<Application> applications
+            Streamable<Application> applications,
+            Streamable<Chat>chats,
+            Streamable<Comment> comments,
+            Streamable<Rating> ratings
     ){
-        User user = new User(accountID, email, password, rating, version, name, summary, photoUrl, offeredJobs, curriculums, applications);
+        User user = new User(
+                accountID,
+                email,
+                password,
+                rating,
+                version,
+                name,
+                summary,
+                photoUrl,
+                offeredJobs,
+                curriculums,
+                applications,
+                chats,
+                comments,
+                ratings
+        );
         user.markClean();
         return user;
     }
