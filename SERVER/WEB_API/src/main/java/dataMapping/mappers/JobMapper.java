@@ -47,7 +47,7 @@ public class JobMapper extends AbstractMapper<Job, Long> {
             Streamable<Application> applications = ((ApplicationMapper) getMapper(Application.class)).findJobApplications(jobID);
             Streamable<JobExperience> jobExperiences = ((JobExperienceMapper) getMapper(JobExperience.class)).findExperiences(jobID);
 
-            Job job = Job.load(jobID, accountID, address, wage, description, schedule, offerBeginDate, offerEndDate, offerType, version, applications, null);
+            Job job = Job.load(jobID, accountID, address, wage, description, schedule, offerBeginDate, offerEndDate, offerType, version, applications, jobExperiences);
             identityMap.put(jobID, job);
 
             return job;

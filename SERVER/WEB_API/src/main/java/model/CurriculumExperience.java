@@ -3,33 +3,35 @@ package model;
 public class CurriculumExperience extends DomainObject<String> {
     private final long userId;
     private final long curriculumId;
-    private final long experienceId;
+    private final String competences;
+    private final short years;
 
-    private CurriculumExperience(long userId, long curriculumId, long experienceId, long version){
-        super(String.format("%d %d %d",userId,curriculumId,experienceId), version);
+    private CurriculumExperience(long userId, long curriculumId, String competences, short years){
+        super(String.format("%d %d",userId,curriculumId),-1);
         this.userId = userId;
         this.curriculumId = curriculumId;
-        this.experienceId = experienceId;
+        this.competences = competences;
+        this.years = years;
     }
 
     public static CurriculumExperience create(long userId,
                                               long curriculumId,
-                                              long experienceId,
-                                              long version
+                                              String competences,
+                                              short years
     )
     {
-        CurriculumExperience curriculumExperience = new CurriculumExperience( userId, curriculumId, experienceId, version);
+        CurriculumExperience curriculumExperience = new CurriculumExperience( userId, curriculumId, competences, years);
         curriculumExperience.markNew();
         return curriculumExperience;
     }
 
     public static CurriculumExperience load(long userId,
                                               long curriculumId,
-                                              long experienceId,
-                                              long version
+                                              String competences,
+                                              short years
     )
     {
-        CurriculumExperience curriculumExperience = new CurriculumExperience( userId, curriculumId, experienceId, version);
+        CurriculumExperience curriculumExperience = new CurriculumExperience( userId, curriculumId, competences, years);
         curriculumExperience.markClean();
         return curriculumExperience;
     }
@@ -42,7 +44,11 @@ public class CurriculumExperience extends DomainObject<String> {
         return curriculumId;
     }
 
-    public long getExperienceId() {
-        return experienceId;
+    public String getCompetences() {
+        return competences;
+    }
+
+    public short getYears() {
+        return years;
     }
 }

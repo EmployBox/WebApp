@@ -8,7 +8,7 @@ BEGIN
 END
 
 GO
-USE PS_TEST_API_DATABASE
+USE PS_API_DATABASE
 GO
 
 CREATE TABLE ApiDatabase.Account (
@@ -136,7 +136,10 @@ CREATE TABLE ApiDatabase.Job(
 
 CREATE TABLE Apidatabase.Curriculum_Experience(
 	userId BIGINT,
-	curriculumId BIGINT
+	curriculumId BIGINT,
+	competences NVARCHAR(50),
+	years SMALLINT,
+	[version] rowversion
 
 	FOREIGN KEY (userId,curriculumId) REFERENCES ApiDatabase.Curriculum ON DELETE CASCADE,
 
@@ -144,7 +147,10 @@ CREATE TABLE Apidatabase.Curriculum_Experience(
 )
 
 CREATE TABLE Apidatabase.Job_Experience(
-	jobId BIGINT
+	jobId BIGINT,
+	competences NVARCHAR(50),
+	years SMALLINT,
+	[version] rowversion
 
 	FOREIGN KEY (jobId) REFERENCES ApiDatabase.Job(jobId) ON DELETE CASCADE,
 
@@ -168,7 +174,6 @@ CREATE TABLE ApiDatabase.Rating(
 	AccountIdTo BIGINT,
 	moderatorId BIGINT references ApiDatabase.Moderator,
 	ratingValue decimal(2,1) DEFAULT 0.0,
-	[status] bit,
 	[version] rowversion,
 	
 	FOREIGN KEY (accountIdFrom) REFERENCES ApiDatabase.Account(accountID),

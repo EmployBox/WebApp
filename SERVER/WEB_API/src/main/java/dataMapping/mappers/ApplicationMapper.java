@@ -12,7 +12,7 @@ import java.sql.*;
 public class ApplicationMapper extends AbstractMapper<Application, String> {
     private static final String SELECT_QUERY =  "SELECT UserId, CurriculumId, JobId, [date] from [Application]";
     private static final String INSERT_QUERY =  "INSERT INTO [Application](userId, jobId, curriculumId, [date]) values (? , ? , ? , ?)";
-    private static final String UPDATE_QUERY =  "UPDATE [Application] SET [date] = ? where where userId = ? AND JobId = ?";
+    private static final String UPDATE_QUERY =  "UPDATE [Application] SET [date] = ? where userId = ? AND JobId = ?";
     private static final String DELETE_QUERY =  "DELETE [Application] where userId = ? AND jobId = ?";
 
     public ApplicationMapper() {

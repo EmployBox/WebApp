@@ -9,10 +9,10 @@ import util.Streamable;
 
 import java.sql.*;
 
-public class CommentMapper extends AbstractMapper<Comment, Long> {
+public class CommentMapper extends AbstractMapper {
     private static final String SELECT_QUERY =  "SELECT commentID, accountIdFrom, accountIdTo, mainCommentId, [date], [text], [status] from Comment";
     private static final String INSERT_QUERY =  "INSERT INTO Comment (commentID, accountIdFrom, accountIdTo, mainCommentId, [date], [text], [status]) values (?, ?, ?, ?, ?, ?, ?)";
-    private static final String UPDATE_QUERY =  "UPDATE Comment SET [text], [status] = ? where commentId = ?";
+    private static final String UPDATE_QUERY =  "UPDATE Comment SET [text] = ?, [status] = ? where commentId = ?";
     private static final String DELETE_QUERY =  "DELETE Comment where commentID =  ?";
 
     public CommentMapper() {
@@ -21,14 +21,6 @@ public class CommentMapper extends AbstractMapper<Comment, Long> {
             new MapperSettings<>(UPDATE_QUERY, PreparedStatement.class, CommentMapper::prepareUpdateStatement),
             new MapperSettings<>(DELETE_QUERY, PreparedStatement.class, CommentMapper::prepareDeleteStatement)
         );
-    }
-
-    public Streamable<Comment> findCommentsForAccount(long accountId) {
-        return findWhere(new Pair<>("accountId", accountId));
-    }
-
-    public Streamable<Comment> findCommentReplies(long commentId){
-        return findWhere(new Pair<>("mainCommentId",commentId));
     }
 
     @Override
@@ -45,18 +37,19 @@ public class CommentMapper extends AbstractMapper<Comment, Long> {
 
             Streamable<Comment> replies = ((CommentMapper) MapperRegistry.getMapper(Comment.class)).findCommentReplies(commentID);
 
-            Comment comment = Comment.load(commentID,accountIdFrom,accountIdTo, mainCommentId, date, text, status, replies, version);
-            identityMap.put(comment.getIdentityKey(), comment);
-
+            Comment comment =  Comment.load(commentID,accountIdFrom,accountIdTo, mainCommentId, date, text, status, replies, version);
             return comment;
         } catch (SQLException e) {
             throw new DataMapperException(e);
         }
     }
 
-    @Override
-    String getSelectQuery() {
-        return SELECT_QUERY;
+    public Streamable<Comment> findCommentsForAccount(long accountId) {
+        return findWhere(new Pair<>("accountId", accountId));
+    }
+
+    public Streamable findCommentReplies(long commentId){
+        return findWhere(new Pair<>("mainCommentId",commentId));
     }
 
     private static void prepareInsertStatement(PreparedStatement statement, Comment comment) {
@@ -91,5 +84,10 @@ public class CommentMapper extends AbstractMapper<Comment, Long> {
         } catch (SQLException e) {
             throw new DataMapperException(e);
         }
+    }
+
+    @Override
+    String getSelectQuery() {
+        return SELECT_QUERY;
     }
 }
