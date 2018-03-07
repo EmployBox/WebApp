@@ -11,15 +11,14 @@ import java.sql.CallableStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
-import java.util.function.Consumer;
 
 public class CompanyMapper extends AccountMapper<Company> {
 
     public CompanyMapper() {
         super(
-                new MapperSettings<>("{call AddCompany(?, ?, ?, ?, ?, ?, ?, ?, ?, ,? ,?)}", CallableStatement.class, CompanyMapper::prepareUpdateProcedureArguments),
-                new MapperSettings<>("{call UpdateCompany (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)}", CallableStatement.class, CompanyMapper::prepareUpdateProcedureArguments),
-                new MapperSettings<>("{call DeleteCompany (?, ?)}", CallableStatement.class, CompanyMapper::prepareDeleteProcedure)
+            new MapperSettings<>("{call AddCompany(?, ?, ?, ?, ?, ?, ?, ?, ?, ,? ,?)}", CallableStatement.class, CompanyMapper::prepareUpdateProcedureArguments),
+            new MapperSettings<>("{call UpdateCompany (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)}", CallableStatement.class, CompanyMapper::prepareUpdateProcedureArguments),
+            new MapperSettings<>("{call DeleteCompany (?, ?)}", CallableStatement.class, CompanyMapper::prepareDeleteProcedure)
         );
     }
 

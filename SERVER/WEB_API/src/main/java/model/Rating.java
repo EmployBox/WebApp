@@ -5,23 +5,25 @@ public class Rating extends DomainObject<String> {
     private final long accountIdTo;
     private final long moderatorId; // can be null
     private final double ratingValue;
+    private final boolean approved;
 
-    public Rating(long accountIdFrom,long accountIdTo, long moderatorId, double ratingValue, long version) {
+    public Rating(long accountIdFrom,long accountIdTo, long moderatorId, double ratingValue, boolean approved, long version) {
         super(String.format("%d, %d",accountIdFrom,accountIdTo), version);
         this.accountIdFrom = accountIdFrom;
         this.accountIdTo = accountIdTo;
         this.moderatorId = moderatorId;
         this.ratingValue = ratingValue;
+        this.approved = approved;
     }
 
-    public static Rating create(long accountIdFrom,long accountIdTo, long moderatorId, double ratingValue ) {
-        Rating rating = new Rating(accountIdFrom,accountIdTo, moderatorId, ratingValue, 0);
+    public static Rating create(long accountIdFrom,long accountIdTo, long moderatorId, double ratingValue, boolean approved) {
+        Rating rating = new Rating(accountIdFrom,accountIdTo, moderatorId, ratingValue, approved, 0);
         rating.markNew();
         return rating;
     }
 
-    public static Rating load(long accountIdFrom,long accountIdTo, long moderatorId, double ratingValue, long version ) {
-        Rating rating = new Rating(accountIdFrom,accountIdTo, moderatorId, ratingValue, version);
+    public static Rating load(long accountIdFrom,long accountIdTo, long moderatorId, double ratingValue, boolean approved, long version ) {
+        Rating rating = new Rating(accountIdFrom,accountIdTo, moderatorId, ratingValue, approved, version);
         rating.markClean();
         return rating;
     }

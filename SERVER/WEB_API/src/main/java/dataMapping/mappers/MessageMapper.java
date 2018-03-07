@@ -1,7 +1,6 @@
 package dataMapping.mappers;
 
 import dataMapping.exceptions.DataMapperException;
-import dataMapping.utils.MapperSettings;
 import model.Message;
 
 import java.sql.Date;
@@ -13,9 +12,9 @@ public class MessageMapper extends AbstractMapper<Message,String> {
     //TODO
     public MessageMapper() {
         super(
-                null,
-                null,
-                null
+            null,
+            null,
+            null
         );
     }
 
