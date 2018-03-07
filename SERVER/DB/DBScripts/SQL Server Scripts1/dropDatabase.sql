@@ -19,14 +19,12 @@ IF DB_ID ('PS_API_DATABASE') IS NOT NULL
 			DROP VIEW dbo.Job_Experience;
 		IF OBJECT_ID(N'dbo.Curriculum_Experience') IS NOT NULL
 			DROP VIEW dbo.Curriculum_Experience;
-		IF OBJECT_ID(N'dbo.Experience') IS NOT NULL
-			DROP VIEW dbo.Experience;
-		IF OBJECT_ID(N'ApiDatabase.AcademicBackground') IS NOT NULL
-			DROP VIEW dbo.AcademicBackground;
 		IF OBJECT_ID(N'dbo.Curriculum') IS NOT NULL
 			DROP VIEW dbo.Curriculum;
 		IF OBJECT_ID(N'dbo.Job') IS NOT NULL
 			DROP VIEW dbo.Job;
+		IF OBJECT_ID(N'ApiDatabase.AcademicBackground') IS NOT NULL
+			DROP VIEW dbo.AcademicBackground;
 		IF OBJECT_ID(N'dbo.[Local]') IS NOT NULL
 			DROP VIEW dbo.[Local];
 		IF OBJECT_ID(N'dbo.Company') IS NOT NULL
@@ -56,8 +54,6 @@ IF DB_ID ('PS_API_DATABASE') IS NOT NULL
 			DROP TABLE ApiDatabase.Job_Experience;
 		IF OBJECT_ID(N'ApiDatabase.Curriculum_Experience') IS NOT NULL
 			DROP TABLE ApiDatabase.Curriculum_Experience;
-		IF OBJECT_ID(N'ApiDatabase.Experience') IS NOT NULL
-			DROP TABLE ApiDatabase.Experience;
 		IF OBJECT_ID(N'ApiDatabase.Job') IS NOT NULL
 			DROP TABLE ApiDatabase.Job;
 		IF OBJECT_ID(N'ApiDatabase.PreviousJobs') IS NOT NULL
