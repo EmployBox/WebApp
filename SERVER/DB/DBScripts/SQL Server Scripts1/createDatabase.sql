@@ -54,6 +54,8 @@ CREATE TABLE ApiDatabase.[User] (
 CREATE TABLE ApiDatabase.Curriculum(
 	userId BIGINT references ApiDatabase.[User],
 	curriculumId BIGINT,
+	title NVARCHAR(25),
+	[version] rowversion
 
 	FOREIGN KEY (userId) REFERENCES ApiDatabase.[User] ( accountId) ON DELETE CASCADE,	
 	primary key(userId,curriculumId)
