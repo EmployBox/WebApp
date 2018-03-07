@@ -1,22 +1,29 @@
 package dataMapping.mappers;
 
 import dataMapping.exceptions.DataMapperException;
+import dataMapping.utils.MapperSettings;
 import javafx.util.Pair;
 import model.PreviousJobs;
 import util.Streamable;
 
-import java.sql.Date;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 
 public class PreviousJobsMapper extends AbstractMapper<PreviousJobs, String> {
-    private final String SELECT_QUERY = "SELECT userId, curriculumId, beginDate, endDate, companyName, [workload], [role], [version] FROM PreviousJobs";
-    private final String INSERT_QUERY = "INSERT INTO PreviousJobs (userId, curriculumId, beginDate, endDate, companyName, [workload], [role]) VALUES (?, ?, ?, ?, ?, ?, ?)";
-    private final String UPDATE_QUERY = "UPDATE PreviousJobs SET beginDate = ?, endDate = ?, companyName = ?, [workload] = ?, [role] = ? WHERE userId = ? AND curriculumId = ? AND [version] = ?";
-    private final String DELETE_QUERY = "DELETE FROM PreviousJobs WHERE userId = ? AND curriculumId = ? AND [version] = ?";
+    private static final String SELECT_QUERY = "SELECT userId, curriculumId, beginDate, endDate, companyName, [workload], [role], [version] FROM PreviousJobs";
+    private static final String INSERT_QUERY = "INSERT INTO PreviousJobs (userId, curriculumId, beginDate, endDate, companyName, [workload], [role]) VALUES (?, ?, ?, ?, ?, ?, ?)";
+    private static final String UPDATE_QUERY = "UPDATE PreviousJobs SET beginDate = ?, endDate = ?, companyName = ?, [workload] = ?, [role] = ? WHERE userId = ? AND curriculumId = ? AND [version] = ?";
+    private static final String DELETE_QUERY = "DELETE FROM PreviousJobs WHERE userId = ? AND curriculumId = ? AND [version] = ?";
 
     public Streamable<PreviousJobs> findForUserAndCurriculum(long accountId, long curriculumId){
         return findWhere(new Pair<>("userId", accountId), new Pair<>("curriculumId", curriculumId));
+    }
+
+    public PreviousJobsMapper(){
+        super(
+            new MapperSettings<>(INSERT_QUERY, PreparedStatement.class, PreviousJobsMapper::prepareInsertStatement),
+            new MapperSettings<>(UPDATE_QUERY, PreparedStatement.class, PreviousJobsMapper::prepareUpdateStatement),
+            new MapperSettings<>(DELETE_QUERY, PreparedStatement.class, PreviousJobsMapper::prepareDeleteStatement)
+        );
     }
 
     @Override
@@ -45,63 +52,42 @@ public class PreviousJobsMapper extends AbstractMapper<PreviousJobs, String> {
         return SELECT_QUERY;
     }
 
-    @Override
-    public void insert(PreviousJobs obj) {
-        executeSQLUpdate(
-                INSERT_QUERY,
-                obj,
-                statement -> {
-                    try{
-                        statement.setLong(1, obj.getUserId());
-                        statement.setLong(2, obj.getCurriculumId());
-                        statement.setDate(3, obj.getBeginDate());
-                        statement.setDate(4, obj.getEndDate());
-                        statement.setString(5, obj.getCompanyName());
-                        statement.setString(6, obj.getWorkLoad());
-                        statement.setString(7, obj.getRole());
-                    } catch (SQLException e) {
-                        throw new DataMapperException(e);
-                    }
-                }
-        );
+    private static void prepareInsertStatement (PreparedStatement statement, PreviousJobs obj) {
+        try{
+            statement.setLong(1, obj.getUserId());
+            statement.setLong(2, obj.getCurriculumId());
+            statement.setDate(3, obj.getBeginDate());
+            statement.setDate(4, obj.getEndDate());
+            statement.setString(5, obj.getCompanyName());
+            statement.setString(6, obj.getWorkLoad());
+            statement.setString(7, obj.getRole());
+        } catch (SQLException e) {
+            throw new DataMapperException(e);
+        }
     }
 
-    @Override
-    public void update(PreviousJobs obj) {
-        executeSQLUpdate(
-                UPDATE_QUERY,
-                obj,
-                statement -> {
-                    try{
-                        statement.setDate(1, obj.getBeginDate());
-                        statement.setDate(2, obj.getEndDate());
-                        statement.setString(3, obj.getCompanyName());
-                        statement.setString(4, obj.getWorkLoad());
-                        statement.setString(5, obj.getRole());
-                        statement.setLong(6, obj.getUserId());
-                        statement.setLong(7, obj.getCurriculumId());
-                        statement.setLong(8, obj.getVersion());
-                    } catch (SQLException e) {
-                        throw new DataMapperException(e);
-                    }
-                }
-        );
+    private static void prepareUpdateStatement(PreparedStatement statement, PreviousJobs obj) {
+        try{
+            statement.setDate(1, obj.getBeginDate());
+            statement.setDate(2, obj.getEndDate());
+            statement.setString(3, obj.getCompanyName());
+            statement.setString(4, obj.getWorkLoad());
+            statement.setString(5, obj.getRole());
+            statement.setLong(6, obj.getUserId());
+            statement.setLong(7, obj.getCurriculumId());
+            statement.setLong(8, obj.getVersion());
+        } catch (SQLException e) {
+            throw new DataMapperException(e);
+        }
     }
 
-    @Override
-    public void delete(PreviousJobs obj) {
-        executeSQLUpdate(
-                DELETE_QUERY,
-                obj,
-                statement -> {
-                    try{
-                        statement.setLong(1, obj.getUserId());
-                        statement.setLong(2, obj.getCurriculumId());
-                        statement.setLong(3, obj.getVersion());
-                    } catch (SQLException e) {
-                        throw new DataMapperException(e);
-                    }
-                }
-        );
+    public static void prepareDeleteStatement (PreparedStatement statement, PreviousJobs obj) {
+        try{
+            statement.setLong(1, obj.getUserId());
+            statement.setLong(2, obj.getCurriculumId());
+            statement.setLong(3, obj.getVersion());
+        } catch (SQLException e) {
+            throw new DataMapperException(e);
+        }
     }
 }

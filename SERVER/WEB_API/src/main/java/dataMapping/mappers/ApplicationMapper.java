@@ -2,6 +2,7 @@ package dataMapping.mappers;
 
 
 import dataMapping.exceptions.DataMapperException;
+import dataMapping.utils.MapperSettings;
 import javafx.util.Pair;
 import model.Application;
 import util.Streamable;
@@ -9,14 +10,24 @@ import util.Streamable;
 import java.sql.*;
 
 public class ApplicationMapper extends AbstractMapper<Application, String> {
-    private String SELECT_QUERY =  "SELECT UserId, CurriculumId, JobId, [date] from [Application]";
-    private String INSERT_QUERY =  "INSERT INTO [Application](userId, jobId, curriculumId, [date]) values (? , ? , ? , ?)";
-    private String UPDATE_QUERY =  "UPDATE [Application] SET [date] = ? where where userId = ? AND JobId = ?";
-    private String DELETE_QUERY =  "DELETE [Application] where userId = ? AND jobId = ?";
+    private static final String SELECT_QUERY =  "SELECT UserId, CurriculumId, JobId, [date] from [Application]";
+    private static final String INSERT_QUERY =  "INSERT INTO [Application](userId, jobId, curriculumId, [date]) values (? , ? , ? , ?)";
+    private static final String UPDATE_QUERY =  "UPDATE [Application] SET [date] = ? where where userId = ? AND JobId = ?";
+    private static final String DELETE_QUERY =  "DELETE [Application] where userId = ? AND jobId = ?";
+
+
+    public ApplicationMapper() {
+        super(
+            new MapperSettings<>(INSERT_QUERY, PreparedStatement.class, ApplicationMapper::prepareInsertStatement),
+            new MapperSettings<>(UPDATE_QUERY, PreparedStatement.class, ApplicationMapper::prepareUpdateStatement),
+            new MapperSettings<>(DELETE_QUERY, PreparedStatement.class, ApplicationMapper::prepareDeleteStatement)
+        );
+    }
 
     public Streamable<Application> findJobApplications(long jobId){
         return findWhere(new Pair<>("jobId", jobId));
     }
+
 
     @Override
     Application mapper(ResultSet rs) throws DataMapperException {
@@ -41,52 +52,32 @@ public class ApplicationMapper extends AbstractMapper<Application, String> {
         return SELECT_QUERY;
     }
 
-    @Override
-    public void insert(Application obj) {
-        executeSQLUpdate(
-                INSERT_QUERY,
-                obj,
-                preparedStatement -> {
-                    try{
-                        preparedStatement.setLong(1, obj.getUserId());
-                        preparedStatement.setLong(2, obj.getCurriculumId());
-                        preparedStatement.setLong(3, obj.getJobId());
-                        preparedStatement.setDate(4, obj.getDate());
-                    } catch (SQLException e) {
-                        throw new DataMapperException(e);
-                    }
-                }
-        );
+
+    private static void prepareInsertStatement(PreparedStatement statement, Application obj) {
+        try{
+            statement.setLong(1, obj.getUserId());
+            statement.setLong(2, obj.getCurriculumId());
+            statement.setLong(3, obj.getJobId());
+            statement.setDate(4, obj.getDate());
+        } catch (SQLException e) {
+            throw new DataMapperException(e);
+        }
     }
 
-    @Override
-    public void update(Application obj) {
-        executeSQLUpdate(
-                UPDATE_QUERY,
-                obj,
-                preparedStatement -> {
-                    try{
-                        preparedStatement.setDate(4, obj.getDate());
-                    } catch (SQLException e) {
-                        throw new DataMapperException(e);
-                    }
-                }
-        );
+    private static void prepareUpdateStatement(PreparedStatement statement, Application obj) {
+        try{
+            statement.setDate(4, obj.getDate());
+        } catch (SQLException e) {
+            throw new DataMapperException(e);
+        }
     }
 
-    @Override
-    public void delete(Application obj) {
-        executeSQLUpdate(
-                DELETE_QUERY,
-                obj,
-                preparedStatement -> {
-                    try{
-                        preparedStatement.setLong(1, obj.getUserId());
-                        preparedStatement.setLong(2, obj.getCurriculumId());
-                    } catch (SQLException e) {
-                        throw new DataMapperException(e);
-                    }
-                }
-        );
+    private static void prepareDeleteStatement(PreparedStatement statement, Application obj) {
+        try{
+            statement.setLong(1, obj.getUserId());
+            statement.setLong(2, obj.getCurriculumId());
+        } catch (SQLException e) {
+            throw new DataMapperException(e);
+        }
     }
 }
