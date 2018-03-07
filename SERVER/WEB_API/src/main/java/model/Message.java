@@ -35,4 +35,12 @@ public class Message extends DomainObject<String> {
     public Date getDate() {
         return date;
     }
+
+    public long getMessageId() {
+        return messageId;
+    }
+
+    public long getChadId() {
+        return chadId;
+    }
 }

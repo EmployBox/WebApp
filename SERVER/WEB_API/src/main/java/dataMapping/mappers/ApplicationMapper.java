@@ -15,7 +15,6 @@ public class ApplicationMapper extends AbstractMapper<Application, String> {
     private static final String UPDATE_QUERY =  "UPDATE [Application] SET [date] = ? where where userId = ? AND JobId = ?";
     private static final String DELETE_QUERY =  "DELETE [Application] where userId = ? AND jobId = ?";
 
-
     public ApplicationMapper() {
         super(
             new MapperSettings<>(INSERT_QUERY, PreparedStatement.class, ApplicationMapper::prepareInsertStatement),
@@ -28,6 +27,9 @@ public class ApplicationMapper extends AbstractMapper<Application, String> {
         return findWhere(new Pair<>("jobId", jobId));
     }
 
+    public Streamable<Application> findUserApplications(long userId){
+        return findWhere(new Pair<>("userId", userId));
+    }
 
     @Override
     Application mapper(ResultSet rs) throws DataMapperException {
@@ -38,7 +40,7 @@ public class ApplicationMapper extends AbstractMapper<Application, String> {
             Date date = rs.getDate("[date]");
             long version = rs.getLong("[version]");
 
-            Application application = Application.load(userId,jobId,curriculumId,date, version);
+            Application application = Application.load(userId, jobId, curriculumId, date, version);
             identityMap.put(String.format("ApplicationPK %s %s",userId,jobId), application);
 
             return application;

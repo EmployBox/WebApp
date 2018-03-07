@@ -8,7 +8,7 @@ BEGIN
 END
 
 GO
-USE PS_API_DATABASE
+USE PS_TEST_API_DATABASE
 GO
 
 CREATE TABLE ApiDatabase.Account (
@@ -168,6 +168,7 @@ CREATE TABLE ApiDatabase.Rating(
 	AccountIdTo BIGINT,
 	moderatorId BIGINT references ApiDatabase.Moderator,
 	ratingValue decimal(2,1) DEFAULT 0.0,
+	[status] bit,
 	[version] rowversion,
 	
 	FOREIGN KEY (accountIdFrom) REFERENCES ApiDatabase.Account(accountID),

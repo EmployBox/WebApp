@@ -3,15 +3,17 @@ package dataMapping.mappers;
 import dataMapping.exceptions.DataMapperException;
 import dataMapping.utils.MapperRegistry;
 import dataMapping.utils.MapperSettings;
-import model.Curriculum;
-import model.Job;
-import model.User;
+import javafx.util.Pair;
+import model.*;
 import util.Streamable;
 
 import java.sql.CallableStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
+import java.util.stream.Stream;
+
+import static dataMapping.utils.MapperRegistry.*;
 
 public class UserMapper extends AccountMapper<User> {
     private static final String SELECT_QUERY = "SELECT accountId, name, summary, photoUrl, [version] FROM [User]";
@@ -22,6 +24,16 @@ public class UserMapper extends AccountMapper<User> {
             new MapperSettings<>("{call UpdateUser(?, ?, ?, ?, ?, ?, ?, ?)}", CallableStatement.class, UserMapper::prepareWriteProcedure),
             new MapperSettings<>("{call DeleteUser(?, ?)}", CallableStatement.class, UserMapper::prepareDeleteProcedure)
         );
+    }
+
+    public Streamable<User> findFollowingUsers(long accountID) {
+        Stream<Follow> following = ((FollowMapper) getMapper(Follow.class)).findFollowingForAccount(accountID).get();
+        return () -> following.map(follow -> find(follow.getAccountIdFrom()));
+    }
+
+    public User find(long accountId){
+        return findWhere(new Pair<>("accountId", accountId)).get()
+                .findFirst().get();
     }
 
     @Override
@@ -36,11 +48,16 @@ public class UserMapper extends AccountMapper<User> {
             String photoUrl = rs.getString ("PhotoUrl");
             long version = rs.getLong("[version]");
 
-            Streamable<Job> offeredJobs = ((JobMapper) MapperRegistry.getMapper(Job.class)).findForAccount(accountID);
-            Streamable<Curriculum> curriculums = ((CurriculumMapper) MapperRegistry.getMapper(Curriculum.class)).findCurriculumsForAccount(accountID);
+            Streamable<Job> offeredJobs = ((JobMapper) getMapper(Job.class)).findForAccount(accountID);
+            Streamable<Curriculum> curriculums = ((CurriculumMapper) getMapper(Curriculum.class)).findCurriculumsForAccount(accountID);
+            Streamable<Application> applications = ((ApplicationMapper) getMapper(Application.class)).findUserApplications(accountID);
+            Streamable<Chat> chats = ((ChatMapper) getMapper(Chat.class)).findForAccount(accountID);
+            Streamable<Rating> ratings = ((RatingMapper) getMapper(Rating.class)).findRatingsForAccount(accountID);
+
+            Streamable<User> following = findFollowingUsers(accountID);
 
             //todo finders for comments, ratings and chats
-            User user = User.load(accountID, email, passwordHash, rating, version,name ,summary, photoUrl, offeredJobs, curriculums, null, null, null , null);
+            User user = User.load(accountID, email, passwordHash, rating, version, name ,summary, photoUrl, offeredJobs, curriculums, applications, chats, null , ratings, following);
             identityMap.put(accountID, user);
 
             return user;
@@ -53,7 +70,6 @@ public class UserMapper extends AccountMapper<User> {
     String getSelectQuery() {
         return SELECT_QUERY;
     }
-
 
     private static void prepareWriteProcedure(CallableStatement cs, User obj) {
         try {
