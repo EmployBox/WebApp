@@ -50,7 +50,6 @@ public class JobMapper extends AbstractMapper<Job, Long> {
         executeSQLUpdate(
                 INSERT_QUERY,
                 obj,
-                false,
                 preparedStatement -> {
                     try{
                         preparedStatement.setLong(1, obj.getAccountID());
@@ -74,7 +73,6 @@ public class JobMapper extends AbstractMapper<Job, Long> {
         executeSQLUpdate(
                 UPDATE_QUERY,
                 obj,
-                false,
                 preparedStatement -> {
                     try{
                         preparedStatement.setString(1, obj.getAddress());
@@ -97,7 +95,6 @@ public class JobMapper extends AbstractMapper<Job, Long> {
         executeSQLUpdate(
                 DELETE_QUERY,
                 obj,
-                true,
                 preparedStatement -> {
                     try{
                         preparedStatement.setLong(1, obj.getIdentityKey());

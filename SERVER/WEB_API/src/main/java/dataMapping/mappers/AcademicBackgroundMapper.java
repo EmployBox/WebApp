@@ -50,7 +50,6 @@ public class AcademicBackgroundMapper extends AbstractMapper<AcademicBackground,
         executeSQLUpdate(
                 INSERT_QUERY,
                 obj,
-                false,
                 statement -> {
                     try{
                         statement.setLong(1, obj.getAccountID());
@@ -72,7 +71,6 @@ public class AcademicBackgroundMapper extends AbstractMapper<AcademicBackground,
         executeSQLUpdate(
                 UPDATE_QUERY,
                 obj,
-                false,
                 statement -> {
                     try{
                         statement.setDate(1, obj.getBeginDate());
@@ -95,7 +93,6 @@ public class AcademicBackgroundMapper extends AbstractMapper<AcademicBackground,
         executeSQLUpdate(
                 DELETE_QUERY,
                 obj,
-                true,
                 statement -> {
                     try{
                         statement.setLong(1, obj.getAccountID());

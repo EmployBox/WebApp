@@ -39,7 +39,6 @@ public class LocalMapper extends AbstractMapper<Local, String>{
         executeSQLUpdate(
                 INSERT_QUERY,
                 obj,
-                false,
                 statement -> {
                     try {
                         statement.setString(1, obj.getAddress());
@@ -63,7 +62,6 @@ public class LocalMapper extends AbstractMapper<Local, String>{
         executeSQLUpdate(
                 DELETE_QUERY,
                 obj,
-                true,
                 statement -> {
                     try {
                         statement.setString(1, obj.getAddress());

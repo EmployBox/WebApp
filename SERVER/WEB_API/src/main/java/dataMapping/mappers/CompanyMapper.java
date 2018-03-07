@@ -2,6 +2,7 @@ package dataMapping.mappers;
 
 import dataMapping.exceptions.DataMapperException;
 import dataMapping.utils.MapperRegistry;
+import dataMapping.utils.MapperSettings;
 import model.Company;
 import model.Job;
 import util.Streamable;
@@ -12,7 +13,11 @@ import java.sql.SQLException;
 import java.sql.Types;
 import java.util.function.Consumer;
 
-public class CompanyMapper extends MapperByProcedure<Company,Long> {
+public class CompanyMapper extends AbstractMapper<Company,Long> {
+
+    public CompanyMapper() {
+        super(insertSettings, updateSettings, deleteSettings);
+    }
 
     @Override
     Company mapper(ResultSet rs) throws DataMapperException {
@@ -43,7 +48,6 @@ public class CompanyMapper extends MapperByProcedure<Company,Long> {
         return null;
     }
 
-    @Override
     protected Consumer<CallableStatement> prepareUpdateProcedureArguments(Company obj) {
         return cs -> {
             try {

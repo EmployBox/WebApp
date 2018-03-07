@@ -2,6 +2,7 @@ package dataMapping.mappers;
 
 import dataMapping.exceptions.DataMapperException;
 import dataMapping.utils.MapperRegistry;
+import dataMapping.utils.MapperSettings;
 import javafx.util.Pair;
 import model.AcademicBackground;
 import model.Curriculum;
@@ -13,10 +14,14 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.function.Consumer;
 
-public class CurriculumMapper extends MapperByProcedure<Curriculum, String>{
+public class CurriculumMapper extends AbstractMapper<Curriculum, String>{
     private final String SELECT_QUERY = "SELECT userId, CurriculumId, [version] FROM Curriculum";
     private final String INSERT_QUERY = "INSERT INTO Curriculum (userId, CurriculumId) VALUES (?, ?)";
     private final String DELETE_QUERY = "DELETE FROM Curriculum WHERE AccountId = ? AND CurriculumId = ? AND [version] = ?";
+
+    public CurriculumMapper(MapperSettings insertSettings, MapperSettings updateSettings, MapperSettings deleteSettings) {
+        super(insertSettings, updateSettings, deleteSettings);
+    }
 
     public Streamable<Curriculum> findCurriculumsForAccount(long accountId){
         return findWhere(new Pair<>("userId", accountId));
@@ -46,7 +51,6 @@ public class CurriculumMapper extends MapperByProcedure<Curriculum, String>{
         return SELECT_QUERY;
     }
 
-    @Override
     protected Consumer<CallableStatement> prepareUpdateProcedureArguments(Curriculum obj) {
         return null;
     }

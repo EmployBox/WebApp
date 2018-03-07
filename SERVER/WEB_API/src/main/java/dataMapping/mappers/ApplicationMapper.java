@@ -7,7 +7,6 @@ import model.Application;
 import util.Streamable;
 
 import java.sql.*;
-import java.util.stream.Stream;
 
 public class ApplicationMapper extends AbstractMapper<Application, String> {
     private String SELECT_QUERY =  "SELECT UserId, CurriculumId, JobId, [date] from [Application]";
@@ -47,7 +46,6 @@ public class ApplicationMapper extends AbstractMapper<Application, String> {
         executeSQLUpdate(
                 INSERT_QUERY,
                 obj,
-                false,
                 preparedStatement -> {
                     try{
                         preparedStatement.setLong(1, obj.getUserId());
@@ -66,7 +64,6 @@ public class ApplicationMapper extends AbstractMapper<Application, String> {
         executeSQLUpdate(
                 UPDATE_QUERY,
                 obj,
-                false,
                 preparedStatement -> {
                     try{
                         preparedStatement.setDate(4, obj.getDate());
@@ -82,7 +79,6 @@ public class ApplicationMapper extends AbstractMapper<Application, String> {
         executeSQLUpdate(
                 DELETE_QUERY,
                 obj,
-                true,
                 preparedStatement -> {
                     try{
                         preparedStatement.setLong(1, obj.getUserId());

@@ -2,6 +2,7 @@ package dataMapping.mappers;
 
 import dataMapping.exceptions.DataMapperException;
 import dataMapping.utils.MapperRegistry;
+import dataMapping.utils.MapperSettings;
 import model.Curriculum;
 import model.Job;
 import model.User;
@@ -13,11 +14,19 @@ import java.sql.SQLException;
 import java.sql.Types;
 import java.util.function.Consumer;
 
-public class UserMapper extends MapperByProcedure<User,Long> {
+public class UserMapper extends AbstractMapper<User,Long> {
     private final String SELECT_QUERY_WITH_CURRICULUMS = "SELECT a.email, a.passwordHash, a.rating, u.accountId, u.name, u.summary, u.PhotoUrl, u.[version]\n" +
             "FROM ApiDatabase.[User] u inner join ApiDatabase.Account a\n" +
             "ON u.accountId = a.accountId AND a.accountId = ?";
     private final String SELECT_QUERY = "SELECT accountId, name, summary, photoUrl, [version] FROM [User]";
+
+    public UserMapper() {
+        super(
+                new MapperSettings<>("{call AddUser(?, ?, ?, ?, ?, ?, ?, ?)}", CallableStatement.class, UserMapper::prepareUpdateProcedureArguments),
+                new MapperSettings<>("{call UpdateUser(?, ?, ?, ?, ?, ?, ?, ?)}", CallableStatement.class, UserMapper::prepareUpdateProcedureArguments),
+                new MapperSettings<>("{call DeleteUser(?, ?)}", CallableStatement.class, UserMapper::prepareDeleteProcedure)
+        );
+    }
 
     @Override
     public User mapper(ResultSet rs) throws DataMapperException {
@@ -49,56 +58,30 @@ public class UserMapper extends MapperByProcedure<User,Long> {
         return SELECT_QUERY;
     }
 
-    @Override
-    protected Consumer<CallableStatement> prepareUpdateProcedureArguments(User obj) {
-        return cs -> {
-            try {
-                cs.setString(1, obj.getEmail());
-                cs.setDouble(2, obj.getRating());
-                cs.setString(3, obj.getPassword());
-                cs.setString(4, obj.getName());
-                cs.setString(5, obj.getSummary());
-                cs.setString(6, obj.getPhotoUrl());
-                cs.registerOutParameter(7, Types.BIGINT);
-                cs.registerOutParameter(8, Types.NVARCHAR);
-                cs.execute();
-                identityMap.put(obj.getIdentityKey(), obj);
-            } catch (SQLException e) {
-                throw new DataMapperException(e);
-            }
-        };
+
+    private static void prepareUpdateProcedureArguments(CallableStatement cs, User obj) {
+        try {
+            cs.setString(1, obj.getEmail());
+            cs.setDouble(2, obj.getRating());
+            cs.setString(3, obj.getPassword());
+            cs.setString(4, obj.getName());
+            cs.setString(5, obj.getSummary());
+            cs.setString(6, obj.getPhotoUrl());
+            cs.registerOutParameter(7, Types.BIGINT);
+            cs.registerOutParameter(8, Types.NVARCHAR);
+            cs.execute();
+        } catch (SQLException e) {
+            throw new DataMapperException(e);
+        }
     }
 
-    @Override
-    public void insert(User obj) {
-        executeSQLProcedure(
-                "{call AddUser(?, ?, ?, ?, ?, ?, ?, ?)}",
-                prepareUpdateProcedureArguments(obj)
-        );
-    }
-
-    @Override
-    public void update(User obj) {
-        executeSQLProcedure(
-                "{call UpdateUser(?, ?, ?, ?, ?, ?, ?, ?)}",
-                prepareUpdateProcedureArguments(obj)
-        );
-    }
-
-    @Override
-    public void delete(User obj) {
-        executeSQLProcedure(
-                "{call DeleteUser(?, ?)}",
-                callableStatement -> {
-                    try {
-                        callableStatement.setString(1, obj.getEmail());
-                        callableStatement.registerOutParameter(2, Types.NVARCHAR);
-                        callableStatement.execute();
-                        identityMap.remove(obj.getIdentityKey());
-                    } catch (SQLException e) {
-                        throw new DataMapperException(e);
-                    }
-                }
-        );
+    private static void prepareDeleteProcedure(CallableStatement callableStatement, User obj){
+        try {
+            callableStatement.setString(1, obj.getEmail());
+            callableStatement.registerOutParameter(2, Types.NVARCHAR);
+            callableStatement.execute();
+        } catch (SQLException e) {
+            throw new DataMapperException(e);
+        }
     }
 }

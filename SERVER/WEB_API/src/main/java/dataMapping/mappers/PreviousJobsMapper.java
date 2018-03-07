@@ -50,7 +50,6 @@ public class PreviousJobsMapper extends AbstractMapper<PreviousJobs, String> {
         executeSQLUpdate(
                 INSERT_QUERY,
                 obj,
-                false,
                 statement -> {
                     try{
                         statement.setLong(1, obj.getUserId());
@@ -72,7 +71,6 @@ public class PreviousJobsMapper extends AbstractMapper<PreviousJobs, String> {
         executeSQLUpdate(
                 UPDATE_QUERY,
                 obj,
-                false,
                 statement -> {
                     try{
                         statement.setDate(1, obj.getBeginDate());
@@ -95,7 +93,6 @@ public class PreviousJobsMapper extends AbstractMapper<PreviousJobs, String> {
         executeSQLUpdate(
                 DELETE_QUERY,
                 obj,
-                true,
                 statement -> {
                     try{
                         statement.setLong(1, obj.getUserId());
