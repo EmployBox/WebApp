@@ -1,6 +1,7 @@
 package dataMapping.mappers;
 
 import dataMapping.exceptions.DataMapperException;
+import dataMapping.utils.MapperSettings;
 import model.Message;
 
 import java.sql.Date;
@@ -8,6 +9,15 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public class MessageMapper extends AbstractMapper<Message,String> {
+
+    //TODO
+    public MessageMapper() {
+        super(
+                null,
+                null,
+                null
+        );
+    }
 
     @Override
     Message mapper(ResultSet rs) throws DataMapperException {
@@ -29,20 +39,5 @@ public class MessageMapper extends AbstractMapper<Message,String> {
     @Override
     String getSelectQuery() {
         return null;
-    }
-
-    @Override
-    public void insert(Message obj) {
-        //todo
-    }
-
-    @Override
-    public void update(Message obj) {
-        //todo
-    }
-
-    @Override
-    public void delete(Message obj) {
-        //todo
     }
 }

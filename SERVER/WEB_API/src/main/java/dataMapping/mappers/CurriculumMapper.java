@@ -19,8 +19,13 @@ public class CurriculumMapper extends AbstractMapper<Curriculum, String>{
     private final String INSERT_QUERY = "INSERT INTO Curriculum (userId, CurriculumId) VALUES (?, ?)";
     private final String DELETE_QUERY = "DELETE FROM Curriculum WHERE AccountId = ? AND CurriculumId = ? AND [version] = ?";
 
-    public CurriculumMapper(MapperSettings insertSettings, MapperSettings updateSettings, MapperSettings deleteSettings) {
-        super(insertSettings, updateSettings, deleteSettings);
+    //TODO Procedures
+    public CurriculumMapper() {
+        super(
+                null,
+                null,
+                null
+        );
     }
 
     public Streamable<Curriculum> findCurriculumsForAccount(long accountId){
@@ -49,24 +54,5 @@ public class CurriculumMapper extends AbstractMapper<Curriculum, String>{
     @Override
     String getSelectQuery() {
         return SELECT_QUERY;
-    }
-
-    protected Consumer<CallableStatement> prepareUpdateProcedureArguments(Curriculum obj) {
-        return null;
-    }
-
-    @Override
-    public void insert(Curriculum obj) {
-        //TODO Procedure
-    }
-
-    @Override
-    public void update(Curriculum obj) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public void delete(Curriculum obj) {
-        //TODO Procedure
     }
 }

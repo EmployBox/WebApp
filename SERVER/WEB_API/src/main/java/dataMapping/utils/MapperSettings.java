@@ -5,7 +5,6 @@ import model.DomainObject;
 import java.sql.CallableStatement;
 import java.sql.Statement;
 import java.util.function.BiConsumer;
-import java.util.function.Consumer;
 
 public class MapperSettings<T extends Statement, U extends DomainObject> {
 
