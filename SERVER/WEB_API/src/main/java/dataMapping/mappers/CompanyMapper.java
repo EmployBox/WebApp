@@ -38,7 +38,7 @@ public class CompanyMapper extends AccountMapper<Company> {
 
             Streamable<Job> offeredJobs = ((JobMapper) MapperRegistry.getMapper(Job.class)).findForAccount(accountId);
 
-            Company company = new Company(accountId, email,null, rating,version, name, specialization, yearFounded,logoUrl, webPageUrl, description, offeredJobs);
+            Company company =  Company.load (accountId, email,null, rating,version, name, specialization, yearFounded,logoUrl, webPageUrl, description, offeredJobs);
             identityMap.put(accountId, company);
         }catch (SQLException e){
             throw new DataMapperException(e.getMessage(), e);
