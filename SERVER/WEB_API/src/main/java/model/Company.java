@@ -10,7 +10,7 @@ public class Company extends Account {
     private final String webPageUrl;
     private final String description;
 
-    public Company(
+    private Company(
             long accountID,
             String email,
             String password,
