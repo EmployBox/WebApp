@@ -3,7 +3,9 @@ package model;
 import java.sql.Date;
 
 public class PreviousJobs extends DomainObject<String> {
+    @ID
     private final long userId;
+    @ID
     private final long curriculumId;
     private final Date beginDate;
     private final Date endDate;
@@ -11,8 +13,8 @@ public class PreviousJobs extends DomainObject<String> {
     private final String workLoad;
     private final String role;
 
-    public PreviousJobs(long userId, long curriculumId, Date beginDate,Date endDate, String companyName, String workLoad, String role, long version) {
-        super(String.format("PreviousJobsPK: %d %d",userId,curriculumId), version);
+    private PreviousJobs(long userId, long curriculumId, Date beginDate, Date endDate, String companyName, String workLoad, String role, long version) {
+        super(String.format("%d %d",userId,curriculumId), version);
         this.userId = userId;
         this.curriculumId = curriculumId;
         this.beginDate = beginDate;
@@ -45,6 +47,7 @@ public class PreviousJobs extends DomainObject<String> {
     public String getCompanyName() {
         return companyName;
     }
+
     public String getWorkLoad() {
         return workLoad;
     }

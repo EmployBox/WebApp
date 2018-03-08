@@ -1,21 +1,18 @@
 package mappers;
 
 import dataBase.DataBaseTests;
-import dataMapping.mappers.AccountMapper;
 import dataMapping.mappers.JobMapper;
 import dataMapping.utils.MapperRegistry;
 import dataMapping.utils.UnitOfWork;
-import model.Account;
 import model.Job;
-import model.User;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.sql.Connection;
-import java.sql.Date;
 import java.sql.SQLException;
 
+//todo
 public class JobMapperTests {
     private Connection con;
 
@@ -38,7 +35,7 @@ public class JobMapperTests {
 
         UnitOfWork.newCurrent();
 
-        Job.create(1, null, 0, null, null, null, null, null, 0, null, null);
+        //Job.create(1, null, 0, null, null, null, null, null, 0, null, null);
 
         UnitOfWork.getCurrent().commit();
 

@@ -1,6 +1,7 @@
 package model;
 
 public class Local extends DomainObject<String> {
+    @ID
     private final String address;
     private final String country;
     private final String district;

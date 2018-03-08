@@ -3,7 +3,9 @@ package model;
 import java.sql.Date;
 
 public class Application extends DomainObject<String> {
+    @ID
     private final long userId;
+    @ID
     private final long jobId;
     private final long curriculumId;
     private final Date date;
@@ -22,10 +24,17 @@ public class Application extends DomainObject<String> {
         return application;
     }
 
-    public static Application load(long userId, long jobId,long curriculumId, Date date, long version){
+    public static Application load(long userId, long jobId, long curriculumId, Date date, long version){
         Application application = new Application(userId,jobId,curriculumId, date, version);
         application.markClean();
         return application;
+    }
+
+    public static Application update(Application application, long curriculumId){
+        application.markToBeDirty();
+        Application newApplication = new Application(application.getUserId(), application.getJobId(), curriculumId, application.getDate(), application.getNextVersion());
+        newApplication.markDirty();
+        return newApplication;
     }
 
     public Date getDate() {

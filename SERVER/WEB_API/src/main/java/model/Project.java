@@ -1,13 +1,15 @@
 package model;
 
 public class Project extends DomainObject<String> {
+    @ID
     private final long userId;
+    @ID
     private final long curriculumId;
     private final String name;
     private final String description;
 
-    public Project(long userId, long curriculumId, String name, String description, long version){
-        super(String.format("ProjectPK: %d %d",userId,curriculumId), version);
+    private Project(long userId, long curriculumId, String name, String description, long version){
+        super(String.format("%d %d",userId,curriculumId), version);
         this.userId = userId;
         this.curriculumId = curriculumId;
         this.name = name;

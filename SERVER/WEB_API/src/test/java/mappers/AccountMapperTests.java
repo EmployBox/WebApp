@@ -35,7 +35,7 @@ public class AccountMapperTests {
         AccountMapper mapper = (AccountMapper) MapperRegistry.getMapper(Account.class);
 
         UnitOfWork.newCurrent();
-        Account.create("Test@gmail.com", "1234", 0);
+        //Account.create("Test@gmail.com", "1234", 0);
         UnitOfWork.getCurrent().commit();
 
         //Optional<Account> accountOptional = mapper.findByEmail("Test@gmail.com");

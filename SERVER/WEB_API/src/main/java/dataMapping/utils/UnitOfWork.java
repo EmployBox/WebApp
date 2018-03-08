@@ -25,7 +25,6 @@ public class UnitOfWork {
         assert !removedObjects.contains(obj);
         assert !newObjects.contains(obj);
         newObjects.add(obj);
-        MapperRegistry.getMapper(obj.getClass()).getIdentityMap().put(obj.getIdentityKey(), obj);
     }
 
     public void registerClone(DomainObject obj) {
@@ -85,6 +84,7 @@ public class UnitOfWork {
     }
 
     //TODO does it catch the concurrentyException?
+    //TODO update IdentityMaps only after all transactions succeeded?
     public void commit() {
         try {
             insertNew();
