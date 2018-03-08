@@ -3,6 +3,8 @@ package dataMapping.utils;
 import dataMapping.exceptions.ConcurrencyException;
 import model.DomainObject;
 
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -10,10 +12,19 @@ public class UnitOfWork {
     /**
      * Private for each transaction
      */
-    private List<DomainObject> newObjects = new ArrayList<>();
-    private List<DomainObject> clonedObjects = new ArrayList<>();
-    private List<DomainObject> dirtyObjects = new ArrayList<>();
-    private List<DomainObject> removedObjects = new ArrayList<>();
+    private final Connection connection;
+    private final List<DomainObject> newObjects = new ArrayList<>();
+    private final List<DomainObject> clonedObjects = new ArrayList<>();
+    private final List<DomainObject> dirtyObjects = new ArrayList<>();
+    private final List<DomainObject> removedObjects = new ArrayList<>();
+
+    private UnitOfWork(Connection connection){
+        this.connection = connection;
+    }
+
+    public Connection getConnection() {
+        return connection;
+    }
 
     /**
      * Adds the obj to the newObjects List and to the IdentityMap
@@ -67,12 +78,13 @@ public class UnitOfWork {
     }
 
     private static ThreadLocal<UnitOfWork> current = new ThreadLocal<>();
+    private static final ConnectionManager manager = ConnectionManager.getConnectionManagerOfDefaultDB();
 
     /**
      * Each Thread will have its own UnitOfWork
      */
     public static void newCurrent() {
-        setCurrent(new UnitOfWork());
+        setCurrent(new UnitOfWork(manager.getConnection()));
     }
 
     public static void setCurrent(UnitOfWork uow) {
@@ -85,14 +97,19 @@ public class UnitOfWork {
 
     //TODO does it catch the concurrentyException?
     //TODO update IdentityMaps only after all transactions succeeded?
-    public void commit() {
+    public void commit() throws SQLException {
         try {
             insertNew();
             updateDirty();
             deleteRemoved();
+
+            connection.commit();
         } catch (ConcurrencyException e) {
             rollback();
             throw e;
+        }
+        finally {
+            try { connection.close(); } catch (SQLException e) { }
         }
     }
 
@@ -120,7 +137,8 @@ public class UnitOfWork {
      * Puts the objects in removedObjects into the IdentityMap
      * The objects in dirtyObjects need to go back as before
      */
-    private void rollback(){
+    private void rollback() throws SQLException {
+        connection.rollback();
         /*for (DomainObject obj : newObjects)
             MapperRegistry.getMapper(obj.getClass()).getIdentityMap().remove(obj.getIdentityKey());*/
 

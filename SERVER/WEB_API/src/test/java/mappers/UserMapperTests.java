@@ -2,9 +2,11 @@ package mappers;
 
 import dataBase.DataBaseTests;
 import dataMapping.mappers.AccountMapper;
+import dataMapping.mappers.UserMapper;
 import dataMapping.utils.MapperRegistry;
 import dataMapping.utils.UnitOfWork;
 import model.Account;
+import model.User;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -13,7 +15,7 @@ import java.sql.Connection;
 import java.sql.SQLException;
 
 
-public class AccountMapperTests {
+public class UserMapperTests {
 
     private Connection con;
 
@@ -21,7 +23,7 @@ public class AccountMapperTests {
     public void start() throws SQLException {
         con = DataBaseTests.getConnection();
         con.setAutoCommit(false);
-        //MapperRegistry.addEntry(Account.class, new AccountMapper());
+        MapperRegistry.addEntry(User.class, new UserMapper());
     }
 
     @After
@@ -31,16 +33,13 @@ public class AccountMapperTests {
     }
 
     @Test
-    public void insertTest(){
-        AccountMapper mapper = (AccountMapper) MapperRegistry.getMapper(Account.class);
+    public void insertTest() throws SQLException {
+        UserMapper mapper = (UserMapper) MapperRegistry.getMapper(User.class);
 
         UnitOfWork.newCurrent();
-        //Account.create("Test@gmail.com", "1234", 0);
+
+        User user = User.create("Test@gmail.com", "1234", 0, "Manel", "Sou um espetaculo", "someurl", null, null, null, null, null, null, null);
+
         UnitOfWork.getCurrent().commit();
-
-        //Optional<Account> accountOptional = mapper.findByEmail("Test@gmail.com");
-        //assertTrue(accountOptional.isPresent());
     }
-
-    //TODO Finish or make tests only for extending members
 }

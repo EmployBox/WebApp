@@ -35,11 +35,13 @@ public abstract class AbstractMapper<T extends DomainObject<K>, K> implements Ma
     private final MapperSettings updateSettings;
     private final MapperSettings deleteSettings;
 
-    public <R extends Statement> AbstractMapper(Class<T> type,
-                              Class<R> statementType,
-                              BiConsumer<R, T> prepareInsertFunction,
-                              BiConsumer<R, T> prepareUpdateFunction,
-                              BiConsumer<R, T> prepareDeleteFunction) {
+    public <R extends Statement> AbstractMapper(
+            Class<T> type,
+            Class<R> statementType,
+            BiConsumer<R, T> prepareInsertFunction,
+            BiConsumer<R, T> prepareUpdateFunction,
+            BiConsumer<R, T> prepareDeleteFunction
+    ) {
 
         Field[] fields = allFieldsFor(type).filter(f ->
                 f.getType().isPrimitive() ||
@@ -73,10 +75,12 @@ public abstract class AbstractMapper<T extends DomainObject<K>, K> implements Ma
 
             Function<Field,String> func = f -> f.getName().equals("version") || f.getName().equals("date") ? "[" + f.getName()+ "]" : f.getName();
 
-            queryBuilder(fields,
+            queryBuilder(
+                    fields,
                     f -> {sjI.add(func.apply(f)); sjIAux.add(" ? ");},
                     f -> {sjD.add(func.apply(f)); sjUAux.add(" ? ");},
-                    f -> {sjI.add(func.apply(f)); sjU.add(func.apply(f) + " = ? "); sjIAux.add(" ? ");});
+                    f -> {sjI.add(func.apply(f)); sjU.add(func.apply(f) + " = ? "); sjIAux.add(" ? ");}
+            );
             sjU.merge(sjUAux);
             sjI.merge(sjIAux);
         }

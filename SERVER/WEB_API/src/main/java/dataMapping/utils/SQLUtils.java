@@ -37,14 +37,11 @@ public class SQLUtils {
     }
 
     private static void handleSQLStatement(String query, boolean isProcedure, Consumer<Statement> handleStatement){
-        Connection connection = ConnectionManager.getConnectionManagerOfDefaultDB().getConnection();
+        Connection connection = UnitOfWork.getCurrent().getConnection();
         try(Statement statement = isProcedure ? connection.prepareCall(query) : connection.prepareStatement(query)) {
             handleStatement.accept(statement);
         } catch (SQLException e) {
             throw new DataMapperException(e);
-        }
-        finally {
-            try{ connection.close(); } catch(SQLException e) {}
         }
     }
 

@@ -89,3 +89,4 @@ gradle-app.setting
 # End of https://www.gitignore.io/api/git,gradle,intellij
 /SERVER/WEB_API/.idea/vcs.xml
 /SERVER/WEB_API/.idea/kotlinc.xml
+/SERVER/WEB_API/.idea/encodings.xml

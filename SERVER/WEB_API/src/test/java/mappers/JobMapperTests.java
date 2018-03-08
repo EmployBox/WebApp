@@ -30,15 +30,13 @@ public class JobMapperTests {
     }
 
     @Test
-    public void insertTest(){
+    public void insertTest() throws SQLException {
         JobMapper jobMapper = (JobMapper) MapperRegistry.getMapper(Job.class);
 
         UnitOfWork.newCurrent();
 
-        //Job.create(1, null, 0, null, null, null, null, null, 0, null, null);
+
 
         UnitOfWork.getCurrent().commit();
-
-
     }
 }
