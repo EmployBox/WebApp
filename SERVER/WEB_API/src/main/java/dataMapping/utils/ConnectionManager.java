@@ -23,7 +23,7 @@ public class ConnectionManager {
         dataSource = getDataSource(envVarName);
     }
 
-    public ConnectionManager (){
+    private ConnectionManager(){
         dataSource = getDataSource("DB_CONNECTION_STRING");//default enviroment variable name
     }
 

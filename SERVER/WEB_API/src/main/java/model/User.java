@@ -26,9 +26,10 @@ public class User extends Account {
             Streamable<Application> applications,
             Streamable<Chat>chats,
             Streamable<Comment> comments,
-            Streamable<Rating> ratings
+            Streamable<Rating> ratings,
+            Streamable<User> followers
     ){
-        super(accountID, email, password, rating, version, offeredJobs,comments,chats,ratings);
+        super(accountID, email, password, rating, version, offeredJobs, comments, chats, ratings, followers);
         this.name = name;
         this.summary = summary;
         this.photoUrl = photoUrl;
@@ -49,7 +50,8 @@ public class User extends Account {
             Streamable<Application> applications,
             Streamable<Chat>chats,
             Streamable<Comment> comments,
-            Streamable<Rating> ratings
+            Streamable<Rating> ratings,
+            Streamable<User> followers
     ){
         User user = new User(
                 defaultKey,
@@ -65,7 +67,8 @@ public class User extends Account {
                 applications,
                 chats,
                 comments,
-                ratings
+                ratings,
+                followers
         );
         user.markNew();
         return user;
@@ -85,7 +88,8 @@ public class User extends Account {
             Streamable<Application> applications,
             Streamable<Chat>chats,
             Streamable<Comment> comments,
-            Streamable<Rating> ratings
+            Streamable<Rating> ratings,
+            Streamable<User> followers
     ){
         User user = new User(
                 accountID,
@@ -101,7 +105,8 @@ public class User extends Account {
                 applications,
                 chats,
                 comments,
-                ratings
+                ratings,
+                followers
         );
         user.markClean();
         return user;

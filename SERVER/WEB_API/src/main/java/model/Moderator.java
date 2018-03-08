@@ -17,7 +17,7 @@ public class Moderator extends Account {
                         Streamable<Rating> ratings,
                         Streamable<Rating> ratingsModerated
     ) {
-        super(accountID, email, password, rating, version, null, comments, chats, ratings);
+        super(accountID, email, password, rating, version, null, comments, chats, ratings, null);
         this.ratingsModerated = ratingsModerated;
     }
 

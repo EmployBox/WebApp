@@ -3,10 +3,14 @@ package dataMapping.mappers;
 import dataMapping.exceptions.DataMapperException;
 import dataMapping.utils.MapperSettings;
 import javafx.util.Pair;
+import model.Application;
 import model.Job;
+import model.JobExperience;
 import util.Streamable;
 
 import java.sql.*;
+
+import static dataMapping.utils.MapperRegistry.getMapper;
 
 public class JobMapper extends AbstractMapper<Job, Long> {
     public JobMapper() {
@@ -37,7 +41,10 @@ public class JobMapper extends AbstractMapper<Job, Long> {
             String offerType = rs.getString("OfferType");
             long version = rs.getLong("Version");
 
-            Job job = Job.load(jobID, accountID, address, wage, description, schedule, offerBeginDate, offerEndDate, offerType, version, null);
+            Streamable<Application> applications = ((ApplicationMapper) getMapper(Application.class)).findJobApplications(jobID);
+            Streamable<JobExperience> jobExperiences = ((JobExperienceMapper) getMapper(JobExperience.class)).findExperiences(jobID);
+
+            Job job = Job.load(jobID, accountID, address, wage, description, schedule, offerBeginDate, offerEndDate, offerType, version, applications, jobExperiences);
             identityMap.put(jobID, job);
 
             return job;

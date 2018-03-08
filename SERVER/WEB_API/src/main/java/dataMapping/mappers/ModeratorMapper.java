@@ -29,7 +29,7 @@ public class ModeratorMapper extends AccountMapper<Moderator> {
             long version = rs.getLong("[version]");
 
             Streamable<Comment> comments = ((CommentMapper) MapperRegistry.getMapper(Comment.class)).findCommentsForAccount(accountID);
-            Streamable<Chat> chats = ((ChatMapper) MapperRegistry.getMapper(Chat.class)).findChatsForAccount(accountID);
+            Streamable<Chat> chats = ((ChatMapper) MapperRegistry.getMapper(Chat.class)).findForAccount(accountID);
             Streamable<Rating> ratings = ((RatingMapper) MapperRegistry.getMapper(Rating.class)).findRatingsForAccount(accountID);
             Streamable<Rating> ratingsModerated = ((RatingMapper) MapperRegistry.getMapper(Rating.class)).findModeratedRatingsForModerator(accountID);
 

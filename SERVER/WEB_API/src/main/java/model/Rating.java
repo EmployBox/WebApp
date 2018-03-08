@@ -45,4 +45,8 @@ public class Rating extends DomainObject<String> {
     public long getAccountIdFrom() {
         return accountIdFrom;
     }
+
+    public boolean isApproved() {
+        return approved;
+    }
 }

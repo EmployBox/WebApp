@@ -1,7 +1,12 @@
 GO
 USE PS_API_DATABASE
+--USE PS_TEST_API_DATABASE
 GO
 
+
+if object_id('dbo.AddAccount') is not null
+	drop procedure dbo.AddAccount
+go
 CREATE PROCEDURE dbo.AddAccount
     @email NVARCHAR(50),
 	@rating decimal(2,1),
@@ -26,9 +31,11 @@ BEGIN
         SELECT ERROR_MESSAGE() 
     END CATCH
 END
-
-
 GO
+
+if object_id('dbo.AddUser') is not null
+	drop procedure dbo.AddUser
+go
 CREATE PROCEDURE dbo.AddUser
 	@email NVARCHAR(50),
 	@rating decimal(2,1),
@@ -48,7 +55,7 @@ AS
 				SELECT @accountId
 				IF(@responseMessage != 'success')
 					RETURN
-				INSERT INTO [ApiDatabase].[User] values (@accountId, @name , @summary, @PhotoUrl)
+				INSERT INTO ApiDatabase.[User](accountId, name, summary, PhotoUrl) values (@accountId, @name , @summary, @PhotoUrl)
 				COMMIT
 			END TRY
 			BEGIN CATCH
@@ -56,5 +63,5 @@ AS
 				ROLLBACK
 			END CATCH
 	END
-
+GO
 				

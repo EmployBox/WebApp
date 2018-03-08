@@ -10,7 +10,7 @@ public class Company extends Account {
     private final String webPageUrl;
     private final String description;
 
-    public Company(
+    private Company(
             long accountID,
             String email,
             String password,
@@ -22,9 +22,13 @@ public class Company extends Account {
             String logoUrl,
             String webPageUrl,
             String description,
-            Streamable<Job> offeredJobs
+            Streamable<Job> offeredJobs,
+            Streamable<Chat>chats,
+            Streamable<Comment> comments,
+            Streamable<Rating> ratings,
+            Streamable<User> following
     ){
-        super(accountID, email, password, rating, version, offeredJobs,null, null, null);
+        super(accountID, email, password, rating, version, offeredJobs,comments, chats, ratings, following);
         this.name = name;
         this.Specialization = Specialization;
         this.logoUrl = logoUrl;
@@ -45,9 +49,29 @@ public class Company extends Account {
             String logoUrl,
             String webPageUrl,
             String description,
-            Streamable<Job> offeredJobs
+            Streamable<Job> offeredJobs,
+            Streamable<Chat>chats,
+            Streamable<Comment> comments,
+            Streamable<Rating> ratings,
+            Streamable<User> following
     ){
-        Company company = new Company(defaultKey, email, password, rating, version, name, specialization, yearFounded, logoUrl, webPageUrl, description, offeredJobs);
+        Company company = new Company(defaultKey,
+                email,
+                password,
+                rating,
+                version,
+                name,
+                specialization,
+                yearFounded,
+                logoUrl,
+                webPageUrl,
+                description,
+                offeredJobs,
+                chats,
+                comments,
+                ratings,
+                following
+        );
         company.markNew();
         return company;
     }
@@ -64,9 +88,30 @@ public class Company extends Account {
             String logoUrl,
             String webPageUrl,
             String description,
-            Streamable<Job> offeredJobs
+            Streamable<Job> offeredJobs,
+            Streamable<Chat>chats,
+            Streamable<Comment> comments,
+            Streamable<Rating> ratings,
+            Streamable<User> following
     ){
-        Company company = new Company(accountID, email, password, rating, version, name, specialization, yearFounded, logoUrl, webPageUrl, description, offeredJobs);
+        Company company = new Company(
+                accountID,
+                email,
+                password,
+                rating,
+                version,
+                name,
+                specialization,
+                yearFounded,
+                logoUrl,
+                webPageUrl,
+                description,
+                offeredJobs,
+                chats,
+                comments,
+                ratings,
+                following
+        );
         company.markClean();
         return company;
     }
@@ -82,10 +127,30 @@ public class Company extends Account {
            String logoUrl,
            String webPageUrl,
            String description,
-           Streamable<Job> offeredJobs
+           Streamable<Job> offeredJobs,
+           Streamable<Chat>chats,
+           Streamable<Comment> comments,
+           Streamable<Rating> ratings,
+           Streamable<User> following
     ){
         company.markToBeDirty();
-        Company newCompany = new Company(company.getIdentityKey(), email, password, rating, company.getNextVersion(), name, specialization, yearFounded, logoUrl, webPageUrl, description, offeredJobs);
+        Company newCompany = new Company(
+                company.getIdentityKey(),
+                email,
+                password,
+                rating,
+                company.getNextVersion(),
+                name, specialization,
+                yearFounded,
+                logoUrl,
+                webPageUrl,
+                description,
+                offeredJobs,
+                chats,
+                comments,
+                ratings,
+                following
+        );
         newCompany.markDirty();
         return newCompany;
     }

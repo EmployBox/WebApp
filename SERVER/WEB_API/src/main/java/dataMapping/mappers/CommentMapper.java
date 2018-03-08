@@ -1,30 +1,85 @@
 package dataMapping.mappers;
 
 import dataMapping.exceptions.DataMapperException;
+import dataMapping.utils.MapperRegistry;
 import dataMapping.utils.MapperSettings;
+import javafx.util.Pair;
 import model.Comment;
-import model.DomainObject;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 import util.Streamable;
 
-import java.sql.ResultSet;
+import java.sql.*;
 
-public class CommentMapper extends AbstractMapper {
-    public CommentMapper(MapperSettings insertSettings, MapperSettings updateSettings, MapperSettings deleteSettings) {
-        super(insertSettings, updateSettings, deleteSettings);
+public class CommentMapper extends AbstractMapper<Comment, Long> {
+    public CommentMapper() {
+        super(
+                Comment.class,
+                PreparedStatement.class,
+                CommentMapper::prepareInsertStatement,
+                CommentMapper::prepareUpdateStatement,
+                CommentMapper::prepareDeleteStatement
+        );
     }
 
     @Override
-    DomainObject mapper(ResultSet rs) throws DataMapperException {
-        return null;
+    Comment mapper(ResultSet rs) throws DataMapperException {
+        try {
+            long commentID = rs.getLong(1);
+            long accountIdFrom = rs.getLong(2);
+            long accountIdTo = rs.getLong(3);
+            long mainCommentId = rs.getLong(4);
+            Date date = rs.getDate(5);
+            String text = rs.getString(6);
+            boolean status = rs.getBoolean(7);
+            long version = rs.getLong(8);
+
+            Streamable<Comment> replies = ((CommentMapper) MapperRegistry.getMapper(Comment.class)).findCommentReplies(commentID);
+
+            Comment comment =  Comment.load(commentID,accountIdFrom,accountIdTo, mainCommentId, date, text, status, replies, version);
+            return comment;
+        } catch (SQLException e) {
+            throw new DataMapperException(e);
+        }
     }
 
-    @Override
-    String getSelectQuery() {
-        return null;
+    public Streamable<Comment> findCommentsForAccount(long accountId) {
+        return findWhere(new Pair<>("accountId", accountId));
     }
 
-    public Streamable<Comment> findCommentsForAccount(long accountID) {
-        throw new NotImplementedException();
+    public Streamable findCommentReplies(long commentId){
+        return findWhere(new Pair<>("mainCommentId",commentId));
+    }
+
+    private static void prepareInsertStatement(PreparedStatement statement, Comment comment) {
+        try {
+            statement.setLong(1, comment.getCommentID());
+            statement.setDouble(2, comment.getAccountIdFrom());
+            statement.setLong(3, comment.getAccountIdTo());
+            statement.setLong(4, comment.getMainCommendID());
+            statement.setDate(5, comment.getDate());
+            statement.setString(6, comment.getText());
+            statement.setBoolean(7, comment.getStatus());
+            statement.execute();
+        } catch (SQLException e) {
+            throw new DataMapperException(e);
+        }
+    }
+
+    private static void prepareUpdateStatement(PreparedStatement statement, Comment comment) {
+        try {
+            statement.setString(1, comment.getText());
+            statement.setBoolean(2, comment.getStatus());
+            statement.execute();
+        } catch (SQLException e) {
+            throw new DataMapperException(e);
+        }
+    }
+
+    private static void prepareDeleteStatement(PreparedStatement statement, Comment comment) {
+        try {
+            statement.setLong(1, comment.getCommentID());
+            statement.execute();
+        } catch (SQLException e) {
+            throw new DataMapperException(e);
+        }
     }
 }

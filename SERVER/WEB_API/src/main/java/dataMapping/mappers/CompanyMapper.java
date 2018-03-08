@@ -3,14 +3,15 @@ package dataMapping.mappers;
 import dataMapping.exceptions.DataMapperException;
 import dataMapping.utils.MapperRegistry;
 import dataMapping.utils.MapperSettings;
-import model.Company;
-import model.Job;
+import model.*;
 import util.Streamable;
 
 import java.sql.CallableStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
+
+import static dataMapping.utils.MapperRegistry.getMapper;
 
 public class CompanyMapper extends AccountMapper<Company> {
 
@@ -38,8 +39,11 @@ public class CompanyMapper extends AccountMapper<Company> {
             long version = rs.getLong("version");
 
             Streamable<Job> offeredJobs = ((JobMapper) MapperRegistry.getMapper(Job.class)).findForAccount(accountId);
+            Streamable<Chat> chats = ((ChatMapper) getMapper(Chat.class)).findForAccount(accountId);
+            Streamable<Rating> ratings = ((RatingMapper) getMapper(Rating.class)).findRatingsForAccount(accountId);
+            Streamable<User> following = ((UserMapper) getMapper(Rating.class)).findFollowingUsers(accountId);
 
-            Company company = new Company(accountId, email,null, rating,version, name, specialization, yearFounded,logoUrl, webPageUrl, description, offeredJobs);
+            Company company =  Company.load (accountId, email,null, rating,version, name, specialization, yearFounded,logoUrl, webPageUrl, description, offeredJobs, chats, null, ratings, following );
             identityMap.put(accountId, company);
         }catch (SQLException e){
             throw new DataMapperException(e.getMessage(), e);

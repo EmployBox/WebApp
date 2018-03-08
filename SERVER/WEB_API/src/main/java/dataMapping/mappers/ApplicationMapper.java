@@ -12,7 +12,7 @@ import java.sql.*;
 public class ApplicationMapper extends AbstractMapper<Application, String> {
     public ApplicationMapper() {
         super(Application.class,
-            PreparedStatement.class
+            PreparedStatement.class,
             ApplicationMapper::prepareInsertStatement,
             ApplicationMapper::prepareUpdateStatement,
             ApplicationMapper::prepareDeleteStatement
@@ -23,6 +23,9 @@ public class ApplicationMapper extends AbstractMapper<Application, String> {
         return findWhere(new Pair<>("jobId", jobId));
     }
 
+    public Streamable<Application> findUserApplications(long userId){
+        return findWhere(new Pair<>("userId", userId));
+    }
 
     @Override
     Application mapper(ResultSet rs) throws DataMapperException {
@@ -33,7 +36,7 @@ public class ApplicationMapper extends AbstractMapper<Application, String> {
             Date date = rs.getDate("[date]");
             long version = rs.getLong("[version]");
 
-            Application application = Application.load(userId,jobId,curriculumId,date, version);
+            Application application = Application.load(userId, jobId, curriculumId, date, version);
             identityMap.put(String.format("ApplicationPK %s %s",userId,jobId), application);
 
             return application;
