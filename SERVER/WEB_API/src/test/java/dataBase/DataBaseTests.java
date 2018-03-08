@@ -13,12 +13,12 @@ import java.sql.SQLException;
 import static junit.framework.TestCase.assertTrue;
 import static org.junit.Assert.assertEquals;
 
-@Deprecated
-//todo this test with new querys REASON: Experience table is deprecated
 public class DataBaseTests {
 
+    private static final String envVarName = "DBTEST_CONNECTION_STRING";
+    private static final ConnectionManager manager = new ConnectionManager(envVarName);
+
     public static Connection getConnection() {
-        ConnectionManager manager = new ConnectionManager("DB_TEST_CONNECTION_STRING");
         return manager.getConnection();
     }
 
@@ -38,27 +38,26 @@ public class DataBaseTests {
 
     @Test
     public void CRUDTest() throws SQLException {
-        PreparedStatement statement = con.prepareStatement("INSERT INTO Experience (Competence, Years) Values (?, ?)");
-        statement.setString(1, "SQL Server");
-        statement.setShort(2, (short) 2);
+        PreparedStatement statement = con.prepareStatement("INSERT INTO ApiDatabase.[Local] ([Address], Country) Values (?, ?)");
+        statement.setString(1, "Rua do Teste da Base de Dados");
+        statement.setString(2, "Dataland");
         statement.executeUpdate();
 
-        statement = con.prepareStatement("SELECT * FROM Experience WHERE competence = ?");
-        statement.setString(1, "SQL Server");
+        statement = con.prepareStatement("SELECT * FROM ApiDatabase.[Local] WHERE Country = ?");
+        statement.setString(1, "Dataland");
         ResultSet rs = statement.executeQuery();
 
         assertTrue(rs.next());
-        assertEquals((short) 2, rs.getShort("years"));
-        long experienceId = rs.getLong("experienceId");
+        assertEquals("Rua do Teste da Base de Dados", rs.getString("Address"));
 
-        statement = con.prepareStatement("UPDATE Experience SET years = 1 WHERE experienceId = ?");
-        statement.setLong(1, experienceId);
+        statement = con.prepareStatement("UPDATE ApiDatabase.[Local] SET ZIPCode = 404 WHERE [Address] = ?");
+        statement.setString(1, "Rua do Teste da Base de Dados");
         int rows = statement.executeUpdate();
 
         assertEquals(1, rows);
 
-        statement = con.prepareStatement("DELETE FROM Experience WHERE experienceId = ?");
-        statement.setLong(1, experienceId);
+        statement = con.prepareStatement("DELETE FROM ApiDatabase.[Local] WHERE [Address] = ?");
+        statement.setString(1, "Rua do Teste da Base de Dados");
         rows = statement.executeUpdate();
 
         assertEquals(1, rows);
