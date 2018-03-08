@@ -8,11 +8,11 @@ BEGIN
 END
 
 GO
---USE PS_API_DATABASE
-USE PS_TEST_API_DATABASE
+USE PS_API_DATABASE
+--USE PS_TEST_API_DATABASE
 GO
 
-CREATE TABLE ApiDatabase.Account (
+CREATE TABLE ApiDatabase.[Account] (
 	accountId BIGINT IDENTITY PRIMARY KEY,
 	email NVARCHAR(25) UNIQUE NOT NULL,
 	rating decimal(2,1) default(0.0),
@@ -23,7 +23,7 @@ CREATE TABLE ApiDatabase.Account (
 	CHECK (rating >= 0.0 AND rating <= 5.0)
 )
 
-CREATE TABLE ApiDatabase.Company (
+CREATE TABLE ApiDatabase.[Company] (
 	accountId BIGINT primary key references ApiDatabase.Account,
 	name NVARCHAR(40),
 	yearFounded SMALLINT,
@@ -36,7 +36,7 @@ CREATE TABLE ApiDatabase.Company (
 	FOREIGN KEY (accountID) REFERENCES ApiDatabase.Account(accountID) ON DELETE CASCADE	
 )
 
-CREATE TABLE ApiDatabase.Moderator (
+CREATE TABLE ApiDatabase.[Moderator] (
 	accountID BIGINT primary key references ApiDatabase.Account,
 
 	FOREIGN KEY (accountID) REFERENCES ApiDatabase.Account(accountID) ON DELETE CASCADE	
@@ -52,7 +52,7 @@ CREATE TABLE ApiDatabase.[User] (
 	FOREIGN KEY (accountID) REFERENCES ApiDatabase.Account(accountID) ON DELETE CASCADE		
 )
 
-CREATE TABLE ApiDatabase.Curriculum(
+CREATE TABLE ApiDatabase.[Curriculum](
 	userId BIGINT references ApiDatabase.[User],
 	curriculumId BIGINT,
 
@@ -60,7 +60,7 @@ CREATE TABLE ApiDatabase.Curriculum(
 	primary key(userId,curriculumId)
 )
 
-CREATE TABLE ApiDatabase.Project (
+CREATE TABLE ApiDatabase.[Project] (
 	userId BIGINT,
 	curriculumId BIGINT,
 	name NVARCHAR(15),
@@ -71,7 +71,7 @@ CREATE TABLE ApiDatabase.Project (
 	FOREIGN KEY (userId,curriculumId) REFERENCES ApiDatabase.Curriculum(userId,curriculumId) ON DELETE CASCADE
 )
 
-CREATE TABLE ApiDatabase.AcademicBackground(
+CREATE TABLE ApiDatabase.[AcademicBackground](
 	userId BIGINT,
 	curriculumId BIGINT,
 	beginDate DATETIME DEFAULT(GETDATE()),
@@ -93,7 +93,7 @@ CREATE TABLE ApiDatabase.AcademicBackground(
 						OR degreeObtained = 'PHD')				
 )
 
-CREATE TABLE Apidatabase.PreviousJobs(
+CREATE TABLE Apidatabase.[PreviousJobs](
 	userId BIGINT,
 	curriculumId BIGINT,
 	beginDate DATETIME DEFAULT(GETDATE()),
@@ -118,7 +118,7 @@ CREATE TABLE ApiDatabase.[Local] (
 )
 
 
-CREATE TABLE ApiDatabase.Job(
+CREATE TABLE ApiDatabase.[Job](
 	jobId BIGINT identity primary key,
 	accountId BIGINT,
 	schedule NVARCHAR(20),
@@ -135,7 +135,7 @@ CREATE TABLE ApiDatabase.Job(
 	check(offerType = 'Looking for work' OR offerType = 'Looking for Worker')
 )
 
-CREATE TABLE Apidatabase.Curriculum_Experience(
+CREATE TABLE Apidatabase.[Curriculum_Experience](
 	userId BIGINT,
 	curriculumId BIGINT,
 	competences NVARCHAR(50),
@@ -147,7 +147,7 @@ CREATE TABLE Apidatabase.Curriculum_Experience(
 	primary key(userId, curriculumId)
 )
 
-CREATE TABLE Apidatabase.Job_Experience(
+CREATE TABLE Apidatabase.[Job_Experience](
 	jobId BIGINT,
 	competences NVARCHAR(50),
 	years SMALLINT,
@@ -170,7 +170,7 @@ CREATE TABLE ApiDatabase.[Application](
 	primary key (UserId, JobId)
 )
 
-CREATE TABLE ApiDatabase.Rating(
+CREATE TABLE ApiDatabase.[Rating](
 	AccountIdFrom BIGINT,
 	AccountIdTo BIGINT,
 	moderatorId BIGINT references ApiDatabase.Moderator,
@@ -184,7 +184,7 @@ CREATE TABLE ApiDatabase.Rating(
 	PRIMARY KEY(AccountIdFrom , AccountIdTo)
 )
 
-CREATE TABLE ApiDatabase.Chat(
+CREATE TABLE ApiDatabase.[Chat](
 	chatId BIGINT IDENTITY PRIMARY KEY,
 	AccountIdFirst BIGINT,
 	AccountIdSecond BIGINT,
@@ -207,7 +207,7 @@ CREATE TABLE ApiDatabase.[MESSAGE](
 	PRIMARY KEY(messageId,chatId)
 )
 
-CREATE TABLE ApiDatabase.Comment (
+CREATE TABLE ApiDatabase.[Comment] (
 	CommentId BIGINT identity primary key,
 	AccountIdFrom BIGINT,
 	AccountIdDest BIGINT,
@@ -222,7 +222,7 @@ CREATE TABLE ApiDatabase.Comment (
 	FOREIGN KEY (MainCommentId) REFERENCES ApiDatabase.Comment(commentId),
 )
 
-CREATE TABLE ApiDatabase.Follows (
+CREATE TABLE ApiDatabase.[Follows] (
 	AccountIdFrom BIGINT references ApiDatabase.Account,
 	AccountIdDest BIGINT references ApiDatabase.Account,
 
