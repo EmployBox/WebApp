@@ -11,7 +11,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public class CurriculumExperienceMapper extends AbstractMapper<CurriculumExperience,String> {
-    private static final String SELECT_QUERY = "SELECT competences, years FROM Curriculum_Experience where userId = ? AND curriculumId = ?";
+    private static final String SELECT_QUERY = "SELECT competences, years, [version] FROM Curriculum_Experience where userId = ? AND curriculumId = ?";
     private static final String INSERT_QUERY = "INSERT INTO Curriculum_Experience (competences, years) VALUES (?, ?)";
     private static final String UPDATE_QUERY = "UPDATE Curriculum_Experience SET competences = ?, years = ? VALUES (?, ?) where userId = ? AND curriculumId = ?";
     private static final String DELETE_QUERY = "DELETE FROM Curriculum_Experience WHERE userId = ? AND curriculumId = ?";
@@ -31,8 +31,9 @@ public class CurriculumExperienceMapper extends AbstractMapper<CurriculumExperie
             long curriculumId = rs.getLong(1);
             String competences = rs.getString(2);
             short years = rs.getShort(3);
+            long version = rs.getLong(4);
 
-            CurriculumExperience curriculumExperience = CurriculumExperience.load(userID, curriculumId, competences, years);
+            CurriculumExperience curriculumExperience = CurriculumExperience.load(userID, curriculumId, competences, years, version);
             return curriculumExperience;
         } catch (SQLException e) {
             throw new DataMapperException(e);
