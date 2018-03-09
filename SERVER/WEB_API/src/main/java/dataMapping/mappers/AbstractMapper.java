@@ -47,7 +47,7 @@ public abstract class AbstractMapper<T extends DomainObject<K>, K> implements Ma
                 (f.getType().isPrimitive() ||
                 f.getType().isAssignableFrom(String.class) ||
                 f.getType().isAssignableFrom(Date.class)) &&
-                !f.getName().equals("identityKey"))
+                        !(f.getName().equals("identityKey") || f.getName().equals("defaultKey")))
                 .toArray(Field[]::new);
 
         this.SELECT_QUERY = Arrays.stream(fields)
@@ -65,7 +65,10 @@ public abstract class AbstractMapper<T extends DomainObject<K>, K> implements Ma
             StringJoiner sjU = new StringJoiner(",","{call Update"+type.getSimpleName()+"(", ")");
             StringJoiner sjD = new StringJoiner(",","{call Delete"+type.getSimpleName()+"(", ")");
 
-            queryBuilder(fields, f -> sjI.add("?"), f -> sjD.add("?"), f -> {sjI.add("?"); sjU.add("?");});
+            queryBuilder(fields,
+                    f -> sjI.add("?"),
+                    f -> sjD.add("?"),
+                    f -> {sjI.add("?"); sjU.add("?");});
 
             sI = sjI.toString();
             sU = sjU.toString();
