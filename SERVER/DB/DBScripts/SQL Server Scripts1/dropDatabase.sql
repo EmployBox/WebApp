@@ -77,8 +77,26 @@ IF DB_ID ('PS_TEST_API_DATABASE') IS NOT NULL
 
 		IF OBJECT_ID(N'dbo.AddAccount') IS NOT NULL
 			DROP PROC dbo.AddAccount;
+		IF OBJECT_ID(N'dbo.getNewPasswordHash') IS NOT NULL
+			DROP PROC dbo.getNewPasswordHash;
 		IF OBJECT_ID(N'dbo.AddUser') IS NOT NULL
 			DROP PROC dbo.AddUser;
+		IF OBJECT_ID(N'dbo.UpdateUser') IS NOT NULL
+			DROP PROC dbo.UpdateUser;
+		IF OBJECT_ID(N'dbo.DeleteUser') IS NOT NULL
+			DROP PROC dbo.DeleteUser;
+		IF OBJECT_ID(N'dbo.AddCompany') IS NOT NULL
+			DROP PROC dbo.AddCompany;
+		IF OBJECT_ID(N'dbo.UpdateCompany') IS NOT NULL
+			DROP PROC dbo.UpdateCompany;
+		IF OBJECT_ID(N'dbo.DeleteCompany') IS NOT NULL
+			DROP PROC dbo.DeleteCompany;
+		IF OBJECT_ID(N'dbo.AddModerator') IS NOT NULL
+			DROP PROC dbo.AddModerator;
+		IF OBJECT_ID(N'dbo.UpdateModerator') IS NOT NULL
+			DROP PROC dbo.UpdateModerator;
+		IF OBJECT_ID(N'dbo.DeleteModerator') IS NOT NULL
+			DROP PROC dbo.DeleteModerator;
 
 		IF OBJECT_ID ('ApiDatabase') IS NOT NULL
 			DROP SCHEMA ApiDatabase;

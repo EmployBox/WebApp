@@ -1,8 +1,6 @@
 package dataMapping.mappers;
 
 import dataMapping.exceptions.DataMapperException;
-import dataMapping.utils.MapperRegistry;
-import dataMapping.utils.MapperSettings;
 import javafx.util.Pair;
 import model.*;
 import util.Streamable;
@@ -13,7 +11,7 @@ import java.sql.SQLException;
 import java.sql.Types;
 import java.util.stream.Stream;
 
-import static dataMapping.utils.MapperRegistry.*;
+import static dataMapping.utils.MapperRegistry.getMapper;
 
 public class UserMapper extends AccountMapper<User> {
     public UserMapper() {
@@ -82,7 +80,7 @@ public class UserMapper extends AccountMapper<User> {
 
     private static void prepareDeleteProcedure(CallableStatement callableStatement, User obj){
         try {
-            callableStatement.setString(1, obj.getEmail());
+            callableStatement.setLong(1, obj.getIdentityKey());
             callableStatement.registerOutParameter(2, Types.NVARCHAR);
             callableStatement.execute();
         } catch (SQLException e) {

@@ -2,7 +2,6 @@ package dataMapping.mappers;
 
 import dataMapping.exceptions.DataMapperException;
 import dataMapping.utils.MapperRegistry;
-import dataMapping.utils.MapperSettings;
 import model.*;
 import util.Streamable;
 
@@ -72,7 +71,7 @@ public class CompanyMapper extends AccountMapper<Company> {
 
     private static void prepareDeleteProcedure(CallableStatement callableStatement, Company obj){
         try {
-            callableStatement.setString(1, obj.getEmail());
+            callableStatement.setLong(1, obj.getIdentityKey());
             callableStatement.registerOutParameter(2, Types.NVARCHAR);
             callableStatement.execute();
         } catch (SQLException e) {

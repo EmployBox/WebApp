@@ -85,12 +85,12 @@ CREATE TABLE ApiDatabase.[AcademicBackground](
 	PRIMARY KEY(userId,curriculumId),
 	check (endDate < beginDate),
 	check (degreeObtained = 'basic level 1' 
-						OR degreeObtained = 'basic level 2' 
-						OR degreeObtained = 'basic level 3'
-						OR degreeObtained = 'secundary'
-						OR degreeObtained = 'bachelor'
-						OR degreeObtained = 'master'
-						OR degreeObtained = 'PHD')				
+			OR degreeObtained = 'basic level 2' 
+			OR degreeObtained = 'basic level 3'
+			OR degreeObtained = 'secundary'
+			OR degreeObtained = 'bachelor'
+			OR degreeObtained = 'master'
+			OR degreeObtained = 'PHD')				
 )
 
 CREATE TABLE Apidatabase.[PreviousJobs](
