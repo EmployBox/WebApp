@@ -197,7 +197,7 @@ CREATE TABLE ApiDatabase.[Chat](
 
 
 CREATE TABLE ApiDatabase.[MESSAGE](
-	messageId BIGINT,
+	messageId BIGINT IDENTITY,
 	chatId BIGINT REFERENCES ApiDatabase.Chat,
 	[text] NVARCHAR(200),
 	[date] datetime default(getdate()),

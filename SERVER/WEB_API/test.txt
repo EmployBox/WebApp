@@ -7,19 +7,19 @@
 	MapperSettings{query='update [Application] set curriculumId = ? ,[date] = ? ,[version] = ?  where userId = ?  and jobId = ? '},
 	MapperSettings{query='delete from [Application] where userIdandjobId'}}
 {ChatMapper:
-	MapperSettings{query='insert into [Chat] (chadId,accountIdFirst,accountIdSecond,[version]) values( ?  ,  ?  ,  ?  ,  ? )'},
+	MapperSettings{query='insert into [Chat] (accountIdFirst,accountIdSecond,[version]) values( ?  ,  ?  ,  ? )'},
 	MapperSettings{query='update [Chat] set accountIdFirst = ? ,accountIdSecond = ? ,[version] = ?  where chadId = ? '},
 	MapperSettings{query='delete from [Chat] where chadId'}}
 {CommentMapper:
-	MapperSettings{query='insert into [Comment] (commentID,accountIdFrom,accountIdTo,parentCommendID,[date],text,status,[version]) values( ?  ,  ?  ,  ?  ,  ?  ,  ?  ,  ?  ,  ?  ,  ? )'},
+	MapperSettings{query='insert into [Comment] (accountIdFrom,accountIdTo,parentCommendID,[date],text,status,[version]) values( ?  ,  ?  ,  ?  ,  ?  ,  ?  ,  ?  ,  ? )'},
 	MapperSettings{query='update [Comment] set accountIdFrom = ? ,accountIdTo = ? ,parentCommendID = ? ,[date] = ? ,text = ? ,status = ? ,[version] = ?  where commentID = ? '},
 	MapperSettings{query='delete from [Comment] where commentID'}}
 {CommentMapper:
-	MapperSettings{query='insert into [Comment] (commentID,accountIdFrom,accountIdTo,parentCommendID,[date],text,status,[version]) values( ?  ,  ?  ,  ?  ,  ?  ,  ?  ,  ?  ,  ?  ,  ? )'},
+	MapperSettings{query='insert into [Comment] (accountIdFrom,accountIdTo,parentCommendID,[date],text,status,[version]) values( ?  ,  ?  ,  ?  ,  ?  ,  ?  ,  ?  ,  ? )'},
 	MapperSettings{query='update [Comment] set accountIdFrom = ? ,accountIdTo = ? ,parentCommendID = ? ,[date] = ? ,text = ? ,status = ? ,[version] = ?  where commentID = ? '},
 	MapperSettings{query='delete from [Comment] where commentID'}}
 {CompanyMapper:
-	MapperSettings{query='{call AddCompany(?,?,?,?,?,?,?,?,?,?,?)'},
+	MapperSettings{query='{call AddCompany(?,?,?,?,?,?,?,?,?,?)'},
 	MapperSettings{query='{call UpdateCompany(?,?,?,?,?,?,?,?,?,?)'},
 	MapperSettings{query='{call DeleteCompany(?)'}}
 {CurriculumExperienceMapper:
@@ -39,7 +39,7 @@
 	MapperSettings{query='update [JobExperience] set jobId = ? ,competeces = ? ,years = ? ,[version] = ?  where '},
 	MapperSettings{query='delete from [JobExperience] where '}}
 {JobMapper:
-	MapperSettings{query='insert into [Job] (jobId,accountID,address,wage,description,schedule,offerBeginDate,offerEndDate,offerType,[version]) values( ?  ,  ?  ,  ?  ,  ?  ,  ?  ,  ?  ,  ?  ,  ?  ,  ?  ,  ? )'},
+	MapperSettings{query='insert into [Job] (accountID,address,wage,description,schedule,offerBeginDate,offerEndDate,offerType,[version]) values( ?  ,  ?  ,  ?  ,  ?  ,  ?  ,  ?  ,  ?  ,  ?  ,  ? )'},
 	MapperSettings{query='update [Job] set accountID = ? ,address = ? ,wage = ? ,description = ? ,schedule = ? ,offerBeginDate = ? ,offerEndDate = ? ,offerType = ? ,[version] = ?  where jobId = ? '},
 	MapperSettings{query='delete from [Job] where jobId'}}
 {LocalMapper:
@@ -51,7 +51,7 @@
 	MapperSettings{query='update [Message] set text = ? ,[date] = ? ,[version] = ?  where messageId = ?  and chadId = ? '},
 	MapperSettings{query='delete from [Message] where messageIdandchadId'}}
 {ModeratorMapper:
-	MapperSettings{query='{call AddModerator(?,?,?,?,?)'},
+	MapperSettings{query='{call AddModerator(?,?,?,?)'},
 	MapperSettings{query='{call UpdateModerator(?,?,?,?)'},
 	MapperSettings{query='{call DeleteModerator(?)'}}
 {PreviousJobsMapper:
@@ -67,6 +67,6 @@
 	MapperSettings{query='update [Rating] set moderatorId = ? ,ratingValue = ? ,approved = ? ,[version] = ?  where accountIdFrom = ?  and accountIdTo = ? '},
 	MapperSettings{query='delete from [Rating] where accountIdFromandaccountIdTo'}}
 {UserMapper:
-	MapperSettings{query='{call AddUser(?,?,?,?,?,?,?,?)'},
+	MapperSettings{query='{call AddUser(?,?,?,?,?,?,?)'},
 	MapperSettings{query='{call UpdateUser(?,?,?,?,?,?,?)'},
 	MapperSettings{query='{call DeleteUser(?)'}}

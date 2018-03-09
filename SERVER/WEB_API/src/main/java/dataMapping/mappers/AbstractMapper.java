@@ -104,7 +104,7 @@ public abstract class AbstractMapper<T extends DomainObject<K>, K> implements Ma
     private static void queryBuilder(Field[] fieds, Consumer<Field> first, Consumer<Field> second, Consumer<Field> third){
         for(Field f : fieds){
             if(f.isAnnotationPresent(ID.class)){
-                if(f.getAnnotation(ID.class).isInserted()) {
+                if(!f.getAnnotation(ID.class).isIdentity()) {
                     first.accept(f);
                 }
                 second.accept(f);
