@@ -7,23 +7,36 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Supplier;
+
+import static dataMapping.utils.MapperRegistry.getMapper;
 
 public class UnitOfWork {
     /**
      * Private for each transaction
      */
-    private final Connection connection;
+    private Connection connection = null;
+    private final Supplier<Connection> connectionSupplier;
     private final List<DomainObject> newObjects = new ArrayList<>();
     private final List<DomainObject> clonedObjects = new ArrayList<>();
     private final List<DomainObject> dirtyObjects = new ArrayList<>();
     private final List<DomainObject> removedObjects = new ArrayList<>();
 
-    private UnitOfWork(Connection connection){
-        this.connection = connection;
+    private UnitOfWork(Supplier<Connection> connectionSupplier){
+        this.connectionSupplier = connectionSupplier;
     }
 
     public Connection getConnection() {
+        if(connection == null)
+            connection = connectionSupplier.get();
         return connection;
+    }
+
+    public void closeConnection(){
+        try {
+            connection.close();
+        } catch (SQLException e) { }
+        connection = null;
     }
 
     /**
@@ -74,7 +87,7 @@ public class UnitOfWork {
      */
     public void registerClean(DomainObject obj){
         assert obj.getIdentityKey()!= null;
-        MapperRegistry.getMapper(obj.getClass()).getIdentityMap().put(obj.getIdentityKey(), obj);
+        getMapper(obj.getClass()).getIdentityMap().put(obj.getIdentityKey(), obj);
     }
 
     private static ThreadLocal<UnitOfWork> current = new ThreadLocal<>();
@@ -84,10 +97,10 @@ public class UnitOfWork {
      * Each Thread will have its own UnitOfWork
      */
     public static void newCurrent() {
-        setCurrent(new UnitOfWork(manager.getConnection()));
+        setCurrent(new UnitOfWork(manager::getConnection));
     }
 
-    public static void setCurrent(UnitOfWork uow) {
+    private static void setCurrent(UnitOfWork uow) {
         current.set(uow);
     }
 
@@ -109,13 +122,17 @@ public class UnitOfWork {
             throw e;
         }
         finally {
-            try { connection.close(); } catch (SQLException e) { }
+            closeConnection();
+            newObjects.clear();
+            clonedObjects.clear();
+            dirtyObjects.clear();
+            removedObjects.clear();
         }
     }
 
     private void insertNew() {
         for (DomainObject obj : newObjects) {
-            MapperRegistry.getMapper(obj.getClass()).insert(obj);
+            getMapper(obj.getClass()).insert(obj);
         }
     }
 
@@ -123,12 +140,12 @@ public class UnitOfWork {
         dirtyObjects
                 .stream()
                 .filter(domainObject -> !removedObjects.contains(domainObject))
-                .forEach(domainObject -> MapperRegistry.getMapper(domainObject.getClass()).update(domainObject));
+                .forEach(domainObject -> getMapper(domainObject.getClass()).update(domainObject));
     }
 
     private void deleteRemoved() {
         for (DomainObject obj : removedObjects) {
-            MapperRegistry.getMapper(obj.getClass()).delete(obj);
+            getMapper(obj.getClass()).delete(obj);
         }
     }
 
@@ -144,8 +161,8 @@ public class UnitOfWork {
 
         newObjects
                 .stream()
-                .filter(domainObject -> MapperRegistry.getMapper(domainObject.getClass()).getIdentityMap().containsKey(domainObject.getIdentityKey()))
-                .forEach(domainObject -> MapperRegistry.getMapper(domainObject.getClass()).getIdentityMap().remove(domainObject.getIdentityKey(), domainObject));
+                .filter(domainObject -> getMapper(domainObject.getClass()).getIdentityMap().containsKey(domainObject.getIdentityKey()))
+                .forEach(domainObject -> getMapper(domainObject.getClass()).getIdentityMap().remove(domainObject.getIdentityKey(), domainObject));
 
         for(DomainObject obj : dirtyObjects){
             clonedObjects
@@ -153,13 +170,13 @@ public class UnitOfWork {
                     .filter(domainObject -> domainObject.getIdentityKey().equals(obj.getIdentityKey()))
                     .findFirst()
                     .ifPresent(
-                            clone -> MapperRegistry.getMapper(obj.getClass()).getIdentityMap().put(clone.getIdentityKey(), clone)
+                            clone -> getMapper(obj.getClass()).getIdentityMap().put(clone.getIdentityKey(), clone)
                     );
         }
 
         removedObjects
                 .stream()
                 .filter(obj -> !dirtyObjects.contains(obj))
-                .forEach(obj -> MapperRegistry.getMapper(obj.getClass()).getIdentityMap().put(obj.getIdentityKey(), obj));
+                .forEach(obj -> getMapper(obj.getClass()).getIdentityMap().put(obj.getIdentityKey(), obj));
     }
 }

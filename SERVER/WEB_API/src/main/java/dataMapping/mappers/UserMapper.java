@@ -5,10 +5,7 @@ import javafx.util.Pair;
 import model.*;
 import util.Streamable;
 
-import java.sql.CallableStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Types;
+import java.sql.*;
 import java.util.stream.Stream;
 
 import static dataMapping.utils.MapperRegistry.getMapper;
@@ -71,8 +68,12 @@ public class UserMapper extends AccountMapper<User> {
             cs.setString(5, obj.getSummary());
             cs.setString(6, obj.getPhotoUrl());
             cs.registerOutParameter(7, Types.BIGINT);
-            cs.registerOutParameter(8, Types.NVARCHAR);
+            cs.registerOutParameter(8,Types.TIMESTAMP);
             cs.execute();
+
+            long accountId = cs.getLong(7);
+            Timestamp timestamp = cs.getTimestamp(8);
+
         } catch (SQLException e) {
             throw new DataMapperException(e);
         }

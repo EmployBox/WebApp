@@ -1,6 +1,6 @@
 GO
-USE PS_API_DATABASE
---USE PS_TEST_API_DATABASE
+--USE PS_API_DATABASE
+USE PS_TEST_API_DATABASE
 GO
 
 
@@ -65,24 +65,27 @@ CREATE PROCEDURE dbo.AddUser
 	@summary NVARCHAR(1500),
 	@PhotoUrl NVARCHAR(100),
 	@accountId BIGINT OUTPUT,
-    @responseMessage NVARCHAR(250) OUTPUT
+    @version rowversion OUTPUT
 AS
 	BEGIN
 		BEGIN TRAN
 			BEGIN TRY
 				SET NOCOUNT ON
+				declare @responseMessage NVARCHAR(250)
 				EXEC AddAccount @email, @rating, @password, @accountId OUTPUT, @responseMessage OUTPUT
 				SELECT @responseMessage
 				SELECT @accountId
 				IF(@responseMessage != 'success')
 					RETURN
 				INSERT INTO ApiDatabase.[User](accountId, name, summary, PhotoUrl) values (@accountId, @name , @summary, @PhotoUrl)
+				set @version = (select [version] from ApiDatabase.Account where accountId = @accountId)
 				COMMIT
 			END TRY
 			BEGIN CATCH
-				SET @responseMessage = ERROR_MESSAGE() 
-				ROLLBACK
+				ROLLBACK;
+				throw
 			END CATCH
+		COMMIT TRAN
 	END
 GO
 
@@ -270,7 +273,7 @@ if object_id('dbo.DeleteCompany') is not null
 	drop procedure dbo.DeleteCompany
 go
 
-CREATE PROCEDURE dbo.DeleteComapny
+CREATE PROCEDURE dbo.DeleteCompany
 	@accountId BIGINT,
     @responseMessage NVARCHAR(250) OUTPUT
 	AS
