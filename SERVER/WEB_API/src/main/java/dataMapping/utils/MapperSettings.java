@@ -29,4 +29,11 @@ public class MapperSettings<T extends Statement, U extends DomainObject> {
     public boolean isProcedure() {
         return isProcedure;
     }
+
+    @Override
+    public String toString() {
+        return "MapperSettings{" +
+                "query='" + query + '\'' +
+                '}';
+    }
 }

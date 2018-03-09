@@ -44,57 +44,66 @@ public abstract class AbstractMapper<T extends DomainObject<K>, K> implements Ma
     ) {
 
         Field[] fields = allFieldsFor(type).filter(f ->
-                f.getType().isPrimitive() ||
+                (f.getType().isPrimitive() ||
                 f.getType().isAssignableFrom(String.class) ||
-                f.getType().isAssignableFrom(Date.class))
+                f.getType().isAssignableFrom(Date.class)) &&
+                !f.getName().equals("identityKey"))
                 .toArray(Field[]::new);
 
         this.SELECT_QUERY = Arrays.stream(fields)
                 .map(f -> f.getName().equals("version") || f.getName().equals("date") ? "[" + f.getName()+ "]" : f.getName())
                 .collect(Collectors.joining(", ", "select ", " from ["+type.getSimpleName()+"]"));
 
-        StringJoiner sjI;
-        StringJoiner sjU;
-        StringJoiner sjD;
+        String sI;
+        String sU;
+        String sD;
 
-        if(statementType.isAssignableFrom(CallableStatement.class)){
-            sjI = new StringJoiner(",","{call Add"+type.getSimpleName()+"(", ")");
-            sjU = new StringJoiner(",","{call Update"+type.getSimpleName()+"(", ")");
-            sjD = new StringJoiner(",","{call Delete"+type.getSimpleName()+"(", ")");
+        System.out.println(statementType +" : " + (statementType == CallableStatement.class));
+
+        if(statementType == CallableStatement.class){
+            StringJoiner sjI = new StringJoiner(",","{call Add"+type.getSimpleName()+"(", ")");
+            StringJoiner sjU = new StringJoiner(",","{call Update"+type.getSimpleName()+"(", ")");
+            StringJoiner sjD = new StringJoiner(",","{call Delete"+type.getSimpleName()+"(", ")");
 
             queryBuilder(fields, f -> sjI.add("?"), f -> sjD.add("?"), f -> {sjI.add("?"); sjU.add("?");});
+
+            sI = sjI.toString();
+            sU = sjU.toString();
+            sD = sjD.toString();
         }
-
         else {
-            sjI = new StringJoiner(",", "insert into ["+type.getSimpleName()+"] (", ")");
-            sjU = new StringJoiner(",", "update ["+type.getSimpleName()+"] set "," where ");
-            sjD = new StringJoiner("and", "delete from ["+type.getSimpleName()+"] where ", "");
+            StringJoiner sjI = new StringJoiner(",", "insert into ["+type.getSimpleName()+"] (", ")");
+            StringJoiner sjU = new StringJoiner(",", "update ["+type.getSimpleName()+"] set "," where ");
+            StringJoiner sjD = new StringJoiner("and", "delete from ["+type.getSimpleName()+"] where ", "");
 
-            StringJoiner sjUAux = new StringJoiner("and");
-            StringJoiner sjIAux = new StringJoiner(",", " values(", ")");
+            StringJoiner sjUAux = new StringJoiner(" and ");
+            StringJoiner sjIAux = new StringJoiner(" , ", " values(", ")");
 
             Function<Field,String> func = f -> f.getName().equals("version") || f.getName().equals("date") ? "[" + f.getName()+ "]" : f.getName();
 
             queryBuilder(
                     fields,
                     f -> {sjI.add(func.apply(f)); sjIAux.add(" ? ");},
-                    f -> {sjD.add(func.apply(f)); sjUAux.add(" ? ");},
+                    f -> {sjD.add(func.apply(f)); sjUAux.add(func.apply(f) +" = ? ");},
                     f -> {sjI.add(func.apply(f)); sjU.add(func.apply(f) + " = ? "); sjIAux.add(" ? ");}
             );
-            sjU.merge(sjUAux);
-            sjI.merge(sjIAux);
+
+            sU = sjU.toString() + sjUAux.toString();
+            sI = sjI.toString() + sjIAux.toString();
+            sD = sjD.toString();
         }
 
-        insertSettings = new MapperSettings<>(sjI.toString(), statementType, prepareInsertFunction);
-        updateSettings = new MapperSettings<>(sjU.toString(), statementType, prepareUpdateFunction);
-        deleteSettings = new MapperSettings<>(sjD.toString(), statementType, prepareDeleteFunction);
+        insertSettings = new MapperSettings<>(sI, statementType, prepareInsertFunction);
+        updateSettings = new MapperSettings<>(sU, statementType, prepareUpdateFunction);
+        deleteSettings = new MapperSettings<>(sD, statementType, prepareDeleteFunction);
     }
 
     private static void queryBuilder(Field[] fieds, Consumer<Field> first, Consumer<Field> second, Consumer<Field> third){
         for(Field f : fieds){
             if(f.isAnnotationPresent(ID.class)){
-                if(f.getAnnotation(ID.class).isInserted())
+                if(f.getAnnotation(ID.class).isInserted()) {
                     first.accept(f);
+                }
                 second.accept(f);
             }
             else

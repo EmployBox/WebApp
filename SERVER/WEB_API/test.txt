@@ -1,0 +1,72 @@
+{AcademicBackgroundMapper:
+	MapperSettings{query='insert into [AcademicBackground] (accountID,curriculumId,beginDate,endDate,studyArea,institution,degreeObtained,[version]) values( ?  ,  ?  ,  ?  ,  ?  ,  ?  ,  ?  ,  ?  ,  ? )'},
+	MapperSettings{query='update [AcademicBackground] set beginDate = ? ,endDate = ? ,studyArea = ? ,institution = ? ,degreeObtained = ? ,[version] = ?  where accountID = ?  and curriculumId = ? '},
+	MapperSettings{query='delete from [AcademicBackground] where accountIDandcurriculumId'}}
+{ApplicationMapper:
+	MapperSettings{query='insert into [Application] (userId,jobId,curriculumId,[date],[version]) values( ?  ,  ?  ,  ?  ,  ?  ,  ? )'},
+	MapperSettings{query='update [Application] set curriculumId = ? ,[date] = ? ,[version] = ?  where userId = ?  and jobId = ? '},
+	MapperSettings{query='delete from [Application] where userIdandjobId'}}
+{ChatMapper:
+	MapperSettings{query='insert into [Chat] (chadId,accountIdFirst,accountIdSecond,defaultKey,[version]) values( ?  ,  ?  ,  ?  ,  ?  ,  ? )'},
+	MapperSettings{query='update [Chat] set accountIdFirst = ? ,accountIdSecond = ? ,defaultKey = ? ,[version] = ?  where chadId = ? '},
+	MapperSettings{query='delete from [Chat] where chadId'}}
+{CommentMapper:
+	MapperSettings{query='insert into [Comment] (commentID,accountIdFrom,accountIdTo,parentCommendID,[date],text,status,defaultKey,[version]) values( ?  ,  ?  ,  ?  ,  ?  ,  ?  ,  ?  ,  ?  ,  ?  ,  ? )'},
+	MapperSettings{query='update [Comment] set accountIdFrom = ? ,accountIdTo = ? ,parentCommendID = ? ,[date] = ? ,text = ? ,status = ? ,defaultKey = ? ,[version] = ?  where commentID = ? '},
+	MapperSettings{query='delete from [Comment] where commentID'}}
+{CommentMapper:
+	MapperSettings{query='insert into [Comment] (commentID,accountIdFrom,accountIdTo,parentCommendID,[date],text,status,defaultKey,[version]) values( ?  ,  ?  ,  ?  ,  ?  ,  ?  ,  ?  ,  ?  ,  ?  ,  ? )'},
+	MapperSettings{query='update [Comment] set accountIdFrom = ? ,accountIdTo = ? ,parentCommendID = ? ,[date] = ? ,text = ? ,status = ? ,defaultKey = ? ,[version] = ?  where commentID = ? '},
+	MapperSettings{query='delete from [Comment] where commentID'}}
+{CompanyMapper:
+	MapperSettings{query='{call AddCompany(?,?,?,?,?,?,?,?,?,?,?,?)'},
+	MapperSettings{query='{call UpdateCompany(?,?,?,?,?,?,?,?,?,?,?)'},
+	MapperSettings{query='{call DeleteCompany(?)'}}
+{CurriculumExperienceMapper:
+	MapperSettings{query='insert into [CurriculumExperience] (userId,curriculumId,competences,years,[version]) values( ?  ,  ?  ,  ?  ,  ?  ,  ? )'},
+	MapperSettings{query='update [CurriculumExperience] set userId = ? ,curriculumId = ? ,competences = ? ,years = ? ,[version] = ?  where '},
+	MapperSettings{query='delete from [CurriculumExperience] where '}}
+{CurriculumMapper:
+	MapperSettings{query='insert into [Curriculum] (accountId,curriculumId,title,defaultKey,[version]) values( ?  ,  ?  ,  ?  ,  ?  ,  ? )'},
+	MapperSettings{query='update [Curriculum] set title = ? ,defaultKey = ? ,[version] = ?  where accountId = ?  and curriculumId = ? '},
+	MapperSettings{query='delete from [Curriculum] where accountIdandcurriculumId'}}
+{FollowMapper:
+	MapperSettings{query='insert into [Follow] (accountIdFrom,accountIdDest,[version]) values( ?  ,  ?  ,  ? )'},
+	MapperSettings{query='update [Follow] set accountIdFrom = ? ,accountIdDest = ? ,[version] = ?  where '},
+	MapperSettings{query='delete from [Follow] where '}}
+{JobExperienceMapper:
+	MapperSettings{query='insert into [JobExperience] (jobId,competeces,years,[version]) values( ?  ,  ?  ,  ?  ,  ? )'},
+	MapperSettings{query='update [JobExperience] set jobId = ? ,competeces = ? ,years = ? ,[version] = ?  where '},
+	MapperSettings{query='delete from [JobExperience] where '}}
+{JobMapper:
+	MapperSettings{query='insert into [Job] (jobId,accountID,address,wage,description,schedule,offerBeginDate,offerEndDate,offerType,defaultKey,[version]) values( ?  ,  ?  ,  ?  ,  ?  ,  ?  ,  ?  ,  ?  ,  ?  ,  ?  ,  ?  ,  ? )'},
+	MapperSettings{query='update [Job] set accountID = ? ,address = ? ,wage = ? ,description = ? ,schedule = ? ,offerBeginDate = ? ,offerEndDate = ? ,offerType = ? ,defaultKey = ? ,[version] = ?  where jobId = ? '},
+	MapperSettings{query='delete from [Job] where jobId'}}
+{LocalMapper:
+	MapperSettings{query='insert into [Local] (address,country,district,zipCode,[version]) values( ?  ,  ?  ,  ?  ,  ?  ,  ? )'},
+	MapperSettings{query='update [Local] set country = ? ,district = ? ,zipCode = ? ,[version] = ?  where address = ? '},
+	MapperSettings{query='delete from [Local] where address'}}
+{MessageMapper:
+	MapperSettings{query='insert into [Message] (messageId,chadId,text,[date],[version]) values( ?  ,  ?  ,  ?  ,  ?  ,  ? )'},
+	MapperSettings{query='update [Message] set text = ? ,[date] = ? ,[version] = ?  where messageId = ?  and chadId = ? '},
+	MapperSettings{query='delete from [Message] where messageIdandchadId'}}
+{ModeratorMapper:
+	MapperSettings{query='{call AddModerator(?,?,?,?,?,?)'},
+	MapperSettings{query='{call UpdateModerator(?,?,?,?,?)'},
+	MapperSettings{query='{call DeleteModerator(?)'}}
+{PreviousJobsMapper:
+	MapperSettings{query='insert into [PreviousJobs] (userId,curriculumId,beginDate,endDate,companyName,workLoad,role,[version]) values( ?  ,  ?  ,  ?  ,  ?  ,  ?  ,  ?  ,  ?  ,  ? )'},
+	MapperSettings{query='update [PreviousJobs] set beginDate = ? ,endDate = ? ,companyName = ? ,workLoad = ? ,role = ? ,[version] = ?  where userId = ?  and curriculumId = ? '},
+	MapperSettings{query='delete from [PreviousJobs] where userIdandcurriculumId'}}
+{ProjectMapper:
+	MapperSettings{query='insert into [Project] (userId,curriculumId,name,description,[version]) values( ?  ,  ?  ,  ?  ,  ?  ,  ? )'},
+	MapperSettings{query='update [Project] set name = ? ,description = ? ,[version] = ?  where userId = ?  and curriculumId = ? '},
+	MapperSettings{query='delete from [Project] where userIdandcurriculumId'}}
+{RatingMapper:
+	MapperSettings{query='insert into [Rating] (accountIdFrom,accountIdTo,moderatorId,ratingValue,approved,[version]) values( ?  ,  ?  ,  ?  ,  ?  ,  ?  ,  ? )'},
+	MapperSettings{query='update [Rating] set moderatorId = ? ,ratingValue = ? ,approved = ? ,[version] = ?  where accountIdFrom = ?  and accountIdTo = ? '},
+	MapperSettings{query='delete from [Rating] where accountIdFromandaccountIdTo'}}
+{UserMapper:
+	MapperSettings{query='{call AddUser(?,?,?,?,?,?,?,?,?)'},
+	MapperSettings{query='{call UpdateUser(?,?,?,?,?,?,?,?)'},
+	MapperSettings{query='{call DeleteUser(?)'}}
