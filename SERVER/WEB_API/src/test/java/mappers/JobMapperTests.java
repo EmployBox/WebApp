@@ -33,7 +33,7 @@ public class JobMapperTests {
     public void insertTest() throws SQLException {
         JobMapper jobMapper = (JobMapper) MapperRegistry.getMapper(Job.class);
 
-        UnitOfWork.newCurrent();
+        //UnitOfWork.newCurrent();
 
 
 

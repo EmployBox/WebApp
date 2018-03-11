@@ -58,16 +58,16 @@ public abstract class AbstractMapper<T extends DomainObject<K>, K> implements Ma
         String sU;
         String sD;
 
-        System.out.println(statementType +" : " + (statementType == CallableStatement.class));
+        //System.out.println(statementType +" : " + (statementType == CallableStatement.class));
 
         if(statementType == CallableStatement.class){
-            StringJoiner sjI = new StringJoiner(",","{call Add"+type.getSimpleName()+"(", ")");
-            StringJoiner sjU = new StringJoiner(",","{call Update"+type.getSimpleName()+"(", ")");
-            StringJoiner sjD = new StringJoiner(",","{call Delete"+type.getSimpleName()+"(", ")");
+            StringJoiner sjI = new StringJoiner(",","{call Add"+type.getSimpleName()+"(", ")}");
+            StringJoiner sjU = new StringJoiner(",","{call Update"+type.getSimpleName()+"(", ")}");
+            StringJoiner sjD = new StringJoiner(",","{call Delete"+type.getSimpleName()+"(", ")}");
 
             queryBuilder(fields,
                     f -> sjI.add("?"),
-                    f -> sjD.add("?"),
+                    f -> {sjD.add("?"); sjI.add("?");},
                     f -> {sjI.add("?"); sjU.add("?");});
 
             sI = sjI.toString();
@@ -147,7 +147,7 @@ public abstract class AbstractMapper<T extends DomainObject<K>, K> implements Ma
                 statement -> {
                     try{
                         for (int i = 0; i < values.length; i++) {
-                            statement.setObject(i, values[i].getValue());
+                            statement.setObject(i+1, values[i].getValue());
                         }
                     } catch (SQLException e) {
                         throw new DataMapperException(e);
@@ -179,6 +179,7 @@ public abstract class AbstractMapper<T extends DomainObject<K>, K> implements Ma
             executeSQLUpdate(mapperSettings.getQuery(), obj, mapperSettings.getStatementConsumer());
     }
 
+    //TODO Auto generated keys, obj's key will be null. Update version as well
     @Override
     public void insert(T obj) {
         handleCRUD(insertSettings, obj);

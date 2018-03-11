@@ -1,19 +1,18 @@
 package dataMapping.mappers;
 
 import dataMapping.exceptions.DataMapperException;
-import dataMapping.utils.MapperSettings;
 import javafx.util.Pair;
-import model.Follow;
+import model.Follows;
 import util.Streamable;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-public class FollowMapper extends AbstractMapper<Follow, String> {
+public class FollowMapper extends AbstractMapper<Follows, String> {
   public FollowMapper() {
         super(
-                Follow.class,
+                Follows.class,
                 PreparedStatement.class,
                 FollowMapper::prepareStatement,
                 null,
@@ -21,26 +20,26 @@ public class FollowMapper extends AbstractMapper<Follow, String> {
         );
     }
 
-    public Streamable<Follow> findFollowingForAccount(long accountId){
+    public Streamable<Follows> findFollowingForAccount(long accountId){
         return findWhere(new Pair<>("AccountIdFrom", accountId));
     }
 
     @Override
-    Follow mapper(ResultSet rs) throws DataMapperException {
+    Follows mapper(ResultSet rs) throws DataMapperException {
         try{
             long accountIdFrom = rs.getLong(1);
             long accountIdDest = rs.getLong(2);
 
-            Follow follow = Follow.load(accountIdFrom, accountIdDest);
-            identityMap.put(follow.getIdentityKey(), follow);
+            Follows follows = Follows.load(accountIdFrom, accountIdDest);
+            identityMap.put(follows.getIdentityKey(), follows);
 
-            return follow;
+            return follows;
         } catch (SQLException e) {
             throw new DataMapperException(e);
         }
     }
 
-    private static void prepareStatement(PreparedStatement statement, Follow obj){
+    private static void prepareStatement(PreparedStatement statement, Follows obj){
         try{
             statement.setLong(1, obj.getAccountIdFrom());
             statement.setLong(2, obj.getAccountIdDest());

@@ -11,25 +11,19 @@ CREATE PROCEDURE dbo.AddAccount
     @email NVARCHAR(50),
 	@rating decimal(2,1),
     @password NVARCHAR(40),
-	@accountId BIGINT OUTPUT,
-    @responseMessage NVARCHAR(250) OUTPUT
+	@accountId BIGINT OUTPUT
 AS
 BEGIN
     SET NOCOUNT ON
 
     DECLARE @salt UNIQUEIDENTIFIER=NEWID()
-    BEGIN TRY
+    
 
-        INSERT INTO ApiDatabase.Account(email, rating, passwordHash, salt)
-        VALUES(@email, @rating, HASHBYTES('SHA2_512', @password+CAST(@salt AS NVARCHAR(36))), @salt)
+	INSERT INTO ApiDatabase.Account(email, rating, passwordHash, salt)
+	VALUES(@email, @rating, HASHBYTES('SHA2_512', @password+CAST(@salt AS NVARCHAR(36))), @salt)
 
-	   SET @accountId = SCOPE_IDENTITY()
-       SET @responseMessage='Success'
-
-    END TRY
-    BEGIN CATCH
-        SET @responseMessage = ERROR_MESSAGE() 
-    END CATCH
+	SET @accountId = SCOPE_IDENTITY()
+     
 END
 GO
 
@@ -65,21 +59,15 @@ CREATE PROCEDURE dbo.AddUser
 	@summary NVARCHAR(1500),
 	@PhotoUrl NVARCHAR(100),
 	@accountId BIGINT OUTPUT,
-    @version rowversion OUTPUT
+    @version bigint output
 AS
 	BEGIN
 		BEGIN TRAN
 			BEGIN TRY
 				SET NOCOUNT ON
-				declare @responseMessage NVARCHAR(250)
-				EXEC AddAccount @email, @rating, @password, @accountId OUTPUT, @responseMessage OUTPUT
-				SELECT @responseMessage
-				SELECT @accountId
-				IF(@responseMessage != 'success')
-					RETURN
+				EXEC AddAccount @email, @rating, @password, @accountId OUTPUT
 				INSERT INTO ApiDatabase.[User](accountId, name, summary, PhotoUrl) values (@accountId, @name , @summary, @PhotoUrl)
 				set @version = (select [version] from ApiDatabase.Account where accountId = @accountId)
-				COMMIT
 			END TRY
 			BEGIN CATCH
 				ROLLBACK;

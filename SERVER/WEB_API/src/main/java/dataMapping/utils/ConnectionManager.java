@@ -9,9 +9,14 @@ import java.sql.Connection;
 import java.sql.SQLException;
 
 public class ConnectionManager {
-    private static ConnectionManager connectionManager = new ConnectionManager();
+    private final Logger logger = LoggerFactory.getLogger(ConnectionManager.class);
+    public static final String defaultDB = "DB_CONNECTION_STRING";
+    public static final String testDB = "DBTEST_CONNECTION_STRING";
+    private static ConnectionManager connectionManager = null;
 
-    public static ConnectionManager getConnectionManagerOfDefaultDB(){
+    //TODO String -> Enum
+    public static ConnectionManager getConnectionManager(String envVar){
+        if(connectionManager == null) connectionManager = new ConnectionManager(envVar);
         return connectionManager;
     }
 
@@ -22,13 +27,7 @@ public class ConnectionManager {
         dataSource = getDataSource(envVarName);
     }
 
-    private ConnectionManager(){
-        dataSource = getDataSource("DB_CONNECTION_STRING");//default enviroment variable name
-    }
-
-
     public Connection getConnection() {
-        Logger logger = LoggerFactory.getLogger(ConnectionManager.class);
         try {
             Connection connection = dataSource
                     .getPooledConnection()

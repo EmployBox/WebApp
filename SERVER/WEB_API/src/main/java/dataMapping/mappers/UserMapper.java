@@ -21,13 +21,22 @@ public class UserMapper extends AccountMapper<User> {
     }
 
     public Streamable<User> findFollowingUsers(long accountID) {
-        Stream<Follow> following = ((FollowMapper) getMapper(Follow.class)).findFollowingForAccount(accountID).get();
-        return () -> following.map(follow -> find(follow.getAccountIdFrom()));
+        Stream<Follows> following = ((FollowMapper) getMapper(Follows.class)).findFollowingForAccount(accountID).get();
+        return () -> following.map(follows -> find(follows.getAccountIdFrom()));
     }
 
     public User find(long accountId){
-        return findWhere(new Pair<>("accountId", accountId)).get()
-                .findFirst().get();
+        User[] user = new User[1];
+        findWhere(new Pair<>("accountId", accountId)).get()
+                .findFirst().ifPresent(u -> user[0] = u);
+        return user[0];
+    }
+
+    public User findForEmail(String email){
+        User[] user = new User[1];
+        findWhere(new Pair<>("email", email)).get()
+                .findFirst().ifPresent(u -> user[0] = u);
+        return user[0];
     }
 
     @Override
@@ -35,12 +44,12 @@ public class UserMapper extends AccountMapper<User> {
         try {
             long accountID = rs.getLong("AccountID");
             String email = rs.getString("Email");
-            String passwordHash = rs.getString("passwordHash");
+            String passwordHash = rs.getString("password");
             Double rating = rs.getDouble("Rating");
             String name = rs.getString ("Name");
             String summary = rs.getString ("Summary");
             String photoUrl = rs.getString ("PhotoUrl");
-            long version = rs.getLong("[version]");
+            long version = rs.getLong("version");
 
             Streamable<Job> offeredJobs = ((JobMapper) getMapper(Job.class)).findForAccount(accountID);
             Streamable<Curriculum> curriculums = ((CurriculumMapper) getMapper(Curriculum.class)).findCurriculumsForAccount(accountID);
@@ -68,12 +77,14 @@ public class UserMapper extends AccountMapper<User> {
             cs.setString(5, obj.getSummary());
             cs.setString(6, obj.getPhotoUrl());
             cs.registerOutParameter(7, Types.BIGINT);
-            cs.registerOutParameter(8,Types.TIMESTAMP);
+            cs.registerOutParameter(8, Types.BIGINT);
             cs.execute();
 
             long accountId = cs.getLong(7);
-            Timestamp timestamp = cs.getTimestamp(8);
+            long version = cs.getLong(8);
 
+            obj = User.load(accountId, obj.getEmail(), obj.getPassword(), obj.getRating(), version, obj.getName(), obj.getSummary(), obj.getPhotoUrl(),
+                    obj.getOfferedJobs(), obj.getCurriculums(), obj.getApplications(), obj.getChats(), obj.getComments(), obj.getRatings(), obj.getFollowing());
         } catch (SQLException e) {
             throw new DataMapperException(e);
         }

@@ -1,45 +1,61 @@
 package mappers;
 
-import dataBase.DataBaseTests;
-import dataMapping.mappers.AccountMapper;
-import dataMapping.mappers.UserMapper;
-import dataMapping.utils.MapperRegistry;
+import dataMapping.mappers.*;
+import dataMapping.utils.ConnectionManager;
 import dataMapping.utils.UnitOfWork;
-import model.Account;
-import model.User;
+import model.*;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import java.sql.Connection;
 import java.sql.SQLException;
 
+import static dataMapping.utils.ConnectionManager.getConnectionManager;
+import static dataMapping.utils.ConnectionManager.testDB;
+import static dataMapping.utils.MapperRegistry.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class UserMapperTests {
 
-    private Connection con;
+    private final Logger log = LoggerFactory.getLogger(UserMapperTests.class);
+    private UserMapper mapper = new UserMapper();
 
     @Before
-    public void start() throws SQLException {
-        con = DataBaseTests.getConnection();
-        con.setAutoCommit(false);
-        MapperRegistry.addEntry(User.class, new UserMapper());
+    public void start() {
+        addEntry(User.class, mapper);
+        addEntry(Job.class, new JobMapper());
+        addEntry(Curriculum.class, new CurriculumMapper());
+        addEntry(Application.class, new ApplicationMapper());
+        addEntry(Chat.class, new ChatMapper());
+        addEntry(Rating.class, new RatingMapper());
+        addEntry(Comment.class, new CommentMapper());
+        addEntry(Follows.class, new FollowMapper());
+        ConnectionManager manager = getConnectionManager(testDB);
+        UnitOfWork.newCurrent(manager::getConnection);
     }
 
     @After
     public void finish() throws SQLException {
-        con.rollback();
-        con.close();
+        log.info("rolling back changes");
+        UnitOfWork.getCurrent().rollback();
+        UnitOfWork.getCurrent().closeConnection();
     }
 
     @Test
-    public void insertTest() throws SQLException {
-        UserMapper mapper = (UserMapper) MapperRegistry.getMapper(User.class);
+    public void insertTest() {
+        User user = User.create("Test@gmail.com", "1234", 0, "Manel", "Sou um espetaculo", "someurl");
 
-        UnitOfWork.newCurrent();
+        mapper.insert(user);
 
-        User user = User.create("Test@gmail.com", "1234", 0, "Manel", "Sou um espetaculo", "someurl", null, null, null, null, null, null, null);
-
-        UnitOfWork.getCurrent().commit();
+        User dbUser = mapper.findForEmail(user.getEmail());
+        assertTrue(dbUser != null);
+        assertEquals(user.getEmail(), dbUser.getEmail());
+        //assertEquals(user.getRating(), dbUser.getRating());
+        assertEquals(user.getName(), dbUser.getName());
+        assertEquals(user.getSummary(), dbUser.getSummary());
+        assertEquals(user.getPhotoUrl(), dbUser.getPhotoUrl());
     }
 }

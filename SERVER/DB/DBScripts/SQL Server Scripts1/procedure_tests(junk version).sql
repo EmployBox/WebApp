@@ -1,8 +1,11 @@
-declare @accountId BIGINT
-declare @err NVARCHAR(20)
+begin tran
+	declare @accountId BIGINT
+	declare @version rowversion
+	exec dbo.AddUser 'maria@gmail.com', 2, '123', 'Maria', 'Finalista do curso', 'someurl', @accountId out, @version out
+	select @accountId ID, @version [Version]
+rollback
 
-exec dbo.AddAccount 'test', 2, '123', @accountId, @err
-
-declare @accountId BIGINT
-declare @err2 BIGINT
-exec dbo.AddUser 'test2', 2, '123','firstUser','DO U KNOW THE WEY?','WWW.SLBENFICA.PT/ÁGUIA.PNG', @accountId, @err2
+/** Utils **/
+select * from [Account]
+select * from [User]
+delete from ApiDatabase.Account

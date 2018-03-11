@@ -2,6 +2,8 @@ package dataMapping.utils;
 
 import dataMapping.exceptions.ConcurrencyException;
 import model.DomainObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -16,6 +18,7 @@ public class UnitOfWork {
      * Private for each transaction
      */
     private Connection connection = null;
+    private final Logger log = LoggerFactory.getLogger(UnitOfWork.class);
     private final Supplier<Connection> connectionSupplier;
     private final List<DomainObject> newObjects = new ArrayList<>();
     private final List<DomainObject> clonedObjects = new ArrayList<>();
@@ -91,13 +94,12 @@ public class UnitOfWork {
     }
 
     private static ThreadLocal<UnitOfWork> current = new ThreadLocal<>();
-    private static final ConnectionManager manager = ConnectionManager.getConnectionManagerOfDefaultDB();
 
     /**
      * Each Thread will have its own UnitOfWork
      */
-    public static void newCurrent() {
-        setCurrent(new UnitOfWork(manager::getConnection));
+    public static void newCurrent(Supplier<Connection> supplier) {
+        setCurrent(new UnitOfWork(supplier));
     }
 
     private static void setCurrent(UnitOfWork uow) {
@@ -122,7 +124,7 @@ public class UnitOfWork {
             throw e;
         }
         finally {
-            closeConnection();
+            //closeConnection();
             newObjects.clear();
             clonedObjects.clear();
             dirtyObjects.clear();
@@ -154,7 +156,7 @@ public class UnitOfWork {
      * Puts the objects in removedObjects into the IdentityMap
      * The objects in dirtyObjects need to go back as before
      */
-    private void rollback() throws SQLException {
+    public void rollback() throws SQLException {
         connection.rollback();
         /*for (DomainObject obj : newObjects)
             MapperRegistry.getMapper(obj.getClass()).getIdentityMap().remove(obj.getIdentityKey());*/

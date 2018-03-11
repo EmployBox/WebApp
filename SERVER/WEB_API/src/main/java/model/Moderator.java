@@ -7,15 +7,16 @@ import java.util.stream.Stream;
 public class Moderator extends Account {
     private final Streamable<Rating> ratingsModerated;
 
-    protected Moderator(long accountID,
-                        String email,
-                        String password,
-                        double rating,
-                        long version,
-                        Streamable<Comment> comments,
-                        Streamable<Chat> chats,
-                        Streamable<Rating> ratings,
-                        Streamable<Rating> ratingsModerated
+    protected Moderator(
+            long accountID,
+            String email,
+            String password,
+            double rating,
+            long version,
+            Streamable<Comment> comments,
+            Streamable<Chat> chats,
+            Streamable<Rating> ratings,
+            Streamable<Rating> ratingsModerated
     ) {
         super(accountID, email, password, rating, version, null, comments, chats, ratings, null);
         this.ratingsModerated = ratingsModerated;
@@ -47,6 +48,7 @@ public class Moderator extends Account {
     }
 
     public static Moderator load(
+            long accountId,
             String email,
             String password,
             double rating,
@@ -57,7 +59,7 @@ public class Moderator extends Account {
             Streamable<Rating> ratingsModerated
     ){
         Moderator moderator = new Moderator(
-                defaultKey,
+                accountId,
                 email,
                 password,
                 rating,

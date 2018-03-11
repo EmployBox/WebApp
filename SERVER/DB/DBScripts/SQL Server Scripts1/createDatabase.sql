@@ -225,6 +225,7 @@ CREATE TABLE ApiDatabase.[Comment] (
 CREATE TABLE ApiDatabase.[Follows] (
 	AccountIdFrom BIGINT references ApiDatabase.Account,
 	AccountIdDest BIGINT references ApiDatabase.Account,
+	[version] rowversion
 
 	FOREIGN KEY (accountIdFrom) REFERENCES ApiDatabase.Account(accountID),
 	FOREIGN KEY (accountIdDest) REFERENCES ApiDatabase.Account(accountID),

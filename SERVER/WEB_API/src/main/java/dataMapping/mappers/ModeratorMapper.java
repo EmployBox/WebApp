@@ -33,7 +33,7 @@ public class ModeratorMapper extends AccountMapper<Moderator> {
             Streamable<Rating> ratings = ((RatingMapper) MapperRegistry.getMapper(Rating.class)).findRatingsForAccount(accountID);
             Streamable<Rating> ratingsModerated = ((RatingMapper) MapperRegistry.getMapper(Rating.class)).findModeratedRatingsForModerator(accountID);
 
-            Moderator moderator = Moderator.load( email, passwordHash, rating, version, comments, chats, ratings, ratingsModerated );
+            Moderator moderator = Moderator.load(accountID, email, passwordHash, rating, version, comments, chats, ratings, ratingsModerated );
             identityMap.put(accountID, moderator);
 
             return moderator;

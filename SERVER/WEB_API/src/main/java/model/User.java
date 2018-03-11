@@ -43,15 +43,9 @@ public class User extends Account {
             double rating,
             String name,
             String summary,
-            String photoUrl,
-            Streamable<Job> offeredJobs,
-            Streamable<Curriculum> curriculums,
-            Streamable<Application> applications,
-            Streamable<Chat>chats,
-            Streamable<Comment> comments,
-            Streamable<Rating> ratings,
-            Streamable<User> followers
+            String photoUrl
     ){
+        Streamable empty = Stream::empty;
         User user = new User(
                 defaultKey,
                 email,
@@ -61,13 +55,13 @@ public class User extends Account {
                 name,
                 summary,
                 photoUrl,
-                offeredJobs,
-                curriculums,
-                applications,
-                chats,
-                comments,
-                ratings,
-                followers
+                empty,
+                empty,
+                empty,
+                empty,
+                empty,
+                empty,
+                empty
         );
         user.markNew();
         return user;
@@ -123,11 +117,11 @@ public class User extends Account {
         return photoUrl;
     }
 
-    public Stream<Application> getApplications() {
-        return applications.get();
+    public Streamable<Application> getApplications() {
+        return applications;
     }
 
-    public Stream<Curriculum> getCurriculums() {
-        return curriculums.get();
+    public Streamable<Curriculum> getCurriculums() {
+        return curriculums;
     }
 }
