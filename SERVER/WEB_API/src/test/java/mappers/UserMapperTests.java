@@ -1,9 +1,9 @@
 package mappers;
 
-import dataMapping.mappers.*;
-import dataMapping.utils.ConnectionManager;
-import dataMapping.utils.UnitOfWork;
-import model.*;
+import isel.ps.EmployBox.dataMapping.mappers.*;
+import isel.ps.EmployBox.dataMapping.utils.ConnectionManager;
+import isel.ps.EmployBox.dataMapping.utils.UnitOfWork;
+import isel.ps.EmployBox.model.*;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -12,9 +12,9 @@ import org.slf4j.LoggerFactory;
 
 import java.sql.SQLException;
 
-import static dataMapping.utils.ConnectionManager.getConnectionManager;
-import static dataMapping.utils.ConnectionManager.testDB;
-import static dataMapping.utils.MapperRegistry.*;
+import static isel.ps.EmployBox.dataMapping.utils.ConnectionManager.getConnectionManager;
+import static isel.ps.EmployBox.dataMapping.utils.ConnectionManager.testDB;
+import static isel.ps.EmployBox.dataMapping.utils.MapperRegistry.*;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -46,7 +46,7 @@ public class UserMapperTests {
 
     @Test
     public void insertTest() {
-        User user = User.create("Test@gmail.com", "1234", 0, "Manel", "Sou um espetaculo", "someurl");
+        User user = User.create("isel.ps.EmployBox.Test@gmail.com", "1234", 0, "Manel", "Sou um espetaculo", "someurl");
 
         mapper.insert(user);
 
