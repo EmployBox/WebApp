@@ -33,13 +33,13 @@ CREATE TABLE ApiDatabase.[Company] (
 	[description] NVARCHAR(50),
 	[version] rowversion,
 
-	FOREIGN KEY (accountID) REFERENCES ApiDatabase.Account(accountID) ON DELETE CASCADE	
+	FOREIGN KEY (accountID) REFERENCES ApiDatabase.Account(accountID)
 )
 
 CREATE TABLE ApiDatabase.[Moderator] (
 	accountID BIGINT primary key references ApiDatabase.Account,
 
-	FOREIGN KEY (accountID) REFERENCES ApiDatabase.Account(accountID) ON DELETE CASCADE	
+	FOREIGN KEY (accountID) REFERENCES ApiDatabase.Account(accountID)
 )
 
 CREATE TABLE ApiDatabase.[User] (
@@ -49,14 +49,14 @@ CREATE TABLE ApiDatabase.[User] (
 	PhotoUrl NVARCHAR(100),
 	[version] rowversion
 
-	FOREIGN KEY (accountID) REFERENCES ApiDatabase.Account(accountID) ON DELETE CASCADE		
+	FOREIGN KEY (accountID) REFERENCES ApiDatabase.Account(accountID)		
 )
 
 CREATE TABLE ApiDatabase.[Curriculum](
 	userId BIGINT references ApiDatabase.[User],
 	curriculumId BIGINT,
 
-	FOREIGN KEY (userId) REFERENCES ApiDatabase.[User] ( accountId) ON DELETE CASCADE,	
+	FOREIGN KEY (userId) REFERENCES ApiDatabase.[User] ( accountId),	
 	primary key(userId,curriculumId)
 )
 
@@ -68,7 +68,7 @@ CREATE TABLE ApiDatabase.[Project] (
 	[version] rowversion
 
 	PRIMARY KEY (userId,curriculumID),
-	FOREIGN KEY (userId,curriculumId) REFERENCES ApiDatabase.Curriculum(userId,curriculumId) ON DELETE CASCADE
+	FOREIGN KEY (userId,curriculumId) REFERENCES ApiDatabase.Curriculum(userId,curriculumId)
 )
 
 CREATE TABLE ApiDatabase.[AcademicBackground](
@@ -81,7 +81,7 @@ CREATE TABLE ApiDatabase.[AcademicBackground](
 	degreeObtained NVARCHAR(10),
 	[version] rowversion,
 
-	FOREIGN KEY (userId,curriculumId) REFERENCES ApiDatabase.Curriculum(userId,curriculumId) ON DELETE CASCADE,
+	FOREIGN KEY (userId,curriculumId) REFERENCES ApiDatabase.Curriculum(userId,curriculumId),
 	PRIMARY KEY(userId,curriculumId),
 	check (endDate < beginDate),
 	check (degreeObtained = 'basic level 1' 
@@ -105,7 +105,7 @@ CREATE TABLE Apidatabase.[PreviousJobs](
 
 	PRIMARY KEY(userId,curriculumId),
 	
-	FOREIGN KEY (userId,curriculumId) REFERENCES ApiDatabase.Curriculum(userId,curriculumId) ON DELETE CASCADE,
+	FOREIGN KEY (userId,curriculumId) REFERENCES ApiDatabase.Curriculum(userId,curriculumId),
 	CHECK([workLoad] = 'partial' OR [workLoad] = 'total')
 )
 
@@ -130,8 +130,8 @@ CREATE TABLE ApiDatabase.[Job](
 	[Address] NVARCHAR(50),
 	[version] rowversion,
 
-	FOREIGN KEY (accountID) REFERENCES ApiDatabase.Account(accountID) ON DELETE CASCADE,
-	FOREIGN KEY ([Address]) REFERENCES ApiDatabase.[Local]([Address]) ON DELETE CASCADE,
+	FOREIGN KEY (accountID) REFERENCES ApiDatabase.Account(accountID),
+	FOREIGN KEY ([Address]) REFERENCES ApiDatabase.[Local]([Address]),
 	check(offerType = 'Looking for work' OR offerType = 'Looking for Worker')
 )
 
@@ -142,7 +142,7 @@ CREATE TABLE Apidatabase.[Curriculum_Experience](
 	years SMALLINT,
 	[version] rowversion
 
-	FOREIGN KEY (userId,curriculumId) REFERENCES ApiDatabase.Curriculum ON DELETE CASCADE,
+	FOREIGN KEY (userId,curriculumId) REFERENCES ApiDatabase.Curriculum,
 
 	primary key(userId, curriculumId)
 )
@@ -153,7 +153,7 @@ CREATE TABLE Apidatabase.[Job_Experience](
 	years SMALLINT,
 	[version] rowversion
 
-	FOREIGN KEY (jobId) REFERENCES ApiDatabase.Job(jobId) ON DELETE CASCADE,
+	FOREIGN KEY (jobId) REFERENCES ApiDatabase.Job(jobId),
 
 	primary key(jobId)
 )
