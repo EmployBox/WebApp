@@ -9,24 +9,24 @@ IF DB_ID ('PS_API_DATABASE') IS NOT NULL
 			DROP VIEW dbo.[Project];
 		IF OBJECT_ID(N'dbo.[Follows]') IS NOT NULL
 			DROP VIEW dbo.[Follows];
-		IF OBJECT_ID(N'dbo.[Message]') IS NOT NULL
-			DROP VIEW dbo.[Message];
-		IF OBJECT_ID(N'dbo.[Application]') IS NOT NULL
-			DROP VIEW dbo.[Application];
-		IF OBJECT_ID(N'dbo.[Chat]') IS NOT NULL
-			DROP VIEW dbo.[Chat];
 		IF OBJECT_ID(N'dbo.[Comment]') IS NOT NULL
 			DROP VIEW dbo.[Comment];
+		IF OBJECT_ID(N'dbo.[Message]') IS NOT NULL
+			DROP VIEW dbo.[Message];
+		IF OBJECT_ID(N'dbo.[Chat]') IS NOT NULL
+			DROP VIEW dbo.[Chat];
+		IF OBJECT_ID(N'dbo.[Application]') IS NOT NULL
+			DROP VIEW dbo.[Application];
 		IF OBJECT_ID(N'dbo.[Job_Experience]') IS NOT NULL
 			DROP VIEW dbo.[Job_Experience];
 		IF OBJECT_ID(N'dbo.[Curriculum_Experience]') IS NOT NULL
 			DROP VIEW dbo.[Curriculum_Experience];
+		IF OBJECT_ID(N'dbo.[AcademicBackground]') IS NOT NULL
+			DROP VIEW dbo.[AcademicBackground];
 		IF OBJECT_ID(N'dbo.[Curriculum]') IS NOT NULL
 			DROP VIEW dbo.[Curriculum];
 		IF OBJECT_ID(N'dbo.[Job]') IS NOT NULL
 			DROP VIEW dbo.[Job];
-		IF OBJECT_ID(N'ApiDatabase.[AcademicBackground]') IS NOT NULL
-			DROP VIEW dbo.[AcademicBackground];
 		IF OBJECT_ID(N'dbo.[Local]') IS NOT NULL
 			DROP VIEW dbo.[Local];
 		IF OBJECT_ID(N'dbo.[Company]') IS NOT NULL
@@ -97,6 +97,15 @@ IF DB_ID ('PS_API_DATABASE') IS NOT NULL
 			DROP PROC dbo.UpdateModerator;
 		IF OBJECT_ID(N'dbo.DeleteModerator') IS NOT NULL
 			DROP PROC dbo.DeleteModerator;
+
+		IF OBJECT_ID(N'Apidatabase.deleteCascadeAccount') IS NOT NULL
+			DROP TRIGGER Apidatabase.deleteCascadeAccount;
+		IF OBJECT_ID(N'Apidatabase.deleteCascadeCurriculum') IS NOT NULL
+			DROP TRIGGER Apidatabase.deleteCascadeCurriculum;
+		IF OBJECT_ID(N'Apidatabase.deleteCascadeJob') IS NOT NULL
+			DROP TRIGGER Apidatabase.deleteCascadeJob;
+		IF OBJECT_ID(N'Apidatabase.deleteCascadeComment') IS NOT NULL
+			DROP TRIGGER Apidatabase.deleteCascadeComment;
 
 		IF OBJECT_ID ('ApiDatabase') IS NOT NULL
 			DROP SCHEMA ApiDatabase;

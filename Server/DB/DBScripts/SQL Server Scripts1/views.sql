@@ -108,3 +108,10 @@ go
 CREATE VIEW dbo.[Follows] AS
 SELECT * FROM ApiDatabase.Follows
 GO
+
+if object_id('dbo.[Rating]') is not null
+	drop view dbo.[Rating]
+go
+CREATE VIEW dbo.[Rating] AS
+SELECT * FROM ApiDatabase.[Rating]
+GO

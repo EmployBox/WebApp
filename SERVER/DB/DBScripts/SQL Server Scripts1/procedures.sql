@@ -104,7 +104,6 @@ CREATE PROCEDURE dbo.UpdateUser
 					RETURN
 
 				UPDATE Apidatabase.[Account] SET email = @email, rating = @rating, passwordHash = @newPasswordHash where Apidatabase.[Account].email = @email
-
 				
 				UPDATE ApiDatabase.[User] SET name = @name, summary = @summary, PhotoUrl = @PhotoUrl where Apidatabase.[User].accountId = @accountId
 				COMMIT
@@ -132,7 +131,6 @@ CREATE PROCEDURE dbo.DeleteUser
 		BEGIN TRAN
 			BEGIN TRY
 				SET NOCOUNT ON
-				DELETE ApiDatabase.[User] where Apidatabase.[User].accountId = accountId
 				DELETE Apidatabase.[Account] where Apidatabase.[Account].accountId = @accountId
 				COMMIT
 			END TRY
@@ -270,7 +268,6 @@ CREATE PROCEDURE dbo.DeleteCompany
 			BEGIN TRY
 				SET NOCOUNT ON
 				DELETE ApiDatabase.[Account] where Apidatabase.[Account].accountId = @accountId
-				DELETE Apidatabase.[Company] where Apidatabase.[Company].accountId = @accountId
 				COMMIT
 			END TRY
 			BEGIN CATCH
@@ -360,7 +357,6 @@ CREATE PROCEDURE dbo.DeleteModerator
 			BEGIN TRY
 				SET NOCOUNT ON
 				DELETE ApiDatabase.[Account] where Apidatabase.[Account].accountId = @accountId
-				DELETE Apidatabase.[Moderator] where Apidatabase.[Moderator].accountId = @accountId
 				COMMIT
 			END TRY
 			BEGIN CATCH

@@ -203,7 +203,7 @@ CREATE TABLE ApiDatabase.[MESSAGE](
 	[date] datetime default(getdate()),
 	[version] rowversion,
 
-	FOREIGN KEY (chatId) REFERENCES ApiDatabase.Chat(chatId),
+	FOREIGN KEY (chatId) REFERENCES ApiDatabase.Chat(chatId) ON DELETE CASCADE,
 	PRIMARY KEY(messageId,chatId)
 )
 
