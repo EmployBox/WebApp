@@ -12,6 +12,6 @@ import java.util.stream.Stream;
 
 public interface DataBaseConnectivity<T extends DomainObject<K>, K> {
     Stream<T> executeSQLQuery(String query, Function<ResultSet, T> mapper, Consumer<PreparedStatement> prepareStatement);
-    T executeSQLUpdate(String query, T obj, BiFunction<PreparedStatement, T, T> prepareStatement);
-    T executeSQLProcedure(String call, T obj, BiFunction<CallableStatement, T, T> handleStatement);
+    T executeSQLUpdate(String query, Function<PreparedStatement, T> handleStatement);
+    T executeSQLProcedure(String call, Function<CallableStatement, T> handleStatement);
 }

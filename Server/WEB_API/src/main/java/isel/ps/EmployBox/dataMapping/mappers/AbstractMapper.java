@@ -31,9 +31,9 @@ public abstract class AbstractMapper<T extends DomainObject<K>, K> implements Ma
     protected final ConcurrentMap<K, T> identityMap = new ConcurrentHashMap<>();
 
     protected final String SELECT_QUERY;
-    private final MapperSettings insertSettings;
-    private final MapperSettings updateSettings;
-    private final MapperSettings deleteSettings;
+    private final MapperSettings<? extends Statement, T, K> insertSettings;
+    private final MapperSettings<? extends Statement, T, K> updateSettings;
+    private final MapperSettings<? extends Statement, T, K> deleteSettings;
     private final DataBaseConnectivity<T, K> dbc;
 
     public <R extends Statement> AbstractMapper(
@@ -164,13 +164,15 @@ public abstract class AbstractMapper<T extends DomainObject<K>, K> implements Ma
         return false;
     }
 
-    private T executeStatement(MapperSettings mapperSettings, T obj){
-        T result;
+    private<R extends Statement> T executeStatement(MapperSettings<R, T, K> mapperSettings, T obj){
         if(mapperSettings.isProcedure())
-            result = dbc.executeSQLProcedure(mapperSettings.getQuery(), obj, mapperSettings.getStatementFunction());
+            return dbc.executeSQLProcedure(mapperSettings.getQuery(), callableStatement -> mapperSettings
+                    .getStatementFunction()
+                    .apply((R) callableStatement, obj));
         else
-            result = dbc.executeSQLUpdate(mapperSettings.getQuery(), obj, mapperSettings.getStatementFunction());
-        return result;
+            return dbc.executeSQLUpdate(mapperSettings.getQuery(), preparedStatement -> mapperSettings
+                    .getStatementFunction()
+                    .apply((R) preparedStatement, obj));
     }
 
     @Override

@@ -20,7 +20,7 @@ public class Job extends DomainObject<Long> {
     private final Streamable<Application> applications;
     private final Streamable<JobExperience> experiences;
 
-    private Job(
+    public Job(
             long id,
             long accountID,
             String address,
@@ -135,11 +135,11 @@ public class Job extends DomainObject<Long> {
         return address;
     }
 
-    public Stream<Application> getApplications() {
-        return applications.get();
+    public Streamable<Application> getApplications() {
+        return applications;
     }
 
-    public Stream<JobExperience> getExperiences() {
-        return experiences.get();
+    public Streamable<JobExperience> getExperiences() {
+        return experiences;
     }
 }

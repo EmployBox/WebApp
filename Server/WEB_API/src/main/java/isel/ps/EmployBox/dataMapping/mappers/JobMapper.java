@@ -70,13 +70,17 @@ public class JobMapper extends AbstractMapper<Job, Long> {
             if (rowCount == 0) throw new ConcurrencyException("Concurrency problem found");
 
             long jobId;
-            try (ResultSet generatedKeys = preparedStatement.getGeneratedKeys()) {
-                if (generatedKeys.next())
+            long version;
+            try (ResultSet generatedKeys = preparedStatement.getGeneratedKeys(); ResultSet inserted = preparedStatement.getResultSet()) {
+                if (generatedKeys.next() && inserted.next()){
                     jobId = generatedKeys.getLong(1);
+                    version = inserted.getLong(1);
+                }
                 else throw new DataMapperException("Error inserting new entry");
             }
 
-
+            return new Job(jobId, obj.getAccountID(), obj.getAddress(), obj.getWage(), obj.getDescription(), obj.getSchedule(), obj.getOfferBeginDate(), obj.getOfferEndDate(), obj.getOfferType(), version,
+                    obj.getApplications(), obj.getExperiences());
         } catch (SQLException e) {
             throw new DataMapperException(e);
         }

@@ -53,11 +53,11 @@ public class SQLUtils<T extends DomainObject<K>, K> implements DataBaseConnectiv
     }
 
     @Override
-    public T executeSQLProcedure(String call, T obj, BiFunction<CallableStatement, T, T> handleStatement){
+    public T executeSQLProcedure(String call, Function<CallableStatement, T> handleStatement){
         return handleSQLStatement(
                 call,
                 true,
-                statement -> handleStatement.apply((CallableStatement) statement, obj)
+                statement -> handleStatement.apply((CallableStatement) statement)
         );
     }
 
@@ -80,14 +80,13 @@ public class SQLUtils<T extends DomainObject<K>, K> implements DataBaseConnectiv
     /**
      * Executes a sql update and saves the obj in the IdentityMap if successful else throws ConcurrencyException
      * @param query
-     * @param obj
      * @param prepareStatement
      */
     @Override
-    public T executeSQLUpdate(String query, T obj, BiFunction<PreparedStatement, T, T> prepareStatement){
+    public T executeSQLUpdate(String query, Function<PreparedStatement, T> prepareStatement){
         return handleSQLStatement(query,
                 false,
-                statement -> prepareStatement.apply((PreparedStatement) statement, obj)
+                statement -> prepareStatement.apply((PreparedStatement) statement)
         );
 
          /*try{

@@ -6,7 +6,7 @@ import java.sql.CallableStatement;
 import java.sql.Statement;
 import java.util.function.BiFunction;
 
-public class MapperSettings<T extends Statement, U extends DomainObject> {
+public class MapperSettings<T extends Statement, U extends DomainObject<K>, K> {
 
     private final String query;
     private final BiFunction<T, U, U> statementFunction;
