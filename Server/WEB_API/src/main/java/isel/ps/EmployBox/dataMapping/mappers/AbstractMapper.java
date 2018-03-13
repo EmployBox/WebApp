@@ -1,15 +1,16 @@
 package isel.ps.EmployBox.dataMapping.mappers;
 
+import isel.ps.EmployBox.dataMapping.DataBaseConnectivity;
 import isel.ps.EmployBox.dataMapping.Mapper;
 import isel.ps.EmployBox.dataMapping.exceptions.ConcurrencyException;
 import isel.ps.EmployBox.dataMapping.exceptions.DataMapperException;
 import isel.ps.EmployBox.dataMapping.utils.MapperSettings;
+import isel.ps.EmployBox.dataMapping.utils.SQLUtils;
 import javafx.util.Pair;
 import isel.ps.EmployBox.model.DomainObject;
 import isel.ps.EmployBox.model.ID;
 import isel.ps.EmployBox.util.Streamable;
 
-import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.sql.*;
 import java.util.Arrays;
@@ -19,12 +20,11 @@ import java.util.Map;
 import java.util.StringJoiner;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
-import java.util.function.BiConsumer;
+import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import static isel.ps.EmployBox.util.ReflectionUtils.*;
-import static isel.ps.EmployBox.dataMapping.utils.SQLUtils.*;
 
 public abstract class AbstractMapper<T extends DomainObject<K>, K> implements Mapper<T, K> {
 
@@ -34,14 +34,16 @@ public abstract class AbstractMapper<T extends DomainObject<K>, K> implements Ma
     private final MapperSettings insertSettings;
     private final MapperSettings updateSettings;
     private final MapperSettings deleteSettings;
+    private final DataBaseConnectivity<T, K> dbc;
 
     public <R extends Statement> AbstractMapper(
             Class<T> type,
             Class<R> statementType,
-            BiConsumer<R, T> prepareInsertFunction,
-            BiConsumer<R, T> prepareUpdateFunction,
-            BiConsumer<R, T> prepareDeleteFunction
+            BiFunction<R, T, T> prepareInsertFunction,
+            BiFunction<R, T, T> prepareUpdateFunction,
+            BiFunction<R, T, T> prepareDeleteFunction
     ) {
+        this.dbc = new SQLUtils<>();
 
         Field[] fields = allFieldsFor(type).filter(f ->
                 (f.getType().isPrimitive() ||
@@ -125,23 +127,13 @@ public abstract class AbstractMapper<T extends DomainObject<K>, K> implements Ma
      * @throws DataMapperException
      */
     abstract T mapper(ResultSet rs) throws DataMapperException;
-    //abstract String getSelectQuery();
 
     protected<R> Streamable<T> findWhere(Pair<String, R>... values){
-//        StringBuilder queryBuilder = new StringBuilder(getSelectQuery() + " WHERE ");
-//        for (int i = 0; i < values.length; i++) {
-//            queryBuilder
-//                    .append(values[i].getKey())
-//                    .append(" = ?");
-//            if(i != values.length -1)
-//                queryBuilder.append(" AND ");
-//        }
-
         String query = Arrays.stream(values)
                 .map(p -> p.getKey() + " = ? ")
                 .collect(Collectors.joining(" AND ", SELECT_QUERY + " WHERE ", ""));
 
-        return () -> executeSQLQuery(
+        return () -> dbc.executeSQLQuery(
                 query,
                 this::mapper,
                 statement -> {
@@ -172,31 +164,32 @@ public abstract class AbstractMapper<T extends DomainObject<K>, K> implements Ma
         return false;
     }
 
-    private void handleCRUD(MapperSettings mapperSettings, T obj){
+    private T executeStatement(MapperSettings mapperSettings, T obj){
+        T result;
         if(mapperSettings.isProcedure())
-            executeSQLProcedure(mapperSettings.getQuery(), obj, mapperSettings.getStatementConsumer());
+            result = dbc.executeSQLProcedure(mapperSettings.getQuery(), obj, mapperSettings.getStatementFunction());
         else
-            executeSQLUpdate(mapperSettings.getQuery(), obj, mapperSettings.getStatementConsumer());
+            result = dbc.executeSQLUpdate(mapperSettings.getQuery(), obj, mapperSettings.getStatementFunction());
+        return result;
     }
 
-    //TODO Auto generated keys, obj's key will be null. Update version as well
     @Override
     public void insert(T obj) {
-        handleCRUD(insertSettings, obj);
+        executeStatement(insertSettings, obj);
 
         identityMap.put(obj.getIdentityKey(), obj);
     }
 
     @Override
     public void update(T obj) {
-        handleCRUD(updateSettings, obj);
+        executeStatement(updateSettings, obj);
 
         if(!tryReplace(obj, 5000)) throw new ConcurrencyException("Concurrency problem found, could not update IdentityMap");
     }
 
     @Override
     public void delete(T obj) {
-        handleCRUD(deleteSettings, obj);
+        executeStatement(deleteSettings, obj);
 
         identityMap.remove(obj.getIdentityKey());
     }

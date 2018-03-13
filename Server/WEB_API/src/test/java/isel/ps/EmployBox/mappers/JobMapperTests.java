@@ -1,6 +1,6 @@
-package mappers;
+package isel.ps.EmployBox.mappers;
 
-import dataBase.DataBaseTests;
+import isel.ps.EmployBox.DataBaseTests;
 import isel.ps.EmployBox.dataMapping.mappers.JobMapper;
 import isel.ps.EmployBox.dataMapping.utils.MapperRegistry;
 import isel.ps.EmployBox.dataMapping.utils.UnitOfWork;

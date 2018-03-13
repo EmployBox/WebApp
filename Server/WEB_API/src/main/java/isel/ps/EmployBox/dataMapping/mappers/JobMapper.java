@@ -1,5 +1,6 @@
 package isel.ps.EmployBox.dataMapping.mappers;
 
+import isel.ps.EmployBox.dataMapping.exceptions.ConcurrencyException;
 import isel.ps.EmployBox.dataMapping.exceptions.DataMapperException;
 import isel.ps.EmployBox.dataMapping.utils.MapperSettings;
 import javafx.util.Pair;
@@ -18,8 +19,8 @@ public class JobMapper extends AbstractMapper<Job, Long> {
                 Job.class,
                 PreparedStatement.class,
                 JobMapper::prepareInsertStatement,
-                JobMapper::prepareInsertStatement,
-                JobMapper::prepareInsertStatement
+                JobMapper::prepareUpdateStatement,
+                JobMapper::prepareDeleteStatement
         );
     }
 
@@ -53,7 +54,7 @@ public class JobMapper extends AbstractMapper<Job, Long> {
         }
     }
 
-    private static void prepareInsertStatement(PreparedStatement preparedStatement, Job obj){
+    private static Job prepareInsertStatement(PreparedStatement preparedStatement, Job obj){
         try{
             preparedStatement.setLong(1, obj.getAccountID());
             preparedStatement.setString(2, obj.getAddress());
@@ -64,12 +65,24 @@ public class JobMapper extends AbstractMapper<Job, Long> {
             preparedStatement.setDate(7, obj.getOfferEndDate());
             preparedStatement.setString(8, obj.getOfferType());
             preparedStatement.setLong(9, obj.getVersion());
+
+            int rowCount = preparedStatement.executeUpdate();
+            if (rowCount == 0) throw new ConcurrencyException("Concurrency problem found");
+
+            long jobId;
+            try (ResultSet generatedKeys = preparedStatement.getGeneratedKeys()) {
+                if (generatedKeys.next())
+                    jobId = generatedKeys.getLong(1);
+                else throw new DataMapperException("Error inserting new entry");
+            }
+
+
         } catch (SQLException e) {
             throw new DataMapperException(e);
         }
     }
 
-    private static void prepareUpdateStatement(PreparedStatement preparedStatement, Job obj){
+    private static Job prepareUpdateStatement(PreparedStatement preparedStatement, Job obj){
         try{
             preparedStatement.setString(1, obj.getAddress());
             preparedStatement.setInt(2, obj.getWage());
@@ -84,7 +97,7 @@ public class JobMapper extends AbstractMapper<Job, Long> {
         }
     }
 
-    private static void prepareDeleteStatement(PreparedStatement preparedStatement, Job obj){
+    private static Job prepareDeleteStatement(PreparedStatement preparedStatement, Job obj){
         try{
             preparedStatement.setLong(1, obj.getIdentityKey());
             preparedStatement.setLong(2, obj.getVersion());

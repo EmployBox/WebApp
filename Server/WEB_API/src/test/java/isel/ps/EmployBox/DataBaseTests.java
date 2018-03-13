@@ -1,4 +1,4 @@
-package dataBase;
+package isel.ps.EmployBox;
 
 import isel.ps.EmployBox.dataMapping.utils.ConnectionManager;
 import org.junit.After;

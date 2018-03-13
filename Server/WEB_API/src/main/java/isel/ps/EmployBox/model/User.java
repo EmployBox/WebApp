@@ -12,7 +12,7 @@ public class User extends Account {
     private final Streamable<Curriculum> curriculums;
     private final Streamable<Application> applications;
 
-    private User(
+    public User(
             long accountID,
             String email,
             String password,
@@ -24,7 +24,7 @@ public class User extends Account {
             Streamable<Job> offeredJobs,
             Streamable<Curriculum> curriculums,
             Streamable<Application> applications,
-            Streamable<Chat>chats,
+            Streamable<Chat> chats,
             Streamable<Comment> comments,
             Streamable<Rating> ratings,
             Streamable<User> followers

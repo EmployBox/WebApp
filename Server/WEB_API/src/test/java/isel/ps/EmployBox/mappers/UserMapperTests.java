@@ -1,4 +1,4 @@
-package mappers;
+package isel.ps.EmployBox.mappers;
 
 import isel.ps.EmployBox.dataMapping.mappers.*;
 import isel.ps.EmployBox.dataMapping.utils.ConnectionManager;
@@ -46,7 +46,7 @@ public class UserMapperTests {
 
     @Test
     public void insertTest() {
-        User user = User.create("isel.ps.EmployBox.Test@gmail.com", "1234", 0, "Manel", "Sou um espetaculo", "someurl");
+        User user = User.create("Test@gmail.com", "1234", 0, "Manel", "Sou um espetaculo", "someurl");
 
         mapper.insert(user);
 

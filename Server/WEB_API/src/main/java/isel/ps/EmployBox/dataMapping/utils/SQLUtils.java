@@ -1,25 +1,25 @@
 package isel.ps.EmployBox.dataMapping.utils;
 
-import isel.ps.EmployBox.dataMapping.exceptions.ConcurrencyException;
+import isel.ps.EmployBox.dataMapping.DataBaseConnectivity;
 import isel.ps.EmployBox.dataMapping.exceptions.DataMapperException;
 import isel.ps.EmployBox.model.DomainObject;
 
 import java.sql.*;
 import java.util.Spliterator;
 import java.util.Spliterators;
-import java.util.function.BiConsumer;
+import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
-public class SQLUtils {
+public class SQLUtils<T extends DomainObject<K>, K> implements DataBaseConnectivity<T, K> {
 
     /**
      * Inserts the objects read into the LoadedMap
      * @param rs - ResultSet with the result of the DB
      */
-    private static<T> Stream<T> stream(Statement statement, ResultSet rs, Function<ResultSet, T> func) throws DataMapperException{
+    private Stream<T> stream(Statement statement, ResultSet rs, Function<ResultSet, T> func) throws DataMapperException{
         return StreamSupport.stream(new Spliterators.AbstractSpliterator<T>(
                 Long.MAX_VALUE, Spliterator.ORDERED) {
             @Override
@@ -42,39 +42,39 @@ public class SQLUtils {
         });
     }
 
-    private static void handleSQLStatement(String query, boolean isProcedure, Consumer<Statement> handleStatement){
+    private<U> U handleSQLStatement(String query, boolean isProcedure, Function<Statement, U> handleStatement){
         Connection connection = UnitOfWork.getCurrent().getConnection();
         try {
             Statement statement = isProcedure ? connection.prepareCall(query) : connection.prepareStatement(query);
-            handleStatement.accept(statement);
+            return handleStatement.apply(statement);
         } catch (SQLException e) {
             throw new DataMapperException(e);
         }
     }
 
-    public static<T> void executeSQLProcedure(String call, T obj, BiConsumer<CallableStatement, T> handleStatement){
-        handleSQLStatement(
+    @Override
+    public T executeSQLProcedure(String call, T obj, BiFunction<CallableStatement, T, T> handleStatement){
+        return handleSQLStatement(
                 call,
                 true,
-                statement -> handleStatement.accept((CallableStatement) statement, obj)
+                statement -> handleStatement.apply((CallableStatement) statement, obj)
         );
     }
 
-    public static<T> Stream<T> executeSQLQuery(String query, Function<ResultSet, T> mapper, Consumer<PreparedStatement> prepareStatement){
-        Object[] result = new Object[1];
-        handleSQLStatement(
+    @Override
+    public Stream<T> executeSQLQuery(String query, Function<ResultSet, T> mapper, Consumer<PreparedStatement> prepareStatement){
+        return handleSQLStatement(
                 query,
                 false,
                 statement -> {
                     prepareStatement.accept((PreparedStatement) statement);
                     try {
-                        result[0] = stream(statement, ((PreparedStatement) statement).executeQuery(), mapper);
+                        return stream(statement, ((PreparedStatement) statement).executeQuery(), mapper);
                     } catch (SQLException e) {
                         throw new DataMapperException(e);
                     }
                 }
         );
-        return (Stream<T>) result[0];
     }
 
     /**
@@ -83,27 +83,27 @@ public class SQLUtils {
      * @param obj
      * @param prepareStatement
      */
-    public static<T> void executeSQLUpdate(String query, T obj, BiConsumer<PreparedStatement, T> prepareStatement){
-        handleSQLStatement(query,
+    @Override
+    public T executeSQLUpdate(String query, T obj, BiFunction<PreparedStatement, T, T> prepareStatement){
+        return handleSQLStatement(query,
                 false,
-                statement -> {
-                    prepareStatement.accept((PreparedStatement) statement, obj);
-                    try{
-                        int rowCount = ((PreparedStatement) statement).executeUpdate();
-                        if (rowCount == 0) throw new ConcurrencyException("Concurrency problem found");
-
-                        long generatedKey = 0;
-                        try (ResultSet generatedKeys = statement.getGeneratedKeys()) {
-                            if (generatedKeys.next()){
-                                generatedKey = generatedKeys.getLong(1);
-                            }
-                        }
-
-
-                    } catch (SQLException e) {
-                        throw new DataMapperException(e.getMessage(), e);
-                    }
-                }
+                statement -> prepareStatement.apply((PreparedStatement) statement, obj)
         );
+
+         /*try{
+            int rowCount = ((PreparedStatement) statement).executeUpdate();
+            if (rowCount == 0) throw new ConcurrencyException("Concurrency problem found");
+
+            long generatedKey = 0;
+            try (ResultSet generatedKeys = statement.getGeneratedKeys()) {
+                if (generatedKeys.next()){
+                    generatedKey = generatedKeys.getLong(1);
+                }
+            }
+
+
+        } catch (SQLException e) {
+            throw new DataMapperException(e.getMessage(), e);
+        }*/
     }
 }

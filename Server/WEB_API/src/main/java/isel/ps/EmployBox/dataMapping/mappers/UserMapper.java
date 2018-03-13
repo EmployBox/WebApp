@@ -68,7 +68,7 @@ public class UserMapper extends AccountMapper<User> {
         }
     }
 
-    private static void prepareWriteProcedure(CallableStatement cs, User obj) {
+    private static User prepareWriteProcedure(CallableStatement cs, User obj) {
         try {
             cs.setString(1, obj.getEmail());
             cs.setDouble(2, obj.getRating());
@@ -83,18 +83,19 @@ public class UserMapper extends AccountMapper<User> {
             long accountId = cs.getLong(7);
             long version = cs.getLong(8);
 
-            obj = User.load(accountId, obj.getEmail(), obj.getPassword(), obj.getRating(), version, obj.getName(), obj.getSummary(), obj.getPhotoUrl(),
+            return new User(accountId, obj.getEmail(), obj.getPassword(), obj.getRating(), version, obj.getName(), obj.getSummary(), obj.getPhotoUrl(),
                     obj.getOfferedJobs(), obj.getCurriculums(), obj.getApplications(), obj.getChats(), obj.getComments(), obj.getRatings(), obj.getFollowing());
         } catch (SQLException e) {
             throw new DataMapperException(e);
         }
     }
 
-    private static void prepareDeleteProcedure(CallableStatement callableStatement, User obj){
+    private static User prepareDeleteProcedure(CallableStatement callableStatement, User obj){
         try {
             callableStatement.setLong(1, obj.getIdentityKey());
             callableStatement.registerOutParameter(2, Types.NVARCHAR);
             callableStatement.execute();
+            return obj;
         } catch (SQLException e) {
             throw new DataMapperException(e);
         }

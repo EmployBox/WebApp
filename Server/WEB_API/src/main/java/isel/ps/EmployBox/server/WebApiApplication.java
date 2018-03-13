@@ -5,7 +5,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.ComponentScan;
 
 @SpringBootApplication
-@ComponentScan(basePackages = {"server", "controllers"})
+@ComponentScan(basePackages = {"isel.ps.EmployBox.server", "isel.ps.EmployBox.controllers"})
 public class WebApiApplication {
 
     public static void main(String[] args) {
