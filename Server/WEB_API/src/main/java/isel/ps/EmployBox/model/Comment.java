@@ -17,7 +17,7 @@ public class Comment extends DomainObject<Long> {
 
     private final Streamable<Comment> replies;
 
-    private Comment(long commentID, long accountIdFrom, long accountIdTo, long parentCommendID, Date date, String text, boolean status, Streamable<Comment> replies, long version){
+    public Comment(long commentID, long accountIdFrom, long accountIdTo, long parentCommendID, Date date, String text, boolean status, Streamable<Comment> replies, long version){
         super(commentID, version);
         this.commentID = commentID;
         this.accountIdFrom = accountIdFrom;
@@ -104,7 +104,7 @@ public class Comment extends DomainObject<Long> {
         return status;
     }
 
-    public Stream<Comment> getReplies() {
-        return replies.get();
+    public Streamable<Comment> getReplies() {
+        return replies;
     }
 }

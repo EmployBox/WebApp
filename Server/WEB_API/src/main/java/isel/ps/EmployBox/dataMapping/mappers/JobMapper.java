@@ -1,8 +1,6 @@
 package isel.ps.EmployBox.dataMapping.mappers;
 
-import isel.ps.EmployBox.dataMapping.exceptions.ConcurrencyException;
 import isel.ps.EmployBox.dataMapping.exceptions.DataMapperException;
-import isel.ps.EmployBox.dataMapping.utils.MapperSettings;
 import javafx.util.Pair;
 import isel.ps.EmployBox.model.Application;
 import isel.ps.EmployBox.model.Job;
@@ -65,19 +63,10 @@ public class JobMapper extends AbstractMapper<Job, Long> {
             preparedStatement.setDate(7, obj.getOfferEndDate());
             preparedStatement.setString(8, obj.getOfferType());
             preparedStatement.setLong(9, obj.getVersion());
+            executeUpdate(preparedStatement);
 
-            int rowCount = preparedStatement.executeUpdate();
-            if (rowCount == 0) throw new ConcurrencyException("Concurrency problem found");
-
-            long jobId;
-            long version;
-            try (ResultSet generatedKeys = preparedStatement.getGeneratedKeys(); ResultSet inserted = preparedStatement.getResultSet()) {
-                if (generatedKeys.next() && inserted.next()){
-                    jobId = generatedKeys.getLong(1);
-                    version = inserted.getLong(1);
-                }
-                else throw new DataMapperException("Error inserting new entry");
-            }
+            long version = getVersion(preparedStatement);
+            long jobId = getGeneratedKey(preparedStatement);
 
             return new Job(jobId, obj.getAccountID(), obj.getAddress(), obj.getWage(), obj.getDescription(), obj.getSchedule(), obj.getOfferBeginDate(), obj.getOfferEndDate(), obj.getOfferType(), version,
                     obj.getApplications(), obj.getExperiences());
@@ -96,6 +85,12 @@ public class JobMapper extends AbstractMapper<Job, Long> {
             preparedStatement.setDate(6, obj.getOfferEndDate());
             preparedStatement.setString(7, obj.getOfferType());
             preparedStatement.setLong(8, obj.getVersion());
+            executeUpdate(preparedStatement);
+
+            long version = getVersion(preparedStatement);
+
+            return new Job(obj.getIdentityKey(), obj.getAccountID(), obj.getAddress(), obj.getWage(), obj.getDescription(), obj.getSchedule(), obj.getOfferBeginDate(), obj.getOfferEndDate(),
+                    obj.getOfferType(), version, obj.getApplications(), obj.getExperiences());
         } catch (SQLException e) {
             throw new DataMapperException(e);
         }
@@ -105,6 +100,8 @@ public class JobMapper extends AbstractMapper<Job, Long> {
         try{
             preparedStatement.setLong(1, obj.getIdentityKey());
             preparedStatement.setLong(2, obj.getVersion());
+            executeUpdate(preparedStatement);
+            return null;
         } catch (SQLException e) {
             throw new DataMapperException(e);
         }

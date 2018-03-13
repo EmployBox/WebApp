@@ -37,21 +37,28 @@ public class LocalMapper extends AbstractMapper<Local, String>{
         }
     }
 
-    private static void prepareInsertStatement(PreparedStatement statement, Local obj) {
+    private static Local prepareInsertStatement(PreparedStatement statement, Local obj) {
         try {
             statement.setString(1, obj.getAddress());
             statement.setString(2, obj.getCountry());
             statement.setString(3, obj.getDistrict());
             statement.setString(4, obj.getZipCode());
+            executeUpdate(statement);
+
+            long version = getVersion(statement);
+
+            return new Local(obj.getAddress(), obj.getCountry(), obj.getDistrict(), obj.getZipCode(), version);
         } catch (SQLException e) {
             throw new DataMapperException(e);
         }
     }
 
-    private static void prepareDeleteStatement(PreparedStatement statement, Local obj) {
+    private static Local prepareDeleteStatement(PreparedStatement statement, Local obj) {
         try {
             statement.setString(1, obj.getAddress());
             statement.setLong(2, obj.getVersion());
+            executeUpdate(statement);
+            return null;
         } catch (SQLException e) {
             throw new DataMapperException(e);
         }

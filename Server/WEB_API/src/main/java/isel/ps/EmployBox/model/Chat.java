@@ -12,7 +12,7 @@ public class Chat extends DomainObject<Long> {
 
     private final Streamable<Message> messages;
 
-    private Chat(long chatId, long accountIdFirst, long accountIdSecond, long version, Streamable<Message> messages) {
+    public Chat(long chatId, long accountIdFirst, long accountIdSecond, long version, Streamable<Message> messages) {
         super(chatId, version);
         this.chadId = chatId;
         this.accountIdFirst = accountIdFirst;
@@ -51,7 +51,7 @@ public class Chat extends DomainObject<Long> {
         return accountIdSecond;
     }
 
-    public Stream<Message> getMessages() {
-        return messages.get();
+    public Streamable<Message> getMessages() {
+        return messages;
     }
 }

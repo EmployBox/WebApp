@@ -8,7 +8,7 @@ public class Project extends DomainObject<String> {
     private final String name;
     private final String description;
 
-    private Project(long userId, long curriculumId, String name, String description, long version){
+    public Project(long userId, long curriculumId, String name, String description, long version){
         super(String.format("%d %d",userId,curriculumId), version);
         this.userId = userId;
         this.curriculumId = curriculumId;

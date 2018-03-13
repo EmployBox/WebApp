@@ -77,8 +77,8 @@ public abstract class AbstractMapper<T extends DomainObject<K>, K> implements Ma
             sD = sjD.toString();
         }
         else {
-            StringJoiner sjI = new StringJoiner(",", "insert into ["+type.getSimpleName()+"] (", ")");
-            StringJoiner sjU = new StringJoiner(",", "update ["+type.getSimpleName()+"] set "," where ");
+            StringJoiner sjI = new StringJoiner(",", "insert into ["+type.getSimpleName()+"] (", ") output INSERTED.[version]");
+            StringJoiner sjU = new StringJoiner(",", "update ["+type.getSimpleName()+"] set ","output INSERTED.[version] where ");
             StringJoiner sjD = new StringJoiner("and", "delete from ["+type.getSimpleName()+"] where ", "");
 
             StringJoiner sjUAux = new StringJoiner(" and ");
@@ -164,6 +164,33 @@ public abstract class AbstractMapper<T extends DomainObject<K>, K> implements Ma
         return false;
     }
 
+    protected static void executeUpdate(PreparedStatement statement) throws SQLException {
+        int rowCount = statement.executeUpdate();
+        if (rowCount == 0) throw new ConcurrencyException("Concurrency problem found");
+    }
+
+    protected static long getVersion(PreparedStatement statement) throws SQLException {
+        long version;
+        try (ResultSet inserted = statement.getResultSet()) {
+            if (inserted.next()){
+                version = inserted.getLong(1);
+            }
+            else throw new DataMapperException("Error inserting new entry");
+        }
+        return version;
+    }
+
+    protected static long getGeneratedKey(PreparedStatement preparedStatement) throws SQLException {
+        long jobId;
+        try (ResultSet generatedKeys = preparedStatement.getGeneratedKeys()) {
+            if (generatedKeys.next()){
+                jobId = generatedKeys.getLong(1);
+            }
+            else throw new DataMapperException("Error inserting new entry");
+        }
+        return jobId;
+    }
+
     private<R extends Statement> T executeStatement(MapperSettings<R, T, K> mapperSettings, T obj){
         if(mapperSettings.isProcedure())
             return dbc.executeSQLProcedure(mapperSettings.getQuery(), callableStatement -> mapperSettings
@@ -173,6 +200,9 @@ public abstract class AbstractMapper<T extends DomainObject<K>, K> implements Ma
             return dbc.executeSQLUpdate(mapperSettings.getQuery(), preparedStatement -> mapperSettings
                     .getStatementFunction()
                     .apply((R) preparedStatement, obj));
+
+        /*BiFunction<String, Function<R, T>, T> execute = mapperSettings.isProcedure() ? dbc::executeSQLProcedure : dbc::executeSQLUpdate;
+        return execute.apply(mapperSettings.getQuery(), statement -> mapperSettings.getStatementFunction().apply(statement, obj));*/
     }
 
     @Override

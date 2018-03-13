@@ -10,7 +10,7 @@ public class Company extends Account {
     private final String webPageUrl;
     private final String description;
 
-    private Company(
+    public Company(
             long accountID,
             String email,
             String password,
@@ -23,7 +23,7 @@ public class Company extends Account {
             String webPageUrl,
             String description,
             Streamable<Job> offeredJobs,
-            Streamable<Chat>chats,
+            Streamable<Chat> chats,
             Streamable<Comment> comments,
             Streamable<Rating> ratings,
             Streamable<User> following

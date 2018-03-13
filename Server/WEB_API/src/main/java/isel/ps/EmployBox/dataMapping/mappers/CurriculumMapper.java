@@ -50,20 +50,28 @@ public class CurriculumMapper extends AbstractMapper<Curriculum, String>{
         }
     }
 
-    private static void prepareInsertStatement(PreparedStatement statement, Curriculum obj){
+    private static Curriculum prepareInsertStatement(PreparedStatement statement, Curriculum obj){
         try{
             statement.setLong(1, obj.getAccountId());
             statement.setLong(2, obj.getCurriculumId());
+            executeUpdate(statement);
+
+            long version = getVersion(statement);
+            long curriculumId = getGeneratedKey(statement);
+
+            return new Curriculum(obj.getAccountId(), curriculumId, obj.getTitle(), version, obj.getPreviousJobs(), obj.getAcademicBackground(), obj.getProjects(), obj.getExperiences());
         } catch (SQLException e) {
             throw new DataMapperException(e);
         }
     }
 
-    private static void prepareDeleteStatement(PreparedStatement statement, Curriculum obj){
+    private static Curriculum prepareDeleteStatement(PreparedStatement statement, Curriculum obj){
         try{
             statement.setLong(1, obj.getAccountId());
             statement.setLong(2, obj.getCurriculumId());
             statement.setLong(3, obj.getVersion());
+            executeUpdate(statement);
+            return null;
         } catch (SQLException e) {
             throw new DataMapperException(e);
         }

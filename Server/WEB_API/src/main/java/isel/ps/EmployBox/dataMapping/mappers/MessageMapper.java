@@ -43,22 +43,29 @@ public class MessageMapper extends AbstractMapper<Message,String> {
         }
     }
 
-    private static void prepareInsertStatement(PreparedStatement statement, Message obj){
+    private static Message prepareInsertStatement(PreparedStatement statement, Message obj){
         try{
             statement.setLong(1, obj.getMessageId());
             statement.setLong(2, obj.getChadId());
             statement.setString(3, obj.getText());
             statement.setDate(4, obj.getDate());
+            executeUpdate(statement);
+
+            long version = getVersion(statement);
+
+            return new Message(obj.getMessageId(), obj.getChadId(), obj.getText(), obj.getDate(), version);
         } catch (SQLException e) {
             throw new DataMapperException(e);
         }
     }
 
-    private static void prepareDeleteStatement(PreparedStatement statement, Message obj){
+    private static Message prepareDeleteStatement(PreparedStatement statement, Message obj){
         try{
             statement.setLong(1, obj.getMessageId());
             statement.setLong(2, obj.getChadId());
             statement.setLong(3, obj.getVersion());
+            executeUpdate(statement);
+            return null;
         } catch (SQLException e) {
             throw new DataMapperException(e);
         }

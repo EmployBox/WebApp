@@ -6,7 +6,7 @@ public class CurriculumExperience extends DomainObject<String> {
     private final String competences;
     private final short years;
 
-    private CurriculumExperience(long userId, long curriculumId, String competences, short years, long version){
+    public CurriculumExperience(long userId, long curriculumId, String competences, short years, long version){
         super(String.format("%d %d",userId,curriculumId),version);
         this.userId = userId;
         this.curriculumId = curriculumId;

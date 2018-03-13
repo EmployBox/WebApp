@@ -5,7 +5,7 @@ public class Follows extends DomainObject<String> {
     private final long accountIdFrom;
     private final long accountIdDest;
 
-    private Follows(long accountIdFrom, long accountIdDest) {
+    public Follows(long accountIdFrom, long accountIdDest) {
         super(String.format("%d %d", accountIdFrom, accountIdDest), 0);
         this.accountIdFrom = accountIdFrom;
         this.accountIdDest = accountIdDest;

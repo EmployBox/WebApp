@@ -2,6 +2,7 @@ package isel.ps.EmployBox.dataMapping.mappers;
 
 import isel.ps.EmployBox.dataMapping.exceptions.DataMapperException;
 import isel.ps.EmployBox.dataMapping.utils.MapperSettings;
+import isel.ps.EmployBox.model.PreviousJobs;
 import javafx.util.Pair;
 import isel.ps.EmployBox.model.Project;
 import isel.ps.EmployBox.util.Streamable;
@@ -43,34 +44,46 @@ public class ProjectMapper extends AbstractMapper<Project, String> {
         }
     }
 
-    private static void prepareInsertStatement(PreparedStatement statement, Project obj){
+    private static Project prepareInsertStatement(PreparedStatement statement, Project obj){
         try{
             statement.setLong(1, obj.getUserId());
             statement.setLong(2, obj.getCurriculumId());
             statement.setString(3, obj.getName());
             statement.setString(4, obj.getDescription());
+            executeUpdate(statement);
+
+            long version = getVersion(statement);
+
+            return new Project(obj.getUserId(), obj.getCurriculumId(), obj.getName(), obj.getDescription(), version);
         } catch (SQLException e) {
             throw new DataMapperException(e);
         }
     }
 
-    private static void prepareUpdateStatement(PreparedStatement statement, Project obj){
+    private static Project prepareUpdateStatement(PreparedStatement statement, Project obj){
         try{
             statement.setString(1, obj.getName());
             statement.setString(2, obj.getDescription());
             statement.setLong(3, obj.getUserId());
             statement.setLong(4, obj.getCurriculumId());
             statement.setLong(5, obj.getVersion());
+            executeUpdate(statement);
+
+            long version = getVersion(statement);
+
+            return new Project(obj.getUserId(), obj.getCurriculumId(), obj.getName(), obj.getDescription(), version);
         } catch (SQLException e) {
             throw new DataMapperException(e);
         }
     }
 
-    private static void prepareDeleteStatement(PreparedStatement statement, Project obj){
+    private static Project prepareDeleteStatement(PreparedStatement statement, Project obj){
         try{
             statement.setLong(1, obj.getUserId());
             statement.setLong(2, obj.getCurriculumId());
             statement.setLong(3, obj.getVersion());
+            executeUpdate(statement);
+            return null;
         } catch (SQLException e) {
             throw new DataMapperException(e);
         }

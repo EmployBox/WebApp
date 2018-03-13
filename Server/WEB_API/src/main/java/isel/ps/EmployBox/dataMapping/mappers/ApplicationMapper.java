@@ -2,7 +2,6 @@ package isel.ps.EmployBox.dataMapping.mappers;
 
 
 import isel.ps.EmployBox.dataMapping.exceptions.DataMapperException;
-import isel.ps.EmployBox.dataMapping.utils.MapperSettings;
 import javafx.util.Pair;
 import isel.ps.EmployBox.model.Application;
 import isel.ps.EmployBox.util.Streamable;
@@ -45,29 +44,42 @@ public class ApplicationMapper extends AbstractMapper<Application, String> {
         }
     }
 
-    private static void prepareInsertStatement(PreparedStatement statement, Application obj) {
+    private static Application prepareInsertStatement(PreparedStatement statement, Application obj) {
         try{
             statement.setLong(1, obj.getUserId());
             statement.setLong(2, obj.getCurriculumId());
             statement.setLong(3, obj.getJobId());
             statement.setDate(4, obj.getDate());
+            executeUpdate(statement);
+
+            long version = getVersion(statement);
+
+            return new Application(obj.getUserId(), obj.getJobId(), obj.getCurriculumId(), obj.getDate(), version);
         } catch (SQLException e) {
             throw new DataMapperException(e);
         }
     }
 
-    private static void prepareUpdateStatement(PreparedStatement statement, Application obj) {
+    private static Application prepareUpdateStatement(PreparedStatement statement, Application obj) {
         try{
-            statement.setDate(4, obj.getDate());
+            statement.setDate(1, obj.getDate());
+            executeUpdate(statement);
+
+            long version = getVersion(statement);
+
+            return new Application(obj.getUserId(), obj.getJobId(), obj.getCurriculumId(), obj.getDate(), version);
         } catch (SQLException e) {
             throw new DataMapperException(e);
         }
     }
 
-    private static void prepareDeleteStatement(PreparedStatement statement, Application obj) {
+    private static Application prepareDeleteStatement(PreparedStatement statement, Application obj) {
         try{
             statement.setLong(1, obj.getUserId());
             statement.setLong(2, obj.getCurriculumId());
+            executeUpdate(statement);
+
+            return null;
         } catch (SQLException e) {
             throw new DataMapperException(e);
         }

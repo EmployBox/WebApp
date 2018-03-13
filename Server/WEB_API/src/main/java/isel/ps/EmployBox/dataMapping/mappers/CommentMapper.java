@@ -49,35 +49,46 @@ public class CommentMapper extends AbstractMapper<Comment, Long> {
         return findWhere(new Pair<>("mainCommentId",commentId));
     }
 
-    private static void prepareInsertStatement(PreparedStatement statement, Comment comment) {
+    private static Comment prepareInsertStatement(PreparedStatement statement, Comment comment) {
         try {
-            statement.setLong(1, comment.getCommentID());
-            statement.setDouble(2, comment.getAccountIdFrom());
-            statement.setLong(3, comment.getAccountIdTo());
-            statement.setLong(4, comment.getMainCommendID());
-            statement.setDate(5, comment.getDate());
-            statement.setString(6, comment.getText());
-            statement.setBoolean(7, comment.getStatus());
-            statement.execute();
+            statement.setDouble(1, comment.getAccountIdFrom());
+            statement.setLong(2, comment.getAccountIdTo());
+            statement.setLong(3, comment.getMainCommendID());
+            statement.setDate(4, comment.getDate());
+            statement.setString(5, comment.getText());
+            statement.setBoolean(6, comment.getStatus());
+            executeUpdate(statement);
+
+            long version = getVersion(statement);
+            long commentId = getGeneratedKey(statement);
+
+            return new Comment(commentId, comment.getAccountIdFrom(), comment.getAccountIdTo(), comment.getMainCommendID(), comment.getDate(), comment.getText(), comment.getStatus(),
+                    comment.getReplies(), version);
         } catch (SQLException e) {
             throw new DataMapperException(e);
         }
     }
 
-    private static void prepareUpdateStatement(PreparedStatement statement, Comment comment) {
+    private static Comment prepareUpdateStatement(PreparedStatement statement, Comment comment) {
         try {
             statement.setString(1, comment.getText());
             statement.setBoolean(2, comment.getStatus());
-            statement.execute();
+            executeUpdate(statement);
+
+            long version = getVersion(statement);
+
+            return new Comment(comment.getCommentID(), comment.getAccountIdFrom(), comment.getAccountIdTo(), comment.getMainCommendID(), comment.getDate(), comment.getText(), comment.getStatus(),
+                    comment.getReplies(), version);
         } catch (SQLException e) {
             throw new DataMapperException(e);
         }
     }
 
-    private static void prepareDeleteStatement(PreparedStatement statement, Comment comment) {
+    private static Comment prepareDeleteStatement(PreparedStatement statement, Comment comment) {
         try {
             statement.setLong(1, comment.getCommentID());
-            statement.execute();
+            statement.executeUpdate();
+            return null;
         } catch (SQLException e) {
             throw new DataMapperException(e);
         }

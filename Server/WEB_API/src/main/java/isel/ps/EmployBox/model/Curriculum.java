@@ -17,7 +17,7 @@ public class Curriculum extends DomainObject<String>{
     private final Streamable<Project> projects;
     private final Streamable<CurriculumExperience> experiences;
 
-    private Curriculum(
+    public Curriculum(
             long accountId,
             long curriculumId,
             String title,
@@ -78,19 +78,19 @@ public class Curriculum extends DomainObject<String>{
         return title;
     }
 
-    public Stream<PreviousJobs> getPreviousJobs() {
-        return previousJobs.get();
+    public Streamable<PreviousJobs> getPreviousJobs() {
+        return previousJobs;
     }
 
-    public Stream<AcademicBackground> getAcademicBackground() {
-        return academicBackground.get();
+    public Streamable<AcademicBackground> getAcademicBackground() {
+        return academicBackground;
     }
 
-    public Stream<Project> getProjects() {
-        return projects.get();
+    public Streamable<Project> getProjects() {
+        return projects;
     }
 
-    public Stream<CurriculumExperience> getExperiences() {
-        return experiences.get();
+    public Streamable<CurriculumExperience> getExperiences() {
+        return experiences;
     }
 }

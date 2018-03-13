@@ -44,7 +44,7 @@ public class PreviousJobsMapper extends AbstractMapper<PreviousJobs, String> {
         }
     }
 
-    private static void prepareInsertStatement (PreparedStatement statement, PreviousJobs obj) {
+    private static PreviousJobs prepareInsertStatement (PreparedStatement statement, PreviousJobs obj) {
         try{
             statement.setLong(1, obj.getUserId());
             statement.setLong(2, obj.getCurriculumId());
@@ -53,12 +53,17 @@ public class PreviousJobsMapper extends AbstractMapper<PreviousJobs, String> {
             statement.setString(5, obj.getCompanyName());
             statement.setString(6, obj.getWorkLoad());
             statement.setString(7, obj.getRole());
+            executeUpdate(statement);
+
+            long version = getVersion(statement);
+
+            return new PreviousJobs(obj.getUserId(), obj.getCurriculumId(), obj.getBeginDate(), obj.getEndDate(), obj.getCompanyName(), obj.getWorkLoad(), obj.getRole(), version);
         } catch (SQLException e) {
             throw new DataMapperException(e);
         }
     }
 
-    private static void prepareUpdateStatement(PreparedStatement statement, PreviousJobs obj) {
+    private static PreviousJobs prepareUpdateStatement(PreparedStatement statement, PreviousJobs obj) {
         try{
             statement.setDate(1, obj.getBeginDate());
             statement.setDate(2, obj.getEndDate());
@@ -68,16 +73,23 @@ public class PreviousJobsMapper extends AbstractMapper<PreviousJobs, String> {
             statement.setLong(6, obj.getUserId());
             statement.setLong(7, obj.getCurriculumId());
             statement.setLong(8, obj.getVersion());
+            executeUpdate(statement);
+
+            long version = getVersion(statement);
+
+            return new PreviousJobs(obj.getUserId(), obj.getCurriculumId(), obj.getBeginDate(), obj.getEndDate(), obj.getCompanyName(), obj.getWorkLoad(), obj.getRole(), version);
         } catch (SQLException e) {
             throw new DataMapperException(e);
         }
     }
 
-    private static void prepareDeleteStatement (PreparedStatement statement, PreviousJobs obj) {
+    private static PreviousJobs prepareDeleteStatement (PreparedStatement statement, PreviousJobs obj) {
         try{
             statement.setLong(1, obj.getUserId());
             statement.setLong(2, obj.getCurriculumId());
             statement.setLong(3, obj.getVersion());
+            executeUpdate(statement);
+            return null;
         } catch (SQLException e) {
             throw new DataMapperException(e);
         }

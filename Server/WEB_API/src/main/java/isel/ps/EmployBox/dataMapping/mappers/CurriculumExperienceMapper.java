@@ -42,22 +42,28 @@ public class CurriculumExperienceMapper extends AbstractMapper<CurriculumExperie
         return findWhere(new Pair<>("userId", accountId),new Pair<>("curriculumId", curriculumId));
     }
 
-    private static void prepareWriteStatement(PreparedStatement statement, CurriculumExperience obj){
+    private static CurriculumExperience prepareWriteStatement(PreparedStatement statement, CurriculumExperience obj){
         try{
             statement.setLong(1, obj.getUserId());
             statement.setLong(2, obj.getCurriculumId());
             statement.setString(3,obj.getCompetences());
             statement.setShort(4, obj.getYears());
+            executeUpdate(statement);
 
+            long version = getVersion(statement);
+
+            return new CurriculumExperience(obj.getUserId(), obj.getCurriculumId(), obj.getCompetences(), obj.getYears(), version);
         } catch (SQLException e) {
             throw new DataMapperException(e);
         }
     }
 
-    private static void prepareDeleteStatement(PreparedStatement statement, CurriculumExperience obj){
+    private static CurriculumExperience prepareDeleteStatement(PreparedStatement statement, CurriculumExperience obj){
         try{
             statement.setLong(1, obj.getUserId());
             statement.setLong(2, obj.getCurriculumId());
+            executeUpdate(statement);
+            return null;
         } catch (SQLException e) {
             throw new DataMapperException(e);
         }

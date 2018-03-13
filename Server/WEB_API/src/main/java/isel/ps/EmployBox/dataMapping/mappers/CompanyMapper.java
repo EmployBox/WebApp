@@ -50,7 +50,7 @@ public class CompanyMapper extends AccountMapper<Company> {
         return null;
     }
 
-    private static void prepareUpdateProcedureArguments(CallableStatement cs, Company obj) {
+    private static Company prepareUpdateProcedureArguments(CallableStatement cs, Company obj) {
         try {
             cs.setString(1, obj.getEmail());
             cs.setString(2,obj.getPassword());
@@ -62,18 +62,25 @@ public class CompanyMapper extends AccountMapper<Company> {
             cs.setString(8, obj.getWebPageUrl());
             cs.setString(9, obj.getDescription());
             cs.registerOutParameter(10, Types.BIGINT);
-            cs.registerOutParameter(11, Types.NVARCHAR);
+            cs.registerOutParameter(11, Types.BIGINT);
             cs.execute();
+
+            long accountId = cs.getLong(10);
+            long version = cs.getLong(11);
+
+            return new Company(accountId, obj.getEmail(), obj.getPassword(), obj.getRating(), version, obj.getName(), obj.getSpecialization(), obj.getYearFounded(), obj.getLogoUrl(), obj.getWebPageUrl(),
+                    obj.getDescription(), obj.getOfferedJobs(), obj.getChats(), obj.getComments(), obj.getRatings(), obj.getFollowing());
         } catch (SQLException e) {
             throw new DataMapperException(e);
         }
     }
 
-    private static void prepareDeleteProcedure(CallableStatement callableStatement, Company obj){
+    private static Company prepareDeleteProcedure(CallableStatement callableStatement, Company obj){
         try {
             callableStatement.setLong(1, obj.getIdentityKey());
             callableStatement.registerOutParameter(2, Types.NVARCHAR);
             callableStatement.execute();
+            return null;
         } catch (SQLException e) {
             throw new DataMapperException(e);
         }

@@ -14,7 +14,7 @@ public class AcademicBackground extends DomainObject<String> {
     private final String institution;
     private final String degreeObtained;
 
-    private AcademicBackground(long userId, long curriculumId, Date beginDate, Date endDate, String studyArea, String institution, String degreeObtained, long version) {
+    public AcademicBackground(long userId, long curriculumId, Date beginDate, Date endDate, String studyArea, String institution, String degreeObtained, long version) {
         super(String.format("%d-%d", userId, curriculumId), version);
         this.accountID = userId;
         this.curriculumId = curriculumId;

@@ -1,11 +1,8 @@
 package isel.ps.EmployBox.dataMapping.mappers;
 
 import isel.ps.EmployBox.dataMapping.exceptions.DataMapperException;
-import isel.ps.EmployBox.dataMapping.utils.MapperSettings;
 import javafx.util.Pair;
-import isel.ps.EmployBox.model.DomainObject;
 import isel.ps.EmployBox.model.Rating;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 import isel.ps.EmployBox.util.Streamable;
 
 import java.sql.PreparedStatement;
@@ -50,19 +47,24 @@ public class RatingMapper extends AbstractMapper<Rating, String> {
         }
     }
 
-    private static void prepareInsertStatement(PreparedStatement statement, Rating obj){
+    private static Rating prepareInsertStatement(PreparedStatement statement, Rating obj){
         try{
             statement.setLong(1, obj.getAccountIdFrom());
             statement.setLong(2, obj.getAccountIdTo());
             statement.setLong(3, obj.getModeratorId());
             statement.setDouble(4, obj.getRatingValue());
             statement.setBoolean(5, obj.isApproved());
+            executeUpdate(statement);
+
+            long version = getVersion(statement);
+
+            return new Rating(obj.getAccountIdFrom(), obj.getAccountIdTo(), obj.getModeratorId(), obj.getRatingValue(), obj.isApproved(), version);
         } catch (SQLException e) {
             throw new DataMapperException(e);
         }
     }
 
-    private static void prepareUpdateStatement(PreparedStatement statement, Rating obj){
+    private static Rating prepareUpdateStatement(PreparedStatement statement, Rating obj){
         try{
             statement.setLong(1, obj.getModeratorId());
             statement.setDouble(2, obj.getRatingValue());
@@ -70,16 +72,23 @@ public class RatingMapper extends AbstractMapper<Rating, String> {
             statement.setLong(4, obj.getAccountIdFrom());
             statement.setLong(5, obj.getAccountIdTo());
             statement.setLong(6, obj.getVersion());
+            executeUpdate(statement);
+
+            long version = getVersion(statement);
+
+            return new Rating(obj.getAccountIdFrom(), obj.getAccountIdTo(), obj.getModeratorId(), obj.getRatingValue(), obj.isApproved(), version);
         } catch (SQLException e) {
             throw new DataMapperException(e);
         }
     }
 
-    private static void prepareDeleteStatement(PreparedStatement statement, Rating obj){
+    private static Rating prepareDeleteStatement(PreparedStatement statement, Rating obj){
         try{
             statement.setLong(1, obj.getAccountIdFrom());
             statement.setLong(2, obj.getAccountIdTo());
             statement.setLong(3, obj.getVersion());
+            executeUpdate(statement);
+            return null;
         } catch (SQLException e) {
             throw new DataMapperException(e);
         }

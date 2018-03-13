@@ -1,12 +1,9 @@
 package isel.ps.EmployBox.dataMapping.mappers;
 
 import isel.ps.EmployBox.dataMapping.exceptions.DataMapperException;
-import isel.ps.EmployBox.dataMapping.utils.MapperSettings;
 import javafx.util.Pair;
 import isel.ps.EmployBox.model.Chat;
-import isel.ps.EmployBox.model.DomainObject;
 import isel.ps.EmployBox.model.Message;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 import isel.ps.EmployBox.util.Streamable;
 
 import java.sql.PreparedStatement;
@@ -20,9 +17,9 @@ public class ChatMapper extends AbstractMapper<Chat, Long>{
         super(
                 Chat.class,
                 PreparedStatement.class,
-                ChatMapper::prepareStatement,
+                ChatMapper::prepareInsertStatement,
                 null,
-                ChatMapper::prepareStatement
+                ChatMapper::prepareDeleteStatement
         );
     }
 
@@ -49,11 +46,26 @@ public class ChatMapper extends AbstractMapper<Chat, Long>{
         }
     }
 
-    private static void prepareStatement(PreparedStatement statement, Chat obj){
+    private static Chat prepareInsertStatement(PreparedStatement statement, Chat obj){
+        try{
+            statement.setLong(1, obj.getAccountIdFirst());
+            statement.setLong(2, obj.getAccountIdSecond());
+            executeUpdate(statement);
+
+            long version = getVersion(statement);
+            long chatId = getGeneratedKey(statement);
+
+            return new Chat(chatId, obj.getAccountIdFirst(), obj.getAccountIdSecond(), version, obj.getMessages());
+        } catch (SQLException e) {
+            throw new DataMapperException(e);
+        }
+    }
+
+    private static Chat prepareDeleteStatement(PreparedStatement statement, Chat obj){
         try{
             statement.setLong(1, obj.getChadId());
-            statement.setLong(2, obj.getAccountIdFirst());
-            statement.setLong(3, obj.getAccountIdSecond());
+            executeUpdate(statement);
+            return null;
         } catch (SQLException e) {
             throw new DataMapperException(e);
         }

@@ -42,24 +42,30 @@ public class ModeratorMapper extends AccountMapper<Moderator> {
         }
     }
 
-    private static void prepareWriteProcedure(CallableStatement cs,  Moderator obj) {
+    private static Moderator prepareWriteProcedure(CallableStatement cs,  Moderator obj) {
         try {
             cs.setString(1, obj.getEmail());
             cs.setDouble(2, obj.getRating());
             cs.setString(3, obj.getPassword());
             cs.registerOutParameter(4, Types.BIGINT);
-            cs.registerOutParameter(5, Types.NVARCHAR);
+            cs.registerOutParameter(5, Types.BIGINT);
             cs.execute();
+
+            long moderatorId = cs.getLong(4);
+            long version = cs.getLong(5);
+
+            return new Moderator(moderatorId, obj.getEmail(), obj.getPassword(), obj.getRating(), version, obj.getComments(), obj.getChats(), obj.getRatings(), obj.getRatings());
         } catch (SQLException e) {
             throw new DataMapperException(e);
         }
     }
 
-    private static void prepareDeleteProcedure(CallableStatement callableStatement, Moderator obj){
+    private static Moderator prepareDeleteProcedure(CallableStatement callableStatement, Moderator obj){
         try {
             callableStatement.setLong(1, obj.getIdentityKey());
             callableStatement.registerOutParameter(2, Types.NVARCHAR);
             callableStatement.execute();
+            return null;
         } catch (SQLException e) {
             throw new DataMapperException(e);
         }

@@ -39,10 +39,15 @@ public class FollowMapper extends AbstractMapper<Follows, String> {
         }
     }
 
-    private static void prepareStatement(PreparedStatement statement, Follows obj){
+    private static Follows prepareStatement(PreparedStatement statement, Follows obj){
         try{
             statement.setLong(1, obj.getAccountIdFrom());
             statement.setLong(2, obj.getAccountIdDest());
+            executeUpdate(statement);
+
+            long version = getVersion(statement);
+
+            return new Follows(obj.getAccountIdFrom(), obj.getAccountIdDest());
         } catch (SQLException e) {
             throw new DataMapperException(e);
         }

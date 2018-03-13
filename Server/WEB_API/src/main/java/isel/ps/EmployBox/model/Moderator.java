@@ -7,7 +7,7 @@ import java.util.stream.Stream;
 public class Moderator extends Account {
     private final Streamable<Rating> ratingsModerated;
 
-    protected Moderator(
+    public Moderator(
             long accountID,
             String email,
             String password,

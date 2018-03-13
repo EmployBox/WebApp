@@ -5,7 +5,7 @@ public class JobExperience extends DomainObject<Long>{
     private final String competeces;
     private final short years;
 
-    private JobExperience(long jobId,String competeces, short years, long version){
+    public JobExperience(long jobId, String competeces, short years, long version){
         super(jobId,version);
         this.jobId = jobId;
         this.competeces = competeces;
