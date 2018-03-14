@@ -1,11 +1,11 @@
 package isel.ps.EmployBox.dal.domainModel;
 
-import isel.ps.EmployBox.dal.util.Streamable;
-
+import java.util.List;
+import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 public class Moderator extends Account {
-    private final Streamable<Rating> ratingsModerated;
+    private final Supplier<List<Rating>> ratingsModerated;
 
     public Moderator(
             long accountID,
@@ -13,10 +13,10 @@ public class Moderator extends Account {
             String password,
             double rating,
             long version,
-            Streamable<Comment> comments,
-            Streamable<Chat> chats,
-            Streamable<Rating> ratings,
-            Streamable<Rating> ratingsModerated
+            Supplier<List<Comment>> comments,
+            Supplier<List<Chat>> chats,
+            Supplier<List<Rating>> ratings,
+            Supplier<List<Rating>> ratingsModerated
     ) {
         super(accountID, email, password, rating, version, null, comments, chats, ratings, null);
         this.ratingsModerated = ratingsModerated;
@@ -27,10 +27,10 @@ public class Moderator extends Account {
             String password,
             double rating,
             long version,
-            Streamable<Comment> comments,
-            Streamable<Chat>chats,
-            Streamable<Rating> ratings,
-            Streamable<Rating> ratingsModerated
+            Supplier<List<Comment>> comments,
+            Supplier<List<Chat>> chats,
+            Supplier<List<Rating>> ratings,
+            Supplier<List<Rating>> ratingsModerated
     ){
         Moderator moderator = new Moderator(
                 defaultKey,
@@ -53,10 +53,10 @@ public class Moderator extends Account {
             String password,
             double rating,
             long version,
-            Streamable<Comment> comments,
-            Streamable<Chat>chats,
-            Streamable<Rating> ratings,
-            Streamable<Rating> ratingsModerated
+            Supplier<List<Comment>> comments,
+            Supplier<List<Chat>> chats,
+            Supplier<List<Rating>> ratings,
+            Supplier<List<Rating>> ratingsModerated
     ){
         Moderator moderator = new Moderator(
                 accountId,

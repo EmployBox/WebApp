@@ -1,6 +1,8 @@
 package isel.ps.EmployBox.dal.domainModel;
 
-import isel.ps.EmployBox.dal.util.Streamable;
+
+import java.util.List;
+import java.util.function.Supplier;
 
 public class Company extends Account {
     private final String name;
@@ -22,11 +24,11 @@ public class Company extends Account {
             String logoUrl,
             String webPageUrl,
             String description,
-            Streamable<Job> offeredJobs,
-            Streamable<Chat> chats,
-            Streamable<Comment> comments,
-            Streamable<Rating> ratings,
-            Streamable<User> following
+            Supplier<List<Job>> offeredJobs,
+            Supplier<List<Chat>> chats,
+            Supplier<List<Comment>> comments,
+            Supplier<List<Rating>> ratings,
+            Supplier<List<User>> following
     ){
         super(accountID, email, password, rating, version, offeredJobs,comments, chats, ratings, following);
         this.name = name;
@@ -49,11 +51,11 @@ public class Company extends Account {
             String logoUrl,
             String webPageUrl,
             String description,
-            Streamable<Job> offeredJobs,
-            Streamable<Chat>chats,
-            Streamable<Comment> comments,
-            Streamable<Rating> ratings,
-            Streamable<User> following
+            Supplier<List<Job>> offeredJobs,
+            Supplier<List<Chat>> chats,
+            Supplier<List<Comment>> comments,
+            Supplier<List<Rating>> ratings,
+            Supplier<List<User>> following
     ){
         Company company = new Company(defaultKey,
                 email,
@@ -88,11 +90,11 @@ public class Company extends Account {
             String logoUrl,
             String webPageUrl,
             String description,
-            Streamable<Job> offeredJobs,
-            Streamable<Chat>chats,
-            Streamable<Comment> comments,
-            Streamable<Rating> ratings,
-            Streamable<User> following
+            Supplier<List<Job>> offeredJobs,
+            Supplier<List<Chat>> chats,
+            Supplier<List<Comment>> comments,
+            Supplier<List<Rating>> ratings,
+            Supplier<List<User>> following
     ){
         Company company = new Company(
                 accountID,
@@ -127,11 +129,11 @@ public class Company extends Account {
            String logoUrl,
            String webPageUrl,
            String description,
-           Streamable<Job> offeredJobs,
-           Streamable<Chat>chats,
-           Streamable<Comment> comments,
-           Streamable<Rating> ratings,
-           Streamable<User> following
+           Supplier<List<Job>> offeredJobs,
+           Supplier<List<Chat>> chats,
+           Supplier<List<Comment>> comments,
+           Supplier<List<Rating>> ratings,
+           Supplier<List<User>> following
     ){
         company.markToBeDirty();
         Company newCompany = new Company(

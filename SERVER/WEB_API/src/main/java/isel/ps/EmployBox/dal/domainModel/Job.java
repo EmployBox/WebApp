@@ -1,8 +1,8 @@
 package isel.ps.EmployBox.dal.domainModel;
 
-import isel.ps.EmployBox.dal.util.Streamable;
-
 import java.sql.Date;
+import java.util.List;
+import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 public class Job extends DomainObject<Long> {
@@ -17,8 +17,8 @@ public class Job extends DomainObject<Long> {
     private final Date offerEndDate;
     private final String offerType; //TODO change to enum
 
-    private final Streamable<Application> applications;
-    private final Streamable<JobExperience> experiences;
+    private final Supplier<List<Application>> applications;
+    private final Supplier<List<JobExperience>> experiences;
 
     public Job(
             long id,
@@ -31,8 +31,8 @@ public class Job extends DomainObject<Long> {
             Date offerEndDate,
             String offerType,
             long version,
-            Streamable<Application> applications,
-            Streamable<JobExperience> experiences
+            Supplier<List<Application>> applications,
+            Supplier<List<JobExperience>> experiences
     ) {
         super(id, version);
         this.jobId = id;
@@ -57,8 +57,8 @@ public class Job extends DomainObject<Long> {
             Date offerBeginDate,
             Date offerEndDate,
             String offerType,
-            Streamable<Application> applications,
-            Streamable<JobExperience> experiences
+            Supplier<List<Application>> applications,
+            Supplier<List<JobExperience>> experiences
     ) {
         Job job = new Job(defaultKey, accountID, address, wage, description, schedule, offerBeginDate, offerEndDate, offerType, 0, applications, experiences);
         job.markNew();
@@ -76,8 +76,8 @@ public class Job extends DomainObject<Long> {
             Date offerEndDate,
             String offerType,
             long version,
-            Streamable<Application> applications,
-            Streamable<JobExperience> experiences
+            Supplier<List<Application>> applications,
+            Supplier<List<JobExperience>> experiences
     ) {
         Job job = new Job(id, accountID, address, wage, description, schedule, offerBeginDate, offerEndDate, offerType, version, applications, experiences);
         job.markClean();
@@ -94,8 +94,8 @@ public class Job extends DomainObject<Long> {
             Date offerBeginDate,
             Date offerEndDate,
             String offerType,
-            Streamable<Application> applications,
-            Streamable<JobExperience> experiences
+            Supplier<List<Application>> applications,
+            Supplier<List<JobExperience>> experiences
     ){
         job.markToBeDirty();
         Job newJob = new Job(job.getAccountID(), accountID, address, wage, description, schedule, offerBeginDate, offerEndDate, offerType, job.getNextVersion(), applications, experiences);

@@ -2,6 +2,10 @@ package isel.ps.EmployBox.dal.domainModel;
 
 import isel.ps.EmployBox.dal.util.Streamable;
 
+import java.util.List;
+import java.util.function.Supplier;
+import java.util.stream.Stream;
+
 public abstract class Account extends DomainObject<Long> {
     @ID(isIdentity = true)
     protected long accountID;
@@ -9,11 +13,11 @@ public abstract class Account extends DomainObject<Long> {
     protected final String password;
     protected final double rating;
        
-    protected final Streamable<Job> offeredJobs;
-    protected final Streamable<Comment> comments;
-    protected final Streamable<User> following;
-    protected final Streamable<Chat> chats;
-    protected final Streamable<Rating> ratings;
+    protected final Supplier<List<Job>> offeredJobs;
+    protected final Supplier<List<Comment>> comments;
+    protected final Supplier<List<User>> following;
+    protected final Supplier<List<Chat>> chats;
+    protected final Supplier<List<Rating>> ratings;
 
     protected Account(
             long accountID,
@@ -21,11 +25,11 @@ public abstract class Account extends DomainObject<Long> {
             String password,
             double rating,
             long version,
-            Streamable<Job> offeredJobs,
-            Streamable<Comment> comments,
-            Streamable<Chat> chats,
-            Streamable<Rating> ratings,
-            Streamable<User> following
+            Supplier<List<Job>> offeredJobs,
+            Supplier<List<Comment>> comments,
+            Supplier<List<Chat>> chats,
+            Supplier<List<Rating>> ratings,
+            Supplier<List<User>> following
     ){
         super(accountID, version);
         this.accountID = accountID;
@@ -51,23 +55,23 @@ public abstract class Account extends DomainObject<Long> {
         return rating;
     }
 
-    public Streamable<Job> getOfferedJobs() {
-        return offeredJobs;
+    public Stream<Job> getOfferedJobs() {
+        return offeredJobs.get().stream();
     }
 
-    public Streamable<User> getFollowing() {
-        return following;
+    public Stream<User> getFollowing() {
+        return following.get().stream();
     }
 
-    public Streamable<Comment> getComments() {
-        return comments;
+    public Stream<Comment> getComments() {
+        return comments.get().stream();
     }
 
-    public Streamable<Chat> getChats() {
-        return chats;
+    public Stream<Chat> getChats() {
+        return chats.get().stream();
     }
 
-    public Streamable<Rating> getRatings() {
-        return ratings;
+    public Stream<Rating> getRatings() {
+        return ratings.get().stream();
     }
 }

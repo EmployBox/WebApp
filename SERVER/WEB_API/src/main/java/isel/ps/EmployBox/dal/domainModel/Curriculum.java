@@ -1,7 +1,7 @@
 package isel.ps.EmployBox.dal.domainModel;
 
-import isel.ps.EmployBox.dal.util.Streamable;
-
+import java.util.List;
+import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 public class Curriculum extends DomainObject<String>{
@@ -12,20 +12,20 @@ public class Curriculum extends DomainObject<String>{
     private long curriculumId;
     private final String title;
 
-    private final Streamable<PreviousJobs> previousJobs;
-    private final Streamable<AcademicBackground> academicBackground;
-    private final Streamable<Project> projects;
-    private final Streamable<CurriculumExperience> experiences;
+    private final Supplier<List<PreviousJobs>> previousJobs;
+    private final Supplier<List<AcademicBackground>> academicBackground;
+    private final Supplier<List<Project>> projects;
+    private final Supplier<List<CurriculumExperience>> experiences;
 
     public Curriculum(
             long accountId,
             long curriculumId,
             String title,
             long version,
-            Streamable<PreviousJobs> previousJobs,
-            Streamable<AcademicBackground> academicBackground,
-            Streamable<Project> projects,
-            Streamable<CurriculumExperience> experiences
+            Supplier<List<PreviousJobs>> previousJobs,
+            Supplier<List<AcademicBackground>> academicBackground,
+            Supplier<List<Project>> projects,
+            Supplier<List<CurriculumExperience>> experiences
     ) {
         super(String.format("%d%n-%d%n", accountId, curriculumId), version);
         this.accountId = accountId;
@@ -41,10 +41,10 @@ public class Curriculum extends DomainObject<String>{
             long accountId,
             String title,
             long version,
-            Streamable<PreviousJobs> previousJobs,
-            Streamable<AcademicBackground> academicBackground,
-            Streamable<Project> projects,
-            Streamable<CurriculumExperience> experiences
+            Supplier<List<PreviousJobs>> previousJobs,
+            Supplier<List<AcademicBackground>> academicBackground,
+            Supplier<List<Project>> projects,
+            Supplier<List<CurriculumExperience>> experiences
     ) {
         Curriculum curriculum = new Curriculum(accountId, defaultKey, title, version, previousJobs, academicBackground, projects, experiences);
         curriculum.markNew();
@@ -56,10 +56,10 @@ public class Curriculum extends DomainObject<String>{
             long curriculumId,
             String title,
             long version,
-            Streamable<PreviousJobs> previousJobs,
-            Streamable<AcademicBackground> academicBackground,
-            Streamable<Project> projects,
-            Streamable<CurriculumExperience> experiences
+            Supplier<List<PreviousJobs>> previousJobs,
+            Supplier<List<AcademicBackground>> academicBackground,
+            Supplier<List<Project>> projects,
+            Supplier<List<CurriculumExperience>> experiences
     ) {
         Curriculum curriculum = new Curriculum(accountId, curriculumId, title, version, previousJobs, academicBackground, projects, experiences);
         curriculum.markClean();
