@@ -3,7 +3,7 @@
   <Items>
     <LogicalFolder Name="Connections" Type="2" Sorted="true">
       <Items>
-        <ConnectionNode Name="(local):ASUS-JOAO\JonyM">
+        <ConnectionNode Name="(local):Neo\MATRIX">
           <Created>2018-03-11T16:32:15.3211978+00:00</Created>
           <Type>SQL</Type>
           <Server>(local)</Server>
@@ -55,11 +55,11 @@
           <AssociatedConnUserName />
           <FullPath>procedures.sql</FullPath>
         </FileNode>
-        <FileNode Name="TestDBPopulate.sql">
+        <FileNode Name="triggers.sql">
           <AssociatedConnectionMoniker>8c91a03d-f9b4-46c0-a305-b5dcc79ff907:(local):True</AssociatedConnectionMoniker>
           <AssociatedConnSrvName>(local)</AssociatedConnSrvName>
           <AssociatedConnUserName />
-          <FullPath>TestDBPopulate.sql</FullPath>
+          <FullPath>triggers.sql</FullPath>
         </FileNode>
         <FileNode Name="views.sql">
           <AssociatedConnectionMoniker>8c91a03d-f9b4-46c0-a305-b5dcc79ff907:(local):True</AssociatedConnectionMoniker>
