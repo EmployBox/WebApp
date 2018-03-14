@@ -1,12 +1,12 @@
 package isel.ps.EmployBox.dal.dataMapping.utils;
 
-import isel.ps.EmployBox.dal.dataMapping.exceptions.ConcurrencyException;
 import isel.ps.EmployBox.dal.dataMapping.exceptions.DataMapperException;
+import isel.ps.EmployBox.dal.domainModel.DomainObject;
+import isel.ps.EmployBox.dataMapping.DataBaseConnectivity;
 
 import java.sql.*;
 import java.util.Spliterator;
 import java.util.Spliterators;
-import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Stream;
