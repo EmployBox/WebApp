@@ -1,5 +1,6 @@
 package isel.ps.EmployBox.dal.dataMapping.mappers;
 
+import isel.ps.EmployBox.dal.dataMapping.DataBaseConnectivity;
 import isel.ps.EmployBox.dal.dataMapping.utils.MapperSettings;
 import isel.ps.EmployBox.dal.dataMapping.utils.SQLUtils;
 import isel.ps.EmployBox.dal.dataMapping.Mapper;
@@ -15,8 +16,12 @@ import javafx.util.Pair;
 import java.lang.reflect.Field;
 import java.sql.*;
 import java.util.Arrays;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.List;
 import java.util.Map;
 import java.util.StringJoiner;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.function.BiFunction;
@@ -51,7 +56,7 @@ public abstract class AbstractMapper<T extends DomainObject<K>, K> implements Ma
                 .toArray(Field[]::new);
 
         this.SELECT_QUERY = Arrays.stream(fields)
-                .map(f -> f.getName().equals("version") || f.getName().equals("date") ? "[" + f.getName()+ "]" : f.getName())
+                .map(Field::getName)
                 .collect(Collectors.joining(", ", "select ", " from ["+type.getSimpleName()+"]"));
 
         String sI;
@@ -127,12 +132,24 @@ public abstract class AbstractMapper<T extends DomainObject<K>, K> implements Ma
      */
     abstract T mapper(ResultSet rs) throws DataMapperException;
 
+    @Override
+    public CompletableFuture<T> getById(K id) {
+        return null;
+    }
+
+    @Override
+    public CompletableFuture<List<T>> getAll() {
+        dbc.executeSQLQuery(SELECT_QUERY, this::mapper, s -> {});
+
+        return null;
+    }
+
     protected<R> Streamable<T> findWhere(Pair<String, R>... values){
         String query = Arrays.stream(values)
                 .map(p -> p.getKey() + " = ? ")
                 .collect(Collectors.joining(" AND ", SELECT_QUERY + " WHERE ", ""));
 
-        return () -> dbc.executeSQLQuery(
+        return dbc.executeSQLQuery(
                 query,
                 this::mapper,
                 statement -> {
@@ -143,8 +160,7 @@ public abstract class AbstractMapper<T extends DomainObject<K>, K> implements Ma
                     } catch (SQLException e) {
                         throw new DataMapperException(e);
                     }
-                }
-        );
+                })::join;
     }
 
     private boolean tryReplace(T obj, long timeout){
@@ -161,6 +177,11 @@ public abstract class AbstractMapper<T extends DomainObject<K>, K> implements Ma
             Thread.yield();
         }
         return false;
+    }
+
+    private<R extends Statement> CompletableFuture<T> executeStatement(MapperSettings<R, T, K> mapperSettings, T obj){
+        BiFunction<String, Function<? super Statement, T>, CompletableFuture<T>> execute = mapperSettings.isProcedure() ? dbc::executeSQLProcedure : dbc::executeSQLUpdate;
+        return execute.apply(mapperSettings.getQuery(), statement -> mapperSettings.getStatementFunction().apply((R)statement, obj));
     }
 
     protected static void executeUpdate(PreparedStatement statement) throws SQLException {
@@ -190,38 +211,20 @@ public abstract class AbstractMapper<T extends DomainObject<K>, K> implements Ma
         return jobId;
     }
 
-    private<R extends Statement> T executeStatement(MapperSettings<R, T, K> mapperSettings, T obj){
-        if(mapperSettings.isProcedure())
-            return dbc.executeSQLProcedure(mapperSettings.getQuery(), callableStatement -> mapperSettings
-                    .getStatementFunction()
-                    .apply((R) callableStatement, obj));
-        else
-            return dbc.executeSQLUpdate(mapperSettings.getQuery(), preparedStatement -> mapperSettings
-                    .getStatementFunction()
-                    .apply((R) preparedStatement, obj));
-
-        /*BiFunction<String, Function<R, T>, T> execute = mapperSettings.isProcedure() ? dbc::executeSQLProcedure : dbc::executeSQLUpdate;
-        return execute.apply(mapperSettings.getQuery(), statement -> mapperSettings.getStatementFunction().apply(statement, obj));*/
-    }
-
     @Override
     public void insert(T obj) {
-        obj = executeStatement(insertSettings, obj);
-
-        identityMap.put(obj.getIdentityKey(), obj);
+        executeStatement(insertSettings, obj).thenAccept(o -> identityMap.put(o.getIdentityKey(), o));
     }
 
     @Override
     public void update(T obj) {
-        obj = executeStatement(updateSettings, obj);
-
-        if(!tryReplace(obj, 5000)) throw new ConcurrencyException("Concurrency problem found, could not update IdentityMap");
+        executeStatement(updateSettings, obj)
+                .thenApply(o -> tryReplace(o, 5000))
+                .thenAccept(b -> {if(!b) throw new ConcurrencyException("Concurrency problem found, could not update IdentityMap");});
     }
 
     @Override
     public void delete(T obj) {
-        executeStatement(deleteSettings, obj);
-
-        identityMap.remove(obj.getIdentityKey());
+        executeStatement(deleteSettings, obj).thenAccept(o -> identityMap.remove(obj.getIdentityKey()));
     }
 }

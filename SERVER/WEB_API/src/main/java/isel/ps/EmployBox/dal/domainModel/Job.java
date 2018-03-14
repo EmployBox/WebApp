@@ -135,11 +135,11 @@ public class Job extends DomainObject<Long> {
         return address;
     }
 
-    public Streamable<Application> getApplications() {
-        return applications;
+    public Stream<Application> getApplications() {
+        return applications.get().stream();
     }
 
-    public Streamable<JobExperience> getExperiences() {
-        return experiences;
+    public Stream<JobExperience> getExperiences() {
+        return experiences.get().stream();
     }
 }

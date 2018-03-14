@@ -22,7 +22,7 @@ public class MapperSettings<T extends Statement, U extends DomainObject<K>, K> {
         return query;
     }
 
-    public BiFunction<T, U, U> getStatementFunction() {
+    public BiFunction<? super T, U, U> getStatementFunction() {
         return statementFunction;
     }
 
