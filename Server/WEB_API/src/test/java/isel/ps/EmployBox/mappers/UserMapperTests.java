@@ -58,4 +58,22 @@ public class UserMapperTests {
         assertEquals(user.getSummary(), dbUser.getSummary());
         assertEquals(user.getPhotoUrl(), dbUser.getPhotoUrl());
     }
+
+    @Test
+    public void updateTest(){
+        User user = mapper.findForEmail("123@gmail.com");
+
+        User newUser = User.update(user, "432@hotmail.com", "43532", 4.0, "Baril", "O Baril sou eu", "yetAnotherURL", user.getOfferedJobs(), user.getCurriculums(),
+                user.getApplications(), user.getChats(), user.getComments(), user.getRatings(), user.getFollowing());
+
+        mapper.update(newUser);
+
+        User dbUser = mapper.find(user.getIdentityKey());
+        assertTrue(dbUser != null);
+        assertEquals("432@hotmail.com", dbUser.getEmail());
+        //assertEquals(user.getRating(), dbUser.getRating());
+        assertEquals("Baril", dbUser.getName());
+        assertEquals("O Baril sou eu", dbUser.getSummary());
+        assertEquals("yetAnotherURL", dbUser.getPhotoUrl());
+    }
 }

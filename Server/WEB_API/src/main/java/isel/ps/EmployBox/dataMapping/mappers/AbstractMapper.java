@@ -69,7 +69,7 @@ public abstract class AbstractMapper<T extends DomainObject<K>, K> implements Ma
 
             queryBuilder(fields,
                     f -> sjI.add("?"),
-                    f -> {sjD.add("?"); sjI.add("?");},
+                    f -> {sjD.add("?"); sjI.add("?"); sjU.add("?");},
                     f -> {sjI.add("?"); sjU.add("?");});
 
             sI = sjI.toString();
@@ -148,13 +148,13 @@ public abstract class AbstractMapper<T extends DomainObject<K>, K> implements Ma
         );
     }
 
-    private boolean tryReplace(T obj, long timeout){
+    private boolean tryReplace(T obj, long previousVersion, long timeout){
         long target = System.currentTimeMillis() +  timeout;
         long remaining = target - System.currentTimeMillis();
 
         while(remaining >= target){
             T observedObj = identityMap.get(obj.getIdentityKey());
-            if(observedObj.getVersion() + 1 == obj.getVersion()) {
+            if(previousVersion < obj.getVersion()) {
                 if(identityMap.replace(obj.getIdentityKey(), observedObj, obj))
                     return true;
             }
@@ -207,16 +207,17 @@ public abstract class AbstractMapper<T extends DomainObject<K>, K> implements Ma
 
     @Override
     public void insert(T obj) {
-        executeStatement(insertSettings, obj);
+        obj = executeStatement(insertSettings, obj);
 
         identityMap.put(obj.getIdentityKey(), obj);
     }
 
     @Override
     public void update(T obj) {
-        executeStatement(updateSettings, obj);
+        long previousVersion = obj.getVersion();
+        obj = executeStatement(updateSettings, obj);
 
-        if(!tryReplace(obj, 5000)) throw new ConcurrencyException("Concurrency problem found, could not update IdentityMap");
+        if(!tryReplace(obj, previousVersion, 5000)) throw new ConcurrencyException("Concurrency problem found, could not update IdentityMap");
     }
 
     @Override

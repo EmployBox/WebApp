@@ -91,28 +91,30 @@ CREATE PROCEDURE dbo.UpdateUser
 	@summary NVARCHAR(1500),
 	@PhotoUrl NVARCHAR(100),
 	@accountId BIGINT OUTPUT,
-    @responseMessage NVARCHAR(250) OUTPUT
-	AS
+    @version bigint output
+AS
 	BEGIN
 		BEGIN TRAN
 			BEGIN TRY
 				SET NOCOUNT ON
-				select @accountId = accountId from Apidatabase.[Account] where Apidatabase.[Account].email = @email
+				set @accountId = (select accountId from Apidatabase.[Account] where Apidatabase.[Account].email = @email)
 				DECLARE @newPasswordHash NVARCHAR(40) = NULL
-				EXEC getNewPasswordHash @accountId, @password, @newPasswordHash, @responseMessage
-				IF(@responseMessage != NULL)
-					RETURN
 
-				UPDATE Apidatabase.[Account] SET email = @email, rating = @rating, passwordHash = @newPasswordHash where Apidatabase.[Account].email = @email
+				if @password is not null
+				begin
+					EXEC getNewPasswordHash @accountId, @password, @newPasswordHash, null
+				end
+
+				UPDATE Apidatabase.[Account] SET email = @email, rating = @rating, passwordHash = isnull(@newPasswordHash, passwordHash) where Apidatabase.[Account].email = @email
 				
 				UPDATE ApiDatabase.[User] SET name = @name, summary = @summary, PhotoUrl = @PhotoUrl where Apidatabase.[User].accountId = @accountId
-				COMMIT
+				set @version = (select [version] from ApiDatabase.[User] where accountId = @accountId)
 			END TRY
 			BEGIN CATCH
-				IF(@responseMessage != NULL)
-					SET @responseMessage = ERROR_MESSAGE() 
-				ROLLBACK
+				ROLLBACK;
+				throw
 			END CATCH
+		COMMIT
 	END
 GO
 

@@ -105,6 +105,28 @@ public class User extends Account {
         return user;
     }
 
+    public static User update(
+            User user,
+            String email,
+            String password,
+            double rating,
+            String name,
+            String summary,
+            String photoUrl,
+            Streamable<Job> offeredJobs,
+            Streamable<Curriculum> curriculums,
+            Streamable<Application> applications,
+            Streamable<Chat>chats,
+            Streamable<Comment> comments,
+            Streamable<Rating> ratings,
+            Streamable<User> followers
+    ){
+        user.markToBeDirty();
+        User newUser = new User(user.accountID, email, password, rating, user.version, name, summary, photoUrl, offeredJobs, curriculums, applications, chats, comments, ratings, followers);
+        newUser.markDirty();
+        return newUser;
+    }
+
     public String getName() {
         return name;
     }
