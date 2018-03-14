@@ -1,15 +1,18 @@
 package isel.ps.EmployBox.dal.dataMapping.utils;
 
+
 import isel.ps.EmployBox.dal.dataMapping.DataBaseConnectivity;
 
 import isel.ps.EmployBox.dal.dataMapping.exceptions.DataMapperException;
 import isel.ps.EmployBox.dal.domainModel.DomainObject;
 
 
+
 import java.sql.*;
 import java.util.List;
 import java.util.Spliterator;
 import java.util.Spliterators;
+
 import java.util.concurrent.CompletableFuture;
 
 import java.util.function.Consumer;
