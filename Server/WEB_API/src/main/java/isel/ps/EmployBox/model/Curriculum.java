@@ -79,18 +79,18 @@ public class Curriculum extends DomainObject<String>{
     }
 
     public Stream<PreviousJobs> getPreviousJobs() {
-        return previousJobs.get();
+        return previousJobs.get().stream();
     }
 
     public Stream<AcademicBackground> getAcademicBackground() {
-        return academicBackground.get();
+        return academicBackground.get().stream();
     }
 
     public Stream<Project> getProjects() {
-        return projects.get();
+        return projects.get().stream();
     }
 
     public Stream<CurriculumExperience> getExperiences() {
-        return experiences.get();
+        return experiences.get().stream();
     }
 }

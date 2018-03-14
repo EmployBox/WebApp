@@ -136,10 +136,10 @@ public class Job extends DomainObject<Long> {
     }
 
     public Stream<Application> getApplications() {
-        return applications.get();
+        return applications.get().stream();
     }
 
     public Stream<JobExperience> getExperiences() {
-        return experiences.get();
+        return experiences.get().stream();
     }
 }

@@ -74,6 +74,6 @@ public class Moderator extends Account {
     }
 
     public Stream<Rating> getRatingsModerated() {
-        return ratingsModerated.get();
+        return ratingsModerated.get().stream();
     }
 }

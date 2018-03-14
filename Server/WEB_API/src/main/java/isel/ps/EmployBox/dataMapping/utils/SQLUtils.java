@@ -5,11 +5,14 @@ import isel.ps.EmployBox.dataMapping.exceptions.DataMapperException;
 import isel.ps.EmployBox.model.DomainObject;
 
 import java.sql.*;
+import java.util.List;
 import java.util.Spliterator;
 import java.util.Spliterators;
+import java.util.concurrent.CompletableFuture;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
@@ -42,27 +45,27 @@ public class SQLUtils<T extends DomainObject<K>, K> implements DataBaseConnectiv
         });
     }
 
-    private<U> U handleSQLStatement(String query, boolean isProcedure, Function<Statement, U> handleStatement){
+    private<U> CompletableFuture<U> handleSQLStatement(String query, boolean isProcedure, Function<Statement, U> handleStatement){
         Connection connection = UnitOfWork.getCurrent().getConnection();
         try {
             Statement statement = isProcedure ? connection.prepareCall(query) : connection.prepareStatement(query);
-            return handleStatement.apply(statement);
+            return CompletableFuture.supplyAsync(()->handleStatement.apply(statement));
         } catch (SQLException e) {
             throw new DataMapperException(e);
         }
     }
 
     @Override
-    public T executeSQLProcedure(String call, T obj, BiFunction<CallableStatement, T, T> handleStatement){
+    public CompletableFuture<T> executeSQLProcedure(String call, Function<Statement, T> handleStatement){
         return handleSQLStatement(
                 call,
                 true,
-                statement -> handleStatement.apply((CallableStatement) statement, obj)
+                statement -> handleStatement.apply((CallableStatement) statement)
         );
     }
 
     @Override
-    public Stream<T> executeSQLQuery(String query, Function<ResultSet, T> mapper, Consumer<PreparedStatement> prepareStatement){
+    public CompletableFuture<List<T>> executeSQLQuery(String query, Function<ResultSet, T> mapper, Consumer<PreparedStatement> prepareStatement){
         return handleSQLStatement(
                 query,
                 false,
@@ -74,20 +77,19 @@ public class SQLUtils<T extends DomainObject<K>, K> implements DataBaseConnectiv
                         throw new DataMapperException(e);
                     }
                 }
-        );
+        ).thenApply(s-> s.collect(Collectors.toList()));
     }
 
     /**
      * Executes a sql update and saves the obj in the IdentityMap if successful else throws ConcurrencyException
      * @param query
-     * @param obj
      * @param prepareStatement
      */
     @Override
-    public T executeSQLUpdate(String query, T obj, BiFunction<PreparedStatement, T, T> prepareStatement){
+    public CompletableFuture<T> executeSQLUpdate(String query, Function<Statement, T> prepareStatement){
         return handleSQLStatement(query,
                 false,
-                statement -> prepareStatement.apply((PreparedStatement) statement, obj)
+                statement -> prepareStatement.apply((PreparedStatement) statement)
         );
 
          /*try{

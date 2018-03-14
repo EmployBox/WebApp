@@ -52,6 +52,6 @@ public class Chat extends DomainObject<Long> {
     }
 
     public Stream<Message> getMessages() {
-        return messages.get();
+        return messages.get().stream();
     }
 }

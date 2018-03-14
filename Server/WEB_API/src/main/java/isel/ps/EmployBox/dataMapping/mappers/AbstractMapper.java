@@ -16,8 +16,10 @@ import java.sql.*;
 import java.util.Arrays;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.List;
 import java.util.Map;
 import java.util.StringJoiner;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.function.BiFunction;
@@ -128,12 +130,24 @@ public abstract class AbstractMapper<T extends DomainObject<K>, K> implements Ma
      */
     abstract T mapper(ResultSet rs) throws DataMapperException;
 
+    @Override
+    public CompletableFuture<T> getById(K id) {
+        return null;
+    }
+
+    @Override
+    public CompletableFuture<List<T>> getAll() {
+        dbc.executeSQLQuery(SELECT_QUERY, this::mapper, s -> {});
+
+        return null;
+    }
+
     protected<R> Streamable<T> findWhere(Pair<String, R>... values){
         String query = Arrays.stream(values)
                 .map(p -> p.getKey() + " = ? ")
                 .collect(Collectors.joining(" AND ", SELECT_QUERY + " WHERE ", ""));
 
-        return () -> dbc.executeSQLQuery(
+        return dbc.executeSQLQuery(
                 query,
                 this::mapper,
                 statement -> {
@@ -144,8 +158,7 @@ public abstract class AbstractMapper<T extends DomainObject<K>, K> implements Ma
                     } catch (SQLException e) {
                         throw new DataMapperException(e);
                     }
-                }
-        );
+                })::join;
     }
 
     private boolean tryReplace(T obj, long timeout){
@@ -164,13 +177,22 @@ public abstract class AbstractMapper<T extends DomainObject<K>, K> implements Ma
         return false;
     }
 
-    private T executeStatement(MapperSettings mapperSettings, T obj){
-        T result;
-        if(mapperSettings.isProcedure())
-            result = dbc.executeSQLProcedure(mapperSettings.getQuery(), obj, mapperSettings.getStatementFunction());
-        else
-            result = dbc.executeSQLUpdate(mapperSettings.getQuery(), obj, mapperSettings.getStatementFunction());
-        return result;
+    private CompletableFuture<T> executeStatement(MapperSettings<Statement, T> mapperSettings, T obj) {
+        BiFunction<String, Function<Statement, T>, CompletableFuture<T>> execute =
+                mapperSettings.isProcedure() ?
+                        dbc::executeSQLProcedure : dbc::executeSQLUpdate;
+
+        return execute.apply(mapperSettings.getQuery(), s -> mapperSettings.getStatementFunction().apply(s, obj));
+
+//        if (mapperSettings.isProcedure())
+//            return dbc.executeSQLProcedure(
+//                    mapperSettings.getQuery(),
+//                    obj,
+//                    (s) -> mapperSettings.getStatementFunction().apply(s, obj));
+//        return dbc.executeSQLUpdate(
+//                mapperSettings.getQuery(),
+//                obj,
+//                s -> mapperSettings.getStatementFunction().apply(s, obj));
     }
 
     @Override

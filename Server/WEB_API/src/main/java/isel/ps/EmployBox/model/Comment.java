@@ -105,6 +105,6 @@ public class Comment extends DomainObject<Long> {
     }
 
     public Stream<Comment> getReplies() {
-        return replies.get();
+        return replies.get().stream();
     }
 }
