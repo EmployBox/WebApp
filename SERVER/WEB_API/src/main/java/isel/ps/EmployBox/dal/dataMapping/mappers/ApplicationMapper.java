@@ -2,11 +2,12 @@ package isel.ps.EmployBox.dal.dataMapping.mappers;
 
 
 import isel.ps.EmployBox.dal.dataMapping.exceptions.DataMapperException;
-import isel.ps.EmployBox.dal.util.Streamable;
 import javafx.util.Pair;
 import isel.ps.EmployBox.dal.domainModel.Application;
 
 import java.sql.*;
+import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 public class ApplicationMapper extends AbstractMapper<Application, String> {
     public ApplicationMapper() {
@@ -18,11 +19,11 @@ public class ApplicationMapper extends AbstractMapper<Application, String> {
         );
     }
 
-    public Streamable<Application> findJobApplications(long jobId){
+    public CompletableFuture<List<Application>> findJobApplications(long jobId){
         return findWhere(new Pair<>("jobId", jobId));
     }
 
-    public Streamable<Application> findUserApplications(long userId){
+    public CompletableFuture<List<Application>> findUserApplications(long userId){
         return findWhere(new Pair<>("userId", userId));
     }
 

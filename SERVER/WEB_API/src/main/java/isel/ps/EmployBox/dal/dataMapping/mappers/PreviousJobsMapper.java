@@ -3,12 +3,13 @@ package isel.ps.EmployBox.dal.dataMapping.mappers;
 import isel.ps.EmployBox.dal.dataMapping.exceptions.DataMapperException;
 import javafx.util.Pair;
 import isel.ps.EmployBox.dal.domainModel.PreviousJobs;
-import isel.ps.EmployBox.dal.util.Streamable;
 
 import java.sql.*;
+import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 public class PreviousJobsMapper extends AbstractMapper<PreviousJobs, String> {
-    public Streamable<PreviousJobs> findForUserAndCurriculum(long accountId, long curriculumId){
+    public CompletableFuture<List<PreviousJobs>> findForUserAndCurriculum(long accountId, long curriculumId){
         return findWhere(new Pair<>("userId", accountId), new Pair<>("curriculumId", curriculumId));
     }
 

@@ -1,13 +1,14 @@
 package isel.ps.EmployBox.dal.dataMapping.mappers;
 
 import isel.ps.EmployBox.dal.dataMapping.exceptions.DataMapperException;
-import isel.ps.EmployBox.dal.util.Streamable;
 import javafx.util.Pair;
 import isel.ps.EmployBox.dal.domainModel.Follows;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 public class FollowMapper extends AbstractMapper<Follows, String> {
   public FollowMapper() {
@@ -20,7 +21,7 @@ public class FollowMapper extends AbstractMapper<Follows, String> {
         );
     }
 
-    public Streamable<Follows> findFollowingForAccount(long accountId){
+    public CompletableFuture<List<Follows>> findFollowingForAccount(long accountId){
         return findWhere(new Pair<>("AccountIdFrom", accountId));
     }
 

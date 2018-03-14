@@ -6,12 +6,14 @@ import isel.ps.EmployBox.dal.domainModel.Chat;
 import isel.ps.EmployBox.dal.domainModel.Comment;
 import isel.ps.EmployBox.dal.domainModel.Moderator;
 import isel.ps.EmployBox.dal.domainModel.Rating;
-import isel.ps.EmployBox.dal.util.Streamable;
 
 import java.sql.CallableStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
+import java.util.List;
+import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 public class ModeratorMapper extends AccountMapper<Moderator> {
 
@@ -33,10 +35,10 @@ public class ModeratorMapper extends AccountMapper<Moderator> {
             Double rating = rs.getDouble("Rating");
             long version = rs.getLong("[version]");
 
-            Streamable<Comment> comments = ((CommentMapper) MapperRegistry.getMapper(Comment.class)).findCommentsForAccount(accountID);
-            Streamable<Chat> chats = ((ChatMapper) MapperRegistry.getMapper(Chat.class)).findForAccount(accountID);
-            Streamable<Rating> ratings = ((RatingMapper) MapperRegistry.getMapper(Rating.class)).findRatingsForAccount(accountID);
-            Streamable<Rating> ratingsModerated = ((RatingMapper) MapperRegistry.getMapper(Rating.class)).findModeratedRatingsForModerator(accountID);
+            Supplier<List<Comment>> comments = ((CommentMapper) MapperRegistry.getMapper(Comment.class)).findCommentsForAccount(accountID)::join;
+            Supplier<List<Chat>> chats = ((ChatMapper) MapperRegistry.getMapper(Chat.class)).findForAccount(accountID)::join;
+            Supplier<List<Rating>> ratings = ((RatingMapper) MapperRegistry.getMapper(Rating.class)).findRatingsForAccount(accountID)::join;
+            Supplier<List<Rating>> ratingsModerated = ((RatingMapper) MapperRegistry.getMapper(Rating.class)).findModeratedRatingsForModerator(accountID)::join;
 
             Moderator moderator = Moderator.load(accountID, email, passwordHash, rating, version, comments, chats, ratings, ratingsModerated );
             identityMap.put(accountID, moderator);
@@ -59,7 +61,16 @@ public class ModeratorMapper extends AccountMapper<Moderator> {
             long moderatorId = cs.getLong(4);
             long version = cs.getLong(5);
 
-            return new Moderator(moderatorId, obj.getEmail(), obj.getPassword(), obj.getRating(), version, obj.getComments(), obj.getChats(), obj.getRatings(), obj.getRatings());
+            return new Moderator(
+                    moderatorId,
+                    obj.getEmail(),
+                    obj.getPassword(),
+                    obj.getRating(),
+                    version,
+                    ()->obj.getComments().collect(Collectors.toList()),
+                    ()->obj.getChats().collect(Collectors.toList()),
+                    ()->obj.getRatings().collect(Collectors.toList()),
+                    ()->obj.getRatings().collect(Collectors.toList()));
         } catch (SQLException e) {
             throw new DataMapperException(e);
         }

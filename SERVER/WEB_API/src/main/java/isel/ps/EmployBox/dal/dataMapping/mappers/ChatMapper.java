@@ -5,11 +5,14 @@ import isel.ps.EmployBox.dal.dataMapping.exceptions.DataMapperException;
 import javafx.util.Pair;
 import isel.ps.EmployBox.dal.domainModel.Chat;
 import isel.ps.EmployBox.dal.domainModel.Message;
-import isel.ps.EmployBox.dal.util.Streamable;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 public class ChatMapper extends AbstractMapper<Chat, Long>{
     public ChatMapper() {
@@ -22,7 +25,7 @@ public class ChatMapper extends AbstractMapper<Chat, Long>{
         );
     }
 
-    public Streamable<Chat> findForAccount(long accountID) {
+    public CompletableFuture<List<Chat>> findForAccount(long accountID) {
         return findWhere(new Pair<>("accountIdFirst", accountID));
     }
 
@@ -34,7 +37,7 @@ public class ChatMapper extends AbstractMapper<Chat, Long>{
             long accountIdSecond = rs.getLong(3);
             long version = rs.getLong(4);
 
-            Streamable<Message> messages = ((MessageMapper) MapperRegistry.getMapper(Message.class)).findForChat(chatId);
+            Supplier<List<Message>> messages = ((MessageMapper) MapperRegistry.getMapper(Message.class)).findForChat(chatId)::join;
 
             Chat chat = Chat.load(chatId, accountIdFirst, accountIdSecond, version, messages);
             identityMap.put(chat.getIdentityKey(), chat);
@@ -54,7 +57,7 @@ public class ChatMapper extends AbstractMapper<Chat, Long>{
             long version = getVersion(statement);
             long chatId = getGeneratedKey(statement);
 
-            return new Chat(chatId, obj.getAccountIdFirst(), obj.getAccountIdSecond(), version, obj.getMessages());
+            return new Chat(chatId, obj.getAccountIdFirst(), obj.getAccountIdSecond(), version, ()->obj.getMessages().collect(Collectors.toList()));
         } catch (SQLException e) {
             throw new DataMapperException(e);
         }

@@ -6,9 +6,12 @@ import javafx.util.Pair;
 import isel.ps.EmployBox.dal.domainModel.Application;
 import isel.ps.EmployBox.dal.domainModel.Job;
 import isel.ps.EmployBox.dal.domainModel.JobExperience;
-import isel.ps.EmployBox.dal.util.Streamable;
 
 import java.sql.*;
+import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 public class JobMapper extends AbstractMapper<Job, Long> {
     public JobMapper() {
@@ -21,7 +24,7 @@ public class JobMapper extends AbstractMapper<Job, Long> {
         );
     }
 
-    public Streamable<Job> findForAccount(long accountID){
+    public CompletableFuture<List<Job>> findForAccount(long accountID){
         return findWhere(new Pair<>("accountId", accountID));
     }
 
@@ -39,8 +42,8 @@ public class JobMapper extends AbstractMapper<Job, Long> {
             String offerType = rs.getString("OfferType");
             long version = rs.getLong("Version");
 
-            Streamable<Application> applications = ((ApplicationMapper) MapperRegistry.getMapper(Application.class)).findJobApplications(jobID);
-            Streamable<JobExperience> jobExperiences = ((JobExperienceMapper) MapperRegistry.getMapper(JobExperience.class)).findExperiences(jobID);
+            Supplier<List<Application>> applications = ((ApplicationMapper) MapperRegistry.getMapper(Application.class)).findJobApplications(jobID)::join;
+            Supplier<List<JobExperience>> jobExperiences = ((JobExperienceMapper) MapperRegistry.getMapper(JobExperience.class)).findExperiences(jobID)::join;
 
             Job job = Job.load(jobID, accountID, address, wage, description, schedule, offerBeginDate, offerEndDate, offerType, version, applications, jobExperiences);
             identityMap.put(jobID, job);
@@ -68,7 +71,7 @@ public class JobMapper extends AbstractMapper<Job, Long> {
             long jobId = getGeneratedKey(preparedStatement);
 
             return new Job(jobId, obj.getAccountID(), obj.getAddress(), obj.getWage(), obj.getDescription(), obj.getSchedule(), obj.getOfferBeginDate(), obj.getOfferEndDate(), obj.getOfferType(), version,
-                    obj.getApplications(), obj.getExperiences());
+                    ()->obj.getApplications().collect(Collectors.toList()), ()->obj.getExperiences().collect(Collectors.toList()));
         } catch (SQLException e) {
             throw new DataMapperException(e);
         }
@@ -89,7 +92,7 @@ public class JobMapper extends AbstractMapper<Job, Long> {
             long version = getVersion(preparedStatement);
 
             return new Job(obj.getIdentityKey(), obj.getAccountID(), obj.getAddress(), obj.getWage(), obj.getDescription(), obj.getSchedule(), obj.getOfferBeginDate(), obj.getOfferEndDate(),
-                    obj.getOfferType(), version, obj.getApplications(), obj.getExperiences());
+                    obj.getOfferType(), version,()-> obj.getApplications().collect(Collectors.toList()),()-> obj.getExperiences().collect(Collectors.toList()));
         } catch (SQLException e) {
             throw new DataMapperException(e);
         }

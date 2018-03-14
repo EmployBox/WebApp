@@ -4,11 +4,14 @@ import isel.ps.EmployBox.dal.dataMapping.utils.MapperRegistry;
 import isel.ps.EmployBox.dal.dataMapping.exceptions.DataMapperException;
 import javafx.util.Pair;
 import isel.ps.EmployBox.dal.domainModel.*;
-import isel.ps.EmployBox.dal.util.Streamable;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 public class CurriculumMapper extends AbstractMapper<Curriculum, String>{
 
@@ -22,7 +25,7 @@ public class CurriculumMapper extends AbstractMapper<Curriculum, String>{
         );
     }
 
-    public Streamable<Curriculum> findCurriculumsForAccount(long accountId){
+    public CompletableFuture<List<Curriculum>> findCurriculumsForAccount(long accountId){
         return findWhere(new Pair<>("userId", accountId));
     }
 
@@ -34,10 +37,10 @@ public class CurriculumMapper extends AbstractMapper<Curriculum, String>{
             String title = rs.getString("title");
             long version = rs.getLong("[version]");
 
-            Streamable<PreviousJobs> previousJobs = ((PreviousJobsMapper) MapperRegistry.getMapper(PreviousJobs.class)).findForUserAndCurriculum(accountId, curriculumId);
-            Streamable<AcademicBackground> academicBackground = ((AcademicBackgroundMapper) MapperRegistry.getMapper(AcademicBackground.class)).findForUserAndCurriculum(accountId, curriculumId);
-            Streamable<Project> project = ((ProjectMapper) MapperRegistry.getMapper(Project.class)).findForUserAndCurriculum(accountId, curriculumId);
-            Streamable<CurriculumExperience> curriculumExperiences = ((CurriculumExperienceMapper) MapperRegistry.getMapper(JobExperience.class)).findExperiences(accountId, curriculumId);
+            Supplier<List<PreviousJobs>> previousJobs = ((PreviousJobsMapper) MapperRegistry.getMapper(PreviousJobs.class)).findForUserAndCurriculum(accountId, curriculumId)::join;
+            Supplier<List<AcademicBackground>> academicBackground = ((AcademicBackgroundMapper) MapperRegistry.getMapper(AcademicBackground.class)).findForUserAndCurriculum(accountId, curriculumId)::join;
+            Supplier<List<Project>> project = ((ProjectMapper) MapperRegistry.getMapper(Project.class)).findForUserAndCurriculum(accountId, curriculumId)::join;
+            Supplier<List<CurriculumExperience>> curriculumExperiences = ((CurriculumExperienceMapper) MapperRegistry.getMapper(JobExperience.class)).findExperiences(accountId, curriculumId)::join;
 
             Curriculum curriculum = Curriculum.load(accountId, curriculumId, title, version, previousJobs, academicBackground, project, curriculumExperiences);
             identityMap.put(curriculum.getIdentityKey(), curriculum);
@@ -57,7 +60,15 @@ public class CurriculumMapper extends AbstractMapper<Curriculum, String>{
             long version = getVersion(statement);
             long curriculumId = getGeneratedKey(statement);
 
-            return new Curriculum(obj.getAccountId(), curriculumId, obj.getTitle(), version, obj.getPreviousJobs(), obj.getAcademicBackground(), obj.getProjects(), obj.getExperiences());
+            return new Curriculum(
+                    obj.getAccountId(),
+                    curriculumId,
+                    obj.getTitle(),
+                    version,
+                    ()->obj.getPreviousJobs().collect(Collectors.toList()),
+                    ()->obj.getAcademicBackground().collect(Collectors.toList()),
+                    ()->obj.getProjects().collect(Collectors.toList()),
+                    ()->obj.getExperiences().collect(Collectors.toList()));
         } catch (SQLException e) {
             throw new DataMapperException(e);
         }

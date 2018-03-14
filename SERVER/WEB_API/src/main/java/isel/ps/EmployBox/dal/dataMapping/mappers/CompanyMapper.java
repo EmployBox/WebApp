@@ -2,13 +2,15 @@ package isel.ps.EmployBox.dal.dataMapping.mappers;
 
 import isel.ps.EmployBox.dal.dataMapping.utils.MapperRegistry;
 import isel.ps.EmployBox.dal.dataMapping.exceptions.DataMapperException;
-import isel.ps.EmployBox.dal.util.Streamable;
 import isel.ps.EmployBox.dal.domainModel.*;
 
 import java.sql.CallableStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
+import java.util.List;
+import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 public class CompanyMapper extends AccountMapper<Company> {
 
@@ -35,10 +37,10 @@ public class CompanyMapper extends AccountMapper<Company> {
             String description = rs.getString("[description]");
             long version = rs.getLong("version");
 
-            Streamable<Job> offeredJobs = ((JobMapper) MapperRegistry.getMapper(Job.class)).findForAccount(accountId);
-            Streamable<Chat> chats = ((ChatMapper) MapperRegistry.getMapper(Chat.class)).findForAccount(accountId);
-            Streamable<Rating> ratings = ((RatingMapper) MapperRegistry.getMapper(Rating.class)).findRatingsForAccount(accountId);
-            Streamable<User> following = ((UserMapper) MapperRegistry.getMapper(Rating.class)).findFollowingUsers(accountId);
+            Supplier<List<Job>> offeredJobs = ((JobMapper) MapperRegistry.getMapper(Job.class)).findForAccount(accountId)::join;
+            Supplier<List<Chat>> chats = ((ChatMapper) MapperRegistry.getMapper(Chat.class)).findForAccount(accountId)::join;
+            Supplier<List<Rating>> ratings = ((RatingMapper) MapperRegistry.getMapper(Rating.class)).findRatingsForAccount(accountId)::join;
+            Supplier<List<User>> following = ((UserMapper) MapperRegistry.getMapper(Rating.class)).findFollowingUsers(accountId)::join;
 
             Company company =  Company.load (accountId, email,null, rating,version, name, specialization, yearFounded,logoUrl, webPageUrl, description, offeredJobs, chats, null, ratings, following );
             identityMap.put(accountId, company);
@@ -66,8 +68,23 @@ public class CompanyMapper extends AccountMapper<Company> {
             long accountId = cs.getLong(10);
             long version = cs.getLong(11);
 
-            return new Company(accountId, obj.getEmail(), obj.getPassword(), obj.getRating(), version, obj.getName(), obj.getSpecialization(), obj.getYearFounded(), obj.getLogoUrl(), obj.getWebPageUrl(),
-                    obj.getDescription(), obj.getOfferedJobs(), obj.getChats(), obj.getComments(), obj.getRatings(), obj.getFollowing());
+            return new Company(
+                    accountId,
+                    obj.getEmail(),
+                    obj.getPassword(),
+                    obj.getRating(),
+                    version,
+                    obj.getName(),
+                    obj.getSpecialization(),
+                    obj.getYearFounded(),
+                    obj.getLogoUrl(),
+                    obj.getWebPageUrl(),
+                    obj.getDescription(),
+                    ()->obj.getOfferedJobs().collect(Collectors.toList()),
+                    ()->obj.getChats().collect(Collectors.toList()),
+                    ()->obj.getComments().collect(Collectors.toList()),
+                    ()->obj.getRatings().collect(Collectors.toList()),
+                    ()->obj.getFollowing().collect(Collectors.toList()));
         } catch (SQLException e) {
             throw new DataMapperException(e);
         }

@@ -1,11 +1,12 @@
 package isel.ps.EmployBox.dal.dataMapping.mappers;
 
 import isel.ps.EmployBox.dal.dataMapping.exceptions.DataMapperException;
-import isel.ps.EmployBox.dal.util.Streamable;
 import javafx.util.Pair;
 import isel.ps.EmployBox.dal.domainModel.AcademicBackground;
 
 import java.sql.*;
+import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 public class AcademicBackgroundMapper extends AbstractMapper<AcademicBackground, String> {
     public AcademicBackgroundMapper() {
@@ -16,7 +17,7 @@ public class AcademicBackgroundMapper extends AbstractMapper<AcademicBackground,
                 AcademicBackgroundMapper::prepareDeleteStatement);
     }
 
-    public Streamable<AcademicBackground> findForUserAndCurriculum(long accountId, long curriculumId){
+    public CompletableFuture<List<AcademicBackground>> findForUserAndCurriculum(long accountId, long curriculumId){
         return findWhere(new Pair<>("userId", accountId), new Pair<>("curriculumId", curriculumId));
     }
 

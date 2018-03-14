@@ -4,9 +4,12 @@ import isel.ps.EmployBox.dal.dataMapping.utils.MapperRegistry;
 import isel.ps.EmployBox.dal.dataMapping.exceptions.DataMapperException;
 import javafx.util.Pair;
 import isel.ps.EmployBox.dal.domainModel.Comment;
-import isel.ps.EmployBox.dal.util.Streamable;
 
 import java.sql.*;
+import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 public class CommentMapper extends AbstractMapper<Comment, Long> {
     public CommentMapper() {
@@ -31,7 +34,7 @@ public class CommentMapper extends AbstractMapper<Comment, Long> {
             boolean status = rs.getBoolean(7);
             long version = rs.getLong(8);
 
-            Streamable<Comment> replies = ((CommentMapper) MapperRegistry.getMapper(Comment.class)).findCommentReplies(commentID);
+            Supplier<List<Comment>> replies = ((CommentMapper) MapperRegistry.getMapper(Comment.class)).findCommentReplies(commentID)::join;
 
             Comment comment =  Comment.load(commentID,accountIdFrom,accountIdTo, mainCommentId, date, text, status, replies, version);
             return comment;
@@ -40,11 +43,11 @@ public class CommentMapper extends AbstractMapper<Comment, Long> {
         }
     }
 
-    public Streamable<Comment> findCommentsForAccount(long accountId) {
+    public CompletableFuture<List<Comment>> findCommentsForAccount(long accountId) {
         return findWhere(new Pair<>("accountId", accountId));
     }
 
-    public Streamable findCommentReplies(long commentId){
+    public CompletableFuture<List<Comment>> findCommentReplies(long commentId){
         return findWhere(new Pair<>("mainCommentId",commentId));
     }
 
@@ -61,8 +64,16 @@ public class CommentMapper extends AbstractMapper<Comment, Long> {
             long version = getVersion(statement);
             long commentId = getGeneratedKey(statement);
 
-            return new Comment(commentId, comment.getAccountIdFrom(), comment.getAccountIdTo(), comment.getMainCommendID(), comment.getDate(), comment.getText(), comment.getStatus(),
-                    comment.getReplies(), version);
+            return new Comment(
+                    commentId,
+                    comment.getAccountIdFrom(),
+                    comment.getAccountIdTo(),
+                    comment.getMainCommendID(),
+                    comment.getDate(),
+                    comment.getText(),
+                    comment.getStatus(),
+                    ()->comment.getReplies().collect(Collectors.toList()),
+                    version);
         } catch (SQLException e) {
             throw new DataMapperException(e);
         }
@@ -76,8 +87,16 @@ public class CommentMapper extends AbstractMapper<Comment, Long> {
 
             long version = getVersion(statement);
 
-            return new Comment(comment.getCommentID(), comment.getAccountIdFrom(), comment.getAccountIdTo(), comment.getMainCommendID(), comment.getDate(), comment.getText(), comment.getStatus(),
-                    comment.getReplies(), version);
+            return new Comment(
+                    comment.getCommentID(),
+                    comment.getAccountIdFrom(),
+                    comment.getAccountIdTo(),
+                    comment.getMainCommendID(),
+                    comment.getDate(),
+                    comment.getText(),
+                    comment.getStatus(),
+                    ()->comment.getReplies().collect(Collectors.toList()),
+                    version);
         } catch (SQLException e) {
             throw new DataMapperException(e);
         }

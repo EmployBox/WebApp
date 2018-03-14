@@ -1,13 +1,14 @@
 package isel.ps.EmployBox.dal.dataMapping.mappers;
 
 import isel.ps.EmployBox.dal.dataMapping.exceptions.DataMapperException;
-import isel.ps.EmployBox.dal.util.Streamable;
 import javafx.util.Pair;
 import isel.ps.EmployBox.dal.domainModel.JobExperience;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 public class JobExperienceMapper extends AbstractMapper<JobExperience,Long> {
     public JobExperienceMapper() {
@@ -35,7 +36,7 @@ public class JobExperienceMapper extends AbstractMapper<JobExperience,Long> {
         }
     }
 
-    public Streamable<JobExperience> findExperiences(long jobId){
+    public CompletableFuture<List<JobExperience>> findExperiences(long jobId){
         return findWhere(new Pair<>("jobId", jobId));
     }
 

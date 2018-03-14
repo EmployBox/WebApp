@@ -1,13 +1,14 @@
 package isel.ps.EmployBox.dal.dataMapping.mappers;
 
 import isel.ps.EmployBox.dal.dataMapping.exceptions.DataMapperException;
-import isel.ps.EmployBox.dal.util.Streamable;
 import javafx.util.Pair;
 import isel.ps.EmployBox.dal.domainModel.Rating;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 public class RatingMapper extends AbstractMapper<Rating, String> {
     public RatingMapper() {
@@ -20,11 +21,11 @@ public class RatingMapper extends AbstractMapper<Rating, String> {
         );
     }
 
-    public Streamable<Rating> findRatingsForAccount(long accountID) {
+    public CompletableFuture<List<Rating>> findRatingsForAccount(long accountID) {
         return findWhere(new Pair<>("accountIdFrom", accountID));
     }
 
-    public Streamable<Rating> findModeratedRatingsForModerator(long moderatorID) {
+    public CompletableFuture<List<Rating>> findModeratedRatingsForModerator(long moderatorID) {
         return findWhere(new Pair<>("moderatorId", moderatorID));
     }
 

@@ -2,12 +2,14 @@ package isel.ps.EmployBox.dal.dataMapping.mappers;
 
 import isel.ps.EmployBox.dal.dataMapping.utils.MapperRegistry;
 import isel.ps.EmployBox.dal.dataMapping.exceptions.DataMapperException;
-import isel.ps.EmployBox.dal.util.Streamable;
 import javafx.util.Pair;
 import isel.ps.EmployBox.dal.domainModel.*;
 
 import java.sql.*;
-import java.util.stream.Stream;
+import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 public class UserMapper extends AccountMapper<User> {
     public UserMapper() {
@@ -19,30 +21,23 @@ public class UserMapper extends AccountMapper<User> {
         );
     }
 
-    public Streamable<User> findFollowingUsers(long accountID) {
-        Stream<Follows> following = ((FollowMapper) MapperRegistry.getMapper(Follows.class)).findFollowingForAccount(accountID).get();
-        return () -> following.map(follows -> find(follows.getAccountIdFrom()));
+    public CompletableFuture<List<User>> findFollowingUsers(long accountID) {
+        CompletableFuture<List<Follows>> following = ((FollowMapper) MapperRegistry.getMapper(Follows.class)).findFollowingForAccount(accountID);
+        return following.thenApply(l -> l.stream().map(follows -> find(follows.getAccountIdFrom())).collect(Collectors.toList()));
+
     }
 
     public User find(long accountId){
-        User[] user = new User[1];
-        if((user[0] = identityMap.get(accountId)) == null)
-            findWhere(new Pair<>("accountId", accountId)).get()
-                    .findFirst().ifPresent(u -> user[0] = u);
-        return user[0];
+        return identityMap.getOrDefault(accountId,
+                findWhere(new Pair<>("accountId", accountId)).thenApply(l->l.stream().findFirst().get()).join());
     }
 
     public User findForEmail(String email){
-        User[] user = new User[1];
-        identityMap.values()
+        return identityMap.values()
                 .stream()
                 .filter(user1 -> user1.getEmail().equals(email))
                 .findFirst()
-                .ifPresent(user1 -> user[0] = user1);
-        if(user[0] == null)
-            findWhere(new Pair<>("email", email)).get()
-                    .findFirst().ifPresent(u -> user[0] = u);
-        return user[0];
+                .orElseGet(findWhere(new Pair<>("email", email)).thenApply(l-> l.stream().findFirst().get())::join);
     }
 
     @Override
@@ -57,13 +52,13 @@ public class UserMapper extends AccountMapper<User> {
             String photoUrl = rs.getString ("PhotoUrl");
             long version = rs.getLong("version");
 
-            Streamable<Job> offeredJobs = ((JobMapper) MapperRegistry.getMapper(Job.class)).findForAccount(accountID);
-            Streamable<Curriculum> curriculums = ((CurriculumMapper) MapperRegistry.getMapper(Curriculum.class)).findCurriculumsForAccount(accountID);
-            Streamable<Application> applications = ((ApplicationMapper) MapperRegistry.getMapper(Application.class)).findUserApplications(accountID);
-            Streamable<Chat> chats = ((ChatMapper) MapperRegistry.getMapper(Chat.class)).findForAccount(accountID);
-            Streamable<Rating> ratings = ((RatingMapper) MapperRegistry.getMapper(Rating.class)).findRatingsForAccount(accountID);
-            Streamable<Comment> comments = ((CommentMapper) MapperRegistry.getMapper(Comment.class)).findCommentsForAccount(accountID);
-            Streamable<User> following = findFollowingUsers(accountID);
+            Supplier<List<Job>> offeredJobs = ((JobMapper) MapperRegistry.getMapper(Job.class)).findForAccount(accountID)::join;
+            Supplier<List<Curriculum>> curriculums = ((CurriculumMapper) MapperRegistry.getMapper(Curriculum.class)).findCurriculumsForAccount(accountID)::join;
+            Supplier<List<Application>> applications = ((ApplicationMapper) MapperRegistry.getMapper(Application.class)).findUserApplications(accountID)::join;
+            Supplier<List<Chat>> chats = ((ChatMapper) MapperRegistry.getMapper(Chat.class)).findForAccount(accountID)::join;
+            Supplier<List<Rating>> ratings = ((RatingMapper) MapperRegistry.getMapper(Rating.class)).findRatingsForAccount(accountID)::join;
+            Supplier<List<Comment>> comments = ((CommentMapper) MapperRegistry.getMapper(Comment.class)).findCommentsForAccount(accountID)::join;
+            Supplier<List<User>> following = findFollowingUsers(accountID)::join;
 
             User user = User.load(accountID, email, passwordHash, rating, version, name ,summary, photoUrl, offeredJobs, curriculums, applications, chats, comments , ratings, following);
             identityMap.put(accountID, user);
@@ -89,8 +84,22 @@ public class UserMapper extends AccountMapper<User> {
             long accountId = cs.getLong(7);
             long version = cs.getLong(8);
 
-            return new User(accountId, obj.getEmail(), obj.getPassword(), obj.getRating(), version, obj.getName(), obj.getSummary(), obj.getPhotoUrl(),
-                    obj.getOfferedJobs(), obj.getCurriculums(), obj.getApplications(), obj.getChats(), obj.getComments(), obj.getRatings(), obj.getFollowing());
+            return new User(
+                    accountId,
+                    obj.getEmail(),
+                    obj.getPassword(),
+                    obj.getRating(),
+                    version,
+                    obj.getName(),
+                    obj.getSummary(),
+                    obj.getPhotoUrl(),
+                    ()->obj.getOfferedJobs().collect(Collectors.toList()),
+                    ()->obj.getCurriculums().collect(Collectors.toList()),
+                    ()->obj.getApplications().collect(Collectors.toList()),
+                    ()->obj.getChats().collect(Collectors.toList()),
+                    ()->obj.getComments().collect(Collectors.toList()),
+                    ()->obj.getRatings().collect(Collectors.toList()),
+                    ()->obj.getFollowing().collect(Collectors.toList()));
         } catch (SQLException e) {
             throw new DataMapperException(e);
         }
@@ -110,8 +119,22 @@ public class UserMapper extends AccountMapper<User> {
 
             long version = cs.getLong(8);
 
-            return new User(obj.getIdentityKey(), obj.getEmail(), obj.getPassword(), obj.getRating(), version, obj.getName(), obj.getSummary(), obj.getPhotoUrl(),
-                    obj.getOfferedJobs(), obj.getCurriculums(), obj.getApplications(), obj.getChats(), obj.getComments(), obj.getRatings(), obj.getFollowing());
+            return new User(
+                    obj.getIdentityKey(),
+                    obj.getEmail(),
+                    obj.getPassword(),
+                    obj.getRating(),
+                    version,
+                    obj.getName(),
+                    obj.getSummary(),
+                    obj.getPhotoUrl(),
+                    ()->obj.getOfferedJobs().collect(Collectors.toList()),
+                    ()->obj.getCurriculums().collect(Collectors.toList()),
+                    ()->obj.getApplications().collect(Collectors.toList()),
+                    ()->obj.getChats().collect(Collectors.toList()),
+                    ()->obj.getComments().collect(Collectors.toList()),
+                    ()->obj.getRatings().collect(Collectors.toList()),
+                    ()->obj.getFollowing().collect(Collectors.toList()));
         } catch (SQLException e) {
             throw new DataMapperException(e);
         }

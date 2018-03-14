@@ -13,6 +13,7 @@ import org.slf4j.LoggerFactory;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import static isel.ps.EmployBox.dal.dataMapping.utils.ConnectionManager.DBsPath.TESTDB;
 import static isel.ps.EmployBox.dal.dataMapping.utils.ConnectionManager.getConnectionManager;
@@ -87,8 +88,21 @@ public class UserMapperTests {
 
         User user = mapper.findForEmail("123@gmail.com");
 
-        User newUser = User.update(user, email, password, rating, name, summary, photoUrl, user.getOfferedJobs(), user.getCurriculums(),
-                user.getApplications(), user.getChats(), user.getComments(), user.getRatings(), user.getFollowing());
+        User newUser = User.update(
+                user,
+                email,
+                password,
+                rating,
+                name,
+                summary,
+                photoUrl,
+                ()->user.getOfferedJobs().collect(Collectors.toList()),
+                ()->user.getCurriculums().collect(Collectors.toList()),
+                ()->user.getApplications().collect(Collectors.toList()),
+                ()->user.getChats().collect(Collectors.toList()),
+                ()->user.getComments().collect(Collectors.toList()),
+                ()->user.getRatings().collect(Collectors.toList()),
+                ()->user.getFollowing().collect(Collectors.toList()));
 
         mapper.update(newUser);
 

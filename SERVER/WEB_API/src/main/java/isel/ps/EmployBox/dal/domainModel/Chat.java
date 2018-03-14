@@ -1,7 +1,5 @@
 package isel.ps.EmployBox.dal.domainModel;
 
-import isel.ps.EmployBox.dal.util.Streamable;
-
 import java.util.List;
 import java.util.function.Supplier;
 import java.util.stream.Stream;

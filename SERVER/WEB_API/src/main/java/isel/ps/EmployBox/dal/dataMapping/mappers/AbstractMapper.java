@@ -7,7 +7,6 @@ import isel.ps.EmployBox.dal.dataMapping.Mapper;
 import isel.ps.EmployBox.dal.dataMapping.exceptions.ConcurrencyException;
 import isel.ps.EmployBox.dal.dataMapping.exceptions.DataMapperException;
 import isel.ps.EmployBox.dal.util.ReflectionUtils;
-import isel.ps.EmployBox.dal.util.Streamable;
 import isel.ps.EmployBox.dal.domainModel.DomainObject;
 import isel.ps.EmployBox.dal.domainModel.ID;
 import isel.ps.EmployBox.dal.dataMapping.DataBaseConnectivity;
@@ -144,7 +143,7 @@ public abstract class AbstractMapper<T extends DomainObject<K>, K> implements Ma
         return null;
     }
 
-    protected<R> Streamable<T> findWhere(Pair<String, R>... values){
+    protected<R> CompletableFuture<List<T>> findWhere(Pair<String, R>... values){
         String query = Arrays.stream(values)
                 .map(p -> p.getKey() + " = ? ")
                 .collect(Collectors.joining(" AND ", SELECT_QUERY + " WHERE ", ""));
@@ -160,7 +159,7 @@ public abstract class AbstractMapper<T extends DomainObject<K>, K> implements Ma
                     } catch (SQLException e) {
                         throw new DataMapperException(e);
                     }
-                })::join;
+                });
     }
 
     private boolean tryReplace(T obj, long timeout){
