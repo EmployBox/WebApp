@@ -1,7 +1,8 @@
 package isel.ps.EmployBox.dal.domainModel;
 
-import isel.ps.EmployBox.dal.util.Streamable;
-
+import java.util.Collections;
+import java.util.List;
+import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 public class User extends Account {
@@ -9,8 +10,8 @@ public class User extends Account {
     private final String summary;
     private final String photoUrl;
 
-    private final Streamable<Curriculum> curriculums;
-    private final Streamable<Application> applications;
+    private final Supplier<List<Curriculum>> curriculums;
+    private final Supplier<List<Application>> applications;
 
     public User(
             long accountID,
@@ -21,13 +22,13 @@ public class User extends Account {
             String name,
             String summary,
             String photoUrl,
-            Streamable<Job> offeredJobs,
-            Streamable<Curriculum> curriculums,
-            Streamable<Application> applications,
-            Streamable<Chat> chats,
-            Streamable<Comment> comments,
-            Streamable<Rating> ratings,
-            Streamable<User> followers
+            Supplier<List<Job>> offeredJobs,
+            Supplier<List<Curriculum>> curriculums,
+            Supplier<List<Application>> applications,
+            Supplier<List<Chat>> chats,
+            Supplier<List<Comment>> comments,
+            Supplier<List<Rating>> ratings,
+            Supplier<List<User>> followers
     ){
         super(accountID, email, password, rating, version, offeredJobs, comments, chats, ratings, followers);
         this.name = name;
@@ -45,7 +46,6 @@ public class User extends Account {
             String summary,
             String photoUrl
     ){
-        Streamable empty = Stream::empty;
         User user = new User(
                 defaultKey,
                 email,
@@ -55,13 +55,13 @@ public class User extends Account {
                 name,
                 summary,
                 photoUrl,
-                empty,
-                empty,
-                empty,
-                empty,
-                empty,
-                empty,
-                empty
+                Collections::emptyList,
+                Collections::emptyList,
+                Collections::emptyList,
+                Collections::emptyList,
+                Collections::emptyList,
+                Collections::emptyList,
+                Collections::emptyList
         );
         user.markNew();
         return user;
@@ -76,13 +76,13 @@ public class User extends Account {
             String name,
             String summary,
             String photoUrl,
-            Streamable<Job> offeredJobs,
-            Streamable<Curriculum> curriculums,
-            Streamable<Application> applications,
-            Streamable<Chat>chats,
-            Streamable<Comment> comments,
-            Streamable<Rating> ratings,
-            Streamable<User> followers
+            Supplier<List<Job>> offeredJobs,
+            Supplier<List<Curriculum>> curriculums,
+            Supplier<List<Application>> applications,
+            Supplier<List<Chat>> chats,
+            Supplier<List<Comment>> comments,
+            Supplier<List<Rating>> ratings,
+            Supplier<List<User>> followers
     ){
         User user = new User(
                 accountID,
@@ -113,13 +113,13 @@ public class User extends Account {
             String name,
             String summary,
             String photoUrl,
-            Streamable<Job> offeredJobs,
-            Streamable<Curriculum> curriculums,
-            Streamable<Application> applications,
-            Streamable<Chat>chats,
-            Streamable<Comment> comments,
-            Streamable<Rating> ratings,
-            Streamable<User> followers
+            Supplier<List<Job>> offeredJobs,
+            Supplier<List<Curriculum>> curriculums,
+            Supplier<List<Application>> applications,
+            Supplier<List<Chat>> chats,
+            Supplier<List<Comment>> comments,
+            Supplier<List<Rating>> ratings,
+            Supplier<List<User>> followers
     ){
         user.markToBeDirty();
         User newUser = new User(user.accountID, email, password, rating, user.version, name, summary, photoUrl, offeredJobs, curriculums, applications, chats, comments, ratings, followers);
@@ -139,11 +139,11 @@ public class User extends Account {
         return photoUrl;
     }
 
-    public Streamable<Application> getApplications() {
-        return applications;
+    public Stream<Application> getApplications() {
+        return applications.get().stream();
     }
 
-    public Streamable<Curriculum> getCurriculums() {
-        return curriculums;
+    public Stream<Curriculum> getCurriculums() {
+        return curriculums.get().stream();
     }
 }

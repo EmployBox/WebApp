@@ -2,6 +2,8 @@ package isel.ps.EmployBox.dal.domainModel;
 
 import isel.ps.EmployBox.dal.util.Streamable;
 
+import java.util.List;
+import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 public class Chat extends DomainObject<Long> {
@@ -10,9 +12,9 @@ public class Chat extends DomainObject<Long> {
     private final long accountIdFirst;
     private final long accountIdSecond;
 
-    private final Streamable<Message> messages;
+    private final Supplier<List<Message>> messages;
 
-    public Chat(long chatId, long accountIdFirst, long accountIdSecond, long version, Streamable<Message> messages) {
+    public Chat(long chatId, long accountIdFirst, long accountIdSecond, long version, Supplier<List<Message>> messages) {
         super(chatId, version);
         this.chadId = chatId;
         this.accountIdFirst = accountIdFirst;
@@ -20,19 +22,19 @@ public class Chat extends DomainObject<Long> {
         this.messages = messages;
     }
 
-    public static Chat create(long accountIdFirst, long accountIdSecond, long version, Streamable<Message> messages){
+    public static Chat create(long accountIdFirst, long accountIdSecond, long version, Supplier<List<Message>> messages){
         Chat chat = new Chat(defaultKey, accountIdFirst, accountIdSecond, version, messages);
         chat.markNew();
         return chat;
     }
 
-    public static Chat load(long chatId, long accountIdFirst, long accountIdSecond, long version, Streamable<Message> messages){
+    public static Chat load(long chatId, long accountIdFirst, long accountIdSecond, long version, Supplier<List<Message>> messages){
         Chat chat = new Chat(chatId, accountIdFirst, accountIdSecond, version, messages);
         chat.markClean();
         return chat;
     }
 
-    public static Chat update(Chat chat, Streamable<Message> messages){
+    public static Chat update(Chat chat, Supplier<List<Message>> messages){
         chat.markToBeDirty();
         Chat newChat = new Chat(chat.getChadId(), chat.getAccountIdFirst(), chat.getAccountIdSecond(), chat.getVersion(), messages);
         newChat.markDirty();
