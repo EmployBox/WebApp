@@ -122,9 +122,7 @@ public abstract class AbstractMapper<T extends DomainObject<K>, K> implements Ma
 
     @Override
     public CompletableFuture<List<T>> getAll() {
-        dbc.executeSQLQuery(SELECT_QUERY, this::mapper, s -> {});
-
-        return null;
+        return dbc.executeSQLQuery(SELECT_QUERY, this::mapper, s -> {});
     }
 
     protected<R> CompletableFuture<List<T>> findWhere(Pair<String, R>... values){
