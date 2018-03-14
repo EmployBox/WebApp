@@ -2,11 +2,16 @@ package isel.ps.EmployBox.dataMapping.mappers;
 
 import isel.ps.EmployBox.dataMapping.exceptions.DataMapperException;
 import isel.ps.EmployBox.dataMapping.utils.MapperRegistry;
-import isel.ps.EmployBox.dataMapping.utils.MapperSettings;
-import isel.ps.EmployBox.model.*;
+import isel.ps.EmployBox.model.Chat;
+import isel.ps.EmployBox.model.Comment;
+import isel.ps.EmployBox.model.Moderator;
+import isel.ps.EmployBox.model.Rating;
 import isel.ps.EmployBox.util.Streamable;
 
-import java.sql.*;
+import java.sql.CallableStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Types;
 
 public class ModeratorMapper extends AccountMapper<Moderator> {
 
@@ -47,8 +52,8 @@ public class ModeratorMapper extends AccountMapper<Moderator> {
             cs.setString(1, obj.getEmail());
             cs.setDouble(2, obj.getRating());
             cs.setString(3, obj.getPassword());
-            cs.registerOutParameter(4, Types.BIGINT);
-            cs.registerOutParameter(5, Types.NVARCHAR);
+            cs.registerOutParameter(4, Types.BIGINT);//ACCOUNTID
+            cs.registerOutParameter(5, Types.BIGINT);//VERSION
             cs.execute();
         } catch (SQLException e) {
             throw new DataMapperException(e);
@@ -58,7 +63,6 @@ public class ModeratorMapper extends AccountMapper<Moderator> {
     private static void prepareDeleteProcedure(CallableStatement callableStatement, Moderator obj){
         try {
             callableStatement.setLong(1, obj.getIdentityKey());
-            callableStatement.registerOutParameter(2, Types.NVARCHAR);
             callableStatement.execute();
         } catch (SQLException e) {
             throw new DataMapperException(e);

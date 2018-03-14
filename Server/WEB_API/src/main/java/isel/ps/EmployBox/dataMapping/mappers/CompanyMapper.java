@@ -61,8 +61,8 @@ public class CompanyMapper extends AccountMapper<Company> {
             cs.setString(7, obj.getLogoUrl());
             cs.setString(8, obj.getWebPageUrl());
             cs.setString(9, obj.getDescription());
-            cs.registerOutParameter(10, Types.BIGINT);
-            cs.registerOutParameter(11, Types.NVARCHAR);
+            cs.registerOutParameter(10, Types.BIGINT);//ACCOUNTID
+            cs.registerOutParameter(11, Types.BIGINT);//VERSION
             cs.execute();
         } catch (SQLException e) {
             throw new DataMapperException(e);
@@ -72,7 +72,6 @@ public class CompanyMapper extends AccountMapper<Company> {
     private static void prepareDeleteProcedure(CallableStatement callableStatement, Company obj){
         try {
             callableStatement.setLong(1, obj.getIdentityKey());
-            callableStatement.registerOutParameter(2, Types.NVARCHAR);
             callableStatement.execute();
         } catch (SQLException e) {
             throw new DataMapperException(e);

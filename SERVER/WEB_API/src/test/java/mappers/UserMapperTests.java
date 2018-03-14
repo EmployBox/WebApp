@@ -12,9 +12,9 @@ import org.slf4j.LoggerFactory;
 
 import java.sql.SQLException;
 
+import static isel.ps.EmployBox.dataMapping.utils.ConnectionManager.DBsPath.TESTDB;
 import static isel.ps.EmployBox.dataMapping.utils.ConnectionManager.getConnectionManager;
-import static isel.ps.EmployBox.dataMapping.utils.ConnectionManager.testDB;
-import static isel.ps.EmployBox.dataMapping.utils.MapperRegistry.*;
+import static isel.ps.EmployBox.dataMapping.utils.MapperRegistry.addEntry;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -33,7 +33,7 @@ public class UserMapperTests {
         addEntry(Rating.class, new RatingMapper());
         addEntry(Comment.class, new CommentMapper());
         addEntry(Follows.class, new FollowMapper());
-        ConnectionManager manager = getConnectionManager(testDB);
+        ConnectionManager manager = getConnectionManager(TESTDB.toString());
         UnitOfWork.newCurrent(manager::getConnection);
     }
 

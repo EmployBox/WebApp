@@ -4,17 +4,14 @@ import isel.ps.EmployBox.dataMapping.Mapper;
 import isel.ps.EmployBox.dataMapping.exceptions.ConcurrencyException;
 import isel.ps.EmployBox.dataMapping.exceptions.DataMapperException;
 import isel.ps.EmployBox.dataMapping.utils.MapperSettings;
-import javafx.util.Pair;
 import isel.ps.EmployBox.model.DomainObject;
 import isel.ps.EmployBox.model.ID;
 import isel.ps.EmployBox.util.Streamable;
+import javafx.util.Pair;
 
-import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.sql.*;
 import java.util.Arrays;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.Map;
 import java.util.StringJoiner;
 import java.util.concurrent.ConcurrentHashMap;
@@ -23,8 +20,9 @@ import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-import static isel.ps.EmployBox.util.ReflectionUtils.*;
+
 import static isel.ps.EmployBox.dataMapping.utils.SQLUtils.*;
+import static isel.ps.EmployBox.util.ReflectionUtils.allFieldsFor;
 
 public abstract class AbstractMapper<T extends DomainObject<K>, K> implements Mapper<T, K> {
 
@@ -63,7 +61,8 @@ public abstract class AbstractMapper<T extends DomainObject<K>, K> implements Ma
         if(statementType == CallableStatement.class){
             StringJoiner sjI = new StringJoiner(",","{call Add"+type.getSimpleName()+"(", ")}");
             StringJoiner sjU = new StringJoiner(",","{call Update"+type.getSimpleName()+"(", ")}");
-            StringJoiner sjD = new StringJoiner(",","{call Delete"+type.getSimpleName()+"(", ")}");
+            //StringJoiner sjD = new StringJoiner(",","{call Delete"+type.getSimpleName()+"(", ")}");
+            StringJoiner sjD = new StringJoiner(",","{call DeleteAccount(", ")}");
 
             queryBuilder(fields,
                     f -> sjI.add("?"),

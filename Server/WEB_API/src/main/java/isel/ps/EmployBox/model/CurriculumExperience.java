@@ -1,5 +1,5 @@
 package isel.ps.EmployBox.model;
-//TODO acho q nao esta de acordo com a db
+
 public class CurriculumExperience extends DomainObject<String> {
     private final long userId;
     private final long curriculumId;

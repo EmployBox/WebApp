@@ -10,11 +10,24 @@ import java.sql.SQLException;
 
 public class ConnectionManager {
     private final Logger logger = LoggerFactory.getLogger(ConnectionManager.class);
-    public static final String defaultDB = "DB_CONNECTION_STRING";
-    public static final String testDB = "DBTEST_CONNECTION_STRING";
+
+    public enum DBsPath {
+        DEFAULTDB ("DB_CONNECTION_STRING"),
+        TESTDB ("DBTEST_CONNECTION_STRING");
+
+        String value;
+        DBsPath(String value) {
+            this.value = value;
+        }
+
+        @Override
+        public String toString(){
+            return value;
+        }
+    }
+
     private static ConnectionManager connectionManager = null;
 
-    //TODO String -> Enum
     public static ConnectionManager getConnectionManager(String envVar){
         if(connectionManager == null) connectionManager = new ConnectionManager(envVar);
         return connectionManager;

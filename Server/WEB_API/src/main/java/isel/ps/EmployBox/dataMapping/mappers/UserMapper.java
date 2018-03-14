@@ -76,8 +76,8 @@ public class UserMapper extends AccountMapper<User> {
             cs.setString(4, obj.getName());
             cs.setString(5, obj.getSummary());
             cs.setString(6, obj.getPhotoUrl());
-            cs.registerOutParameter(7, Types.BIGINT);
-            cs.registerOutParameter(8, Types.BIGINT);
+            cs.registerOutParameter(7, Types.BIGINT);//ACCOUNTID
+            cs.registerOutParameter(8, Types.BIGINT);//VERSION
             cs.execute();
 
             long accountId = cs.getLong(7);
@@ -93,7 +93,6 @@ public class UserMapper extends AccountMapper<User> {
     private static void prepareDeleteProcedure(CallableStatement callableStatement, User obj){
         try {
             callableStatement.setLong(1, obj.getIdentityKey());
-            callableStatement.registerOutParameter(2, Types.NVARCHAR);
             callableStatement.execute();
         } catch (SQLException e) {
             throw new DataMapperException(e);

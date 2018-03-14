@@ -175,7 +175,6 @@ public class UnitOfWork {
                             clone -> getMapper(obj.getClass()).getIdentityMap().put(clone.getIdentityKey(), clone)
                     );
         }
-
         removedObjects
                 .stream()
                 .filter(obj -> !dirtyObjects.contains(obj))
