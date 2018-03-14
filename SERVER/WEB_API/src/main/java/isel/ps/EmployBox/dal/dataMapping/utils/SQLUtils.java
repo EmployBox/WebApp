@@ -1,16 +1,17 @@
 package isel.ps.EmployBox.dal.dataMapping.utils;
 
 import isel.ps.EmployBox.dal.dataMapping.DataBaseConnectivity;
-import isel.ps.EmployBox.dal.dataMapping.exceptions.ConcurrencyException;
+
 import isel.ps.EmployBox.dal.dataMapping.exceptions.DataMapperException;
 import isel.ps.EmployBox.dal.domainModel.DomainObject;
+
 
 import java.sql.*;
 import java.util.List;
 import java.util.Spliterator;
 import java.util.Spliterators;
 import java.util.concurrent.CompletableFuture;
-import java.util.function.BiFunction;
+
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -57,11 +58,11 @@ public class SQLUtils<T extends DomainObject<K>, K> implements DataBaseConnectiv
     }
 
     @Override
-    public CompletableFuture<T> executeSQLProcedure(String call, Function<Statement, T> handleStatement){
+    public CompletableFuture<T> executeSQLProcedure(String call, Function<? super Statement, T> handleStatement){
         return handleSQLStatement(
                 call,
                 true,
-                statement -> handleStatement.apply((CallableStatement) statement)
+                handleStatement::apply
         );
     }
 
@@ -87,10 +88,10 @@ public class SQLUtils<T extends DomainObject<K>, K> implements DataBaseConnectiv
      * @param prepareStatement
      */
     @Override
-    public CompletableFuture<T> executeSQLUpdate(String query, Function<Statement, T> prepareStatement){
+    public CompletableFuture<T> executeSQLUpdate(String query, Function<? super Statement, T> prepareStatement){
         return handleSQLStatement(query,
                 false,
-                statement -> prepareStatement.apply((PreparedStatement) statement)
+                prepareStatement::apply
         );
 
          /*try{

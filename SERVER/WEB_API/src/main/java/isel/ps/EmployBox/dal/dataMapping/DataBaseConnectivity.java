@@ -15,6 +15,6 @@ import java.util.stream.Stream;
 
 public interface DataBaseConnectivity<T extends DomainObject<K>, K> {
     CompletableFuture<List<T>> executeSQLQuery(String query, Function<ResultSet, T> mapper, Consumer<PreparedStatement> prepareStatement);
-    CompletableFuture<T> executeSQLUpdate(String query, Function<Statement, T> prepareStatement);
-    CompletableFuture<T> executeSQLProcedure(String call, Function<Statement, T> handleStatement);
+    CompletableFuture<T> executeSQLUpdate(String query, Function<? super Statement, T> prepareStatement);
+    CompletableFuture<T> executeSQLProcedure(String call, Function<? super Statement, T> handleStatement);
 }

@@ -135,20 +135,11 @@ public class Job extends DomainObject<Long> {
         return address;
     }
 
-<<<<<<< HEAD:Server/WEB_API/src/main/java/isel/ps/EmployBox/model/Job.java
     public Stream<Application> getApplications() {
         return applications.get().stream();
     }
 
     public Stream<JobExperience> getExperiences() {
         return experiences.get().stream();
-=======
-    public Streamable<Application> getApplications() {
-        return applications;
-    }
-
-    public Streamable<JobExperience> getExperiences() {
-        return experiences;
->>>>>>> 286a67c73e98b9cc18e3770092bd246c7effc51a:SERVER/WEB_API/src/main/java/isel/ps/EmployBox/dal/domainModel/Job.java
     }
 }

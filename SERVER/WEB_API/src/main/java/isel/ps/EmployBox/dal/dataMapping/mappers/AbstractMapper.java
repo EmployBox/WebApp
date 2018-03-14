@@ -33,9 +33,9 @@ public abstract class AbstractMapper<T extends DomainObject<K>, K> implements Ma
     protected final ConcurrentMap<K, T> identityMap = new ConcurrentHashMap<>();
 
     protected final String SELECT_QUERY;
-    private final MapperSettings<Statement, T, K> insertSettings;
-    private final MapperSettings<Statement, T, K> updateSettings;
-    private final MapperSettings<Statement, T, K> deleteSettings;
+    private final MapperSettings<? extends Statement, T, K> insertSettings;
+    private final MapperSettings<? extends Statement, T, K> updateSettings;
+    private final MapperSettings<? extends Statement, T, K> deleteSettings;
     private final DataBaseConnectivity<T, K> dbc;
 
     public <R extends Statement> AbstractMapper(
@@ -55,7 +55,7 @@ public abstract class AbstractMapper<T extends DomainObject<K>, K> implements Ma
                 .toArray(Field[]::new);
 
         this.SELECT_QUERY = Arrays.stream(fields)
-                .map(f -> f.getName().equals("version") || f.getName().equals("date") ? "[" + f.getName()+ "]" : f.getName())
+                .map(Field::getName)
                 .collect(Collectors.joining(", ", "select ", " from ["+type.getSimpleName()+"]"));
 
         String sI;
@@ -178,14 +178,11 @@ public abstract class AbstractMapper<T extends DomainObject<K>, K> implements Ma
         return false;
     }
 
-    private CompletableFuture<T> executeStatement(MapperSettings<Statement, T,K> mapperSettings, T obj) {
-        BiFunction<String, Function<Statement, T>, CompletableFuture<T>> execute =
-                mapperSettings.isProcedure() ?
-                        dbc::executeSQLProcedure : dbc::executeSQLUpdate;
-
-        return execute.apply(mapperSettings.getQuery(), s -> mapperSettings.getStatementFunction().apply(s, obj));
-
+    private<R extends Statement> CompletableFuture<T> executeStatement(MapperSettings<R, T, K> mapperSettings, T obj){
+        BiFunction<String, Function<? super Statement, T>, CompletableFuture<T>> execute = mapperSettings.isProcedure() ? dbc::executeSQLProcedure : dbc::executeSQLUpdate;
+        return execute.apply(mapperSettings.getQuery(), statement -> mapperSettings.getStatementFunction().apply((R)statement, obj));
     }
+
     protected static void executeUpdate(PreparedStatement statement) throws SQLException {
         int rowCount = statement.executeUpdate();
         if (rowCount == 0) throw new ConcurrencyException("Concurrency problem found");
