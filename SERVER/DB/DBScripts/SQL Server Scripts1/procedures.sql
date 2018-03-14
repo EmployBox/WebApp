@@ -111,21 +111,19 @@ AS
 
 				if @password is not null
 				begin
-					EXEC getNewPasswordHash @accountId, @password, @newPasswordHash, null
+					EXEC getNewPasswordHash @accountId, @password, @newPasswordHash
 				end
 
 				UPDATE Apidatabase.[Account] SET email = @email, rating = @rating, passwordHash = isnull(@newPasswordHash, passwordHash) where Apidatabase.[Account].email = @email
 				
 				UPDATE ApiDatabase.[User] SET name = @name, summary = @summary, PhotoUrl = @PhotoUrl where Apidatabase.[User].accountId = @accountId
 				set @version = (select [version] from ApiDatabase.[User] where accountId = @accountId)
-		COMMIT
-				
-				select @version = [version] from ApiDatabase.[User] where ApiDatabase.[User].accountId = @accountId
-				COMMIT
 			END TRY
 			BEGIN CATCH
-				ROLLBACK
+				ROLLBACK;
+				throw
 			END CATCH
+		COMMIT
 	END
 GO
 

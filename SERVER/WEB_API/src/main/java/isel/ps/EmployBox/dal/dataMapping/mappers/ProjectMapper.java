@@ -2,7 +2,6 @@ package isel.ps.EmployBox.dal.dataMapping.mappers;
 
 import isel.ps.EmployBox.dal.dataMapping.exceptions.DataMapperException;
 import isel.ps.EmployBox.dal.util.Streamable;
-import isel.ps.EmployBox.model.PreviousJobs;
 import javafx.util.Pair;
 import isel.ps.EmployBox.dal.domainModel.Project;
 
