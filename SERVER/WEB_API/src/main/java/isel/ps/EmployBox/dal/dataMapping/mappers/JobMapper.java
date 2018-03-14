@@ -2,6 +2,7 @@ package isel.ps.EmployBox.dal.dataMapping.mappers;
 
 import isel.ps.EmployBox.dal.dataMapping.utils.MapperRegistry;
 import isel.ps.EmployBox.dal.dataMapping.exceptions.DataMapperException;
+import isel.ps.EmployBox.dal.dataMapping.utils.SQLUtils;
 import javafx.util.Pair;
 import isel.ps.EmployBox.dal.domainModel.Application;
 import isel.ps.EmployBox.dal.domainModel.Job;
@@ -62,10 +63,10 @@ public class JobMapper extends AbstractMapper<Job, Long> {
             preparedStatement.setDate(7, obj.getOfferEndDate());
             preparedStatement.setString(8, obj.getOfferType());
             preparedStatement.setLong(9, obj.getVersion());
-            executeUpdate(preparedStatement);
+            SQLUtils.executeUpdate(preparedStatement);
 
-            long version = getVersion(preparedStatement);
-            long jobId = getGeneratedKey(preparedStatement);
+            long version = SQLUtils.getVersion(preparedStatement);
+            long jobId = SQLUtils.getGeneratedKey(preparedStatement);
 
             return new Job(jobId, obj.getAccountID(), obj.getAddress(), obj.getWage(), obj.getDescription(), obj.getSchedule(), obj.getOfferBeginDate(), obj.getOfferEndDate(), obj.getOfferType(), version,
                     obj.getApplications(), obj.getExperiences());
@@ -84,9 +85,9 @@ public class JobMapper extends AbstractMapper<Job, Long> {
             preparedStatement.setDate(6, obj.getOfferEndDate());
             preparedStatement.setString(7, obj.getOfferType());
             preparedStatement.setLong(8, obj.getVersion());
-            executeUpdate(preparedStatement);
+            SQLUtils.executeUpdate(preparedStatement);
 
-            long version = getVersion(preparedStatement);
+            long version = SQLUtils.getVersion(preparedStatement);
 
             return new Job(obj.getIdentityKey(), obj.getAccountID(), obj.getAddress(), obj.getWage(), obj.getDescription(), obj.getSchedule(), obj.getOfferBeginDate(), obj.getOfferEndDate(),
                     obj.getOfferType(), version, obj.getApplications(), obj.getExperiences());
@@ -99,7 +100,7 @@ public class JobMapper extends AbstractMapper<Job, Long> {
         try{
             preparedStatement.setLong(1, obj.getIdentityKey());
             preparedStatement.setLong(2, obj.getVersion());
-            executeUpdate(preparedStatement);
+            SQLUtils.executeUpdate(preparedStatement);
             return null;
         } catch (SQLException e) {
             throw new DataMapperException(e);

@@ -1,6 +1,7 @@
 package isel.ps.EmployBox.dal.dataMapping.mappers;
 
 import isel.ps.EmployBox.dal.dataMapping.exceptions.DataMapperException;
+import isel.ps.EmployBox.dal.dataMapping.utils.SQLUtils;
 import isel.ps.EmployBox.dal.util.Streamable;
 import javafx.util.Pair;
 import isel.ps.EmployBox.dal.domainModel.Message;
@@ -48,9 +49,9 @@ public class MessageMapper extends AbstractMapper<Message,String> {
             statement.setLong(2, obj.getChadId());
             statement.setString(3, obj.getText());
             statement.setDate(4, obj.getDate());
-            executeUpdate(statement);
+            SQLUtils.executeUpdate(statement);
 
-            long version = getVersion(statement);
+            long version = SQLUtils.getVersion(statement);
 
             return new Message(obj.getMessageId(), obj.getChadId(), obj.getText(), obj.getDate(), version);
         } catch (SQLException e) {
@@ -63,7 +64,7 @@ public class MessageMapper extends AbstractMapper<Message,String> {
             statement.setLong(1, obj.getMessageId());
             statement.setLong(2, obj.getChadId());
             statement.setLong(3, obj.getVersion());
-            executeUpdate(statement);
+            SQLUtils.executeUpdate(statement);
             return null;
         } catch (SQLException e) {
             throw new DataMapperException(e);

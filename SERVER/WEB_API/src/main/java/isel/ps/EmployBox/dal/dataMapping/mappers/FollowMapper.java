@@ -1,6 +1,7 @@
 package isel.ps.EmployBox.dal.dataMapping.mappers;
 
 import isel.ps.EmployBox.dal.dataMapping.exceptions.DataMapperException;
+import isel.ps.EmployBox.dal.dataMapping.utils.SQLUtils;
 import isel.ps.EmployBox.dal.util.Streamable;
 import javafx.util.Pair;
 import isel.ps.EmployBox.dal.domainModel.Follows;
@@ -43,9 +44,9 @@ public class FollowMapper extends AbstractMapper<Follows, String> {
         try{
             statement.setLong(1, obj.getAccountIdFrom());
             statement.setLong(2, obj.getAccountIdDest());
-            executeUpdate(statement);
+            SQLUtils.executeUpdate(statement);
 
-            long version = getVersion(statement);
+            long version = SQLUtils.getVersion(statement);
 
             return new Follows(obj.getAccountIdFrom(), obj.getAccountIdDest());
         } catch (SQLException e) {

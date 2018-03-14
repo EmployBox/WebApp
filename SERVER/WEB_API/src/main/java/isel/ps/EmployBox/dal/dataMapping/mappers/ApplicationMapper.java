@@ -2,6 +2,7 @@ package isel.ps.EmployBox.dal.dataMapping.mappers;
 
 
 import isel.ps.EmployBox.dal.dataMapping.exceptions.DataMapperException;
+import isel.ps.EmployBox.dal.dataMapping.utils.SQLUtils;
 import isel.ps.EmployBox.dal.util.Streamable;
 import javafx.util.Pair;
 import isel.ps.EmployBox.dal.domainModel.Application;
@@ -50,9 +51,9 @@ public class ApplicationMapper extends AbstractMapper<Application, String> {
             statement.setLong(2, obj.getCurriculumId());
             statement.setLong(3, obj.getJobId());
             statement.setDate(4, obj.getDate());
-            executeUpdate(statement);
+            SQLUtils.executeUpdate(statement);
 
-            long version = getVersion(statement);
+            long version = SQLUtils.getVersion(statement);
 
             return new Application(obj.getUserId(), obj.getJobId(), obj.getCurriculumId(), obj.getDate(), version);
         } catch (SQLException e) {
@@ -63,9 +64,9 @@ public class ApplicationMapper extends AbstractMapper<Application, String> {
     private static Application prepareUpdateStatement(PreparedStatement statement, Application obj) {
         try{
             statement.setDate(1, obj.getDate());
-            executeUpdate(statement);
+            SQLUtils.executeUpdate(statement);
 
-            long version = getVersion(statement);
+            long version = SQLUtils.getVersion(statement);
 
             return new Application(obj.getUserId(), obj.getJobId(), obj.getCurriculumId(), obj.getDate(), version);
         } catch (SQLException e) {
@@ -77,7 +78,7 @@ public class ApplicationMapper extends AbstractMapper<Application, String> {
         try{
             statement.setLong(1, obj.getUserId());
             statement.setLong(2, obj.getCurriculumId());
-            executeUpdate(statement);
+            SQLUtils.executeUpdate(statement);
 
             return null;
         } catch (SQLException e) {

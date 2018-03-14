@@ -2,6 +2,7 @@ package isel.ps.EmployBox.dal.dataMapping.mappers;
 
 import isel.ps.EmployBox.dal.dataMapping.utils.MapperRegistry;
 import isel.ps.EmployBox.dal.dataMapping.exceptions.DataMapperException;
+import isel.ps.EmployBox.dal.dataMapping.utils.SQLUtils;
 import javafx.util.Pair;
 import isel.ps.EmployBox.dal.domainModel.Comment;
 import isel.ps.EmployBox.dal.util.Streamable;
@@ -56,10 +57,10 @@ public class CommentMapper extends AbstractMapper<Comment, Long> {
             statement.setDate(4, comment.getDate());
             statement.setString(5, comment.getText());
             statement.setBoolean(6, comment.getStatus());
-            executeUpdate(statement);
+            SQLUtils.executeUpdate(statement);
 
-            long version = getVersion(statement);
-            long commentId = getGeneratedKey(statement);
+            long version = SQLUtils.getVersion(statement);
+            long commentId = SQLUtils.getGeneratedKey(statement);
 
             return new Comment(commentId, comment.getAccountIdFrom(), comment.getAccountIdTo(), comment.getMainCommendID(), comment.getDate(), comment.getText(), comment.getStatus(),
                     comment.getReplies(), version);
@@ -72,9 +73,9 @@ public class CommentMapper extends AbstractMapper<Comment, Long> {
         try {
             statement.setString(1, comment.getText());
             statement.setBoolean(2, comment.getStatus());
-            executeUpdate(statement);
+            SQLUtils.executeUpdate(statement);
 
-            long version = getVersion(statement);
+            long version = SQLUtils.getVersion(statement);
 
             return new Comment(comment.getCommentID(), comment.getAccountIdFrom(), comment.getAccountIdTo(), comment.getMainCommendID(), comment.getDate(), comment.getText(), comment.getStatus(),
                     comment.getReplies(), version);

@@ -1,8 +1,8 @@
 package isel.ps.EmployBox.dal.dataMapping.utils;
 
-
 import isel.ps.EmployBox.dal.dataMapping.DataBaseConnectivity;
 
+import isel.ps.EmployBox.dal.dataMapping.exceptions.ConcurrencyException;
 import isel.ps.EmployBox.dal.dataMapping.exceptions.DataMapperException;
 import isel.ps.EmployBox.dal.domainModel.DomainObject;
 
@@ -22,6 +22,33 @@ import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 public class SQLUtils<T extends DomainObject<K>, K> implements DataBaseConnectivity<T, K> {
+
+    public static void executeUpdate(PreparedStatement statement) throws SQLException {
+        int rowCount = statement.executeUpdate();
+        if (rowCount == 0) throw new ConcurrencyException("Concurrency problem found");
+    }
+
+    public static long getVersion(PreparedStatement statement) throws SQLException {
+        long version;
+        try (ResultSet inserted = statement.getResultSet()) {
+            if (inserted.next()){
+                version = inserted.getLong(1);
+            }
+            else throw new DataMapperException("Error inserting new entry");
+        }
+        return version;
+    }
+
+    public static long getGeneratedKey(PreparedStatement preparedStatement) throws SQLException {
+        long jobId;
+        try (ResultSet generatedKeys = preparedStatement.getGeneratedKeys()) {
+            if (generatedKeys.next()){
+                jobId = generatedKeys.getLong(1);
+            }
+            else throw new DataMapperException("Error inserting new entry");
+        }
+        return jobId;
+    }
 
     /**
      * Inserts the objects read into the LoadedMap
@@ -96,21 +123,5 @@ public class SQLUtils<T extends DomainObject<K>, K> implements DataBaseConnectiv
                 false,
                 prepareStatement::apply
         );
-
-         /*try{
-            int rowCount = ((PreparedStatement) statement).executeUpdate();
-            if (rowCount == 0) throw new ConcurrencyException("Concurrency problem found");
-
-            long generatedKey = 0;
-            try (ResultSet generatedKeys = statement.getGeneratedKeys()) {
-                if (generatedKeys.next()){
-                    generatedKey = generatedKeys.getLong(1);
-                }
-            }
-
-
-        } catch (SQLException e) {
-            throw new DataMapperException(e.getMessage(), e);
-        }*/
     }
 }

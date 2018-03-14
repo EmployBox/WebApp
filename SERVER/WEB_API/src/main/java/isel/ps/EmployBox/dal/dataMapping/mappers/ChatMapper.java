@@ -2,6 +2,7 @@ package isel.ps.EmployBox.dal.dataMapping.mappers;
 
 import isel.ps.EmployBox.dal.dataMapping.utils.MapperRegistry;
 import isel.ps.EmployBox.dal.dataMapping.exceptions.DataMapperException;
+import isel.ps.EmployBox.dal.dataMapping.utils.SQLUtils;
 import javafx.util.Pair;
 import isel.ps.EmployBox.dal.domainModel.Chat;
 import isel.ps.EmployBox.dal.domainModel.Message;
@@ -49,10 +50,10 @@ public class ChatMapper extends AbstractMapper<Chat, Long>{
         try{
             statement.setLong(1, obj.getAccountIdFirst());
             statement.setLong(2, obj.getAccountIdSecond());
-            executeUpdate(statement);
+            SQLUtils.executeUpdate(statement);
 
-            long version = getVersion(statement);
-            long chatId = getGeneratedKey(statement);
+            long version = SQLUtils.getVersion(statement);
+            long chatId = SQLUtils.getGeneratedKey(statement);
 
             return new Chat(chatId, obj.getAccountIdFirst(), obj.getAccountIdSecond(), version, obj.getMessages());
         } catch (SQLException e) {
@@ -63,7 +64,7 @@ public class ChatMapper extends AbstractMapper<Chat, Long>{
     private static Chat prepareDeleteStatement(PreparedStatement statement, Chat obj){
         try{
             statement.setLong(1, obj.getChadId());
-            executeUpdate(statement);
+            SQLUtils.executeUpdate(statement);
             return null;
         } catch (SQLException e) {
             throw new DataMapperException(e);
