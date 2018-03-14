@@ -9,7 +9,7 @@ import isel.ps.EmployBox.dal.util.ReflectionUtils;
 import isel.ps.EmployBox.dal.util.Streamable;
 import isel.ps.EmployBox.dal.domainModel.DomainObject;
 import isel.ps.EmployBox.dal.domainModel.ID;
-import isel.ps.EmployBox.dataMapping.DataBaseConnectivity;
+import isel.ps.EmployBox.dal.dataMapping.DataBaseConnectivity;
 import javafx.util.Pair;
 
 import java.lang.reflect.Field;

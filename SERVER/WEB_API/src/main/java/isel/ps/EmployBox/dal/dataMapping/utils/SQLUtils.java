@@ -2,7 +2,7 @@ package isel.ps.EmployBox.dal.dataMapping.utils;
 
 import isel.ps.EmployBox.dal.dataMapping.exceptions.DataMapperException;
 import isel.ps.EmployBox.dal.domainModel.DomainObject;
-import isel.ps.EmployBox.dataMapping.DataBaseConnectivity;
+import isel.ps.EmployBox.dal.dataMapping.DataBaseConnectivity;
 
 import java.sql.*;
 import java.util.Spliterator;
