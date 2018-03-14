@@ -1,6 +1,7 @@
 package isel.ps.EmployBox.dal.dataMapping.mappers;
 
 import isel.ps.EmployBox.dal.dataMapping.exceptions.DataMapperException;
+import isel.ps.EmployBox.dal.dataMapping.utils.SQLUtils;
 import javafx.util.Pair;
 import isel.ps.EmployBox.dal.domainModel.AcademicBackground;
 
@@ -51,9 +52,9 @@ public class AcademicBackgroundMapper extends AbstractMapper<AcademicBackground,
             statement.setString(5, obj.getStudyArea());
             statement.setString(6, obj.getInstitution());
             statement.setString(7, obj.getDegreeObtained());
-            executeUpdate(statement);
+            SQLUtils.executeUpdate(statement);
 
-            long version = getVersion(statement);
+            long version = SQLUtils.getVersion(statement);
 
             return new AcademicBackground(obj.getAccountID(), obj.getCurriculumId(), obj.getBeginDate(), obj.getEndDate(), obj.getStudyArea(), obj.getInstitution(), obj.getDegreeObtained(), version);
         } catch (SQLException e) {
@@ -71,9 +72,9 @@ public class AcademicBackgroundMapper extends AbstractMapper<AcademicBackground,
             statement.setLong(6, obj.getAccountID());
             statement.setLong(7, obj.getCurriculumId());
             statement.setLong(8, obj.getVersion());
-            executeUpdate(statement);
+            SQLUtils.executeUpdate(statement);
 
-            long version = getVersion(statement);
+            long version = SQLUtils.getVersion(statement);
 
             return new AcademicBackground(obj.getAccountID(), obj.getCurriculumId(), obj.getBeginDate(), obj.getEndDate(), obj.getStudyArea(), obj.getInstitution(), obj.getDegreeObtained(), version);
         } catch (SQLException e) {
@@ -86,7 +87,7 @@ public class AcademicBackgroundMapper extends AbstractMapper<AcademicBackground,
             statement.setLong(1, obj.getAccountID());
             statement.setLong(2, obj.getCurriculumId());
             statement.setLong(3, obj.getVersion());
-            executeUpdate(statement);
+            SQLUtils.executeUpdate(statement);
             return null;
         } catch (SQLException e) {
             throw new DataMapperException(e);

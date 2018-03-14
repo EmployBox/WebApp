@@ -1,6 +1,7 @@
 package isel.ps.EmployBox.dal.dataMapping.mappers;
 
 import isel.ps.EmployBox.dal.dataMapping.exceptions.DataMapperException;
+import isel.ps.EmployBox.dal.dataMapping.utils.SQLUtils;
 import javafx.util.Pair;
 import isel.ps.EmployBox.dal.domainModel.Rating;
 
@@ -55,9 +56,9 @@ public class RatingMapper extends AbstractMapper<Rating, String> {
             statement.setLong(3, obj.getModeratorId());
             statement.setDouble(4, obj.getRatingValue());
             statement.setBoolean(5, obj.isApproved());
-            executeUpdate(statement);
+            SQLUtils.executeUpdate(statement);
 
-            long version = getVersion(statement);
+            long version = SQLUtils.getVersion(statement);
 
             return new Rating(obj.getAccountIdFrom(), obj.getAccountIdTo(), obj.getModeratorId(), obj.getRatingValue(), obj.isApproved(), version);
         } catch (SQLException e) {
@@ -73,9 +74,9 @@ public class RatingMapper extends AbstractMapper<Rating, String> {
             statement.setLong(4, obj.getAccountIdFrom());
             statement.setLong(5, obj.getAccountIdTo());
             statement.setLong(6, obj.getVersion());
-            executeUpdate(statement);
+            SQLUtils.executeUpdate(statement);
 
-            long version = getVersion(statement);
+            long version = SQLUtils.getVersion(statement);
 
             return new Rating(obj.getAccountIdFrom(), obj.getAccountIdTo(), obj.getModeratorId(), obj.getRatingValue(), obj.isApproved(), version);
         } catch (SQLException e) {
@@ -88,7 +89,7 @@ public class RatingMapper extends AbstractMapper<Rating, String> {
             statement.setLong(1, obj.getAccountIdFrom());
             statement.setLong(2, obj.getAccountIdTo());
             statement.setLong(3, obj.getVersion());
-            executeUpdate(statement);
+            SQLUtils.executeUpdate(statement);
             return null;
         } catch (SQLException e) {
             throw new DataMapperException(e);

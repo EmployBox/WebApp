@@ -1,6 +1,7 @@
 package isel.ps.EmployBox.dal.dataMapping.mappers;
 
 import isel.ps.EmployBox.dal.dataMapping.exceptions.DataMapperException;
+import isel.ps.EmployBox.dal.dataMapping.utils.SQLUtils;
 import javafx.util.Pair;
 import isel.ps.EmployBox.dal.domainModel.JobExperience;
 
@@ -45,9 +46,9 @@ public class JobExperienceMapper extends AbstractMapper<JobExperience,Long> {
             statement.setLong(1, obj.getJobId());
             statement.setString(3,obj.getCompeteces());
             statement.setShort(4, obj.getYears());
-            executeUpdate(statement);
+            SQLUtils.executeUpdate(statement);
 
-            long version = getVersion(statement);
+            long version = SQLUtils.getVersion(statement);
 
             return new JobExperience(obj.getJobId(), obj.getCompeteces(), obj.getYears(), version);
         } catch (SQLException e) {
@@ -58,7 +59,7 @@ public class JobExperienceMapper extends AbstractMapper<JobExperience,Long> {
     private static JobExperience prepareDeleteStatement(PreparedStatement statement, JobExperience obj){
         try{
             statement.setLong(1, obj.getJobId());
-            executeUpdate(statement);
+            SQLUtils.executeUpdate(statement);
             return null;
         } catch (SQLException e) {
             throw new DataMapperException(e);

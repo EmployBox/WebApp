@@ -1,6 +1,7 @@
 package isel.ps.EmployBox.dal.dataMapping.mappers;
 
 import isel.ps.EmployBox.dal.dataMapping.exceptions.DataMapperException;
+import isel.ps.EmployBox.dal.dataMapping.utils.SQLUtils;
 import isel.ps.EmployBox.dal.domainModel.Local;
 
 import java.sql.PreparedStatement;
@@ -42,9 +43,9 @@ public class LocalMapper extends AbstractMapper<Local, String>{
             statement.setString(2, obj.getCountry());
             statement.setString(3, obj.getDistrict());
             statement.setString(4, obj.getZipCode());
-            executeUpdate(statement);
+            SQLUtils.executeUpdate(statement);
 
-            long version = getVersion(statement);
+            long version = SQLUtils.getVersion(statement);
 
             return new Local(obj.getAddress(), obj.getCountry(), obj.getDistrict(), obj.getZipCode(), version);
         } catch (SQLException e) {
@@ -56,7 +57,7 @@ public class LocalMapper extends AbstractMapper<Local, String>{
         try {
             statement.setString(1, obj.getAddress());
             statement.setLong(2, obj.getVersion());
-            executeUpdate(statement);
+            SQLUtils.executeUpdate(statement);
             return null;
         } catch (SQLException e) {
             throw new DataMapperException(e);

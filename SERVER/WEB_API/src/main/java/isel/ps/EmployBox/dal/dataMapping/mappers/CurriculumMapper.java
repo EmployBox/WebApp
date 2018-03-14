@@ -2,6 +2,7 @@ package isel.ps.EmployBox.dal.dataMapping.mappers;
 
 import isel.ps.EmployBox.dal.dataMapping.utils.MapperRegistry;
 import isel.ps.EmployBox.dal.dataMapping.exceptions.DataMapperException;
+import isel.ps.EmployBox.dal.dataMapping.utils.SQLUtils;
 import javafx.util.Pair;
 import isel.ps.EmployBox.dal.domainModel.*;
 
@@ -55,10 +56,10 @@ public class CurriculumMapper extends AbstractMapper<Curriculum, String>{
         try{
             statement.setLong(1, obj.getAccountId());
             statement.setLong(2, obj.getCurriculumId());
-            executeUpdate(statement);
+            SQLUtils.executeUpdate(statement);
 
-            long version = getVersion(statement);
-            long curriculumId = getGeneratedKey(statement);
+            long version = SQLUtils.getVersion(statement);
+            long curriculumId = SQLUtils.getGeneratedKey(statement);
 
             return new Curriculum(
                     obj.getAccountId(),
@@ -79,7 +80,7 @@ public class CurriculumMapper extends AbstractMapper<Curriculum, String>{
             statement.setLong(1, obj.getAccountId());
             statement.setLong(2, obj.getCurriculumId());
             statement.setLong(3, obj.getVersion());
-            executeUpdate(statement);
+            SQLUtils.executeUpdate(statement);
             return null;
         } catch (SQLException e) {
             throw new DataMapperException(e);

@@ -8,8 +8,6 @@ import isel.ps.EmployBox.dal.dataMapping.exceptions.ConcurrencyException;
 import isel.ps.EmployBox.dal.dataMapping.exceptions.DataMapperException;
 import isel.ps.EmployBox.dal.util.ReflectionUtils;
 import isel.ps.EmployBox.dal.domainModel.DomainObject;
-import isel.ps.EmployBox.dal.domainModel.ID;
-import isel.ps.EmployBox.dal.dataMapping.DataBaseConnectivity;
 import javafx.util.Pair;
 
 import java.lang.reflect.Field;
@@ -24,7 +22,6 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.function.BiFunction;
-import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -70,7 +67,7 @@ public abstract class AbstractMapper<T extends DomainObject<K>, K> implements Ma
             //StringJoiner sjD = new StringJoiner(",","{call Delete"+type.getSimpleName()+"(", ")}");
             StringJoiner sjD = new StringJoiner(",","{call DeleteAccount(", ")}");
 
-            queryBuilder(fields,
+            ReflectionUtils.queryBuilder(fields,
                     f -> sjI.add("?"),
                     f -> {sjD.add("?"); sjI.add("?"); sjU.add("?");},
                     f -> {sjI.add("?"); sjU.add("?");});
@@ -89,7 +86,7 @@ public abstract class AbstractMapper<T extends DomainObject<K>, K> implements Ma
 
             Function<Field,String> func = f -> f.getName().equals("version") || f.getName().equals("date") ? "[" + f.getName()+ "]" : f.getName();
 
-            queryBuilder(
+            ReflectionUtils.queryBuilder(
                     fields,
                     f -> {sjI.add(func.apply(f)); sjIAux.add(" ? ");},
                     f -> {sjD.add(func.apply(f)); sjUAux.add(func.apply(f) +" = ? ");},
@@ -104,19 +101,6 @@ public abstract class AbstractMapper<T extends DomainObject<K>, K> implements Ma
         insertSettings = new MapperSettings<>(sI, statementType, prepareInsertFunction);
         updateSettings = new MapperSettings<>(sU, statementType, prepareUpdateFunction);
         deleteSettings = new MapperSettings<>(sD, statementType, prepareDeleteFunction);
-    }
-
-    private static void queryBuilder(Field[] fieds, Consumer<Field> first, Consumer<Field> second, Consumer<Field> third){
-        for(Field f : fieds){
-            if(f.isAnnotationPresent(ID.class)){
-                if(!f.getAnnotation(ID.class).isIdentity()) {
-                    first.accept(f);
-                }
-                second.accept(f);
-            }
-            else
-                third.accept(f);
-        }
     }
 
     public Map<K, T> getIdentityMap() {
@@ -181,33 +165,6 @@ public abstract class AbstractMapper<T extends DomainObject<K>, K> implements Ma
     private<R extends Statement> CompletableFuture<T> executeStatement(MapperSettings<R, T, K> mapperSettings, T obj){
         BiFunction<String, Function<? super Statement, T>, CompletableFuture<T>> execute = mapperSettings.isProcedure() ? dbc::executeSQLProcedure : dbc::executeSQLUpdate;
         return execute.apply(mapperSettings.getQuery(), statement -> mapperSettings.getStatementFunction().apply((R)statement, obj));
-    }
-
-    protected static void executeUpdate(PreparedStatement statement) throws SQLException {
-        int rowCount = statement.executeUpdate();
-        if (rowCount == 0) throw new ConcurrencyException("Concurrency problem found");
-    }
-
-    protected static long getVersion(PreparedStatement statement) throws SQLException {
-        long version;
-        try (ResultSet inserted = statement.getResultSet()) {
-            if (inserted.next()){
-                version = inserted.getLong(1);
-            }
-            else throw new DataMapperException("Error inserting new entry");
-        }
-        return version;
-    }
-
-    protected static long getGeneratedKey(PreparedStatement preparedStatement) throws SQLException {
-        long jobId;
-        try (ResultSet generatedKeys = preparedStatement.getGeneratedKeys()) {
-            if (generatedKeys.next()){
-                jobId = generatedKeys.getLong(1);
-            }
-            else throw new DataMapperException("Error inserting new entry");
-        }
-        return jobId;
     }
 
     @Override

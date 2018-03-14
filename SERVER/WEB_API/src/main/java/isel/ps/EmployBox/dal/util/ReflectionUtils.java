@@ -1,5 +1,7 @@
 package isel.ps.EmployBox.dal.util;
 
+import isel.ps.EmployBox.dal.domainModel.ID;
+
 import java.lang.reflect.Field;
 import java.util.*;
 import java.util.function.Consumer;
@@ -32,4 +34,16 @@ public class ReflectionUtils {
         }, false);
     }
 
+    public static void queryBuilder(Field[] fieds, Consumer<Field> first, Consumer<Field> second, Consumer<Field> third){
+        for(Field f : fieds){
+            if(f.isAnnotationPresent(ID.class)){
+                if(!f.getAnnotation(ID.class).isIdentity()) {
+                    first.accept(f);
+                }
+                second.accept(f);
+            }
+            else
+                third.accept(f);
+        }
+    }
 }
