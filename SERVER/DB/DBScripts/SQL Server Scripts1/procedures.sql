@@ -1,6 +1,6 @@
 GO
---USE PS_API_DATABASE
-USE PS_TEST_API_DATABASE
+USE PS_API_DATABASE
+--USE PS_TEST_API_DATABASE
 GO
 
 
@@ -27,6 +27,18 @@ BEGIN
 END
 GO
 
+------------------------------------------------------------------------------------------------------------------
+
+if object_id('dbo.DeleteAccount') is not null
+	drop procedure dbo.DeleteAccount
+
+GO
+CREATE PROCEDURE dbo.DeleteAccount
+	@accountId BIGINT
+	AS
+		DELETE Apidatabase.[Account] where Apidatabase.[Account].accountId = @accountId
+GO
+
 
 ------------------------------------------------------------------------------------------------------------------
 if object_id('dbo.getNewPasswordHash') is not null
@@ -35,15 +47,12 @@ go
 CREATE PROCEDURE dbo.getNewPasswordHash
 	@accountId BIGINT,
 	@newPassword NVARCHAR(40),
-	@newPasswordHash NVARCHAR(40) OUTPUT,
-	@responseMessage NVARCHAR(250) OUTPUT
+	@newPasswordHash NVARCHAR(40) OUTPUT
 	AS
 		SET NOCOUNT ON
 		DECLARE @SALT UNIQUEIDENTIFIER = NULL
 		SELECT @SALT = salt from ApiDatabase.Account WHERE ApiDatabase.[Account].accountId = @accountId
 		SET @newPasswordHash = HASHBYTES('SHA2_512', @newPassword+CAST(@salt AS NVARCHAR(36)))
-		if(@SALT != NULL AND @newPasswordHash = NULL)
-			SET @responseMessage = 'error hashing the password' 
 go
 
 
@@ -77,7 +86,6 @@ AS
 	END
 GO
 
-
 ------------------------------------------------------------------------------------------------------------------
 
 if object_id('dbo.UpdateUser') is not null
@@ -91,51 +99,31 @@ CREATE PROCEDURE dbo.UpdateUser
 	@summary NVARCHAR(1500),
 	@PhotoUrl NVARCHAR(100),
 	@accountId BIGINT OUTPUT,
-    @responseMessage NVARCHAR(250) OUTPUT
-	AS
+    @version bigint output
+AS
 	BEGIN
+		SET TRAN ISOLATION LEVEL REPEATABLE READ
 		BEGIN TRAN
 			BEGIN TRY
 				SET NOCOUNT ON
-				select @accountId = accountId from Apidatabase.[Account] where Apidatabase.[Account].email = @email
+				set @accountId = (select accountId from Apidatabase.[Account] where Apidatabase.[Account].email = @email)
 				DECLARE @newPasswordHash NVARCHAR(40) = NULL
-				EXEC getNewPasswordHash @accountId, @password, @newPasswordHash, @responseMessage
-				IF(@responseMessage != NULL)
-					RETURN
 
-				UPDATE Apidatabase.[Account] SET email = @email, rating = @rating, passwordHash = @newPasswordHash where Apidatabase.[Account].email = @email
+				if @password is not null
+				begin
+					EXEC getNewPasswordHash @accountId, @password, @newPasswordHash, null
+				end
+
+				UPDATE Apidatabase.[Account] SET email = @email, rating = @rating, passwordHash = isnull(@newPasswordHash, passwordHash) where Apidatabase.[Account].email = @email
 				
 				UPDATE ApiDatabase.[User] SET name = @name, summary = @summary, PhotoUrl = @PhotoUrl where Apidatabase.[User].accountId = @accountId
+				set @version = (select [version] from ApiDatabase.[User] where accountId = @accountId)
+		COMMIT
+				
+				select @version = [version] from ApiDatabase.[User] where ApiDatabase.[User].accountId = @accountId
 				COMMIT
 			END TRY
 			BEGIN CATCH
-				IF(@responseMessage != NULL)
-					SET @responseMessage = ERROR_MESSAGE() 
-				ROLLBACK
-			END CATCH
-	END
-GO
-
-
-------------------------------------------------------------------------------------------------------------------
-
-if object_id('dbo.DeleteUser') is not null
-	drop procedure dbo.DeleteUser
-
-GO
-CREATE PROCEDURE dbo.DeleteUser
-	@accountId BIGINT,
-    @responseMessage NVARCHAR(250) OUTPUT
-	AS
-	BEGIN
-		BEGIN TRAN
-			BEGIN TRY
-				SET NOCOUNT ON
-				DELETE Apidatabase.[Account] where Apidatabase.[Account].accountId = @accountId
-				COMMIT
-			END TRY
-			BEGIN CATCH
-				SET @responseMessage = ERROR_MESSAGE() 
 				ROLLBACK
 			END CATCH
 	END
@@ -156,16 +144,13 @@ CREATE PROCEDURE dbo.AddCompany
 	@WebPageUrl NVARCHAR(50),
 	@LogoUrl NVARCHAR(100),
 	@description NVARCHAR(50),
-	@accountId BIGINT OUTPUT,
-    @responseMessage NVARCHAR(250) OUTPUT
+	@accountId BIGINT OUTPUT
 AS
 	BEGIN
 		BEGIN TRAN
 			BEGIN TRY
 				SET NOCOUNT ON
-				EXEC AddAccount @email, @rating, @password, @accountId OUTPUT, @responseMessage OUTPUT
-				IF(@responseMessage != 'success')
-					RETURN
+				EXEC AddAccount @email, @rating, @password, @accountId OUTPUT
 				INSERT INTO ApiDatabase.[Company](
 						accountId,
 						name, 
@@ -187,7 +172,6 @@ AS
 				COMMIT
 			END TRY
 			BEGIN CATCH
-				SET @responseMessage = ERROR_MESSAGE() 
 				ROLLBACK
 			END CATCH
 	END
@@ -209,17 +193,16 @@ CREATE PROCEDURE dbo.UpdateCompany
 	@LogoUrl NVARCHAR(100),
 	@description NVARCHAR(50),
 	@accountId BIGINT OUTPUT,
-    @responseMessage NVARCHAR(250) OUTPUT
+	@version BIGINT OUTPUT
 AS
 	BEGIN
+		SET TRAN ISOLATION LEVEL REPEATABLE READ
 		BEGIN TRAN
 			BEGIN TRY
 				SET NOCOUNT ON
 				select @accountId = accountId from Apidatabase.[Account] where Apidatabase.[Account].email = @email
 				DECLARE @newPasswordHash NVARCHAR(40) = NULL
-				EXEC getNewPasswordHash @accountId, @password, @newPasswordHash, @responseMessage
-				IF(@responseMessage != NULL)
-					RETURN
+				EXEC getNewPasswordHash @accountId, @password, @newPasswordHash
 
 				UPDATE Apidatabase.[Account] 
 					SET 
@@ -228,8 +211,6 @@ AS
 						passwordHash = @newPasswordHash
 					WHERE 
 						Apidatabase.[Account].email = @email
-
-				select @accountId = accountId from Apidatabase.[Account] where Apidatabase.[Account].email = @email
 
 				UPDATE ApiDatabase.[Company] 
 					SET
@@ -243,35 +224,12 @@ AS
 					WHERE 
 						Apidatabase.[Company].accountId = @accountId
 
+					select @accountId = accountId from Apidatabase.[Account] where Apidatabase.[Account].email = @email
+					select @version = [version] from ApiDatabase.[Company] where ApiDatabase.[Company].accountId = @accountId
+
 				COMMIT
 			END TRY
 			BEGIN CATCH
-				SET @responseMessage = ERROR_MESSAGE() 
-				ROLLBACK
-			END CATCH
-	END
-GO
-
-
---------------------------------------------------------------------------------------------------------------------
-
-if object_id('dbo.DeleteCompany') is not null
-	drop procedure dbo.DeleteCompany
-go
-
-CREATE PROCEDURE dbo.DeleteCompany
-	@accountId BIGINT,
-    @responseMessage NVARCHAR(250) OUTPUT
-	AS
-	BEGIN
-		BEGIN TRAN
-			BEGIN TRY
-				SET NOCOUNT ON
-				DELETE ApiDatabase.[Account] where Apidatabase.[Account].accountId = @accountId
-				COMMIT
-			END TRY
-			BEGIN CATCH
-				SET @responseMessage = ERROR_MESSAGE() 
 				ROLLBACK
 			END CATCH
 	END
@@ -287,23 +245,18 @@ CREATE PROCEDURE dbo.AddModerator
 	@email NVARCHAR(50),
 	@rating decimal(2,1),
     @password NVARCHAR(40),
-	@accountId BIGINT OUTPUT,
-    @responseMessage NVARCHAR(250) OUTPUT
+	@accountId BIGINT OUTPUT
 AS
 	BEGIN
 		BEGIN TRAN
 			BEGIN TRY
 				SET NOCOUNT ON
-				EXEC AddAccount @email, @rating, @password, @accountId OUTPUT, @responseMessage OUTPUT
-				SELECT @responseMessage
+				EXEC AddAccount @email, @rating, @password, @accountId OUTPUT
 				SELECT @accountId
-				IF(@responseMessage != 'success')
-					RETURN
 				INSERT INTO ApiDatabase.[Moderator](accountId) values (@accountId)
 				COMMIT
 			END TRY
 			BEGIN CATCH
-				SET @responseMessage = ERROR_MESSAGE() 
 				ROLLBACK
 			END CATCH
 	END
@@ -320,47 +273,22 @@ CREATE PROCEDURE dbo.UpdateModerator
 	@rating decimal(2,1),
     @password NVARCHAR(40),
 	@accountId BIGINT OUTPUT,
-    @responseMessage NVARCHAR(250) OUTPUT
+	@version BIGINT
 	AS
 	BEGIN
+		SET TRAN ISOLATION LEVEL REPEATABLE READ
 		BEGIN TRAN
 			BEGIN TRY
 				select @accountId = accountId from Apidatabase.[Account] where Apidatabase.[Account].email = @email
 				DECLARE @newPasswordHash NVARCHAR(40) = NULL
-				EXEC getNewPasswordHash @accountId, @password, @newPasswordHash, @responseMessage
-				IF(@responseMessage != NULL)
-					RETURN
+				EXEC getNewPasswordHash @accountId, @password, @newPasswordHash
 
 				UPDATE Apidatabase.[Account] SET email = @email, rating = @rating, passwordHash = @newPasswordHash where Apidatabase.[Account].email = @email
+				
+				select @version = [version] from ApiDatabase.[Account] where ApiDatabase.[Account].accountId = @accountId
 				COMMIT
 			END TRY
 			BEGIN CATCH
-				SET @responseMessage = ERROR_MESSAGE() 
-				ROLLBACK
-			END CATCH
-	END
-GO
-
-
---------------------------------------------------------------------------------------------------------------------
-
-if object_id('dbo.DeleteModerator') is not null
-	drop procedure dbo.DeleteModerator
-
-go
-CREATE PROCEDURE dbo.DeleteModerator
-	@accountId BIGINT,
-    @responseMessage NVARCHAR(250) OUTPUT
-	AS
-	BEGIN
-		BEGIN TRAN
-			BEGIN TRY
-				SET NOCOUNT ON
-				DELETE ApiDatabase.[Account] where Apidatabase.[Account].accountId = @accountId
-				COMMIT
-			END TRY
-			BEGIN CATCH
-				SET @responseMessage = ERROR_MESSAGE() 
 				ROLLBACK
 			END CATCH
 	END

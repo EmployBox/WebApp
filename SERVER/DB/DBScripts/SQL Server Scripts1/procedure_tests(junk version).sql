@@ -1,3 +1,7 @@
+GO
+USE PS_API_DATABASE
+GO
+
 begin tran
 	declare @accountId BIGINT
 	declare @version rowversion
@@ -6,6 +10,6 @@ begin tran
 rollback
 
 /** Utils **/
-select * from [Account]
-select * from [User]
-delete from ApiDatabase.Account
+select * from ApiDatabase.[Account]
+select * from ApiDatabase.[User]
+delete from ApiDatabase.Account where ApiDatabase.Account.accountId = 1

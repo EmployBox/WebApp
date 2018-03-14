@@ -1,6 +1,6 @@
 package isel.ps.EmployBox;
 
-import isel.ps.EmployBox.dataMapping.utils.ConnectionManager;
+import isel.ps.EmployBox.dal.dataMapping.utils.ConnectionManager;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
