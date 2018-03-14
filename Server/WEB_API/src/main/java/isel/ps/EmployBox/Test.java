@@ -1,14 +1,14 @@
 package isel.ps.EmployBox;
 
-import isel.ps.EmployBox.dataMapping.mappers.*;
-import isel.ps.EmployBox.dataMapping.utils.MapperSettings;
+import isel.ps.EmployBox.dal.dataMapping.mappers.*;
+import isel.ps.EmployBox.dal.dataMapping.utils.MapperSettings;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.util.stream.Collectors;
 
-import static isel.ps.EmployBox.util.ReflectionUtils.allFieldsFor;
+import static isel.ps.EmployBox.dal.util.ReflectionUtils.allFieldsFor;
 
 public class Test {
     public static void main(String[] args) {

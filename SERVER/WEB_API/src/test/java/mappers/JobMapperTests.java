@@ -1,10 +1,10 @@
 package mappers;
 
 import dataBase.DataBaseTests;
-import isel.ps.EmployBox.dataMapping.mappers.JobMapper;
-import isel.ps.EmployBox.dataMapping.utils.MapperRegistry;
-import isel.ps.EmployBox.dataMapping.utils.UnitOfWork;
-import isel.ps.EmployBox.model.Job;
+import isel.ps.EmployBox.dal.dataMapping.mappers.JobMapper;
+import isel.ps.EmployBox.dal.dataMapping.utils.MapperRegistry;
+import isel.ps.EmployBox.dal.dataMapping.utils.UnitOfWork;
+import isel.ps.EmployBox.dal.domainModel.Job;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
