@@ -13,8 +13,8 @@ public class UserMapper extends AccountMapper<User> {
     public UserMapper() {
         super(
                 User.class,
-                UserMapper::prepareWriteProcedure,
-                UserMapper::prepareWriteProcedure,
+                UserMapper::prepareInsertProcedure,
+                UserMapper::prepareUpdateProcedure,
                 UserMapper::prepareDeleteProcedure
         );
     }
@@ -26,15 +26,22 @@ public class UserMapper extends AccountMapper<User> {
 
     public User find(long accountId){
         User[] user = new User[1];
-        findWhere(new Pair<>("accountId", accountId)).get()
-                .findFirst().ifPresent(u -> user[0] = u);
+        if((user[0] = identityMap.get(accountId)) == null)
+            findWhere(new Pair<>("accountId", accountId)).get()
+                    .findFirst().ifPresent(u -> user[0] = u);
         return user[0];
     }
 
     public User findForEmail(String email){
         User[] user = new User[1];
-        findWhere(new Pair<>("email", email)).get()
-                .findFirst().ifPresent(u -> user[0] = u);
+        identityMap.values()
+                .stream()
+                .filter(user1 -> user1.getEmail().equals(email))
+                .findFirst()
+                .ifPresent(user1 -> user[0] = user1);
+        if(user[0] == null)
+            findWhere(new Pair<>("email", email)).get()
+                    .findFirst().ifPresent(u -> user[0] = u);
         return user[0];
     }
 
@@ -67,7 +74,7 @@ public class UserMapper extends AccountMapper<User> {
         }
     }
 
-    private static User prepareWriteProcedure(CallableStatement cs, User obj) {
+    private static User prepareInsertProcedure(CallableStatement cs, User obj) {
         try {
             cs.setString(1, obj.getEmail());
             cs.setDouble(2, obj.getRating());
@@ -83,6 +90,27 @@ public class UserMapper extends AccountMapper<User> {
             long version = cs.getLong(8);
 
             return new User(accountId, obj.getEmail(), obj.getPassword(), obj.getRating(), version, obj.getName(), obj.getSummary(), obj.getPhotoUrl(),
+                    obj.getOfferedJobs(), obj.getCurriculums(), obj.getApplications(), obj.getChats(), obj.getComments(), obj.getRatings(), obj.getFollowing());
+        } catch (SQLException e) {
+            throw new DataMapperException(e);
+        }
+    }
+
+    private static User prepareUpdateProcedure(CallableStatement cs, User obj){
+        try {
+            cs.setLong(1, obj.getIdentityKey());
+            cs.setString(2, obj.getEmail());
+            cs.setDouble(3, obj.getRating());
+            cs.setString(4, obj.getPassword());
+            cs.setString(5, obj.getName());
+            cs.setString(6, obj.getSummary());
+            cs.setString(7, obj.getPhotoUrl());
+            cs.registerOutParameter(8, Types.BIGINT);//VERSION
+            cs.execute();
+
+            long version = cs.getLong(8);
+
+            return new User(obj.getIdentityKey(), obj.getEmail(), obj.getPassword(), obj.getRating(), version, obj.getName(), obj.getSummary(), obj.getPhotoUrl(),
                     obj.getOfferedJobs(), obj.getCurriculums(), obj.getApplications(), obj.getChats(), obj.getComments(), obj.getRatings(), obj.getFollowing());
         } catch (SQLException e) {
             throw new DataMapperException(e);

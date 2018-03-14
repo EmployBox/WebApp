@@ -1,6 +1,6 @@
 GO
-USE PS_API_DATABASE
---USE PS_TEST_API_DATABASE
+--USE PS_API_DATABASE
+USE PS_TEST_API_DATABASE
 GO
 
 
@@ -46,13 +46,15 @@ if object_id('dbo.getNewPasswordHash') is not null
 go
 CREATE PROCEDURE dbo.getNewPasswordHash
 	@accountId BIGINT,
-	@newPassword NVARCHAR(40),
-	@newPasswordHash NVARCHAR(40) OUTPUT
-	AS
+	@newPassword NVARCHAR(50),
+	@newPasswordHash NVARCHAR(50) OUTPUT
+AS
+	begin
 		SET NOCOUNT ON
 		DECLARE @SALT UNIQUEIDENTIFIER = NULL
-		SELECT @SALT = salt from ApiDatabase.Account WHERE ApiDatabase.[Account].accountId = @accountId
+		SET @SALT = (select salt from ApiDatabase.Account WHERE ApiDatabase.[Account].accountId = @accountId)
 		SET @newPasswordHash = HASHBYTES('SHA2_512', @newPassword+CAST(@salt AS NVARCHAR(36)))
+	end
 go
 
 
@@ -92,13 +94,13 @@ if object_id('dbo.UpdateUser') is not null
 	drop procedure dbo.UpdateUser
 go
 CREATE PROCEDURE dbo.UpdateUser
-	@email NVARCHAR(50),
+	@accountId BIGINT,
+	@email NVARCHAR(25),
 	@rating decimal(2,1),
-    @password NVARCHAR(40),
+    @password NVARCHAR(50),
 	@name NVARCHAR(40),
 	@summary NVARCHAR(1500),
 	@PhotoUrl NVARCHAR(100),
-	@accountId BIGINT OUTPUT,
     @version bigint output
 AS
 	BEGIN
@@ -106,17 +108,16 @@ AS
 		BEGIN TRAN
 			BEGIN TRY
 				SET NOCOUNT ON
-				set @accountId = (select accountId from Apidatabase.[Account] where Apidatabase.[Account].email = @email)
-				DECLARE @newPasswordHash NVARCHAR(40) = NULL
+				DECLARE @newPasswordHash NVARCHAR(50) = NULL
 
 				if @password is not null
 				begin
-					EXEC getNewPasswordHash @accountId, @password, @newPasswordHash
+					EXEC getNewPasswordHash @accountId, @password, @newPasswordHash out
 				end
 
-				UPDATE Apidatabase.[Account] SET email = @email, rating = @rating, passwordHash = isnull(@newPasswordHash, passwordHash) where Apidatabase.[Account].email = @email
+				UPDATE Apidatabase.[Account] SET email = @email, rating = @rating, passwordHash = isnull(@newPasswordHash, passwordHash) where accountId = @accountId
 				
-				UPDATE ApiDatabase.[User] SET name = @name, summary = @summary, PhotoUrl = @PhotoUrl where Apidatabase.[User].accountId = @accountId
+				UPDATE ApiDatabase.[User] SET name = @name, summary = @summary, PhotoUrl = @PhotoUrl where accountId = @accountId
 				set @version = (select [version] from ApiDatabase.[User] where accountId = @accountId)
 			END TRY
 			BEGIN CATCH

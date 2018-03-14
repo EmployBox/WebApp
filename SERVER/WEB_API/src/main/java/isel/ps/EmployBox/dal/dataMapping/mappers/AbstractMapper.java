@@ -147,13 +147,13 @@ public abstract class AbstractMapper<T extends DomainObject<K>, K> implements Ma
         );
     }
 
-    private boolean tryReplace(T obj, long previousVersion, long timeout){
+    private boolean tryReplace(T obj, long timeout){
         long target = System.currentTimeMillis() +  timeout;
         long remaining = target - System.currentTimeMillis();
 
-        while(remaining >= target){
+        while(remaining >= 0){
             T observedObj = identityMap.get(obj.getIdentityKey());
-            if(previousVersion < obj.getVersion()) {
+            if(observedObj.getVersion() < obj.getVersion()) {
                 if(identityMap.replace(obj.getIdentityKey(), observedObj, obj))
                     return true;
             }
@@ -213,10 +213,9 @@ public abstract class AbstractMapper<T extends DomainObject<K>, K> implements Ma
 
     @Override
     public void update(T obj) {
-        long previousVersion = obj.getVersion();
         obj = executeStatement(updateSettings, obj);
 
-        if(!tryReplace(obj, previousVersion, 5000)) throw new ConcurrencyException("Concurrency problem found, could not update IdentityMap");
+        if(!tryReplace(obj, 5000)) throw new ConcurrencyException("Concurrency problem found, could not update IdentityMap");
     }
 
     @Override
