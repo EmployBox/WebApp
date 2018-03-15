@@ -28,7 +28,7 @@ public class CompanyMapper extends AccountMapper<Company> {
         try {
             long accountId = rs.getLong("accountId");
             String email = rs.getString("Email");
-            Double rating = rs.getDouble("Rating");
+            Float rating = rs.getFloat("Rating");
             String name = rs.getString("name");
             short yearFounded = rs.getShort("yearFounded");
             String specialization = rs.getString("Specialization");

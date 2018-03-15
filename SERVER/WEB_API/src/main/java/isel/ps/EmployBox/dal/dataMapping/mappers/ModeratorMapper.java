@@ -32,7 +32,7 @@ public class ModeratorMapper extends AccountMapper<Moderator> {
             long accountID = rs.getLong("AccountID");
             String email = rs.getString("Email");
             String passwordHash = rs.getString("passwordHash");
-            Double rating = rs.getDouble("Rating");
+            Float rating = rs.getFloat("Rating");
             long version = rs.getLong("[version]");
 
             Supplier<List<Comment>> comments = ((CommentMapper) MapperRegistry.getMapper(Comment.class)).findCommentsForAccount(accountID)::join;

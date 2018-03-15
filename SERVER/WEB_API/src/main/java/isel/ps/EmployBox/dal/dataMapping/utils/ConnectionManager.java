@@ -8,6 +8,8 @@ import javax.sql.ConnectionPoolDataSource;
 import java.sql.Connection;
 import java.sql.SQLException;
 
+import static isel.ps.EmployBox.dal.dataMapping.utils.ConnectionManager.DBsPath.TESTDB;
+
 public class ConnectionManager {
     private final Logger logger = LoggerFactory.getLogger(ConnectionManager.class);
 
@@ -53,7 +55,22 @@ public class ConnectionManager {
         return null;
     }
 
-    private ConnectionPoolDataSource getDataSource(String envVar){
+    //test method
+    public static Connection getConnection2() {
+        try {
+            Connection connection = getDataSource(TESTDB.toString())
+                    .getPooledConnection()
+                    .getConnection();
+            connection.setAutoCommit(false);
+            return connection;
+        } catch (SQLException e) {
+            Logger logger = LoggerFactory.getLogger(ConnectionManager.class);
+            logger.info("Error on stablishing connection to the DB \n" + e.getMessage());
+        }
+        return null;
+    }
+
+    private static ConnectionPoolDataSource getDataSource(String envVar){
         String connectionString = System.getenv(envVar);
         String [] connectionStringParts = connectionString.split(";");
 

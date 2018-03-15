@@ -46,7 +46,7 @@ public class UserMapper extends AccountMapper<User> {
             long accountID = rs.getLong("AccountID");
             String email = rs.getString("Email");
             String passwordHash = rs.getString("password");
-            Double rating = rs.getDouble("Rating");
+            Float rating = rs.getFloat("Rating");
             String name = rs.getString ("Name");
             String summary = rs.getString ("Summary");
             String photoUrl = rs.getString ("PhotoUrl");
@@ -105,11 +105,12 @@ public class UserMapper extends AccountMapper<User> {
         }
     }
 
+    //todo fix
     private static User prepareUpdateProcedure(CallableStatement cs, User obj){
         try {
             cs.setLong(1, obj.getIdentityKey());
             cs.setString(2, obj.getEmail());
-            cs.setDouble(3, obj.getRating());
+            cs.setFloat(3, obj.getRating());
             cs.setString(4, obj.getPassword());
             cs.setString(5, obj.getName());
             cs.setString(6, obj.getSummary());

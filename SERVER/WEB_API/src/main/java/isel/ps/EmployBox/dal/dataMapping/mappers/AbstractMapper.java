@@ -167,18 +167,19 @@ public abstract class AbstractMapper<T extends DomainObject<K>, K> implements Ma
 
     @Override
     public void insert(T obj) {
-        executeStatement(insertSettings, obj).thenAccept(o -> identityMap.put(o.getIdentityKey(), o));
+        executeStatement(insertSettings, obj).thenAccept(o -> identityMap.put(o.getIdentityKey(), o)).join();
     }
 
     @Override
     public void update(T obj) {
         executeStatement(updateSettings, obj)
                 .thenApply(o -> tryReplace(o, 5000))
-                .thenAccept(b -> {if(!b) throw new ConcurrencyException("Concurrency problem found, could not update IdentityMap");});
+                .thenAccept(b -> {if(!b) throw new ConcurrencyException("Concurrency problem found, could not update IdentityMap");})
+        .join();
     }
 
     @Override
     public void delete(T obj) {
-        executeStatement(deleteSettings, obj).thenAccept(o -> identityMap.remove(obj.getIdentityKey()));
+        executeStatement(deleteSettings, obj).thenAccept(o -> identityMap.remove(obj.getIdentityKey())).join();
     }
 }

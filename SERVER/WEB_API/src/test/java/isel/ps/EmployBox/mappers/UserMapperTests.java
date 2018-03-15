@@ -11,7 +11,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.sql.SQLException;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -52,7 +51,7 @@ public class UserMapperTests {
     public void insertTest() {
         String email = "Test@gmail.com";
         String password = "1234";
-        double rating = 4.0;
+        float rating = 4.0f;
         String name = "Manel";
         String summary = "Sou um espetaculo";
         String photoUrl = "someurl";
@@ -81,7 +80,7 @@ public class UserMapperTests {
     public void updateTest(){
         String email = "432@hotmail.com";
         String password = "43532";
-        double rating = 4.0;
+        float rating = 4.0f;
         String name = "Baril";
         String summary = "O Baril sou eu";
         String photoUrl = "yetAnotherURL";
@@ -137,7 +136,5 @@ public class UserMapperTests {
 
         User user = mapper.findForEmail(email);
         assertTrue(identityMap.get(user.getIdentityKey()) != null);
-
-
     }
 }

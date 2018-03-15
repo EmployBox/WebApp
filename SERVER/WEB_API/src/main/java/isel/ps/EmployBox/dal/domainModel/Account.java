@@ -9,7 +9,7 @@ public abstract class Account extends DomainObject<Long> {
     protected long accountID;
     protected final String email;
     protected final String password;
-    protected final double rating;
+    protected final float rating;
        
     protected final Supplier<List<Job>> offeredJobs;
     protected final Supplier<List<Comment>> comments;
@@ -21,7 +21,7 @@ public abstract class Account extends DomainObject<Long> {
             long accountID,
             String email,
             String password,
-            double rating,
+            float rating,
             long version,
             Supplier<List<Job>> offeredJobs,
             Supplier<List<Comment>> comments,
@@ -49,7 +49,7 @@ public abstract class Account extends DomainObject<Long> {
         return password;
     }
 
-    public double getRating() {
+    public float getRating() {
         return rating;
     }
 
