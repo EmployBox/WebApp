@@ -76,6 +76,7 @@ public class UserMapperTests {
         assertEquals(user.getPhotoUrl(), mapUser.getPhotoUrl());
     }
 
+    //todo fix
     @Test
     public void updateTest(){
         String email = "432@hotmail.com";
@@ -113,6 +114,7 @@ public class UserMapperTests {
         assertEquals(photoUrl, dbUser.getPhotoUrl());
     }
 
+    //todo fix
     @Test
     public void deleteTest(){
         User user = mapper.findForEmail("123@gmail.com");
