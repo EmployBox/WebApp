@@ -13,6 +13,10 @@ IF DB_ID ('PS_API_DATABASE') IS NOT NULL
 			DROP VIEW dbo.[Comment];
 		IF OBJECT_ID(N'dbo.[Message]') IS NOT NULL
 			DROP VIEW dbo.[Message];
+		IF OBJECT_ID(N'dbo.[PersonRating]') IS NOT NULL
+			DROP VIEW dbo.[PersonRating];
+		IF OBJECT_ID(N'dbo.[CompanyRating]') IS NOT NULL
+			DROP VIEW dbo.[CompanyRating];
 		IF OBJECT_ID(N'dbo.[Chat]') IS NOT NULL
 			DROP VIEW dbo.[Chat];
 		IF OBJECT_ID(N'dbo.[Application]') IS NOT NULL

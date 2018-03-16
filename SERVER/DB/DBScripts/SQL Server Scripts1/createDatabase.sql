@@ -15,12 +15,12 @@ GO
 CREATE TABLE ApiDatabase.[Account] (
 	accountId BIGINT IDENTITY PRIMARY KEY,
 	email NVARCHAR(25) UNIQUE NOT NULL,
-	rating decimal(2,1) default(0.0),
+	rating decimal(3,1) default(0.0),
 	passwordHash NVARCHAR(50) NOT NULL,
 	salt UNIQUEIDENTIFIER NOT NULL,
 	[version] rowversion,
 
-	CHECK (rating >= 0.0 AND rating <= 5.0)
+	CHECK (rating >= 0.0 AND rating <= 10.0)
 )
 
 CREATE TABLE ApiDatabase.[Company] (
@@ -169,18 +169,22 @@ CREATE TABLE ApiDatabase.[Application](
 	FOREIGN KEY (jobId) REFERENCES ApiDatabase.Job(jobId),
 	primary key (UserId, JobId)
 )
-
 CREATE TABLE ApiDatabase.[Rating](
 	AccountIdFrom BIGINT,
 	AccountIdTo BIGINT,
 	moderatorId BIGINT references ApiDatabase.Moderator,
-	ratingValue decimal(2,1) DEFAULT 0.0,
+	[workLoad] decimal(3,1) DEFAULT 0.0  check ([workLoad] >= 0.0 AND [workLoad] <= 10.0),
+	wage decimal(3,1) DEFAULT 0.0 check (wage >= 0.0 AND wage <= 10.0),
+	workEnviroment decimal(3,1) DEFAULT 0.0 check (workEnviroment >= 0.0 AND workEnviroment <= 10.0),
+	competences decimal(3,1) DEFAULT 0.0 check (competences >= 0.0 AND competences <= 10.0),
+	ponctuality decimal(3,1) DEFAULT 0.0 check (ponctuality >= 0.0 AND ponctuality <= 10.0),
+	assiduity decimal(3,1) DEFAULT 0.0 check (assiduity>= 0.0 AND assiduity <= 10.0),
+	demeanor decimal(3,1) DEFAULT 0.0 check (demeanor >= 0.0 AND demeanor <= 10.0),
 	[version] rowversion,
 	
 	FOREIGN KEY (accountIdFrom) REFERENCES ApiDatabase.Account(accountID),
 	FOREIGN KEY (accountIdTo) REFERENCES ApiDatabase.Account(accountID),
 
-	constraint rating_interval check (ratingValue >= 0.0 AND ratingValue <= 5.0),
 	PRIMARY KEY(AccountIdFrom , AccountIdTo)
 )
 
