@@ -155,7 +155,7 @@ CREATE TABLE Apidatabase.[Job_Experience](
 
 	FOREIGN KEY (jobId) REFERENCES ApiDatabase.Job(jobId),
 
-	primary key(jobId)
+	primary key(jobId,competences)
 )
 
 CREATE TABLE ApiDatabase.[Application](
