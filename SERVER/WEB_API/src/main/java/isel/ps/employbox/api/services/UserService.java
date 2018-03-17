@@ -7,8 +7,7 @@ import isel.ps.employbox.dal.Mapper;
 import isel.ps.employbox.dal.util.MapperRegistry;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Service
 public class UserService implements ModelBinder<isel.ps.employbox.dal.model.User, User, isel.ps.employbox.api.model.input.User, Long> {
@@ -38,8 +37,10 @@ public class UserService implements ModelBinder<isel.ps.employbox.dal.model.User
                 .join();
     }
 
-    public User getUser(long id) {
-        return null;
+    public Optional<User> getUser(long id) {
+        return bindOutput(Collections.singletonList(userMapper.getById(id).join()))
+                .stream()
+                .findFirst();
     }
 
     public List<Application> getAllApplications(long id, Map<String, String> queryString) {
@@ -48,5 +49,45 @@ public class UserService implements ModelBinder<isel.ps.employbox.dal.model.User
 
     public List<Curriculum> getAllCurriculums(long id, Map<String, String> queryString) {
         return null;
+    }
+
+    public Curriculum getCurriculum(long id, long cid) {
+        return null;
+    }
+
+    public void updateUser(long id, isel.ps.employbox.api.model.input.User user) {
+
+    }
+
+    public void updateApplication(long id, long jid, isel.ps.employbox.api.model.input.Application application) {
+
+    }
+
+    public void updateCurriculum(long id, long cid, isel.ps.employbox.api.model.input.Curriculum curriculum) {
+
+    }
+
+    public void createUser(isel.ps.employbox.api.model.input.User user) {
+
+    }
+
+    public void createApplication(isel.ps.employbox.api.model.input.Application application) {
+
+    }
+
+    public void createCurriculum(long id, isel.ps.employbox.api.model.input.Curriculum curriculum) {
+
+    }
+
+    public void deleteUser(long id) {
+
+    }
+
+    public void deleteApplication(long id, long jid) {
+
+    }
+
+    public void deleteCurriculum(long id, long cid) {
+        
     }
 }

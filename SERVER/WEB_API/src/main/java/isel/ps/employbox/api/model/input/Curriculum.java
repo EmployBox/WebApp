@@ -1,11 +1,10 @@
-package isel.ps.employbox.api.model.output;
+package isel.ps.employbox.api.model.input;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.List;
 
 public class Curriculum {
-
     private final long id;
     private final String title;
     private final List<Experience> experiences;
