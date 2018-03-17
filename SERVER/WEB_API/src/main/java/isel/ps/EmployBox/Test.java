@@ -1,7 +1,7 @@
 package isel.ps.EmployBox;
 
-import isel.ps.EmployBox.dal.dataMapping.mappers.*;
-import isel.ps.EmployBox.dal.dataMapping.utils.MapperSettings;
+import isel.ps.EmployBox.dal.mappers.*;
+import isel.ps.EmployBox.dal.util.MapperSettings;
 
 import java.io.FileOutputStream;
 import java.io.IOException;

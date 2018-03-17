@@ -1,9 +1,9 @@
 package isel.ps.EmployBox.mappers;
 
-import isel.ps.EmployBox.dal.dataMapping.mappers.*;
-import isel.ps.EmployBox.dal.dataMapping.utils.ConnectionManager;
-import isel.ps.EmployBox.dal.dataMapping.utils.UnitOfWork;
-import isel.ps.EmployBox.dal.domainModel.*;
+import isel.ps.EmployBox.dal.mappers.*;
+import isel.ps.EmployBox.dal.util.ConnectionManager;
+import isel.ps.EmployBox.dal.util.UnitOfWork;
+import isel.ps.EmployBox.dal.model.*;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -14,9 +14,9 @@ import java.sql.SQLException;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import static isel.ps.EmployBox.dal.dataMapping.utils.ConnectionManager.DBsPath.TESTDB;
-import static isel.ps.EmployBox.dal.dataMapping.utils.ConnectionManager.getConnectionManager;
-import static isel.ps.EmployBox.dal.dataMapping.utils.MapperRegistry.addEntry;
+import static isel.ps.EmployBox.dal.util.ConnectionManager.DBsPath.TESTDB;
+import static isel.ps.EmployBox.dal.util.ConnectionManager.getConnectionManager;
+import static isel.ps.EmployBox.dal.util.MapperRegistry.addEntry;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 

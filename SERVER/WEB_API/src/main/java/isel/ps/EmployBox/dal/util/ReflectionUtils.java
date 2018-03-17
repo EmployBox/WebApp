@@ -1,6 +1,6 @@
 package isel.ps.EmployBox.dal.util;
 
-import isel.ps.EmployBox.dal.domainModel.ID;
+import isel.ps.EmployBox.dal.model.ID;
 
 import java.lang.reflect.Field;
 import java.util.*;
