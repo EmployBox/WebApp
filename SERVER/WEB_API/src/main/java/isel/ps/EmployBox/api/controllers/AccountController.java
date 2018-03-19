@@ -35,6 +35,20 @@ public class AccountController {
     @GetMapping("/account/{id}/followers")
     public List<Account> getFollowers(@PathVariable long id){ return accountService.getAccountFollowers(id); }
 
+    @PostMapping("/account/{id}/followers/{fid}")
+    public void setFollower(
+            @PathVariable long id,
+            @PathVariable long fid,
+            @RequestHeader("apiKey") String apiKey){
+        accountService.setFollower(id,fid);
+    }
+
+    @DeleteMapping("/account/{id}/followers/{fid}")
+    public void deleteFollower(@PathVariable long id,
+                                        @PathVariable long fid,
+                                        @RequestHeader("apiKey") String apiKey
+    ){  accountService.deleteFollower(id,fid); }
+
     @GetMapping("/account/{id}/following")
     public List<Account> getFollowing(@PathVariable long id){ return accountService.getAccountFollowing(id); }
 
@@ -47,19 +61,19 @@ public class AccountController {
     }
 
     @PostMapping("/account/{id}/chat")
-    public String setChat (
+    public void setChat (
             @PathVariable long id,
             @RequestHeader("apiKey") String apiKey,
             @RequestBody InChat inChat)
-    { return accountService.createNewChat(inChat); }
+    { accountService.createNewChat(inChat); }
 
     @PostMapping("/account/{id}/chats/{cid}/message")
-    public String setChatMessage (
+    public void setChatMessage (
             @PathVariable long id,
             @PathVariable long cid,
             @RequestHeader("apiKey") String apiKey,
             @RequestBody InMessage msg)
-    { return accountService.createNewChatMessage(msg); }
+    {  accountService.createNewChatMessage(msg); }
 
 
 }

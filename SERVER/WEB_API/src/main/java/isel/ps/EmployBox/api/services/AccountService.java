@@ -16,9 +16,7 @@ import java.util.Map;
 public final class AccountService {
 
     public List<Account> getAccountsPage(Map<String,String> queryString) {
-        String page = queryString.get("page");
-        if (page == null)
-            page = "0";
+        String page = ServiceUtils.getPage(queryString);
 
 
         return null;
@@ -48,11 +46,19 @@ public final class AccountService {
         throw new NotImplementedException();
     }
 
-    public String createNewChat(InChat inChat) {
+    public void createNewChat(InChat inChat) {
         throw new NotImplementedException();
     }
 
-    public String createNewChatMessage(InMessage msg) {
+    public void createNewChatMessage(InMessage msg) {
+        throw new NotImplementedException();
+    }
+
+    public void setFollower(long id, long fid) {
+        throw new NotImplementedException();
+    }
+
+    public void deleteFollower(long id, long fid) {
         throw new NotImplementedException();
     }
 }
