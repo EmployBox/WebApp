@@ -90,7 +90,7 @@ public class UnitOfWork {
      */
     public void registerClean(DomainObject obj){
         assert obj.getIdentityKey()!= null;
-        getMapper(obj.getClass()).getIdentityMap().put(obj.getIdentityKey(), obj);
+        //getMapper(obj.getClass()).getIdentityMap().put(obj.getIdentityKey(), obj);
     }
 
     private static ThreadLocal<UnitOfWork> current = new ThreadLocal<>();
@@ -139,20 +139,20 @@ public class UnitOfWork {
 
     private void insertNew() {
         for (DomainObject obj : newObjects) {
-            getMapper(obj.getClass()).insert(obj);
+            //getMapper(obj.getClass()).insert(obj);
         }
     }
 
     private void updateDirty() {
-        dirtyObjects
+        /*dirtyObjects
                 .stream()
                 .filter(domainObject -> !removedObjects.contains(domainObject))
-                .forEach(domainObject -> getMapper(domainObject.getClass()).update(domainObject));
+                .forEach(domainObject -> getMapper(domainObject.getClass()).update(domainObject));*/
     }
 
     private void deleteRemoved() {
         for (DomainObject obj : removedObjects) {
-            getMapper(obj.getClass()).delete(obj);
+            //getMapper(obj.getClass()).delete(obj);
         }
     }
 
@@ -166,7 +166,7 @@ public class UnitOfWork {
         /*for (DomainObject obj : newObjects)
             MapperRegistry.getMapper(obj.getClass()).getIdentityMap().remove(obj.getIdentityKey());*/
 
-        newObjects
+        /*newObjects
                 .stream()
                 .filter(domainObject -> getMapper(domainObject.getClass()).getIdentityMap().containsKey(domainObject.getIdentityKey()))
                 .forEach(domainObject -> getMapper(domainObject.getClass()).getIdentityMap().remove(domainObject.getIdentityKey(), domainObject));
@@ -183,6 +183,6 @@ public class UnitOfWork {
         removedObjects
                 .stream()
                 .filter(obj -> !dirtyObjects.contains(obj))
-                .forEach(obj -> getMapper(obj.getClass()).getIdentityMap().put(obj.getIdentityKey(), obj));
+                .forEach(obj -> getMapper(obj.getClass()).getIdentityMap().put(obj.getIdentityKey(), obj));*/
     }
 }

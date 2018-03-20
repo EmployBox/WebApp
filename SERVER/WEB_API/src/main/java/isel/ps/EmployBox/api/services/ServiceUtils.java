@@ -1,4 +1,4 @@
-package isel.ps.EmployBox.api.services;
+package isel.ps.employbox.api.services;
 
 import java.util.Map;
 

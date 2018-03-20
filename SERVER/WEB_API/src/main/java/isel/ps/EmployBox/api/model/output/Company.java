@@ -1,4 +1,4 @@
-package isel.ps.EmployBox.api.model.output;
+package isel.ps.employbox.api.model.output;
 
 public class Company {
 }

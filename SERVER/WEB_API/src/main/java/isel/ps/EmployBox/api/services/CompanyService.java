@@ -1,12 +1,12 @@
-package isel.ps.EmployBox.api.services;
+package isel.ps.employbox.api.services;
 
-import isel.ps.EmployBox.api.model.output.Company;
+import isel.ps.employbox.api.model.output.Company;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.util.List;
 import java.util.Map;
 
-import static isel.ps.EmployBox.api.services.ServiceUtils.getPage;
+import static isel.ps.employbox.api.services.ServiceUtils.getPage;
 
 public class CompanyService {
     public static List<Company> getCompanies(Map<String, String> queryString) {

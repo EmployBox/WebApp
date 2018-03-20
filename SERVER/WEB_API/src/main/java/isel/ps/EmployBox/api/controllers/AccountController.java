@@ -6,7 +6,7 @@ import isel.ps.EmployBox.api.model.output.Account;
 import isel.ps.EmployBox.api.model.output.OutChat;
 import isel.ps.EmployBox.api.model.output.Job;
 import isel.ps.EmployBox.api.model.output.OutMessage;
-import isel.ps.EmployBox.api.services.AccountService;
+import isel.ps.employbox.api.services.AccountService;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;

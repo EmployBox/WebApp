@@ -1,7 +1,7 @@
-package isel.ps.EmployBox.api.controllers;
+package isel.ps.employbox.api.controllers;
 
-import isel.ps.EmployBox.api.model.output.Company;
-import isel.ps.EmployBox.api.services.CompanyService;
+import isel.ps.employbox.api.model.output.Company;
+import isel.ps.employbox.api.services.CompanyService;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
