@@ -1,4 +1,4 @@
-package isel.ps.EmployBox.api.controllers;
+package isel.ps.employbox.api.controllers;
 
 import isel.ps.EmployBox.api.model.input.InChat;
 import isel.ps.EmployBox.api.model.input.InMessage;
