@@ -3,30 +3,56 @@ package isel.ps.employbox.api.controllers;
 import isel.ps.employbox.api.model.output.Application;
 import isel.ps.employbox.api.model.output.Curriculum;
 import isel.ps.employbox.api.model.output.User;
+import isel.ps.employbox.api.services.APIService;
+import isel.ps.employbox.api.services.ModelBinder;
 import isel.ps.employbox.api.services.UserService;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @RestController
-public class UserController {
+public class UserController implements ModelBinder<isel.ps.employbox.dal.model.User, User, isel.ps.employbox.api.model.input.User, Long> {
 
     private final UserService userService;
+    private final APIService apiService;
 
-    public UserController(UserService userService) {
+    public UserController(UserService userService, APIService apiService) {
         this.userService = userService;
+        this.apiService = apiService;
+    }
+
+    @Override
+    public List<User> bindOutput(List<isel.ps.employbox.dal.model.User> list) {
+        return list
+                .stream()
+                .map(user -> new User(user.getIdentityKey(), user.getName(), user.getEmail(), user.getPhotoUrl(), user.getSummary(), user.getRating()))
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<isel.ps.employbox.dal.model.User> bindInput(List<isel.ps.employbox.api.model.input.User> list) {
+        return list
+                .stream()
+                .map(user -> new isel.ps.employbox.dal.model.User(-1, user.getEmail(), user.getPassword(), 0, 0, user.getName(), user.getSummary(), user.getPhoto_url(),
+                        Collections::emptyList, Collections::emptyList, Collections::emptyList, Collections::emptyList, Collections::emptyList,
+                        Collections::emptyList, Collections::emptyList))
+                .collect(Collectors.toList());
     }
 
     @GetMapping("/account/user")
     public List<User> getAllUsers(@RequestParam Map<String,String> queryString){
-        return userService.getAllUsers(queryString);
+        return bindOutput(userService.getAllUsers(queryString));
     }
 
     @GetMapping("/account/user/{id}")
     public Optional<User> getUser(@PathVariable long id){
-        return userService.getUser(id);
+        return bindOutput(Collections.singletonList(userService.getUser(id)))
+                .stream()
+                .findFirst();
     }
 
     @GetMapping("/account/user/{id}/apply")
@@ -50,9 +76,8 @@ public class UserController {
             @PathVariable long id,
             @RequestBody isel.ps.employbox.api.model.input.User user
     ){
-        //TODO validate apiKey
+        apiService.validateAPIKey(apiKey);
         userService.updateUser(id, user);
-        //TODO return unauthorized access
     }
 
     @PutMapping("/account/user/{id}/apply/{jid}")
@@ -62,9 +87,8 @@ public class UserController {
             @PathVariable long jid,
             @RequestBody isel.ps.employbox.api.model.input.Application application
     ){
-        //TODO validate apiKey
+        apiService.validateAPIKey(apiKey);
         userService.updateApplication(id, jid, application);
-        //TODO return unauthorized access
     }
 
     @PutMapping("/account/user/{id}/curriculum/{cid}")
@@ -74,9 +98,8 @@ public class UserController {
             @PathVariable long cid,
             @RequestBody isel.ps.employbox.api.model.input.Curriculum curriculum
     ){
-        //TODO validate apiKey
+        apiService.validateAPIKey(apiKey);
         userService.updateCurriculum(id, cid, curriculum);
-        //TODO return unauthorized access
     }
 
     @PostMapping("/account/user/")
@@ -84,9 +107,8 @@ public class UserController {
             @RequestHeader("apiKey") String apiKey,
             @RequestBody isel.ps.employbox.api.model.input.User user
     ){
-        //TODO validate apiKey
+        apiService.validateAPIKey(apiKey);
         userService.createUser(user);
-        //TODO return unauthorized access
     }
 
     @PostMapping("/account/user/{id}/apply/{jid}")
@@ -94,36 +116,31 @@ public class UserController {
             @RequestHeader("apiKey") String apiKey,
             @RequestBody isel.ps.employbox.api.model.input.Application application
     ){
-        //TODO validate apiKey
+        apiService.validateAPIKey(apiKey);
         userService.createApplication(application);
-        //TODO return unauthorized access
     }
 
     @PostMapping("/account/user/{id}/curriculum/")
     public void createCurriculum(@RequestHeader("apiKey") String apiKey, @PathVariable long id, @RequestBody isel.ps.employbox.api.model.input.Curriculum curriculum){
-        //TODO validate apiKey
+        apiService.validateAPIKey(apiKey);
         userService.createCurriculum(id, curriculum);
-        //TODO return unauthorized access
     }
 
     @DeleteMapping("/account/user/{id}")
     public void deleteUser(@RequestHeader("apiKey") String apiKey, @PathVariable long id){
-        //TODO validate apiKey
+        apiService.validateAPIKey(apiKey);
         userService.deleteUser(id);
-        //TODO return unauthorized access
     }
 
     @DeleteMapping("/account/user/{id}/application/{jid}")
     public void deleteApplication(@RequestHeader("apiKey") String apiKey, @PathVariable long id, @PathVariable long jid){
-        //TODO validate apiKey
+        apiService.validateAPIKey(apiKey);
         userService.deleteApplication(id, jid);
-        //TODO return unauthorized access
     }
 
     @DeleteMapping("/account/user/{id}/curriculum/{cid}")
     public void deleteCurriculum(@RequestHeader("apiKey") String apiKey, @PathVariable long id, @PathVariable long cid){
-        //TODO validate apiKey
+        apiService.validateAPIKey(apiKey);
         userService.deleteCurriculum(id, cid);
-        //TODO return unauthorized access
     }
 }

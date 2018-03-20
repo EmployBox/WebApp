@@ -59,7 +59,7 @@ public abstract class DomainObject<K> {
     /**
      * Always called when removing an object
      */
-    protected void markRemoved() {
+    public void markRemoved() {
         UnitOfWork.getCurrent().registerRemoved(this);
     }
 }

@@ -15,7 +15,7 @@ begin tran
 	insert into [Local] ([Address], Country, Street, ZIPCode)
 	values ('123', '456', '789', '101112')
 
-	select * from [local]
+	select * from [Local]
 
 	update [Local] set country = '321' 
 	output INSERTED.[version]
