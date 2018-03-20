@@ -1,19 +1,19 @@
 package isel.ps.employbox.api.model.input;
 
 public class User {
-    private final String email;
-    private final String password;
-    private final String name;
-    private final String photo_url;
-    private final String summary;
+    private String email;
+    private String password;
+    private String name;
+    private String photo_url;
+    private String summary;
 
-    public User(String email, String password, String name, String photo_url, String summary) {
+    /*public User(String email, String password, String name, String photo_url, String summary) {
         this.email = email;
         this.password = password;
         this.name = name;
         this.photo_url = photo_url;
         this.summary = summary;
-    }
+    }*/
 
     public String getEmail() {
         return this.email;
@@ -33,5 +33,25 @@ public class User {
 
     public String getSummary() {
         return this.summary;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setPhoto_url(String photo_url) {
+        this.photo_url = photo_url;
+    }
+
+    public void setSummary(String summary) {
+        this.summary = summary;
     }
 }

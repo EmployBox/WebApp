@@ -12,9 +12,9 @@ import java.util.*;
 @Service
 public class UserService {
 
-    private final Mapper<isel.ps.employbox.dal.model.User, Long> userMapper = MapperRegistry.getMapper(isel.ps.employbox.dal.model.User.class).get();
-    private final Mapper<isel.ps.employbox.dal.model.Curriculum, String> curriculumMapper = MapperRegistry.getMapper(isel.ps.employbox.dal.model.Curriculum.class).get();
-    private final Mapper<isel.ps.employbox.dal.model.Application, String> applicationMapper = MapperRegistry.getMapper(isel.ps.employbox.dal.model.Application.class).get();
+    private final Mapper<isel.ps.employbox.dal.model.User, Long> userMapper = MapperRegistry.getMapper(isel.ps.employbox.dal.model.User.class).orElse(null);
+    private final Mapper<isel.ps.employbox.dal.model.Curriculum, String> curriculumMapper = MapperRegistry.getMapper(isel.ps.employbox.dal.model.Curriculum.class).orElse(null);
+    private final Mapper<isel.ps.employbox.dal.model.Application, String> applicationMapper = MapperRegistry.getMapper(isel.ps.employbox.dal.model.Application.class).orElse(null);
 
     public List<User> getAllUsers(Map<String, String> queryString) {
         String name = queryString.get("name");
