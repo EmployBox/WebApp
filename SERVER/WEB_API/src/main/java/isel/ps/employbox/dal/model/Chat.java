@@ -2,7 +2,6 @@ package isel.ps.employbox.dal.model;
 
 import java.util.List;
 import java.util.function.Supplier;
-import java.util.stream.Stream;
 
 public class Chat extends DomainObject<Long> {
     @ID(isIdentity = true)
@@ -51,7 +50,7 @@ public class Chat extends DomainObject<Long> {
         return accountIdSecond;
     }
 
-    public Stream<Message> getMessages() {
-        return messages.get().stream();
+    public Supplier<List<Message>> getMessages() {
+        return messages;
     }
 }

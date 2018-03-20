@@ -3,7 +3,6 @@ package isel.ps.employbox.dal.model;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Supplier;
-import java.util.stream.Stream;
 
 public class User extends Account {
     private final String name;
@@ -139,11 +138,11 @@ public class User extends Account {
         return photoUrl;
     }
 
-    public Stream<Application> getApplications() {
-        return applications.get().stream();
+    public Supplier<List<Application>> getApplications() {
+        return applications;
     }
 
-    public Stream<Curriculum> getCurriculums() {
-        return curriculums.get().stream();
+    public Supplier<List<Curriculum>> getCurriculums() {
+        return curriculums;
     }
 }

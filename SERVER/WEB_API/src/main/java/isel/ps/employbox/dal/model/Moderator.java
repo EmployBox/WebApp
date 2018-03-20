@@ -2,7 +2,6 @@ package isel.ps.employbox.dal.model;
 
 import java.util.List;
 import java.util.function.Supplier;
-import java.util.stream.Stream;
 
 public class Moderator extends Account {
     private final Supplier<List<Rating>> ratingsModerated;
@@ -73,7 +72,7 @@ public class Moderator extends Account {
         return moderator;
     }
 
-    public Stream<Rating> getRatingsModerated() {
-        return ratingsModerated.get().stream();
+    public Supplier<List<Rating>> getRatingsModerated() {
+        return ratingsModerated;
     }
 }

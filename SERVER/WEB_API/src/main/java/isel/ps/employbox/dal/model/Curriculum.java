@@ -2,7 +2,6 @@ package isel.ps.employbox.dal.model;
 
 import java.util.List;
 import java.util.function.Supplier;
-import java.util.stream.Stream;
 
 public class Curriculum extends DomainObject<String>{
 
@@ -78,19 +77,19 @@ public class Curriculum extends DomainObject<String>{
         return title;
     }
 
-    public Stream<PreviousJobs> getPreviousJobs() {
-        return previousJobs.get().stream();
+    public Supplier<List<PreviousJobs>> getPreviousJobs() {
+        return previousJobs;
     }
 
-    public Stream<AcademicBackground> getAcademicBackground() {
-        return academicBackground.get().stream();
+    public Supplier<List<AcademicBackground>> getAcademicBackground() {
+        return academicBackground;
     }
 
-    public Stream<Project> getProjects() {
-        return projects.get().stream();
+    public Supplier<List<Project>> getProjects() {
+        return projects;
     }
 
-    public Stream<CurriculumExperience> getExperiences() {
-        return experiences.get().stream();
+    public Supplier<List<CurriculumExperience>> getExperiences() {
+        return experiences;
     }
 }

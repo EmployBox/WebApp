@@ -3,7 +3,6 @@ package isel.ps.employbox.dal.model;
 import java.sql.Date;
 import java.util.List;
 import java.util.function.Supplier;
-import java.util.stream.Stream;
 
 public class Job extends DomainObject<Long> {
     @ID(isIdentity = true)
@@ -135,11 +134,11 @@ public class Job extends DomainObject<Long> {
         return address;
     }
 
-    public Stream<Application> getApplications() {
-        return applications.get().stream();
+    public Supplier<List<Application>> getApplications() {
+        return applications;
     }
 
-    public Stream<JobExperience> getExperiences() {
-        return experiences.get().stream();
+    public Supplier<List<JobExperience>> getExperiences() {
+        return experiences;
     }
 }

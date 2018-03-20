@@ -3,7 +3,6 @@ package isel.ps.employbox.dal.model;
 import java.sql.Date;
 import java.util.List;
 import java.util.function.Supplier;
-import java.util.stream.Stream;
 
 public class Comment extends DomainObject<Long> {
     @ID(isIdentity = true)
@@ -104,7 +103,7 @@ public class Comment extends DomainObject<Long> {
         return status;
     }
 
-    public Stream<Comment> getReplies() {
-        return replies.get().stream();
+    public Supplier<List<Comment>> getReplies() {
+        return replies;
     }
 }

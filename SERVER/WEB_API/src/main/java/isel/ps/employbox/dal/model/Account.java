@@ -2,7 +2,6 @@ package isel.ps.employbox.dal.model;
 
 import java.util.List;
 import java.util.function.Supplier;
-import java.util.stream.Stream;
 
 public abstract class Account extends DomainObject<Long> {
     @ID(isIdentity = true)
@@ -53,23 +52,23 @@ public abstract class Account extends DomainObject<Long> {
         return rating;
     }
 
-    public Stream<Job> getOfferedJobs() {
-        return offeredJobs.get().stream();
+    public Supplier<List<Job>> getOfferedJobs() {
+        return offeredJobs;
     }
 
-    public Stream<User> getFollowing() {
-        return following.get().stream();
+    public Supplier<List<User>> getFollowing() {
+        return following;
     }
 
-    public Stream<Comment> getComments() {
-        return comments.get().stream();
+    public Supplier<List<Comment>> getComments() {
+        return comments;
     }
 
-    public Stream<Chat> getChats() {
-        return chats.get().stream();
+    public Supplier<List<Chat>> getChats() {
+        return chats;
     }
 
-    public Stream<Rating> getRatings() {
-        return ratings.get().stream();
+    public Supplier<List<Rating>> getRatings() {
+        return ratings;
     }
 }
