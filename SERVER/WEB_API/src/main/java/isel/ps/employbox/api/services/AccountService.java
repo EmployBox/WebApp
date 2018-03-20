@@ -14,14 +14,14 @@ import java.util.Map;
 @Service
 public final class AccountService {
 
-    public List<isel.ps.EmployBox.api.model.output.OutAccount> getAccountsPage(Map<String,String> queryString) {
+    public List<isel.ps.employbox.api.model.output.OutAccount> getAccountsPage(Map<String,String> queryString) {
         String page = ServiceUtils.getPage(queryString);
 
 
         return null;
     }
 
-    public final isel.ps.EmployBox.api.model.output.OutAccount getAccount(long id) {
+    public final isel.ps.employbox.api.model.output.OutAccount getAccount(long id) {
         throw new NotImplementedException();
     }
 
@@ -29,11 +29,11 @@ public final class AccountService {
         throw new NotImplementedException();
     }
 
-    public List<isel.ps.EmployBox.api.model.output.OutAccount> getAccountFollowers(long id) {
+    public List<isel.ps.employbox.api.model.output.OutAccount> getAccountFollowers(long id) {
         throw new NotImplementedException();
     }
 
-    public List<isel.ps.EmployBox.api.model.output.OutAccount> getAccountFollowing(long id) {
+    public List<isel.ps.employbox.api.model.output.OutAccount> getAccountFollowing(long id) {
         throw new NotImplementedException();
     }
 
