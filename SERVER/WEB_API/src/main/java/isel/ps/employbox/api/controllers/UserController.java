@@ -9,6 +9,7 @@ import isel.ps.employbox.api.model.output.OutUser;
 import isel.ps.employbox.api.services.APIService;
 import isel.ps.employbox.api.services.ModelBinder;
 import isel.ps.employbox.api.services.UserService;
+import isel.ps.employbox.dal.model.User;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Collections;
@@ -18,7 +19,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @RestController
-public class UserController implements ModelBinder<isel.ps.employbox.dal.model.User, OutUser, InUser, Long> {
+public class UserController implements ModelBinder<User, OutUser, InUser, Long> {
 
     private final UserService userService;
     private final APIService apiService;
@@ -29,7 +30,7 @@ public class UserController implements ModelBinder<isel.ps.employbox.dal.model.U
     }
 
     @Override
-    public List<OutUser> bindOutput(List<isel.ps.employbox.dal.model.User> list) {
+    public List<OutUser> bindOutput(List<User> list) {
         return list
                 .stream()
                 .map(user -> new OutUser(user.getIdentityKey(), user.getName(), user.getEmail(), user.getPhotoUrl(), user.getSummary(), user.getRating()))
@@ -37,11 +38,21 @@ public class UserController implements ModelBinder<isel.ps.employbox.dal.model.U
     }
 
     @Override
-    public List<isel.ps.employbox.dal.model.User> bindInput(List<InUser> list) {
+    public List<User> bindInput(List<InUser> list) {
         return list
                 .stream()
-                .map(inUser -> new isel.ps.employbox.dal.model.User(inUser.getEmail(), inUser.getPassword(), 0, inUser.getName(), inUser.getSummary(), inUser.getPhoto_url()))
+                .map(inUser -> new User(inUser.getEmail(), inUser.getPassword(), 0, inUser.getName(), inUser.getSummary(), inUser.getPhoto_url()))
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public OutUser bindOutput(User user) {
+        return new OutUser(user.getIdentityKey(), user.getName(), user.getEmail(), user.getPhotoUrl(), user.getSummary(), user.getRating());
+    }
+
+    @Override
+    public User bindInput(InUser inUser) {
+        return new User(inUser.getEmail(), inUser.getPassword(), 0, inUser.getName(), inUser.getSummary(), inUser.getPhoto_url());
     }
 
     @GetMapping("/account/user")
@@ -58,7 +69,9 @@ public class UserController implements ModelBinder<isel.ps.employbox.dal.model.U
 
     @GetMapping("/account/user/{id}/apply")
     public List<OutApplication> getAllApplications(@PathVariable long id, @RequestParam Map<String,String> queryString){
-        return userService.getAllApplications(id, queryString);
+        return bindOutput(
+                userService.getAllApplications(id, queryString)
+        );
     }
 
     @GetMapping("/account/user/{id}/curriculums")
