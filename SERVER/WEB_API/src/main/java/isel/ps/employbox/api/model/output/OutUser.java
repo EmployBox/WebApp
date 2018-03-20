@@ -1,6 +1,6 @@
 package isel.ps.employbox.api.model.output;
 
-public class User {
+public class OutUser {
     private final long id;
     private final String name;
     private final String email;
@@ -16,7 +16,7 @@ public class User {
     private final String followers_url;
     private final String following_url;
 
-    public User(long id, String name, String email, String photo_url, String summary, double rating) {
+    public OutUser(long id, String name, String email, String photo_url, String summary, double rating) {
         this.id = id;
         this.name = name;
         this.email = email;

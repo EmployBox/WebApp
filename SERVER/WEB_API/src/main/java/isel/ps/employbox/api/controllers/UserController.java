@@ -1,8 +1,11 @@
 package isel.ps.employbox.api.controllers;
 
-import isel.ps.employbox.api.model.output.Application;
-import isel.ps.employbox.api.model.output.Curriculum;
-import isel.ps.employbox.api.model.output.User;
+import isel.ps.employbox.api.model.input.InApplication;
+import isel.ps.employbox.api.model.input.InCurriculum;
+import isel.ps.employbox.api.model.input.InUser;
+import isel.ps.employbox.api.model.output.OutApplication;
+import isel.ps.employbox.api.model.output.OutCurriculum;
+import isel.ps.employbox.api.model.output.OutUser;
 import isel.ps.employbox.api.services.APIService;
 import isel.ps.employbox.api.services.ModelBinder;
 import isel.ps.employbox.api.services.UserService;
@@ -15,7 +18,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @RestController
-public class UserController implements ModelBinder<isel.ps.employbox.dal.model.User, User, isel.ps.employbox.api.model.input.User, Long> {
+public class UserController implements ModelBinder<isel.ps.employbox.dal.model.User, OutUser, InUser, Long> {
 
     private final UserService userService;
     private final APIService apiService;
@@ -26,47 +29,45 @@ public class UserController implements ModelBinder<isel.ps.employbox.dal.model.U
     }
 
     @Override
-    public List<User> bindOutput(List<isel.ps.employbox.dal.model.User> list) {
+    public List<OutUser> bindOutput(List<isel.ps.employbox.dal.model.User> list) {
         return list
                 .stream()
-                .map(user -> new User(user.getIdentityKey(), user.getName(), user.getEmail(), user.getPhotoUrl(), user.getSummary(), user.getRating()))
+                .map(user -> new OutUser(user.getIdentityKey(), user.getName(), user.getEmail(), user.getPhotoUrl(), user.getSummary(), user.getRating()))
                 .collect(Collectors.toList());
     }
 
     @Override
-    public List<isel.ps.employbox.dal.model.User> bindInput(List<isel.ps.employbox.api.model.input.User> list) {
+    public List<isel.ps.employbox.dal.model.User> bindInput(List<InUser> list) {
         return list
                 .stream()
-                .map(user -> new isel.ps.employbox.dal.model.User(-1, user.getEmail(), user.getPassword(), 0, 0, user.getName(), user.getSummary(), user.getPhoto_url(),
-                        Collections::emptyList, Collections::emptyList, Collections::emptyList, Collections::emptyList, Collections::emptyList,
-                        Collections::emptyList, Collections::emptyList))
+                .map(inUser -> new isel.ps.employbox.dal.model.User(inUser.getEmail(), inUser.getPassword(), 0, inUser.getName(), inUser.getSummary(), inUser.getPhoto_url()))
                 .collect(Collectors.toList());
     }
 
     @GetMapping("/account/user")
-    public List<User> getAllUsers(@RequestParam Map<String,String> queryString){
+    public List<OutUser> getAllUsers(@RequestParam Map<String,String> queryString){
         return bindOutput(userService.getAllUsers(queryString));
     }
 
     @GetMapping("/account/user/{id}")
-    public Optional<User> getUser(@PathVariable long id){
+    public Optional<OutUser> getUser(@PathVariable long id){
         return bindOutput(Collections.singletonList(userService.getUser(id)))
                 .stream()
                 .findFirst();
     }
 
     @GetMapping("/account/user/{id}/apply")
-    public List<Application> getAllApplications(@PathVariable long id, @RequestParam Map<String,String> queryString){
+    public List<OutApplication> getAllApplications(@PathVariable long id, @RequestParam Map<String,String> queryString){
         return userService.getAllApplications(id, queryString);
     }
 
     @GetMapping("/account/user/{id}/curriculums")
-    public List<Curriculum> getAllCurriculums(@PathVariable long id, @RequestParam Map<String,String> queryString){
+    public List<OutCurriculum> getAllCurriculums(@PathVariable long id, @RequestParam Map<String,String> queryString){
         return userService.getAllCurriculums(id, queryString);
     }
 
     @GetMapping("/account/user/{id}/curriculum/{cid}")
-    public Curriculum getCurriculum(@PathVariable long id, @PathVariable long cid){
+    public OutCurriculum getCurriculum(@PathVariable long id, @PathVariable long cid){
         return userService.getCurriculum(id, cid);
     }
 
@@ -74,10 +75,10 @@ public class UserController implements ModelBinder<isel.ps.employbox.dal.model.U
     public void updateUser(
             @RequestHeader("apiKey") String apiKey,
             @PathVariable long id,
-            @RequestBody isel.ps.employbox.api.model.input.User user
+            @RequestBody InUser inUser
     ){
         apiService.validateAPIKey(apiKey);
-        userService.updateUser(id, user);
+        userService.updateUser(id, inUser);
     }
 
     @PutMapping("/account/user/{id}/apply/{jid}")
@@ -85,10 +86,10 @@ public class UserController implements ModelBinder<isel.ps.employbox.dal.model.U
             @RequestHeader("apiKey") String apiKey,
             @PathVariable long id,
             @PathVariable long jid,
-            @RequestBody isel.ps.employbox.api.model.input.Application application
+            @RequestBody InApplication inApplication
     ){
         apiService.validateAPIKey(apiKey);
-        userService.updateApplication(id, jid, application);
+        userService.updateApplication(id, jid, inApplication);
     }
 
     @PutMapping("/account/user/{id}/curriculum/{cid}")
@@ -96,34 +97,34 @@ public class UserController implements ModelBinder<isel.ps.employbox.dal.model.U
             @RequestHeader("apiKey") String apiKey,
             @PathVariable long id,
             @PathVariable long cid,
-            @RequestBody isel.ps.employbox.api.model.input.Curriculum curriculum
+            @RequestBody InCurriculum inCurriculum
     ){
         apiService.validateAPIKey(apiKey);
-        userService.updateCurriculum(id, cid, curriculum);
+        userService.updateCurriculum(id, cid, inCurriculum);
     }
 
     @PostMapping("/account/user/")
     public void createUser(
             @RequestHeader("apiKey") String apiKey,
-            @RequestBody isel.ps.employbox.api.model.input.User user
+            @RequestBody InUser inUser
     ){
         apiService.validateAPIKey(apiKey);
-        userService.createUser(user);
+        userService.createUser(inUser);
     }
 
     @PostMapping("/account/user/{id}/apply/{jid}")
     public void createApplication(
             @RequestHeader("apiKey") String apiKey,
-            @RequestBody isel.ps.employbox.api.model.input.Application application
+            @RequestBody InApplication inApplication
     ){
         apiService.validateAPIKey(apiKey);
-        userService.createApplication(application);
+        userService.createApplication(inApplication);
     }
 
     @PostMapping("/account/user/{id}/curriculum/")
-    public void createCurriculum(@RequestHeader("apiKey") String apiKey, @PathVariable long id, @RequestBody isel.ps.employbox.api.model.input.Curriculum curriculum){
+    public void createCurriculum(@RequestHeader("apiKey") String apiKey, @PathVariable long id, @RequestBody InCurriculum inCurriculum){
         apiService.validateAPIKey(apiKey);
-        userService.createCurriculum(id, curriculum);
+        userService.createCurriculum(id, inCurriculum);
     }
 
     @DeleteMapping("/account/user/{id}")

@@ -1,4 +1,4 @@
-package isel.ps.EmployBox.api.model.input;
+package isel.ps.employbox.api.model.input;
 
 public class InChat {
 }

@@ -1,4 +1,4 @@
 package isel.ps.employbox.api.model.input;
 
-public class InMessage {
+public class InCompany {
 }

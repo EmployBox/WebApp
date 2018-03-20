@@ -37,6 +37,15 @@ public class User extends Account {
         this.applications = applications;
     }
 
+    public User(String email, String password, float rating, String name, String summary, String photoUrl){
+        super(email, password, rating);
+        this.name = name;
+        this.summary = summary;
+        this.photoUrl = photoUrl;
+        this.curriculums = Collections::emptyList;
+        this.applications = Collections::emptyList;
+    }
+
     public static User create(
             String email,
             String password,

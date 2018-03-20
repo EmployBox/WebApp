@@ -1,5 +1,6 @@
 package isel.ps.employbox.dal.model;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.function.Supplier;
 
@@ -38,6 +39,19 @@ public abstract class Account extends DomainObject<Long> {
         this.ratings = ratings;
         this.comments = comments;
         this.following = following;
+    }
+
+    protected Account(String email, String password, float rating){
+        super((long) -1, -1);
+        this.accountID = -1;
+        this.email = email;
+        this.password = password;
+        this.rating = rating;
+        this.offeredJobs = Collections::emptyList;
+        this.chats = Collections::emptyList;
+        this.ratings = Collections::emptyList;
+        this.comments = Collections::emptyList;
+        this.following = Collections::emptyList;
     }
 
     public String getEmail() {

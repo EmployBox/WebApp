@@ -1,19 +1,11 @@
 package isel.ps.employbox.api.model.input;
 
-public class User {
+public class InUser {
     private String email;
     private String password;
     private String name;
     private String photo_url;
     private String summary;
-
-    /*public User(String email, String password, String name, String photo_url, String summary) {
-        this.email = email;
-        this.password = password;
-        this.name = name;
-        this.photo_url = photo_url;
-        this.summary = summary;
-    }*/
 
     public String getEmail() {
         return this.email;

@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.List;
 
-public class Curriculum {
+public class OutCurriculum {
 
     private final long id;
     private final String title;
@@ -13,7 +13,7 @@ public class Curriculum {
     private final List<Project> projects;
     private final List<AcademicBackground> academicBackground;
 
-    public Curriculum(long id, String title, List<Experience> experiences, List<PreviousJobs> previousJobs, List<Project> projects, List<AcademicBackground> academicBackground){
+    public OutCurriculum(long id, String title, List<Experience> experiences, List<PreviousJobs> previousJobs, List<Project> projects, List<AcademicBackground> academicBackground){
         this.id = id;
         this.title = title;
         this.experiences = experiences;

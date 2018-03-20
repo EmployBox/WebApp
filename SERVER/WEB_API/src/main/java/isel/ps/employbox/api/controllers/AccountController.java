@@ -1,11 +1,10 @@
 package isel.ps.employbox.api.controllers;
 
-import isel.ps.EmployBox.api.model.input.InChat;
-import isel.ps.EmployBox.api.model.input.InMessage;
-import isel.ps.EmployBox.api.model.output.Account;
-import isel.ps.EmployBox.api.model.output.OutChat;
-import isel.ps.EmployBox.api.model.output.Job;
-import isel.ps.EmployBox.api.model.output.OutMessage;
+import isel.ps.employbox.api.model.input.InChat;
+import isel.ps.employbox.api.model.input.InMessage;
+import isel.ps.employbox.api.model.output.OutChat;
+import isel.ps.employbox.api.model.output.OutMessage;
+import isel.ps.employbox.api.model.output.OutJob;
 import isel.ps.employbox.api.services.AccountService;
 import org.springframework.web.bind.annotation.*;
 
@@ -22,18 +21,20 @@ public class AccountController {
     }
 
     @GetMapping("/account")
-    public List<Account> getAccountsPage (@RequestParam Map<String,String> queryString){
+    public List<isel.ps.EmployBox.api.model.output.OutAccount> getAccountsPage (@RequestParam Map<String,String> queryString){
         return accountService.getAccountsPage (queryString);
     }
 
     @GetMapping("/account/{id}")
-    public Account getAccount(@PathVariable long id){ return accountService.getAccount(id); }
+    public isel.ps.EmployBox.api.model.output.OutAccount getAccount(@PathVariable long id){ return accountService.getAccount(id); }
 
     @GetMapping("/account/{id}/job")
-    public List<Job> getAccountOffers(@PathVariable long id){ return accountService.getAccountOffers(id); }
+    public List<OutJob> getAccountOffers(@PathVariable long id){
+        return null;//accountService.getAccountOffers(id);
+    }
 
     @GetMapping("/account/{id}/followers")
-    public List<Account> getFollowers(@PathVariable long id){ return accountService.getAccountFollowers(id); }
+    public List<isel.ps.EmployBox.api.model.output.OutAccount> getFollowers(@PathVariable long id){ return accountService.getAccountFollowers(id); }
 
     @PostMapping("/account/{id}/followers/{fid}")
     public void setFollower(
@@ -50,7 +51,7 @@ public class AccountController {
     ){  accountService.deleteFollower(id,fid); }
 
     @GetMapping("/account/{id}/following")
-    public List<Account> getFollowing(@PathVariable long id){ return accountService.getAccountFollowing(id); }
+    public List<isel.ps.EmployBox.api.model.output.OutAccount> getFollowing(@PathVariable long id){ return accountService.getAccountFollowing(id); }
 
     @GetMapping("/account/{id}/chat")
     public List<OutChat> getChats (@PathVariable long id){ return accountService.getAccountChats(id); }

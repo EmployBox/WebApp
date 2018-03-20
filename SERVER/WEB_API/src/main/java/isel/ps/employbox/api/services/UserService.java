@@ -1,7 +1,10 @@
 package isel.ps.employbox.api.services;
 
-import isel.ps.employbox.api.model.output.Application;
-import isel.ps.employbox.api.model.output.Curriculum;
+import isel.ps.employbox.api.model.input.InApplication;
+import isel.ps.employbox.api.model.input.InCurriculum;
+import isel.ps.employbox.api.model.input.InUser;
+import isel.ps.employbox.api.model.output.OutApplication;
+import isel.ps.employbox.api.model.output.OutCurriculum;
 import isel.ps.employbox.dal.Mapper;
 import isel.ps.employbox.dal.model.User;
 import isel.ps.employbox.dal.util.MapperRegistry;
@@ -31,39 +34,39 @@ public class UserService {
         return userMapper.getById(id).join();
     }
 
-    public List<Application> getAllApplications(long id, Map<String, String> queryString) {
+    public List<OutApplication> getAllApplications(long id, Map<String, String> queryString) {
         return null;
     }
 
-    public List<Curriculum> getAllCurriculums(long id, Map<String, String> queryString) {
+    public List<OutCurriculum> getAllCurriculums(long id, Map<String, String> queryString) {
         return null;
     }
 
-    public Curriculum getCurriculum(long id, long cid) {
+    public OutCurriculum getCurriculum(long id, long cid) {
         return null;
     }
 
-    public void updateUser(long id, isel.ps.employbox.api.model.input.User user) {
+    public void updateUser(long id, InUser inUser) {
 
     }
 
-    public void updateApplication(long id, long jid, isel.ps.employbox.api.model.input.Application application) {
+    public void updateApplication(long id, long jid, InApplication inApplication) {
 
     }
 
-    public void updateCurriculum(long id, long cid, isel.ps.employbox.api.model.input.Curriculum curriculum) {
+    public void updateCurriculum(long id, long cid, InCurriculum inCurriculum) {
 
     }
 
-    public void createUser(isel.ps.employbox.api.model.input.User user) {
+    public void createUser(InUser inUser) {
 
     }
 
-    public void createApplication(isel.ps.employbox.api.model.input.Application application) {
+    public void createApplication(InApplication inApplication) {
 
     }
 
-    public void createCurriculum(long id, isel.ps.employbox.api.model.input.Curriculum curriculum) {
+    public void createCurriculum(long id, InCurriculum inCurriculum) {
 
     }
 

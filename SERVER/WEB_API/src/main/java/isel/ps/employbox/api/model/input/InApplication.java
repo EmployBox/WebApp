@@ -1,10 +1,10 @@
 package isel.ps.employbox.api.model.input;
 
-public class Application {
+public class InApplication {
 
     private final long curriculumID;
 
-    public Application(long curriculumID){
+    public InApplication(long curriculumID){
 
         this.curriculumID = curriculumID;
     }

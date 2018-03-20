@@ -1,6 +1,7 @@
 package isel.ps.employbox.api.controllers;
 
-import isel.ps.employbox.api.model.output.Company;
+import isel.ps.employbox.api.model.input.InCompany;
+import isel.ps.employbox.api.model.output.OutCompany;
 import isel.ps.employbox.api.services.CompanyService;
 import org.springframework.web.bind.annotation.*;
 
@@ -10,23 +11,23 @@ import java.util.Map;
 @RestController
 public class CompanyController {
     @GetMapping("/account/company")
-    public List<Company> getCompanies(@RequestParam Map<String,String> queryString){
+    public List<OutCompany> getCompanies(@RequestParam Map<String,String> queryString){
         return CompanyService.getCompanies(queryString);
     }
 
     @GetMapping("/account/company/{cid}")
-    public List<Company> getCompany(@PathVariable long cid){
+    public List<OutCompany> getCompany(@PathVariable long cid){
         return CompanyService.getCompany(cid);
     }
 
     @PostMapping("/account/company/")
-    public void setCompany(@RequestBody isel.ps.EmployBox.api.model.input.Company company){
-        CompanyService.setCompany(company);
+    public void setCompany(@RequestBody InCompany inCompany){
+        CompanyService.setCompany(inCompany);
     }
 
     @PutMapping("/account/company/")
-    public void updateCompany(@RequestBody isel.ps.EmployBox.api.model.input.Company company){
-        CompanyService.updateCompany(company);
+    public void updateCompany(@RequestBody InCompany inCompany){
+        CompanyService.updateCompany(inCompany);
     }
 
     @DeleteMapping("/account/company/{cid}")

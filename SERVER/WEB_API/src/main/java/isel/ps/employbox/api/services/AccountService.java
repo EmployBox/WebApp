@@ -1,11 +1,10 @@
 package isel.ps.employbox.api.services;
 
-import isel.ps.EmployBox.api.model.input.InChat;
-import isel.ps.EmployBox.api.model.input.InMessage;
-import isel.ps.EmployBox.api.model.output.Account;
-import isel.ps.EmployBox.api.model.output.OutChat;
-import isel.ps.EmployBox.api.model.output.Job;
-import isel.ps.EmployBox.api.model.output.OutMessage;
+import isel.ps.employbox.api.model.input.InChat;
+import isel.ps.employbox.api.model.input.InMessage;
+import isel.ps.employbox.api.model.output.OutChat;
+import isel.ps.employbox.api.model.output.OutMessage;
+import isel.ps.employbox.dal.model.Job;
 import org.springframework.stereotype.Service;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
@@ -15,14 +14,14 @@ import java.util.Map;
 @Service
 public final class AccountService {
 
-    public List<Account> getAccountsPage(Map<String,String> queryString) {
+    public List<isel.ps.EmployBox.api.model.output.OutAccount> getAccountsPage(Map<String,String> queryString) {
         String page = ServiceUtils.getPage(queryString);
 
 
         return null;
     }
 
-    public final Account getAccount(long id) {
+    public final isel.ps.EmployBox.api.model.output.OutAccount getAccount(long id) {
         throw new NotImplementedException();
     }
 
@@ -30,11 +29,11 @@ public final class AccountService {
         throw new NotImplementedException();
     }
 
-    public List<Account> getAccountFollowers(long id) {
+    public List<isel.ps.EmployBox.api.model.output.OutAccount> getAccountFollowers(long id) {
         throw new NotImplementedException();
     }
 
-    public List<Account> getAccountFollowing(long id) {
+    public List<isel.ps.EmployBox.api.model.output.OutAccount> getAccountFollowing(long id) {
         throw new NotImplementedException();
     }
 
