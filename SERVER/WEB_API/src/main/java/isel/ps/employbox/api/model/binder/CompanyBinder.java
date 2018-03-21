@@ -7,6 +7,7 @@ import isel.ps.employbox.dal.model.Company;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Component
 public class CompanyBinder implements ModelBinder<Company,OutCompany,InCompany,Long> {
@@ -17,7 +18,20 @@ public class CompanyBinder implements ModelBinder<Company,OutCompany,InCompany,L
 
     @Override
     public List<Company> bindInput(List<InCompany> list) {
-        return null;
+        return list.stream()
+                .map(curr -> new Company(
+                        curr.getAccountId(),
+                        curr.getEmail(),
+                        curr.getPassword(),
+                        curr.getRating(),
+                        curr.getName(),
+                        curr.getSpecialization(),
+                        curr.getYearFounded(),
+                        curr.getLogoUrl(),
+                        curr.getWebpageUrl(),
+                        curr.getDescription()
+                ))
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -26,7 +40,18 @@ public class CompanyBinder implements ModelBinder<Company,OutCompany,InCompany,L
     }
 
     @Override
-    public Company bindInput(InCompany object) {
-        return null;
+    public Company bindInput(InCompany obj) {
+
+        return new Company(
+                obj.getAccountId(),
+                obj.getEmail(),
+                obj.getPassword(),
+                obj.getRating(),
+                obj.getName(),
+                obj.getSpecialization(),
+                obj.getYearFounded(),
+                obj.getLogoUrl(),
+                obj.getWebpageUrl(),
+                obj.getDescription());
     }
 }

@@ -18,6 +18,15 @@ public class Application extends DomainObject<String> {
         this.date = date;
     }
 
+    public Application(long userId, long jobId, long curriculumId, Date date) {
+        super(String.format("ApplicationPK %d %d",userId,jobId), -1);
+        this.userId = userId;
+        this.jobId = jobId;
+        this.curriculumId = curriculumId;
+        this.date = date;
+    }
+
+
     public static Application create(long userId, long jobId,long curriculumId, Date date){
         Application application = new Application(userId,jobId,curriculumId, date, 0);
         application.markNew();

@@ -39,6 +39,27 @@ public class Company extends Account {
         this.yearFounded = yearFounded;
     }
 
+    public Company(
+            long accountID,
+            String email,
+            String password,
+            float rating,
+            String name,
+            String Specialization,
+            short yearFounded,
+            String logoUrl,
+            String webPageUrl,
+            String description)
+    {
+        super(email, password, rating);
+        this.accountID = accountID;
+        this.name = name;
+        this.Specialization = Specialization;
+        this.logoUrl = logoUrl;
+        this.webPageUrl = webPageUrl;
+        this.description = description;
+        this.yearFounded = yearFounded;
+    }
 
     public static Company create(
             String email,
