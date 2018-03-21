@@ -1,57 +1,60 @@
 package isel.ps.employbox.api.controllers;
 
+import isel.ps.employbox.api.model.binder.CurriculumBinder;
 import isel.ps.employbox.api.model.input.InCurriculum;
 import isel.ps.employbox.api.model.output.OutCurriculum;
+import isel.ps.employbox.api.services.APIService;
 import isel.ps.employbox.api.services.ModelBinder;
 import isel.ps.employbox.api.services.UserService;
 import isel.ps.employbox.dal.model.Curriculum;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
 
 @RestController
-public class CurriculumController implements ModelBinder<Curriculum,OutCurriculum,InCurriculum,Long> {
-
-    @Override
-    public List<OutCurriculum> bindOutput(List<Curriculum> list) {
-        return null;
-    }
-
-    @Override
-    public List<Curriculum> bindInput(List<InCurriculum> list) {
-        return null;
-    }
-
-    @Override
-    public OutCurriculum bindOutput(Curriculum object) {
-        return null;
-    }
-
-    @Override
-    public Curriculum bindInput(InCurriculum object) {
-        return null;
-    }
-
+public class CurriculumController {
+    @Autowired
+    private APIService apiService;
     @Autowired
     private UserService userService;
-
+    @Autowired
+    private CurriculumBinder curriculumBinder;
 
     @GetMapping("/account/user/{id}/curriculums")
     public List<OutCurriculum> getAllCurriculums(@PathVariable long id, @RequestParam Map<String,String> queryString){
-        return bindOutput(
+        return curriculumBinder.bindOutput(
                 userService.getAllCurriculums(id, queryString)
         );
     }
 
     @GetMapping("/account/user/{id}/curriculum/{cid}")
     public OutCurriculum getCurriculum(@PathVariable long id, @PathVariable long cid){
-        return bindOutput(
+        return curriculumBinder.bindOutput(
                 userService.getCurriculum(id, cid));
     }
 
+    @PutMapping("/account/user/{id}/curriculum/{cid}")
+    public void updateCurriculum(
+            @RequestHeader("apiKey") String apiKey,
+            @PathVariable long id,
+            @PathVariable long cid,
+            @RequestBody InCurriculum inCurriculum
+    ){
+        apiService.validateAPIKey(apiKey);
+        userService.updateCurriculum(id, cid, inCurriculum);
+    }
+
+    @PostMapping("/account/user/{id}/curriculum/")
+    public void createCurriculum(@RequestHeader("apiKey") String apiKey, @PathVariable long id, @RequestBody InCurriculum inCurriculum){
+        apiService.validateAPIKey(apiKey);
+        userService.createCurriculum(id, inCurriculum);
+    }
+
+    @DeleteMapping("/account/user/{id}/curriculum/{cid}")
+    public void deleteCurriculum(@RequestHeader("apiKey") String apiKey, @PathVariable long id, @PathVariable long cid){
+        apiService.validateAPIKey(apiKey);
+        userService.deleteCurriculum(id, cid);
+    }
 }

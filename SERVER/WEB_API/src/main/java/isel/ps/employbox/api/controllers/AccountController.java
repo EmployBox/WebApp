@@ -41,7 +41,8 @@ public class AccountController {
     public void setFollower(
             @PathVariable long id,
             @PathVariable long fid,
-            @RequestHeader("apiKey") String apiKey){
+            @RequestHeader("apiKey") String apiKey
+    ){
         accountService.setFollower(id,fid);
     }
 
@@ -49,7 +50,9 @@ public class AccountController {
     public void deleteFollower(@PathVariable long id,
                                         @PathVariable long fid,
                                         @RequestHeader("apiKey") String apiKey
-    ){  accountService.deleteFollower(id,fid); }
+    ){
+        accountService.deleteFollower(id,fid);
+    }
 
     @GetMapping("/account/{id}/following")
     public List<isel.ps.employbox.api.model.output.OutAccount> getFollowing(@PathVariable long id){ return accountService.getAccountFollowing(id); }
@@ -66,16 +69,20 @@ public class AccountController {
     public void setChat (
             @PathVariable long id,
             @RequestHeader("apiKey") String apiKey,
-            @RequestBody InChat inChat)
-    { accountService.createNewChat(inChat); }
+            @RequestBody InChat inChat
+    ) {
+        accountService.createNewChat(inChat);
+    }
 
     @PostMapping("/account/{id}/chats/{cid}/message")
     public void setChatMessage (
             @PathVariable long id,
             @PathVariable long cid,
             @RequestHeader("apiKey") String apiKey,
-            @RequestBody InMessage msg)
-    {  accountService.createNewChatMessage(msg); }
+            @RequestBody InMessage msg
+    ) {
+        accountService.createNewChatMessage(msg);
+    }
 
 
 }
