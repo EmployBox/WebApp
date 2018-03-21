@@ -1,5 +1,6 @@
 package isel.ps.employbox.api.services;
 
+import isel.ps.employbox.api.model.input.InCurriculum;
 import isel.ps.employbox.dal.RapperRepository;
 import isel.ps.employbox.dal.model.Application;
 import isel.ps.employbox.dal.model.Curriculum;
@@ -54,7 +55,7 @@ public class UserService {
 
     }
 
-    public void updateCurriculum(long id, long cid, Curriculum inCurriculum) {
+    public void updateCurriculum(long id, long cid, InCurriculum inCurriculum) {
 
     }
 
@@ -66,7 +67,7 @@ public class UserService {
 
     }
 
-    public void createCurriculum(long id, Curriculum inCurriculum) {
+    public void createCurriculum(long id, InCurriculum inCurriculum) {
 
     }
 

@@ -3,23 +3,18 @@ package isel.ps.employbox.api.controllers;
 import isel.ps.employbox.api.model.binder.ApplicationBinder;
 import isel.ps.employbox.api.model.binder.UserBinder;
 import isel.ps.employbox.api.model.input.InApplication;
-import isel.ps.employbox.api.model.input.InCurriculum;
 import isel.ps.employbox.api.model.input.InUser;
 import isel.ps.employbox.api.model.output.OutApplication;
 import isel.ps.employbox.api.model.output.OutUser;
 import isel.ps.employbox.api.services.APIService;
-import isel.ps.employbox.api.services.ModelBinder;
 import isel.ps.employbox.api.services.UserService;
 import isel.ps.employbox.dal.model.Application;
 import isel.ps.employbox.dal.model.User;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @RestController
 public class UserController {
@@ -72,9 +67,7 @@ public class UserController {
             @RequestBody InApplication inApplication
     ){
         apiService.validateAPIKey(apiKey);
-
         Application application = applicationBinder.bindInput(inApplication);
-
         userService.updateApplication(id, jid, application);
     }
 

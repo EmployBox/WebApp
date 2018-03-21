@@ -4,8 +4,6 @@ import isel.ps.employbox.api.model.binder.CompanyBinder;
 import isel.ps.employbox.api.model.input.InCompany;
 import isel.ps.employbox.api.model.output.OutCompany;
 import isel.ps.employbox.api.services.CompanyService;
-import isel.ps.employbox.api.services.ModelBinder;
-import isel.ps.employbox.dal.model.Company;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -16,6 +14,11 @@ import java.util.Map;
 public class CompanyController {
     @Autowired
     private CompanyBinder companyBinder;
+
+    public CompanyController( CompanyBinder companyBinder){
+        this.companyBinder = companyBinder;
+    }
+
 
     @GetMapping("/account/company")
     public List<OutCompany> getCompanies(@RequestParam Map<String,String> queryString){

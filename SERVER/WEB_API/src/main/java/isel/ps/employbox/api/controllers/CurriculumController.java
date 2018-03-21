@@ -4,10 +4,7 @@ import isel.ps.employbox.api.model.binder.CurriculumBinder;
 import isel.ps.employbox.api.model.input.InCurriculum;
 import isel.ps.employbox.api.model.output.OutCurriculum;
 import isel.ps.employbox.api.services.APIService;
-import isel.ps.employbox.api.services.ModelBinder;
 import isel.ps.employbox.api.services.UserService;
-import isel.ps.employbox.dal.model.Curriculum;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -15,12 +12,16 @@ import java.util.Map;
 
 @RestController
 public class CurriculumController {
-    @Autowired
+
     private APIService apiService;
-    @Autowired
     private UserService userService;
-    @Autowired
     private CurriculumBinder curriculumBinder;
+
+    public CurriculumController(APIService apiService, UserService userService, CurriculumBinder curriculumBinder){
+        this.apiService = apiService;
+        this.userService = userService;
+        this.curriculumBinder = curriculumBinder;
+    }
 
     @GetMapping("/account/user/{id}/curriculums")
     public List<OutCurriculum> getAllCurriculums(@PathVariable long id, @RequestParam Map<String,String> queryString){

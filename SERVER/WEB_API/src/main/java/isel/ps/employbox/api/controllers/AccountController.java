@@ -48,8 +48,8 @@ public class AccountController {
 
     @DeleteMapping("/account/{id}/followers/{fid}")
     public void deleteFollower(@PathVariable long id,
-                                        @PathVariable long fid,
-                                        @RequestHeader("apiKey") String apiKey
+                               @PathVariable long fid,
+                               @RequestHeader("apiKey") String apiKey
     ){
         accountService.deleteFollower(id,fid);
     }
@@ -83,6 +83,4 @@ public class AccountController {
     ) {
         accountService.createNewChatMessage(msg);
     }
-
-
 }

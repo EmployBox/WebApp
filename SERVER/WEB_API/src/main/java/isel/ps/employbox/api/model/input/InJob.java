@@ -79,9 +79,7 @@ public class InJob {
         this.offerBeginDate = offerBeginDate;
     }
 
-    public Date getOfferEndDate() {
-        return offerEndDate;
-    }
+    public Date getOfferEndDate() {return offerEndDate;}
 
     public void setOfferEndDate(Date offerEndDate) {
         this.offerEndDate = offerEndDate;
