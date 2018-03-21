@@ -3,17 +3,23 @@ package isel.ps.employbox.api.services;
 import isel.ps.employbox.api.model.input.InApplication;
 import isel.ps.employbox.api.model.input.InCurriculum;
 import isel.ps.employbox.api.model.input.InUser;
-import isel.ps.employbox.dal.Mapper;
+import isel.ps.employbox.dal.RapperRepository;
 import isel.ps.employbox.dal.model.Application;
 import isel.ps.employbox.dal.model.Curriculum;
 import isel.ps.employbox.dal.model.User;
-import isel.ps.employbox.dal.util.MapperRegistry;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.List;
+import java.util.Map;
 
 @Service
 public class UserService {
+
+    @Autowired
+    private RapperRepository<User, Long> userRepo;
+    private RapperRepository<Curriculum, Long> curriculumRepo;
+    private RapperRepository<User, Long> applicationRepo;
 
     public List<User> getAllUsers(Map<String, String> queryString) {
         String name = queryString.get("name");
@@ -27,7 +33,7 @@ public class UserService {
     }
 
     public User getUser(long id) {
-        return null; //userMapper.getById(id).join();
+        return userRepo.findById(id).get();
     }
 
     public List<Application> getAllApplications(long id, Map<String, String> queryString) {

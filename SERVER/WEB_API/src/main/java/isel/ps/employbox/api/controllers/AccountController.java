@@ -2,9 +2,10 @@ package isel.ps.employbox.api.controllers;
 
 import isel.ps.employbox.api.model.input.InChat;
 import isel.ps.employbox.api.model.input.InMessage;
+import isel.ps.employbox.api.model.output.OutAccount;
 import isel.ps.employbox.api.model.output.OutChat;
-import isel.ps.employbox.api.model.output.OutMessage;
 import isel.ps.employbox.api.model.output.OutJob;
+import isel.ps.employbox.api.model.output.OutMessage;
 import isel.ps.employbox.api.services.AccountService;
 import org.springframework.web.bind.annotation.*;
 
@@ -21,12 +22,12 @@ public class AccountController {
     }
 
     @GetMapping("/account")
-    public List<isel.ps.employbox.api.model.output.OutAccount> getAccountsPage (@RequestParam Map<String,String> queryString){
+    public List<OutAccount> getAccountsPage (@RequestParam Map<String,String> queryString){
         return accountService.getAccountsPage (queryString);
     }
 
     @GetMapping("/account/{id}")
-    public isel.ps.employbox.api.model.output.OutAccount getAccount(@PathVariable long id){ return accountService.getAccount(id); }
+    public OutAccount getAccount(@PathVariable long id){ return accountService.getAccount(id); }
 
     @GetMapping("/account/{id}/job")
     public List<OutJob> getAccountOffers(@PathVariable long id){
@@ -34,7 +35,7 @@ public class AccountController {
     }
 
     @GetMapping("/account/{id}/followers")
-    public List<isel.ps.employbox.api.model.output.OutAccount> getFollowers(@PathVariable long id){ return accountService.getAccountFollowers(id); }
+    public List<OutAccount> getFollowers(@PathVariable long id){ return accountService.getAccountFollowers(id); }
 
     @PostMapping("/account/{id}/followers/{fid}")
     public void setFollower(

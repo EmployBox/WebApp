@@ -4,6 +4,7 @@ import isel.ps.employbox.api.model.input.InChat;
 import isel.ps.employbox.api.model.input.InMessage;
 import isel.ps.employbox.api.model.output.OutChat;
 import isel.ps.employbox.api.model.output.OutMessage;
+import isel.ps.employbox.api.services.utils.ServiceUtils;
 import isel.ps.employbox.dal.model.Job;
 import org.springframework.stereotype.Service;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;

@@ -8,7 +8,7 @@ public class InJob {
     private long accountID;
     private List<Experience> experiences;
     private String address;
-    private double wage;
+    private int wage;
     private String description;
     private String schedule;
     private Date offerBeginDate;
@@ -47,11 +47,11 @@ public class InJob {
         this.address = address;
     }
 
-    public double getWage() {
+    public int getWage() {
         return wage;
     }
 
-    public void setWage(double wage) {
+    public void setWage(int wage) {
         this.wage = wage;
     }
 

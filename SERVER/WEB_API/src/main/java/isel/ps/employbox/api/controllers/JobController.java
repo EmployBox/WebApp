@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @RestController
 public class JobController implements ModelBinder<Job, OutJob, InJob, Long>{
@@ -24,23 +25,74 @@ public class JobController implements ModelBinder<Job, OutJob, InJob, Long>{
 
     @Override
     public List<OutJob> bindOutput(List<Job> list) {
-        return null;
+        return list
+                .stream()
+                .map((curr)-> new OutJob(
+                        curr.getAccountID(),
+                        null,//todo
+                        curr.getAddress(),
+                        curr.getWage(),
+                        curr.getDescription(),
+                        curr.getSchedule(),
+                        curr.getOfferBeginDate(),
+                        curr.getOfferEndDate(),
+                        curr.getOfferType()))
+                .collect(Collectors.toList());
+
     }
 
     @Override
     public List<Job> bindInput(List<InJob> list) {
-        return null;
+        return list
+                .stream()
+                .map((curr)-> new Job(
+                        curr.getAccountID(),
+                        curr.getJobID(),
+                        curr.getAddress(),
+                        curr.getWage(),
+                        curr.getDescription(),
+                        curr.getSchedule(),
+                        curr.getOfferBeginDate(),
+                        curr.getOfferEndDate(),
+                        curr.getOfferType(),
+                        0,//todo what its supposed to be here??
+                        null,//todo
+                        null))//todo
+                .collect(Collectors.toList());
     }
 
     @Override
-    public OutJob bindOutput(Job object) {
-        return null;
+    public OutJob bindOutput(Job job) {
+        return new OutJob(
+                job.getAccountID(),
+                null,//todo
+                job.getAddress(),
+                job.getWage(),
+                job.getDescription(),
+                job.getSchedule(),
+                job.getOfferBeginDate(),
+                job.getOfferEndDate(),
+                job.getOfferType());
     }
 
     @Override
-    public Job bindInput(InJob object) {
-        return null;
+    public Job bindInput(InJob curr) {
+        return new Job(
+                curr.getAccountID(),
+                curr.getJobID(),
+                curr.getAddress(),
+                curr.getWage(),
+                curr.getDescription(),
+                curr.getSchedule(),
+                curr.getOfferBeginDate(),
+                curr.getOfferEndDate(),
+                curr.getOfferType(),
+                0,//todo what its supposed to be here??
+                null,//todo
+                null);//todo
     }
+
+
 
     @GetMapping("/account/{id}/job/{jid}")
     public Optional<OutJob> getJob(@PathVariable long id, @PathVariable long jid){

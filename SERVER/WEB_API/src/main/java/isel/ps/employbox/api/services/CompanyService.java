@@ -7,7 +7,7 @@ import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 import java.util.List;
 import java.util.Map;
 
-import static isel.ps.employbox.api.services.ServiceUtils.getPage;
+import static isel.ps.employbox.api.services.utils.ServiceUtils.getPage;
 
 public class CompanyService {
     public static List<OutCompany> getCompanies(Map<String, String> queryString) {

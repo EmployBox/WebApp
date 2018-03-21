@@ -3,13 +3,12 @@ package isel.ps.employbox.api.controllers;
 import isel.ps.employbox.api.model.input.InApplication;
 import isel.ps.employbox.api.model.input.InCurriculum;
 import isel.ps.employbox.api.model.input.InUser;
-import isel.ps.employbox.api.model.output.OutApplication;
-import isel.ps.employbox.api.model.output.OutCurriculum;
 import isel.ps.employbox.api.model.output.OutUser;
 import isel.ps.employbox.api.services.APIService;
 import isel.ps.employbox.api.services.ModelBinder;
 import isel.ps.employbox.api.services.UserService;
 import isel.ps.employbox.dal.model.User;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Collections;
@@ -21,13 +20,10 @@ import java.util.stream.Collectors;
 @RestController
 public class UserController implements ModelBinder<User, OutUser, InUser, Long> {
 
-    private final UserService userService;
-    private final APIService apiService;
-
-    public UserController(UserService userService, APIService apiService) {
-        this.userService = userService;
-        this.apiService = apiService;
-    }
+    @Autowired
+    private  UserService userService;
+    @Autowired
+    private  APIService apiService;
 
     @Override
     public List<OutUser> bindOutput(List<User> list) {
@@ -67,22 +63,6 @@ public class UserController implements ModelBinder<User, OutUser, InUser, Long> 
                 .findFirst();
     }
 
-    @GetMapping("/account/user/{id}/apply")
-    public List<OutApplication> getAllApplications(@PathVariable long id, @RequestParam Map<String,String> queryString){
-        return bindOutput(
-                userService.getAllApplications(id, queryString)
-        );
-    }
-
-    @GetMapping("/account/user/{id}/curriculums")
-    public List<OutCurriculum> getAllCurriculums(@PathVariable long id, @RequestParam Map<String,String> queryString){
-        return userService.getAllCurriculums(id, queryString);
-    }
-
-    @GetMapping("/account/user/{id}/curriculum/{cid}")
-    public OutCurriculum getCurriculum(@PathVariable long id, @PathVariable long cid){
-        return userService.getCurriculum(id, cid);
-    }
 
     @PutMapping("/account/user/{id}")
     public void updateUser(
@@ -94,16 +74,7 @@ public class UserController implements ModelBinder<User, OutUser, InUser, Long> 
         userService.updateUser(id, inUser);
     }
 
-    @PutMapping("/account/user/{id}/apply/{jid}")
-    public void updateApplication(
-            @RequestHeader("apiKey") String apiKey,
-            @PathVariable long id,
-            @PathVariable long jid,
-            @RequestBody InApplication inApplication
-    ){
-        apiService.validateAPIKey(apiKey);
-        userService.updateApplication(id, jid, inApplication);
-    }
+
 
     @PutMapping("/account/user/{id}/curriculum/{cid}")
     public void updateCurriculum(
