@@ -1,8 +1,5 @@
 package isel.ps.employbox.api.services;
 
-import isel.ps.employbox.api.model.input.InApplication;
-import isel.ps.employbox.api.model.input.InCurriculum;
-import isel.ps.employbox.api.model.input.InUser;
 import isel.ps.employbox.dal.RapperRepository;
 import isel.ps.employbox.dal.model.Application;
 import isel.ps.employbox.dal.model.Curriculum;
@@ -12,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @Service
 public class UserService {
@@ -32,8 +30,8 @@ public class UserService {
         return null;//userMapper.getAll().join();
     }
 
-    public User getUser(long id) {
-        return userRepo.findById(id).get();
+    public Optional<User> getUser(long id) {
+        return userRepo.findById(id);
     }
 
     public List<Application> getAllApplications(long id, Map<String, String> queryString) {
@@ -48,32 +46,32 @@ public class UserService {
         return null;
     }
 
-    public void updateUser(long id, InUser inUser) {
+    public void updateUser(long id, User inUser) {
 
     }
 
-    public void updateApplication(long id, long jid, InApplication inApplication) {
+    public void updateApplication(long id, long jid, Application inApplication) {
 
     }
 
-    public void updateCurriculum(long id, long cid, InCurriculum inCurriculum) {
+    public void updateCurriculum(long id, long cid, Curriculum inCurriculum) {
 
     }
 
-    public void createUser(InUser inUser) {
+    public void createUser(User user) {
+        userRepo.create(user);
+    }
+
+    public void createApplication(Application inApplication) {
 
     }
 
-    public void createApplication(InApplication inApplication) {
-
-    }
-
-    public void createCurriculum(long id, InCurriculum inCurriculum) {
+    public void createCurriculum(long id, Curriculum inCurriculum) {
 
     }
 
     public void deleteUser(long id) {
-        //userMapper.getById(id).join().markRemoved();
+        userRepo.deleteById(id);
     }
 
     public void deleteApplication(long id, long jid) {

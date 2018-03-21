@@ -25,9 +25,7 @@ public class JobController {
 
     @GetMapping("/account/{id}/job/{jid}")
     public Optional<OutJob> getJob(@PathVariable long id, @PathVariable long jid){
-        return jobBinder.bindOutput(Collections.singletonList(jobService.getJob(id, jid)))
-                .stream()
-                .findFirst();
+        return jobService.getJob(id, jid).map(jobBinder::bindOutput);
     }
 
     @PutMapping("/account/{id}/job/{jid}")

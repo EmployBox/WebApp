@@ -1,6 +1,7 @@
 package isel.ps.employbox.dal.model;
 
 import java.sql.Date;
+import java.util.Collections;
 import java.util.List;
 import java.util.function.Supplier;
 
@@ -47,7 +48,7 @@ public class Job extends DomainObject<Long> {
         this.experiences = experiences;
     }
 
-    public static Job create(
+    public Job(
             long accountID,
             String address,
             int wage,
@@ -55,51 +56,20 @@ public class Job extends DomainObject<Long> {
             String schedule,
             Date offerBeginDate,
             Date offerEndDate,
-            String offerType,
-            Supplier<List<Application>> applications,
-            Supplier<List<JobExperience>> experiences
-    ) {
-        Job job = new Job(defaultKey, accountID, address, wage, description, schedule, offerBeginDate, offerEndDate, offerType, 0, applications, experiences);
-        job.markNew();
-        return job;
-    }
-
-    public static Job load(
-            long id,
-            long accountID,
-            String address,
-            int wage,
-            String description,
-            String schedule,
-            Date offerBeginDate,
-            Date offerEndDate,
-            String offerType,
-            long version,
-            Supplier<List<Application>> applications,
-            Supplier<List<JobExperience>> experiences
-    ) {
-        Job job = new Job(id, accountID, address, wage, description, schedule, offerBeginDate, offerEndDate, offerType, version, applications, experiences);
-        job.markClean();
-        return job;
-    }
-
-    public static Job update(
-            Job job,
-            long accountID,
-            String address,
-            int wage,
-            String description,
-            String schedule,
-            Date offerBeginDate,
-            Date offerEndDate,
-            String offerType,
-            Supplier<List<Application>> applications,
-            Supplier<List<JobExperience>> experiences
+            String offerType
     ){
-        job.markToBeDirty();
-        Job newJob = new Job(job.getAccountID(), accountID, address, wage, description, schedule, offerBeginDate, offerEndDate, offerType, job.getNextVersion(), applications, experiences);
-        newJob.markDirty();
-        return newJob;
+        super((long) -1, -1);
+        this.jobId = -1;
+        this.accountID = accountID;
+        this.address = address;
+        this.wage = wage;
+        this.description = description;
+        this.schedule = schedule;
+        this.offerBeginDate = offerBeginDate;
+        this.offerEndDate = offerEndDate;
+        this.offerType = offerType;
+        this.applications = Collections::emptyList;
+        this.experiences = Collections::emptyList;
     }
 
     public long getAccountID() {

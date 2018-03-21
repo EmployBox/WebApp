@@ -10,6 +10,7 @@ import isel.ps.employbox.api.model.output.OutUser;
 import isel.ps.employbox.api.services.APIService;
 import isel.ps.employbox.api.services.ModelBinder;
 import isel.ps.employbox.api.services.UserService;
+import isel.ps.employbox.dal.model.Application;
 import isel.ps.employbox.dal.model.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -23,14 +24,17 @@ import java.util.stream.Collectors;
 @RestController
 public class UserController {
 
-    @Autowired
-    private  UserService userService;
-    @Autowired
-    private  APIService apiService;
-    @Autowired
-    private UserBinder userBinder;
-    @Autowired
-    private ApplicationBinder applicationBinder;
+    private final UserService userService;
+    private final APIService apiService;
+    private final UserBinder userBinder;
+    private final ApplicationBinder applicationBinder;
+
+    public UserController(UserService userService, APIService apiService, UserBinder userBinder, ApplicationBinder applicationBinder) {
+        this.userService = userService;
+        this.apiService = apiService;
+        this.userBinder = userBinder;
+        this.applicationBinder = applicationBinder;
+    }
 
     @GetMapping("/account/user")
     public List<OutUser> getAllUsers(@RequestParam Map<String,String> queryString){
@@ -39,9 +43,7 @@ public class UserController {
 
     @GetMapping("/account/user/{id}")
     public Optional<OutUser> getUser(@PathVariable long id){
-        return userBinder.bindOutput(Collections.singletonList(userService.getUser(id)))
-                .stream()
-                .findFirst();
+        return userService.getUser(id).map(userBinder::bindOutput);
     }
 
     @GetMapping("/account/user/{id}/apply")
@@ -58,7 +60,8 @@ public class UserController {
             @RequestBody InUser inUser
     ){
         apiService.validateAPIKey(apiKey);
-        userService.updateUser(id, inUser);
+        User user = userBinder.bindInput(inUser);
+        userService.updateUser(id, user);
     }
 
     @PutMapping("/account/user/{id}/apply/{jid}")
@@ -69,7 +72,10 @@ public class UserController {
             @RequestBody InApplication inApplication
     ){
         apiService.validateAPIKey(apiKey);
-        userService.updateApplication(id, jid, inApplication);
+
+        Application application = applicationBinder.bindInput(inApplication);
+
+        userService.updateApplication(id, jid, application);
     }
 
     @PostMapping("/account/user/")
@@ -78,7 +84,8 @@ public class UserController {
             @RequestBody InUser inUser
     ){
         apiService.validateAPIKey(apiKey);
-        userService.createUser(inUser);
+        User user = userBinder.bindInput(inUser);
+        userService.createUser(user);
     }
 
     @PostMapping("/account/user/{id}/apply/{jid}")
@@ -87,7 +94,8 @@ public class UserController {
             @RequestBody InApplication inApplication
     ){
         apiService.validateAPIKey(apiKey);
-        userService.createApplication(inApplication);
+        Application application = applicationBinder.bindInput(inApplication);
+        userService.createApplication(application);
     }
 
     @DeleteMapping("/account/user/{id}")
