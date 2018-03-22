@@ -1,5 +1,6 @@
 package isel.ps.employbox.api;
 
+import isel.ps.employbox.api.exceptions.BadRequestException;
 import isel.ps.employbox.api.exceptions.InvalidApiKeyException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,6 +19,15 @@ public class GlobalControllerExceptionHandler {
         error.status = 401;
         error.type = "http://example.com/error/types/rels/some-type";
         return new ResponseEntity<ErrorModel>(error, HttpStatus.UNAUTHORIZED);
+    }
+
+    @ExceptionHandler(BadRequestException.class)
+    public ResponseEntity<ErrorModel> handleBadRequest(BadRequestException exception){
+        ErrorModel error = new ErrorModel();
+        error.message = exception.getMessage();
+        error.status = 403;
+        error.type = "http://example.com/error/types/rels/some-type";
+        return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
     }
 
     public static class ErrorModel {

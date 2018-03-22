@@ -1,5 +1,6 @@
 package isel.ps.employbox.api.controllers;
 
+import isel.ps.employbox.api.exceptions.BadRequestException;
 import isel.ps.employbox.api.model.binder.ApplicationBinder;
 import isel.ps.employbox.api.model.binder.UserBinder;
 import isel.ps.employbox.api.model.input.InApplication;
@@ -23,6 +24,7 @@ public class UserController {
     private final APIService apiService;
     private final UserBinder userBinder;
     private final ApplicationBinder applicationBinder;
+    private final String badRequest_IdsMismatch = "Given ids do not match";
 
     public UserController(UserService userService, APIService apiService, UserBinder userBinder, ApplicationBinder applicationBinder) {
         this.userService = userService;
@@ -55,8 +57,9 @@ public class UserController {
             @RequestBody InUser inUser
     ){
         apiService.validateAPIKey(apiKey);
+        if(inUser.getId() != id) throw new BadRequestException(badRequest_IdsMismatch);
         User user = userBinder.bindInput(inUser);
-        userService.updateUser(id, user);
+        userService.updateUser(user);
     }
 
     @PutMapping("/account/user/{id}/apply/{jid}")
@@ -67,8 +70,9 @@ public class UserController {
             @RequestBody InApplication inApplication
     ){
         apiService.validateAPIKey(apiKey);
+        if(inApplication.getUserId() != id || inApplication.getJobId() != jid) throw new BadRequestException(badRequest_IdsMismatch);
         Application application = applicationBinder.bindInput(inApplication);
-        userService.updateApplication(id, jid, application);
+        userService.updateApplication(application);
     }
 
     @PostMapping("/account/user/")

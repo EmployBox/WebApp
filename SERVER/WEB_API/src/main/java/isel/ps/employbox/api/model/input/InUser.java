@@ -1,11 +1,20 @@
 package isel.ps.employbox.api.model.input;
 
 public class InUser {
+    private long id;
     private String email;
     private String password;
     private String name;
     private String photo_url;
     private String summary;
+
+    public long getId() {
+        return id;
+    }
+
+    public void setId(long id) {
+        this.id = id;
+    }
 
     public String getEmail() {
         return this.email;
