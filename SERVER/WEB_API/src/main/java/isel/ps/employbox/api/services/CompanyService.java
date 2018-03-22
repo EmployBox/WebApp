@@ -1,30 +1,25 @@
 package isel.ps.employbox.api.services;
 
+import isel.ps.employbox.dal.RapperRepository;
 import isel.ps.employbox.dal.model.Company;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.util.List;
-import java.util.Map;
-
-import static isel.ps.employbox.api.services.utils.ServiceUtils.getPage;
+import java.util.Optional;
 
 public class CompanyService {
-    public static List<Company> getCompanies(Map<String, String> queryString) {
-        String page = getPage(queryString);
-        throw new NotImplementedException();
+    private RapperRepository<Company, Long> repo;
+
+    public CompanyService(RapperRepository<Company, Long> repo){ this.repo = repo; }
+
+    public List<Company> getCompanies() {
+        return repo.findAll();
     }
 
-    public static List<Company> getCompany(long cid) {
-        throw new NotImplementedException();
-    }
+    public Optional<Company> getCompany(long cid) { return repo.findById(cid); }
 
-    public static void setCompany(Company inCompany) {
-        throw new NotImplementedException();
-    }
+    public void setCompany(Company company) { repo.create(company); }
 
-    public static void deleteCompany(long cid) {
-    }
+    public void deleteCompany(long cid) { repo.deleteById(cid); }
 
-    public static void updateCompany(Company inCompany) {
-    }
+    public void updateCompany(Company company) { repo.update(company); }
 }

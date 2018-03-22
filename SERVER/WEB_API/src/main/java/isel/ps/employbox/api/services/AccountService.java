@@ -2,6 +2,7 @@ package isel.ps.employbox.api.services;
 
 import isel.ps.employbox.api.model.input.InChat;
 import isel.ps.employbox.api.model.input.InMessage;
+import isel.ps.employbox.api.model.output.OutAccount;
 import isel.ps.employbox.api.model.output.OutChat;
 import isel.ps.employbox.api.model.output.OutMessage;
 import isel.ps.employbox.api.services.utils.ServiceUtils;
@@ -15,14 +16,13 @@ import java.util.Map;
 @Service
 public final class AccountService {
 
-    public List<isel.ps.employbox.api.model.output.OutAccount> getAccountsPage(Map<String,String> queryString) {
+    public List<OutAccount> getAccountsPage(Map<String,String> queryString) {
         String page = ServiceUtils.getPage(queryString);
-
 
         return null;
     }
 
-    public final isel.ps.employbox.api.model.output.OutAccount getAccount(long id) {
+    public final OutAccount getAccount(long id) {
         throw new NotImplementedException();
     }
 
@@ -30,11 +30,11 @@ public final class AccountService {
         throw new NotImplementedException();
     }
 
-    public List<isel.ps.employbox.api.model.output.OutAccount> getAccountFollowers(long id) {
+    public List<OutAccount> getAccountFollowers(long id) {
         throw new NotImplementedException();
     }
 
-    public List<isel.ps.employbox.api.model.output.OutAccount> getAccountFollowing(long id) {
+    public List<OutAccount> getAccountFollowing(long id) {
         throw new NotImplementedException();
     }
 
@@ -50,7 +50,7 @@ public final class AccountService {
         throw new NotImplementedException();
     }
 
-    public void createNewChatMessage(InMessage msg) {
+    public void createNewChatMessage(long accountId, long chatId, InMessage msg) {
         throw new NotImplementedException();
     }
 

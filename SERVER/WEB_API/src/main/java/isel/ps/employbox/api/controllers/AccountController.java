@@ -6,6 +6,7 @@ import isel.ps.employbox.api.model.output.OutAccount;
 import isel.ps.employbox.api.model.output.OutChat;
 import isel.ps.employbox.api.model.output.OutJob;
 import isel.ps.employbox.api.model.output.OutMessage;
+import isel.ps.employbox.api.services.APIService;
 import isel.ps.employbox.api.services.AccountService;
 import org.springframework.web.bind.annotation.*;
 
@@ -16,9 +17,11 @@ import java.util.Map;
 public class AccountController {
 
     private final AccountService accountService;
+    private final APIService apiService;
 
-    private AccountController(AccountService accountService){
+    private AccountController(AccountService accountService, APIService apiService){
         this.accountService = accountService;
+        this.apiService = apiService;
     }
 
     @GetMapping("/account")
@@ -51,11 +54,12 @@ public class AccountController {
                                @PathVariable long fid,
                                @RequestHeader("apiKey") String apiKey
     ){
+        apiService.validateAPIKey(apiKey);
         accountService.deleteFollower(id,fid);
     }
 
     @GetMapping("/account/{id}/following")
-    public List<isel.ps.employbox.api.model.output.OutAccount> getFollowing(@PathVariable long id){ return accountService.getAccountFollowing(id); }
+    public List<OutAccount> getFollowing(@PathVariable long id){ return accountService.getAccountFollowing(id); }
 
     @GetMapping("/account/{id}/chat")
     public List<OutChat> getChats (@PathVariable long id){ return accountService.getAccountChats(id); }
@@ -71,6 +75,7 @@ public class AccountController {
             @RequestHeader("apiKey") String apiKey,
             @RequestBody InChat inChat
     ) {
+        apiService.validateAPIKey(apiKey);
         accountService.createNewChat(inChat);
     }
 
@@ -81,6 +86,7 @@ public class AccountController {
             @RequestHeader("apiKey") String apiKey,
             @RequestBody InMessage msg
     ) {
-        accountService.createNewChatMessage(msg);
+        apiService.validateAPIKey(apiKey);
+        accountService.createNewChatMessage(id,cid,msg);
     }
 }

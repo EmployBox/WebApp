@@ -50,6 +50,7 @@ public class Job extends DomainObject<Long> {
 
     public Job(
             long accountID,
+            long jobId,
             String address,
             int wage,
             String description,
@@ -59,7 +60,7 @@ public class Job extends DomainObject<Long> {
             String offerType
     ){
         super((long) -1, -1);
-        this.jobId = -1;
+        this.jobId = jobId;
         this.accountID = accountID;
         this.address = address;
         this.wage = wage;

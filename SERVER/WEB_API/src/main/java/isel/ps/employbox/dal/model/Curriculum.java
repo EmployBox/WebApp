@@ -1,5 +1,6 @@
 package isel.ps.employbox.dal.model;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.function.Supplier;
 
@@ -34,6 +35,16 @@ public class Curriculum extends DomainObject<String>{
         this.academicBackground = academicBackground;
         this.projects = projects;
         this.experiences = experiences;
+    }
+
+    public Curriculum(long id, String title) {
+        super(Long.toString(id),-1);
+        this.accountId = id;
+        this.title= title;
+        this.previousJobs = Collections::emptyList;
+        this.academicBackground = Collections::emptyList;
+        this.projects = Collections::emptyList;
+        this.experiences = Collections::emptyList;
     }
 
     public static Curriculum create(

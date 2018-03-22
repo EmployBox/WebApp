@@ -42,10 +42,7 @@ public class JobBinder implements ModelBinder<Job, OutJob, InJob, Long> {
                         curr.getSchedule(),
                         curr.getOfferBeginDate(),
                         curr.getOfferEndDate(),
-                        curr.getOfferType(),
-                        0,//todo what its supposed to be here??
-                        null,//todo
-                        null))//todo
+                        curr.getOfferType()))
                 .collect(Collectors.toList());
     }
 
@@ -66,17 +63,14 @@ public class JobBinder implements ModelBinder<Job, OutJob, InJob, Long> {
     @Override
     public Job bindInput(InJob curr) {
         return new Job(
-                curr.getAccountID(),
-                curr.getJobID(),
-                curr.getAddress(),
-                curr.getWage(),
-                curr.getDescription(),
-                curr.getSchedule(),
-                curr.getOfferBeginDate(),
-                curr.getOfferEndDate(),
-                curr.getOfferType(),
-                0,//todo what its supposed to be here??
-                null,//todo
-                null);//todo
+            curr.getAccountID(),
+            curr.getJobID(),
+            curr.getAddress(),
+            curr.getWage(),
+            curr.getDescription(),
+            curr.getSchedule(),
+            curr.getOfferBeginDate(),
+            curr.getOfferEndDate(),
+            curr.getOfferType());
     }
 }

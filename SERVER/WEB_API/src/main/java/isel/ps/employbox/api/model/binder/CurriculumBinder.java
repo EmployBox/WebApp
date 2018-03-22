@@ -7,6 +7,7 @@ import isel.ps.employbox.dal.model.Curriculum;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Component
 public class CurriculumBinder implements ModelBinder<Curriculum, OutCurriculum, InCurriculum, String> {
@@ -18,7 +19,10 @@ public class CurriculumBinder implements ModelBinder<Curriculum, OutCurriculum, 
 
     @Override
     public List<Curriculum> bindInput(List<InCurriculum> list) {
-        return null;
+        return list
+                .stream()
+                .map(curr-> new Curriculum(curr.getId(), curr.getTitle()))
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -27,7 +31,9 @@ public class CurriculumBinder implements ModelBinder<Curriculum, OutCurriculum, 
     }
 
     @Override
-    public Curriculum bindInput(InCurriculum object) {
-        return null;
+    public Curriculum bindInput(InCurriculum obj) {
+
+        return new Curriculum(obj.getId(),
+                obj.getTitle());
     }
 }
