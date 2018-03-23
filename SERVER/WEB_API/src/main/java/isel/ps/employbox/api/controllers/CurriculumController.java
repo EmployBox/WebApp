@@ -44,13 +44,13 @@ public class CurriculumController {
             @RequestBody InCurriculum inCurriculum
     ){
         apiService.validateAPIKey(apiKey);
-        userService.updateCurriculum(id, cid, inCurriculum);
+        userService.updateCurriculum(curriculumBinder.bindInput(inCurriculum));
     }
 
     @PostMapping("/account/user/{id}/curriculum/")
     public void createCurriculum(@RequestHeader("apiKey") String apiKey, @PathVariable long id, @RequestBody InCurriculum inCurriculum){
         apiService.validateAPIKey(apiKey);
-        userService.createCurriculum(id, inCurriculum);
+        userService.createCurriculum(curriculumBinder.bindInput(inCurriculum));
     }
 
     @DeleteMapping("/account/user/{id}/curriculum/{cid}")
