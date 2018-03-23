@@ -16,7 +16,7 @@ public class CompanyController {
     private final CompanyService companyService;
     private final APIService apiService;
 
-    public CompanyController(CompanyBinder companyBinder,CompanyService companyService,APIService apiservice){
+    public CompanyController(CompanyBinder companyBinder,CompanyService companyService, APIService apiservice){
         this.companyBinder = companyBinder;
         this.companyService = companyService;
         this.apiService = apiservice;

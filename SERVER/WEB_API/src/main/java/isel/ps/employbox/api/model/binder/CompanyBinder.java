@@ -2,7 +2,7 @@ package isel.ps.employbox.api.model.binder;
 
 import isel.ps.employbox.api.model.input.InCompany;
 import isel.ps.employbox.api.model.output.OutCompany;
-import isel.ps.employbox.api.services.ModelBinder;
+import isel.ps.employbox.api.model.ModelBinder;
 import isel.ps.employbox.dal.model.Company;
 import org.springframework.stereotype.Component;
 

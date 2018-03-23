@@ -2,10 +2,12 @@ package isel.ps.employbox.api.services;
 
 import isel.ps.employbox.dal.RapperRepository;
 import isel.ps.employbox.dal.model.Company;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
 
+@Service
 public class CompanyService {
     private RapperRepository<Company, Long> repo;
 

@@ -12,12 +12,13 @@ import org.springframework.web.bind.annotation.*;
 import java.util.Collections;
 import java.util.Optional;
 
+import static isel.ps.employbox.api.ErrorMessages.badRequest_IdsMismatch;
+
 @RestController
 public class JobController {
     private final JobService jobService;
     private final APIService apiService;
     private final JobBinder jobBinder;
-    private final String badRequest_IdsMismatch = "Given ids do not match";
 
     public JobController(JobService jobService, APIService apiService, JobBinder jobBinder) {
         this.jobService = jobService;

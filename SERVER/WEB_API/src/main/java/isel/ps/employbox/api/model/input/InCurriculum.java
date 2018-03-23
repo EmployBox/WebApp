@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.List;
 
 public class InCurriculum {
+    private final long accountID;
     private final long id;
     private final String title;
     private final List<Experience> experiences;
@@ -12,13 +13,18 @@ public class InCurriculum {
     private final List<Project> projects;
     private final List<AcademicBackground> academicBackground;
 
-    public InCurriculum(long id, String title, List<Experience> experiences, List<PreviousJobs> previousJobs, List<Project> projects, List<AcademicBackground> academicBackground){
+    public InCurriculum(long accountID, long id, String title, List<Experience> experiences, List<PreviousJobs> previousJobs, List<Project> projects, List<AcademicBackground> academicBackground){
+        this.accountID = accountID;
         this.id = id;
         this.title = title;
         this.experiences = experiences;
         this.previousJobs = previousJobs;
         this.projects = projects;
         this.academicBackground = academicBackground;
+    }
+
+    public long getAccountID() {
+        return accountID;
     }
 
     public long getId() {

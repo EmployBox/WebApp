@@ -17,6 +17,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import static isel.ps.employbox.api.ErrorMessages.badRequest_IdsMismatch;
+
 @RestController
 public class UserController {
 
@@ -24,7 +26,6 @@ public class UserController {
     private final APIService apiService;
     private final UserBinder userBinder;
     private final ApplicationBinder applicationBinder;
-    private final String badRequest_IdsMismatch = "Given ids do not match";
 
     public UserController(UserService userService, APIService apiService, UserBinder userBinder, ApplicationBinder applicationBinder) {
         this.userService = userService;

@@ -32,7 +32,7 @@ public class GlobalControllerExceptionHandler {
 
     public static class ErrorModel {
         public String type;
-        public int status = 400;
+        public int status;
         public String message;
     }
 }

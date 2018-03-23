@@ -1,4 +1,4 @@
-package isel.ps.employbox.api.services;
+package isel.ps.employbox.api.model;
 
 import isel.ps.employbox.dal.model.DomainObject;
 

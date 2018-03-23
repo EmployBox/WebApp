@@ -1,14 +1,18 @@
 package isel.ps.employbox.api.controllers;
 
+import isel.ps.employbox.api.exceptions.BadRequestException;
 import isel.ps.employbox.api.model.binder.CurriculumBinder;
 import isel.ps.employbox.api.model.input.InCurriculum;
 import isel.ps.employbox.api.model.output.OutCurriculum;
 import isel.ps.employbox.api.services.APIService;
 import isel.ps.employbox.api.services.UserService;
+import isel.ps.employbox.dal.model.Curriculum;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
+
+import static isel.ps.employbox.api.ErrorMessages.badRequest_IdsMismatch;
 
 @RestController
 public class CurriculumController {
@@ -44,13 +48,16 @@ public class CurriculumController {
             @RequestBody InCurriculum inCurriculum
     ){
         apiService.validateAPIKey(apiKey);
-        userService.updateCurriculum(id, cid, inCurriculum);
+        if(inCurriculum.getAccountID() != id || inCurriculum.getId() != cid) throw new BadRequestException(badRequest_IdsMismatch);
+        Curriculum curriculum = curriculumBinder.bindInput(inCurriculum);
+        userService.updateCurriculum(curriculum);
     }
 
     @PostMapping("/account/user/{id}/curriculum/")
     public void createCurriculum(@RequestHeader("apiKey") String apiKey, @PathVariable long id, @RequestBody InCurriculum inCurriculum){
         apiService.validateAPIKey(apiKey);
-        userService.createCurriculum(id, inCurriculum);
+        Curriculum curriculum = curriculumBinder.bindInput(inCurriculum);
+        userService.createCurriculum(curriculum);
     }
 
     @DeleteMapping("/account/user/{id}/curriculum/{cid}")
