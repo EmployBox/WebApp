@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Component
-public class CompanyBinder implements ModelBinder<Company,OutCompany,InCompany,Long> {
+public class CompanyBinder implements ModelBinder<Company, OutCompany, InCompany, Long> {
     @Override
     public List<OutCompany> bindOutput(List<Company> list) {
         return null;

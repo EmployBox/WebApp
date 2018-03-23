@@ -6,7 +6,7 @@ import java.util.List;
 public class InJob {
     private long jobID;
     private long accountID;
-    private List<Experience> experiences;
+    private List<InExperience> experiences;
     private String address;
     private int wage;
     private String description;
@@ -31,11 +31,11 @@ public class InJob {
         this.accountID = accountID;
     }
 
-    public List<Experience> getExperiences() {
+    public List<InExperience> getExperiences() {
         return experiences;
     }
 
-    public void setExperiences(List<Experience> experiences) {
+    public void setExperiences(List<InExperience> experiences) {
         this.experiences = experiences;
     }
 
@@ -93,7 +93,7 @@ public class InJob {
         this.offerType = offerType;
     }
 
-    private class Experience {
+    public class InExperience {
         private String competence;
         private int years;
 

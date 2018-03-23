@@ -56,8 +56,7 @@ public class CurriculumController {
     @PostMapping("/account/user/{id}/curriculum/")
     public void createCurriculum(@RequestHeader("apiKey") String apiKey, @PathVariable long id, @RequestBody InCurriculum inCurriculum){
         apiService.validateAPIKey(apiKey);
-        Curriculum curriculum = curriculumBinder.bindInput(inCurriculum);
-        userService.createCurriculum(curriculum);
+        userService.createCurriculum(curriculumBinder.bindInput(inCurriculum));
     }
 
     @DeleteMapping("/account/user/{id}/curriculum/{cid}")

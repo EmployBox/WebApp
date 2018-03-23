@@ -1,5 +1,5 @@
-use PS_API_DATABASE
---use PS_TEST_API_DATABASE
+--use PS_API_DATABASE
+use PS_TEST_API_DATABASE
 
 if object_id('dbo.[Account]') is not null
 	drop view dbo.[Account]

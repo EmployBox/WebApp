@@ -9,6 +9,7 @@ import java.util.Optional;
 
 @Service
 public class CompanyService {
+
     private RapperRepository<Company, Long> repo;
 
     public CompanyService(RapperRepository<Company, Long> repo){ this.repo = repo; }
