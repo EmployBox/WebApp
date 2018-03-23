@@ -1,8 +1,10 @@
 package isel.ps.employbox.dal.model;
 
+import javafx.util.Pair;
+
 import java.sql.Date;
 
-public class Message extends DomainObject<String> {
+public class Message extends DomainObject<Pair<Long,Long>> {
     @ID
     private final long messageId;
     @ID
@@ -11,12 +13,21 @@ public class Message extends DomainObject<String> {
     private final Date date;
 
     public Message(long messageId, long chatId, String text, Date date, long version) {
-        super(String.format("%d %d",messageId,chatId), version);
+        super(new Pair(messageId, chatId), version);
         this.chadId = chatId;
         this.date = date;
         this.text = text;
         this.messageId = messageId;
     }
+
+    public Message( long chatId, String text, Date date) {
+        super(new Pair(-1L,chatId), 0);
+        this.chadId = chatId;
+        this.date = date;
+        this.text = text;
+        this.messageId = -1;
+    }
+
 
     public static Message create(long messageId, long chatId, String text, Date date){
         Message message = new Message(messageId, chatId , text, date, 0);

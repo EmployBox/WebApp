@@ -5,7 +5,7 @@ import java.util.List;
 
 public class OutJob {
     private final long accountID;
-    private final List<Experience> experiences;
+    private final List<OutExperience> experiences;
     private final String address;
     private final double wage;
     private final String description;
@@ -15,7 +15,7 @@ public class OutJob {
     private final String offerType;
     private final String applications_url;
 
-    public OutJob(long accountID, List<Experience> experiences, String address, double wage, String description, String schedule, Date offerBeginDate, Date offerEndDate, String offerType) {
+    public OutJob(long accountID, List<OutExperience> experiences, String address, double wage, String description, String schedule, Date offerBeginDate, Date offerEndDate, String offerType) {
         this.accountID = accountID;
         this.experiences = experiences;
         this.address = address;
@@ -32,7 +32,7 @@ public class OutJob {
         return accountID;
     }
 
-    public List<Experience> getExperiences() {
+    public List<OutExperience> getExperiences() {
         return experiences;
     }
 
@@ -68,7 +68,7 @@ public class OutJob {
         return applications_url;
     }
 
-    private class Experience {
+    public class OutExperience {
         private String competence;
         private int years;
 
