@@ -15,10 +15,9 @@ import java.util.Optional;
 @Service
 public class UserService {
 
-    @Autowired
     private RapperRepository<User, Long> userRepo;
     private RapperRepository<Curriculum, Long> curriculumRepo;
-    private RapperRepository<User, Long> applicationRepo;
+    private RapperRepository<Application, Long> applicationRepo;
 
     public List<User> getAllUsers(Map<String, String> queryString) {
         String name = queryString.get("name");
@@ -47,28 +46,28 @@ public class UserService {
         return null;
     }
 
-    public void updateUser(long id, User inUser) {
-
+    public void updateUser(User user) {
+        userRepo.update(user);
     }
 
-    public void updateApplication(long id, long jid, Application inApplication) {
-
+    public void updateApplication(Application application) {
+        applicationRepo.update(application);
     }
 
-    public void updateCurriculum(long id, long cid, InCurriculum inCurriculum) {
-
+    public void updateCurriculum(Curriculum curriculum) {
+        curriculumRepo.update(curriculum);
     }
 
     public void createUser(User user) {
         userRepo.create(user);
     }
 
-    public void createApplication(Application inApplication) {
-
+    public void createApplication(Application application) {
+        applicationRepo.create(application);
     }
 
-    public void createCurriculum(long id, InCurriculum inCurriculum) {
-
+    public void createCurriculum(Curriculum curriculum) {
+        curriculumRepo.create(curriculum);
     }
 
     public void deleteUser(long id) {

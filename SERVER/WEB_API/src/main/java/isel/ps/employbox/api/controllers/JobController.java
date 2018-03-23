@@ -1,5 +1,6 @@
 package isel.ps.employbox.api.controllers;
 
+import isel.ps.employbox.api.exceptions.BadRequestException;
 import isel.ps.employbox.api.model.binder.JobBinder;
 import isel.ps.employbox.api.model.input.InJob;
 import isel.ps.employbox.api.model.output.OutJob;
@@ -16,6 +17,7 @@ public class JobController {
     private final JobService jobService;
     private final APIService apiService;
     private final JobBinder jobBinder;
+    private final String badRequest_IdsMismatch = "Given ids do not match";
 
     public JobController(JobService jobService, APIService apiService, JobBinder jobBinder) {
         this.jobService = jobService;
@@ -32,8 +34,7 @@ public class JobController {
     public void updateJob(@PathVariable long id, @PathVariable long jid, @RequestHeader String apiKey, @RequestBody InJob job){
         apiService.validateAPIKey(apiKey);
 
-        job.setAccountID(id);
-        job.setJobID(jid);
+        if(job.getAccountID() != id || job.getJobID() != jid) throw new BadRequestException(badRequest_IdsMismatch);
         Job updateJob = jobBinder.bindInput(job);
 
         jobService.updateJob(updateJob);
@@ -43,7 +44,7 @@ public class JobController {
     public void createJob(@PathVariable long id, @RequestHeader String apiKey, @RequestBody InJob job){
         apiService.validateAPIKey(apiKey);
 
-        job.setAccountID(id);
+        if(job.getAccountID() != id) throw new BadRequestException(badRequest_IdsMismatch);
         Job newJob = jobBinder.bindInput(job);
 
         jobService.createJob(newJob);
