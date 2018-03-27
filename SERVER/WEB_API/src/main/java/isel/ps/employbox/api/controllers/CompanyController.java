@@ -1,5 +1,7 @@
 package isel.ps.employbox.api.controllers;
 
+import isel.ps.employbox.api.ErrorMessages;
+import isel.ps.employbox.api.exceptions.BadRequestException;
 import isel.ps.employbox.api.model.binder.CompanyBinder;
 import isel.ps.employbox.api.model.input.InCompany;
 import isel.ps.employbox.api.model.output.OutCompany;
@@ -9,6 +11,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Optional;
+
+import static isel.ps.employbox.api.ErrorMessages.*;
 
 @RestController
 public class CompanyController {
@@ -45,10 +49,13 @@ public class CompanyController {
         );
     }
 
-    @PutMapping("/account/company/")
+    @PutMapping("/account/company/{id}")
     public void updateCompany(
+            @PathVariable long id,
             @RequestBody InCompany inCompany,
-            @RequestHeader("apiKey") String apiKey){
+            @RequestHeader("apiKey") String apiKey
+    ){
+        if(id != inCompany.getAccountId()) throw new BadRequestException(BAD_REQUEST_IDS_MISMATCH);
         apiService.validateAPIKey(apiKey);
         companyService.updateCompany(
                 companyBinder.bindInput(inCompany)

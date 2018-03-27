@@ -1,8 +1,8 @@
 package isel.ps.employbox.api.model.binder;
 
+import isel.ps.employbox.api.model.ModelBinder;
 import isel.ps.employbox.api.model.input.InMessage;
 import isel.ps.employbox.api.model.output.OutMessage;
-import isel.ps.employbox.api.services.ModelBinder;
 import isel.ps.employbox.dal.model.Message;
 import javafx.util.Pair;
 import org.springframework.stereotype.Component;

@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Map;
 
-import static isel.ps.employbox.api.ErrorMessages.badRequest_IdsMismatch;
+import static isel.ps.employbox.api.ErrorMessages.BAD_REQUEST_IDS_MISMATCH;
 
 @RestController
 public class CurriculumController {
@@ -48,12 +48,12 @@ public class CurriculumController {
             @RequestBody InCurriculum inCurriculum
     ){
         apiService.validateAPIKey(apiKey);
-        if(inCurriculum.getAccountID() != id || inCurriculum.getId() != cid) throw new BadRequestException(badRequest_IdsMismatch);
+        if(inCurriculum.getAccountID() != id || inCurriculum.getId() != cid) throw new BadRequestException(BAD_REQUEST_IDS_MISMATCH);
         Curriculum curriculum = curriculumBinder.bindInput(inCurriculum);
         userService.updateCurriculum(curriculum);
     }
 
-    @PostMapping("/account/user/{id}/curriculum/")
+    @PostMapping("/account/user/{id}/curriculum")
     public void createCurriculum(@RequestHeader("apiKey") String apiKey, @PathVariable long id, @RequestBody InCurriculum inCurriculum){
         apiService.validateAPIKey(apiKey);
         userService.createCurriculum(curriculumBinder.bindInput(inCurriculum));

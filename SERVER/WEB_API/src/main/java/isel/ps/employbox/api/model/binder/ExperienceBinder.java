@@ -1,9 +1,9 @@
 package isel.ps.employbox.api.model.binder;
 
 
+import isel.ps.employbox.api.model.ModelBinder;
 import isel.ps.employbox.api.model.input.InJob;
 import isel.ps.employbox.api.model.output.OutJob;
-import isel.ps.employbox.api.services.ModelBinder;
 import isel.ps.employbox.dal.model.JobExperience;
 
 import java.util.List;

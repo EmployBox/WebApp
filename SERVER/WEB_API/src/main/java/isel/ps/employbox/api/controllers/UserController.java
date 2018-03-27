@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import static isel.ps.employbox.api.ErrorMessages.badRequest_IdsMismatch;
+import static isel.ps.employbox.api.ErrorMessages.BAD_REQUEST_IDS_MISMATCH;
 
 @RestController
 public class UserController {
@@ -58,7 +58,7 @@ public class UserController {
             @RequestBody InUser inUser
     ){
         apiService.validateAPIKey(apiKey);
-        if(inUser.getId() != id) throw new BadRequestException(badRequest_IdsMismatch);
+        if(inUser.getId() != id) throw new BadRequestException(BAD_REQUEST_IDS_MISMATCH);
         User user = userBinder.bindInput(inUser);
         userService.updateUser(user);
     }
@@ -71,7 +71,7 @@ public class UserController {
             @RequestBody InApplication inApplication
     ){
         apiService.validateAPIKey(apiKey);
-        if(inApplication.getUserId() != id || inApplication.getJobId() != jid) throw new BadRequestException(badRequest_IdsMismatch);
+        if(inApplication.getUserId() != id || inApplication.getJobId() != jid) throw new BadRequestException(BAD_REQUEST_IDS_MISMATCH);
         Application application = applicationBinder.bindInput(inApplication);
         userService.updateApplication(application);
     }

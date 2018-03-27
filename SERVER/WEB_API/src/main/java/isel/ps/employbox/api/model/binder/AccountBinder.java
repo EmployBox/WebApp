@@ -1,12 +1,14 @@
 package isel.ps.employbox.api.model.binder;
 
+import isel.ps.employbox.api.model.ModelBinder;
 import isel.ps.employbox.api.model.input.InAccount;
 import isel.ps.employbox.api.model.output.OutAccount;
-import isel.ps.employbox.api.services.ModelBinder;
 import isel.ps.employbox.dal.model.Account;
+import org.springframework.stereotype.Component;
 
 import java.util.List;
 
+@Component
 public class AccountBinder implements ModelBinder<Account, OutAccount, InAccount, Long> {
 
     @Override
