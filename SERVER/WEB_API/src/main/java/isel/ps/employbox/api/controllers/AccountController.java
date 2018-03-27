@@ -25,20 +25,11 @@ public class AccountController {
 
     private final AccountService accountService;
     private final AccountBinder accountBinder;
-    private final ChatBinder chatBinder;
-    private final MessageBinder messageBinder;
-    private final JobBinder jobBinder;
-    private final APIService apiService;
 
-    private AccountController(AccountService accountService, AccountBinder accountBinder, ChatBinder chatBinder, MessageBinder messageBinder, JobBinder jobBinder, APIService apiService){
+    private AccountController(AccountService accountService, AccountBinder accountBinder){
         this.accountService = accountService;
         this.accountBinder = accountBinder;
-        this.chatBinder = chatBinder;
-        this.messageBinder = messageBinder;
-        this.jobBinder = jobBinder;
-        this.apiService = apiService;
     }
-
 
     @GetMapping("/account")
     public List<OutAccount> getAccounts(){

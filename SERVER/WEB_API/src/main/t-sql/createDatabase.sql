@@ -1,6 +1,9 @@
 IF DB_ID ('PS_API_DATABASE') IS NULL
 	CREATE DATABASE PS_API_DATABASE;
 GO
+IF DB_ID ('PS_TEST_API_DATABASE') IS NULL
+  CREATE DATABASE PS_TEST_API_DATABASE;
+GO
 IF NOT EXISTS(SELECT * FROM sys.schemas WHERE name = 'ApiDatabase')
 BEGIN
 	EXEC ('CREATE SCHEMA ApiDatabase')
@@ -111,14 +114,17 @@ CREATE TABLE Apidatabase.[PreviousJobs](
 CREATE TABLE ApiDatabase.[Local] (
 	[Address] NVARCHAR(50) primary key,
 	Country NVARCHAR(15),
-	Street NVARCHAR(40),
 	ZIPCode NVARCHAR(40),
+  District NVARCHAR(40),
+  Longitude decimal(9, 6),
+  Latitude decimal(9,6),
 	[version] rowversion
 )
 
 
 CREATE TABLE ApiDatabase.[Job](
 	jobId BIGINT identity primary key,
+  title nvarchar(50) not null,
 	accountId BIGINT,
 	schedule NVARCHAR(20),
 	wage INT check(wage > 0),
@@ -199,7 +205,7 @@ CREATE TABLE ApiDatabase.[Chat](
 )
 
 
-CREATE TABLE ApiDatabase.[MESSAGE](
+CREATE TABLE ApiDatabase.[Message](
 	messageId BIGINT IDENTITY,
 	chatId BIGINT REFERENCES ApiDatabase.Chat,
 	[text] NVARCHAR(200),

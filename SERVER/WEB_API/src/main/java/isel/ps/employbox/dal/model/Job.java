@@ -8,6 +8,7 @@ import java.util.function.Supplier;
 public class Job extends DomainObject<Long> {
     @ID(isIdentity = true)
     private long jobId;
+    private final String title;
     private final long accountID;
     private final String address;
     private final int wage;
@@ -22,6 +23,7 @@ public class Job extends DomainObject<Long> {
 
     public Job(
             long id,
+            String title,
             long accountID,
             String address,
             int wage,
@@ -36,6 +38,7 @@ public class Job extends DomainObject<Long> {
     ) {
         super(id, version);
         this.jobId = id;
+        this.title = title;
         this.accountID = accountID;
         this.address = address;
         this.wage = wage;
@@ -51,6 +54,7 @@ public class Job extends DomainObject<Long> {
     public Job(
             long accountID,
             long jobId,
+            String title,
             String address,
             int wage,
             String description,
@@ -62,6 +66,7 @@ public class Job extends DomainObject<Long> {
         super((long) -1, -1);
         this.jobId = jobId;
         this.accountID = accountID;
+        this.title = title;
         this.address = address;
         this.wage = wage;
         this.description = description;
@@ -111,5 +116,13 @@ public class Job extends DomainObject<Long> {
 
     public Supplier<List<JobExperience>> getExperiences() {
         return experiences;
+    }
+
+    public long getJobId() {
+        return jobId;
+    }
+
+    public String getTitle() {
+        return title;
     }
 }

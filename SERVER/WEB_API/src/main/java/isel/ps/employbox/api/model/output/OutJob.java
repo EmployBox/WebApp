@@ -5,6 +5,7 @@ import java.util.List;
 
 public class OutJob {
     private final long accountID;
+    private final String title;
     private final List<OutExperience> experiences;
     private final String address;
     private final double wage;
@@ -15,8 +16,9 @@ public class OutJob {
     private final String offerType;
     private final String applications_url;
 
-    public OutJob(long accountID, List<OutExperience> experiences, String address, double wage, String description, String schedule, Date offerBeginDate, Date offerEndDate, String offerType) {
+    public OutJob(long accountID, String title, List<OutExperience> experiences, String address, double wage, String description, String schedule, Date offerBeginDate, Date offerEndDate, String offerType) {
         this.accountID = accountID;
+        this.title = title;
         this.experiences = experiences;
         this.address = address;
         this.wage = wage;
@@ -66,6 +68,10 @@ public class OutJob {
 
     public String getApplications_url() {
         return applications_url;
+    }
+
+    public String getTitle() {
+        return title;
     }
 
     public class OutExperience {

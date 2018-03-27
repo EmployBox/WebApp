@@ -5,6 +5,7 @@ import java.util.List;
 
 public class InJob {
     private long jobID;
+    private String title;
     private long accountID;
     private List<InExperience> experiences;
     private String address;
@@ -14,6 +15,14 @@ public class InJob {
     private Date offerBeginDate;
     private Date offerEndDate;
     private String offerType;
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
 
     public long getJobID() {
         return jobID;
