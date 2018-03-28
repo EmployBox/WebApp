@@ -18,7 +18,7 @@ public class JobService {
         return null;
     }
 
-    public Optional<Job> getJob(long id, long jid) {
+    public Optional<Job> getJob(long id) {
         return null;
     }
 
@@ -28,6 +28,6 @@ public class JobService {
     public void createJob(Job job) {
     }
 
-    public void deleteJob(long id, long jid) {
+    public void deleteJob(long id) {
     }
 }

@@ -15,7 +15,7 @@ public class ChatService {
         throw new NotImplementedException();
     }
 
-    public List<Message> getAccountChatsMessages(long id, long cid, Map<String,String> queryString) {
+    public List<Message> getAccountChatsMessages(long id, long cid, String queryString) {
         throw new NotImplementedException();
     }
 

@@ -17,6 +17,7 @@ import java.util.Optional;
 import static isel.ps.employbox.api.ErrorMessages.BAD_REQUEST_IDS_MISMATCH;
 
 @RestController
+@RequestMapping("/jobs")
 public class JobController {
     private final JobService jobService;
     private final APIService apiService;
@@ -28,48 +29,38 @@ public class JobController {
         this.jobBinder = jobBinder;
     }
 
-    @GetMapping("/jobs")
+    @GetMapping
     public List<OutJob> getAllJobs(@RequestParam Map<String,String> queryString){
         return jobBinder.bindOutput(
                 jobService.getAllJobs(queryString)
         );
     }
 
-    @GetMapping("/account/{id}/job")
-    public List<OutJob> getAccountOffers(@PathVariable long id){
-        return jobBinder.bindOutput(
-                jobService.getAccountOffers(id)
-        );
+    @GetMapping("/{jid}")
+    public Optional<OutJob> getJob(@PathVariable long jid){
+        return jobService.getJob(jid).map(jobBinder::bindOutput);
     }
 
-    @GetMapping("/account/{id}/job/{jid}")
-    public Optional<OutJob> getJob(@PathVariable long id, @PathVariable long jid){
-        return jobService.getJob(id, jid).map(jobBinder::bindOutput);
-    }
-
-    @PutMapping("/account/{id}/job/{jid}")
-    public void updateJob(@PathVariable long id, @PathVariable long jid, @RequestHeader String apiKey, @RequestBody InJob job){
+    @PutMapping("/{jid}")
+    public void updateJob(@PathVariable long jid, @RequestHeader String apiKey, @RequestBody InJob job){
         apiService.validateAPIKey(apiKey);
 
-        if(job.getAccountID() != id || job.getJobID() != jid) throw new BadRequestException(BAD_REQUEST_IDS_MISMATCH);
+        if(job.getJobID() != jid) throw new BadRequestException(BAD_REQUEST_IDS_MISMATCH);
         Job updateJob = jobBinder.bindInput(job);
 
         jobService.updateJob(updateJob);
     }
 
-    @PostMapping("/account/{id}/job")
-    public void createJob(@PathVariable long id, @RequestHeader String apiKey, @RequestBody InJob job){
+    @PostMapping
+    public void createJob(@RequestHeader String apiKey, @RequestBody InJob job){
         apiService.validateAPIKey(apiKey);
-
-        if(job.getAccountID() != id) throw new BadRequestException(BAD_REQUEST_IDS_MISMATCH);
         Job newJob = jobBinder.bindInput(job);
-
         jobService.createJob(newJob);
     }
 
-    @DeleteMapping("/account/{id}/job/{jid}")
-    public void deleteJob(@PathVariable long id, @PathVariable long jid, @RequestHeader String apiKey){
+    @DeleteMapping("/{jid}")
+    public void deleteJob(@PathVariable long jid, @RequestHeader String apiKey){
         apiService.validateAPIKey(apiKey);
-        jobService.deleteJob(id, jid);
+        jobService.deleteJob(jid);
     }
 }

@@ -15,6 +15,7 @@ import java.util.Optional;
 import static isel.ps.employbox.api.ErrorMessages.*;
 
 @RestController
+@RequestMapping("/accounts/companies")
 public class CompanyController {
     private final CompanyBinder companyBinder;
     private final CompanyService companyService;
@@ -26,20 +27,20 @@ public class CompanyController {
         this.apiService = apiservice;
     }
 
-    @GetMapping("/account/company")
+    @GetMapping
     public List<OutCompany> getCompanies(){
         return companyBinder.bindOutput(
                 companyService.getCompanies()
         );
     }
 
-    @GetMapping("/account/company/{cid}")
+    @GetMapping("/{cid}")
     public Optional<OutCompany> getCompany(@PathVariable long cid){
         return companyService.getCompany(cid).map(companyBinder::bindOutput);
 
     }
 
-    @PostMapping("/account/company/")
+    @PostMapping
     public void setCompany(
             @RequestBody InCompany inCompany,
             @RequestHeader("apiKey") String apiKey){
@@ -49,7 +50,7 @@ public class CompanyController {
         );
     }
 
-    @PutMapping("/account/company/{id}")
+    @PutMapping("/{id}")
     public void updateCompany(
             @PathVariable long id,
             @RequestBody InCompany inCompany,
@@ -62,7 +63,7 @@ public class CompanyController {
         );
     }
 
-    @DeleteMapping("/account/company/{cid}")
+    @DeleteMapping("/{cid}")
     public void deleteCompany(
             @PathVariable long cid,
             @RequestHeader("apiKey") String apiKey){

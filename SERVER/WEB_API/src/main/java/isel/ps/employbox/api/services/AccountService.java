@@ -19,7 +19,7 @@ public final class AccountService {
         this.accountRepo = accountRepo;
     }
 
-    public List<Account> getAccountsPage() {
+    public List<Account> getAllAccounts() {
         return null;
     }
 

@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
+@RequestMapping("/accounts/{id}")
 public class FollowsController {
 
     private final ModelBinder<Account, OutAccount, InAccount, Long> accountBinder;
@@ -23,23 +24,23 @@ public class FollowsController {
         this.apiService = apiService;
     }
 
-    @GetMapping("/account/{id}/followers")
+    @GetMapping("/followers")
     public List<OutAccount> getFollowers(@PathVariable long id){
         return accountBinder.bindOutput(followService.getAccountFollowers(id));
     }
 
-    @GetMapping("/account/{id}/following")
+    @GetMapping("/following")
     public List<OutAccount> getFollowing(@PathVariable long id){
         return accountBinder.bindOutput(followService.getAccountFollowing(id));
     }
 
-    @PutMapping("/account/{id}/followers/{fid}")
+    @PutMapping("/followers/{fid}")
     public void setFollower(@PathVariable long id, @PathVariable long fid, @RequestHeader("apiKey") String apiKey){
         apiService.validateAPIKey(apiKey);
         followService.setFollower(id,fid);
     }
 
-    @DeleteMapping("/account/{id}/followers/{fid}")
+    @DeleteMapping("/followers/{fid}")
     public void deleteFollower(@PathVariable long id, @PathVariable long fid, @RequestHeader("apiKey") String apiKey){
         apiService.validateAPIKey(apiKey);
         followService.deleteFollower(id,fid);

@@ -1,5 +1,6 @@
 package isel.ps.employbox.api.controllers;
 
+import isel.ps.employbox.api.exceptions.BadRequestException;
 import isel.ps.employbox.api.model.ModelBinder;
 import isel.ps.employbox.api.model.binder.MessageBinder;
 import isel.ps.employbox.api.model.input.InChat;
@@ -14,7 +15,10 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Map;
 
+import static isel.ps.employbox.api.ErrorMessages.BAD_REQUEST_IDS_MISMATCH;
+
 @RestController
+@RequestMapping("/accounts/{id}/chats")
 public class ChatController {
     private final ModelBinder<Chat, OutChat, InChat, Long> chatBinder;
     private final ChatService chatService;
@@ -28,28 +32,26 @@ public class ChatController {
         this.apiService = apiService;
     }
 
-    @GetMapping("/account/{id}/chat")
+    @GetMapping
     public List<OutChat> getChats (@PathVariable long id){
         return chatBinder.bindOutput(chatService.getAccountChats(id));
     }
 
-    @GetMapping("/account/{id}/chat/{cid}/messages")
-    public List<OutMessage> getChatsMessages (
-            @PathVariable long id,
-            @PathVariable long cid,
-            @RequestParam Map<String,String> queryString) {
-        return messageBinder.bindOutput(chatService.getAccountChatsMessages(id,cid, queryString));
+    @GetMapping("/{cid}/messages")
+    public List<OutMessage> getChatsMessages (@PathVariable long id, @PathVariable long cid, @RequestParam String page) {
+        return messageBinder.bindOutput(chatService.getAccountChatsMessages(id,cid, page));
     }
 
-    @PostMapping("/account/{id}/chat")
+    @PostMapping
     public void createChat(@PathVariable long id, @RequestHeader("apiKey") String apiKey, @RequestBody InChat inChat) {
+        if(id != inChat.getAccountIdFirst()) throw new BadRequestException(BAD_REQUEST_IDS_MISMATCH);
         apiService.validateAPIKey(apiKey);
         chatService.createNewChat(
                 chatBinder.bindInput(inChat)
         );
     }
 
-    @PostMapping("/account/{id}/chats/{cid}/message")
+    @PostMapping("/{cid}/messages")
     public void createMessage(@PathVariable long id, @PathVariable long cid, @RequestHeader("apiKey") String apiKey, @RequestBody InMessage msg) {
         apiService.validateAPIKey(apiKey);
         chatService.createNewChatMessage(id, cid, messageBinder.bindInput(msg));

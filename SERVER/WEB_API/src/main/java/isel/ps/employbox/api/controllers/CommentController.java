@@ -14,6 +14,7 @@ import java.util.Optional;
 import static isel.ps.employbox.api.ErrorMessages.BAD_REQUEST_IDS_MISMATCH;
 
 @RestController
+@RequestMapping("/accounts/{id}/comments")
 public class CommentController {
     private final CommentService commentService;
     private final ModelBinder<Comment, OutComment, InComment, Long> commentBinder;
@@ -23,7 +24,7 @@ public class CommentController {
         this.commentBinder = commentBinder;
     }
 
-    @GetMapping("/account/{id}/comment")
+    @GetMapping
     public List<OutComment> getAllComments(@PathVariable long id, @RequestParam String type){
         if(type.equals("done") || type.equals("received"))
             return commentBinder.bindOutput(commentService.getComments(id, type));
@@ -31,25 +32,25 @@ public class CommentController {
             throw new BadRequestException("Type must be either \"done\" or \"received\"");
     }
 
-    @GetMapping("/account/{id}/comment")
+    @GetMapping
     public Optional<OutComment> getComment(@PathVariable long id, @RequestParam long accountTo){
         return commentService.getComment(id, accountTo)
                 .map(commentBinder::bindOutput);
     }
 
-    @PutMapping("/account/{id}/comment")
+    @PutMapping
     public void updateComment(@PathVariable long id, @RequestParam long accountTo, @RequestBody InComment comment){
         if(id != comment.getAccountIdFrom() || accountTo != comment.getAccountIdTo()) throw new BadRequestException(BAD_REQUEST_IDS_MISMATCH);
         commentService.updateComment(commentBinder.bindInput(comment));
     }
 
-    @PostMapping("/account/{id}/comment")
+    @PostMapping
     public void createComment(@PathVariable long id, @RequestParam long accountTo, @RequestBody InComment comment){
         if(id != comment.getAccountIdFrom() || accountTo != comment.getAccountIdTo()) throw new BadRequestException(BAD_REQUEST_IDS_MISMATCH);
         commentService.createComment(commentBinder.bindInput(comment));
     }
 
-    @DeleteMapping("/account/{id}/comment")
+    @DeleteMapping
     public void deleteComment(@PathVariable long id, @RequestParam long accountTo){
         commentService.deleteComment(id, accountTo);
     }

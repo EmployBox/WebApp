@@ -15,6 +15,7 @@ import java.util.Map;
 import static isel.ps.employbox.api.ErrorMessages.BAD_REQUEST_IDS_MISMATCH;
 
 @RestController
+@RequestMapping("/accounts/users/{id}/curricula")
 public class CurriculumController {
 
     private APIService apiService;
@@ -27,20 +28,20 @@ public class CurriculumController {
         this.curriculumBinder = curriculumBinder;
     }
 
-    @GetMapping("/account/user/{id}/curriculums")
+    @GetMapping
     public List<OutCurriculum> getAllCurriculums(@PathVariable long id, @RequestParam Map<String,String> queryString){
         return curriculumBinder.bindOutput(
                 userService.getAllCurriculums(id, queryString)
         );
     }
 
-    @GetMapping("/account/user/{id}/curriculum/{cid}")
+    @GetMapping("/{cid}")
     public OutCurriculum getCurriculum(@PathVariable long id, @PathVariable long cid){
         return curriculumBinder.bindOutput(
                 userService.getCurriculum(id, cid));
     }
 
-    @PutMapping("/account/user/{id}/curriculum/{cid}")
+    @PutMapping("/{cid}")
     public void updateCurriculum(
             @RequestHeader("apiKey") String apiKey,
             @PathVariable long id,
@@ -53,13 +54,13 @@ public class CurriculumController {
         userService.updateCurriculum(curriculum);
     }
 
-    @PostMapping("/account/user/{id}/curriculum")
+    @PostMapping
     public void createCurriculum(@RequestHeader("apiKey") String apiKey, @PathVariable long id, @RequestBody InCurriculum inCurriculum){
         apiService.validateAPIKey(apiKey);
         userService.createCurriculum(curriculumBinder.bindInput(inCurriculum));
     }
 
-    @DeleteMapping("/account/user/{id}/curriculum/{cid}")
+    @DeleteMapping("/{cid}")
     public void deleteCurriculum(@RequestHeader("apiKey") String apiKey, @PathVariable long id, @PathVariable long cid){
         apiService.validateAPIKey(apiKey);
         userService.deleteCurriculum(id, cid);

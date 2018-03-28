@@ -20,6 +20,7 @@ import java.util.Optional;
 import static isel.ps.employbox.api.ErrorMessages.BAD_REQUEST_IDS_MISMATCH;
 
 @RestController
+@RequestMapping("/accounts/users")
 public class UserController {
 
     private final UserService userService;
@@ -34,75 +35,61 @@ public class UserController {
         this.applicationBinder = applicationBinder;
     }
 
-    @GetMapping("/account/user")
+    @GetMapping
     public List<OutUser> getAllUsers(@RequestParam Map<String,String> queryString){
         return userBinder.bindOutput(userService.getAllUsers(queryString));
     }
 
-    @GetMapping("/account/user/{id}")
+    @GetMapping("/{id}")
     public Optional<OutUser> getUser(@PathVariable long id){
         return userService.getUser(id).map(userBinder::bindOutput);
     }
 
-    @GetMapping("/account/user/{id}/apply")
+    @GetMapping("/{id}/applications")
     public List<OutApplication> getAllApplications(@PathVariable long id, @RequestParam Map<String,String> queryString){
         return applicationBinder.bindOutput(
                 userService.getAllApplications(id, queryString)
         );
     }
 
-    @PutMapping("/account/user/{id}")
-    public void updateUser(
-            @RequestHeader("apiKey") String apiKey,
-            @PathVariable long id,
-            @RequestBody InUser inUser
-    ){
+    @PutMapping("/{id}")
+    public void updateUser(@RequestHeader("apiKey") String apiKey, @PathVariable long id, @RequestBody InUser inUser){
         apiService.validateAPIKey(apiKey);
         if(inUser.getId() != id) throw new BadRequestException(BAD_REQUEST_IDS_MISMATCH);
         User user = userBinder.bindInput(inUser);
         userService.updateUser(user);
     }
 
-    @PutMapping("/account/user/{id}/apply/{jid}")
-    public void updateApplication(
-            @RequestHeader("apiKey") String apiKey,
-            @PathVariable long id,
-            @PathVariable long jid,
-            @RequestBody InApplication inApplication
-    ){
+    @PutMapping("/{id}/applications/{jid}")
+    public void updateApplication(@RequestHeader("apiKey") String apiKey, @PathVariable long id, @PathVariable long jid, @RequestBody InApplication inApplication){
         apiService.validateAPIKey(apiKey);
         if(inApplication.getUserId() != id || inApplication.getJobId() != jid) throw new BadRequestException(BAD_REQUEST_IDS_MISMATCH);
         Application application = applicationBinder.bindInput(inApplication);
         userService.updateApplication(application);
     }
 
-    @PostMapping("/account/user/")
-    public void createUser(
-            @RequestHeader("apiKey") String apiKey,
-            @RequestBody InUser inUser
-    ){
+    @PostMapping
+    public void createUser(@RequestHeader("apiKey") String apiKey, @RequestBody InUser inUser){
         apiService.validateAPIKey(apiKey);
         User user = userBinder.bindInput(inUser);
         userService.createUser(user);
     }
 
-    @PostMapping("/account/user/{id}/apply/{jid}")
-    public void createApplication(
-            @RequestHeader("apiKey") String apiKey,
-            @RequestBody InApplication inApplication
-    ){
+    @PostMapping("/{id}/applications/{jid}")
+    public void createApplication(@PathVariable long id, @PathVariable long jid, @RequestHeader("apiKey") String apiKey, @RequestBody InApplication inApplication){
+        if(id != inApplication.getUserId() || jid != inApplication.getJobId()) throw new BadRequestException(BAD_REQUEST_IDS_MISMATCH);
         apiService.validateAPIKey(apiKey);
         Application application = applicationBinder.bindInput(inApplication);
         userService.createApplication(application);
     }
 
-    @DeleteMapping("/account/user/{id}")
+    @DeleteMapping("/{id}")
     public void deleteUser(@RequestHeader("apiKey") String apiKey, @PathVariable long id){
         apiService.validateAPIKey(apiKey);
         userService.deleteUser(id);
     }
 
-    @DeleteMapping("/account/user/{id}/application/{jid}")
+    @DeleteMapping("/{id}/applications/{jid}")
     public void deleteApplication(@RequestHeader("apiKey") String apiKey, @PathVariable long id, @PathVariable long jid){
         apiService.validateAPIKey(apiKey);
         userService.deleteApplication(id, jid);
