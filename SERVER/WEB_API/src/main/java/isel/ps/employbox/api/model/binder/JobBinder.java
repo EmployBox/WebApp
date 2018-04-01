@@ -23,7 +23,8 @@ public class JobBinder implements ModelBinder<Job, OutJob, InJob, Long> {
             .stream()
             .map((curr)-> new OutJob(
                 curr.getAccountID(),
-                    title, experienceBinder.bindOutput(curr.getExperiences().get()),
+                    curr.getTitle(),
+                    experienceBinder.bindOutput(curr.getExperiences().get()),
                 curr.getAddress(),
                 curr.getWage(),
                 curr.getDescription(),
@@ -41,7 +42,7 @@ public class JobBinder implements ModelBinder<Job, OutJob, InJob, Long> {
             .map((curr)-> new Job(
                 curr.getAccountID(),
                 curr.getJobID(),
-                    title, curr.getAddress(),
+                    curr.getTitle(), curr.getAddress(),
                 curr.getWage(),
                 curr.getDescription(),
                 curr.getSchedule(),
@@ -55,7 +56,7 @@ public class JobBinder implements ModelBinder<Job, OutJob, InJob, Long> {
     public OutJob bindOutput(Job job) {
         return new OutJob(
             job.getAccountID(),
-                title, experienceBinder.bindOutput(job.getExperiences().get()),
+                job.getTitle(), experienceBinder.bindOutput(job.getExperiences().get()),
             job.getAddress(),
             job.getWage(),
             job.getDescription(),
@@ -70,7 +71,7 @@ public class JobBinder implements ModelBinder<Job, OutJob, InJob, Long> {
         return new Job(
             curr.getAccountID(),
             curr.getJobID(),
-                title, curr.getAddress(),
+                curr.getTitle(), curr.getAddress(),
             curr.getWage(),
             curr.getDescription(),
             curr.getSchedule(),

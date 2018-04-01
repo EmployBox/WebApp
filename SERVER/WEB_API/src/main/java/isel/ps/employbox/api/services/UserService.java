@@ -1,11 +1,9 @@
 package isel.ps.employbox.api.services;
 
-import isel.ps.employbox.api.model.input.InCurriculum;
 import isel.ps.employbox.dal.RapperRepository;
 import isel.ps.employbox.dal.model.Application;
 import isel.ps.employbox.dal.model.Curriculum;
 import isel.ps.employbox.dal.model.User;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -74,8 +72,7 @@ public class UserService {
         userRepo.deleteById(id);
     }
 
-    public void deleteApplication(long id, long jid) {
-
+    public void deleteApplication(long aid, long jid) {
     }
 
     public void deleteCurriculum(long id, long cid) {
