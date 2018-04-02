@@ -15,7 +15,7 @@ import java.util.Map;
 import static isel.ps.employbox.api.ErrorMessages.BAD_REQUEST_IDS_MISMATCH;
 
 @RestController
-@RequestMapping("/accounts/users/{id}/curricula")
+@RequestMapping("/accounts/users/{id}/curriculum")
 public class CurriculumController {
 
     private APIService apiService;
