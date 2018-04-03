@@ -15,7 +15,7 @@ public class UserBinder implements ModelBinder<User, OutUser, InUser, Long> {
     public List<OutUser> bindOutput(List<User> list) {
         return list
                 .stream()
-                .map(user -> new OutUser(user.getIdentityKey(), user.getName(), user.getEmail(), user.getPhotoUrl(), user.getSummary(), user.getRating()))
+                .map(this::bindOutput)
                 .collect(Collectors.toList());
     }
 
@@ -23,13 +23,13 @@ public class UserBinder implements ModelBinder<User, OutUser, InUser, Long> {
     public List<User> bindInput(List<InUser> list) {
         return list
                 .stream()
-                .map(inUser -> new User(inUser.getEmail(), inUser.getPassword(), 0, inUser.getName(), inUser.getSummary(), inUser.getPhoto_url()))
+                .map(this::bindInput)
                 .collect(Collectors.toList());
     }
 
     @Override
     public OutUser bindOutput(User user) {
-        return new OutUser(user.getIdentityKey(), user.getName(), user.getEmail(), user.getPhotoUrl(), user.getSummary(), user.getRating());
+        return new OutUser(user.getAccountID(), user.getName(), user.getEmail(), user.getPhotoUrl(), user.getSummary(), user.getRating());
     }
 
     @Override

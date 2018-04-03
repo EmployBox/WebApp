@@ -18,19 +18,9 @@ public class CompanyBinder implements ModelBinder<Company, OutCompany, InCompany
 
     @Override
     public List<Company> bindInput(List<InCompany> list) {
-        return list.stream()
-                .map(curr -> new Company(
-                        curr.getAccountId(),
-                        curr.getEmail(),
-                        curr.getPassword(),
-                        curr.getRating(),
-                        curr.getName(),
-                        curr.getSpecialization(),
-                        curr.getYearFounded(),
-                        curr.getLogoUrl(),
-                        curr.getWebpageUrl(),
-                        curr.getDescription()
-                ))
+        return list
+                .stream()
+                .map(this::bindInput)
                 .collect(Collectors.toList());
     }
 
@@ -41,17 +31,7 @@ public class CompanyBinder implements ModelBinder<Company, OutCompany, InCompany
 
     @Override
     public Company bindInput(InCompany obj) {
-
-        return new Company(
-                obj.getAccountId(),
-                obj.getEmail(),
-                obj.getPassword(),
-                obj.getRating(),
-                obj.getName(),
-                obj.getSpecialization(),
-                obj.getYearFounded(),
-                obj.getLogoUrl(),
-                obj.getWebpageUrl(),
-                obj.getDescription());
+        return new Company(obj.getAccountId(), obj.getEmail(), obj.getPassword(), obj.getRating(), obj.getName(), obj.getSpecialization(), obj.getYearFounded(), obj.getLogoUrl(),
+                obj.getWebpageUrl(), obj.getDescription());
     }
 }

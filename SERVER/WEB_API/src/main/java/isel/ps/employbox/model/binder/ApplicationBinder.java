@@ -15,7 +15,7 @@ public class ApplicationBinder implements ModelBinder<Application, OutApplicatio
     public List<OutApplication> bindOutput(List<Application> list) {
         return list
                 .stream()
-                .map( (curr)-> new OutApplication (curr.getUserId(), curr.getJobId(), curr.getCurriculumId(), curr.getDate() ))
+                .map(this::bindOutput)
                 .collect(Collectors.toList());
     }
 
@@ -23,7 +23,7 @@ public class ApplicationBinder implements ModelBinder<Application, OutApplicatio
     public List<Application> bindInput(List<InApplication> list) {
         return list
                 .stream()
-                .map((curr-> new Application( curr.getUserId(), curr.getJobId(), curr.getCurriculumId(), curr.getDate() )))
+                .map(this::bindInput)
                 .collect(Collectors.toList());
     }
 

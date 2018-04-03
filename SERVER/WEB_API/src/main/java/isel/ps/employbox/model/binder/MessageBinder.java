@@ -17,7 +17,7 @@ public class MessageBinder implements ModelBinder<Message, OutMessage, InMessage
     public List<OutMessage> bindOutput(List<Message> list) {
         return list
             .stream()
-            .map(curr-> new OutMessage(curr.getMessageId(),curr.getChadId(),curr.getDate(), curr.getText()) )
+            .map(this::bindOutput)
             .collect(Collectors.toList());
     }
 
@@ -25,7 +25,7 @@ public class MessageBinder implements ModelBinder<Message, OutMessage, InMessage
     public List<Message> bindInput(List<InMessage> list) {
         return list
             .stream()
-            .map(curr-> new Message(curr.getChatId(), curr.getText(),curr.getDate()) )
+            .map(this::bindInput)
             .collect(Collectors.toList());
     }
 

@@ -32,8 +32,6 @@ public class CurriculumBinder implements ModelBinder<Curriculum, OutCurriculum, 
 
     @Override
     public Curriculum bindInput(InCurriculum obj) {
-
-        return new Curriculum(obj.getId(),
-                obj.getTitle());
+        return new Curriculum(obj.getId(), obj.getTitle());
     }
 }
