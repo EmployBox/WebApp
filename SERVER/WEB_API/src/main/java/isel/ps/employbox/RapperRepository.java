@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Component
-public interface RapperRepository<T, K > {
+public interface RapperRepository<T, K >{
 
   Optional<T> findById(K k);
 

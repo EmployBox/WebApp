@@ -5,10 +5,12 @@ import isel.ps.employbox.model.entities.Application;
 import isel.ps.employbox.model.entities.Curriculum;
 import isel.ps.employbox.model.entities.User;
 import org.springframework.stereotype.Service;
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 @Service
 public class UserService {
@@ -17,7 +19,7 @@ public class UserService {
     private RapperRepository<Curriculum, Long> curriculumRepo;
     private RapperRepository<Application, Long> applicationRepo;
 
-    public List<User> getAllUsers(Map<String, String> queryString) {
+    public Stream<User> getAllUsers(Map<String, String> queryString) {
         String name = queryString.get("name");
         String academicInstitution = queryString.get("academicInstitution");
         String job = queryString.get("job");
@@ -32,7 +34,7 @@ public class UserService {
         return userRepo.findById(id);
     }
 
-    public List<Application> getAllApplications(long id, Map<String, String> queryString) {
+    public Stream<Application> getAllApplications(long id, Map<String, String> queryString) {
         return null;
     }
 
@@ -77,5 +79,9 @@ public class UserService {
 
     public void deleteCurriculum(long id, long cid) {
         
+    }
+
+    public Application getApplication(long id) {
+        throw new NotImplementedException();
     }
 }

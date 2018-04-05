@@ -1,35 +1,24 @@
 package isel.ps.employbox.model.binder;
 
+import isel.ps.employbox.model.entities.User;
 import isel.ps.employbox.model.input.InUser;
 import isel.ps.employbox.model.output.OutUser;
-import isel.ps.employbox.model.ModelBinder;
-import isel.ps.employbox.model.entities.User;
+import org.springframework.hateoas.Resource;
 import org.springframework.stereotype.Component;
 
-import java.util.List;
-import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Component
-public class UserBinder implements ModelBinder<User, OutUser, InUser, Long> {
+public class UserBinder extends ModelBinder<User, OutUser, InUser> {
+
     @Override
-    public List<OutUser> bindOutput(List<User> list) {
-        return list
-                .stream()
-                .map(this::bindOutput)
-                .collect(Collectors.toList());
+    Stream<User> bindInput(Stream<InUser> list) {
+        return null;
     }
 
     @Override
-    public List<User> bindInput(List<InUser> list) {
-        return list
-                .stream()
-                .map(this::bindInput)
-                .collect(Collectors.toList());
-    }
-
-    @Override
-    public OutUser bindOutput(User user) {
-        return new OutUser(user.getAccountID(), user.getName(), user.getEmail(), user.getPhotoUrl(), user.getSummary(), user.getRating());
+    public Resource<OutUser> bindOutput(User user) {
+        return new Resource( new OutUser(user.getAccountID(), user.getName(), user.getEmail(), user.getPhotoUrl(), user.getSummary(), user.getRating()));
     }
 
     @Override

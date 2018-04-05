@@ -1,32 +1,29 @@
 package isel.ps.employbox.model.binder;
 
-import isel.ps.employbox.model.ModelBinder;
+import isel.ps.employbox.model.entities.Rating;
 import isel.ps.employbox.model.input.InRating;
 import isel.ps.employbox.model.output.OutRating;
-import isel.ps.employbox.model.entities.Rating;
+import org.springframework.hateoas.Resource;
 import org.springframework.stereotype.Component;
 
-import java.util.List;
+import java.util.stream.Stream;
 
 @Component
-public class RatingBinder implements ModelBinder<Rating, OutRating, InRating, String> {
+public class RatingBinder extends ModelBinder<Rating, OutRating, InRating> {
+
+
     @Override
-    public List<OutRating> bindOutput(List<Rating> list) {
+    Stream<Rating> bindInput(Stream<InRating> list) {
         return null;
     }
 
     @Override
-    public List<Rating> bindInput(List<InRating> list) {
+    Resource<OutRating> bindOutput(Rating object) {
         return null;
     }
 
     @Override
-    public OutRating bindOutput(Rating object) {
-        return null;
-    }
-
-    @Override
-    public Rating bindInput(InRating object) {
+    Rating bindInput(InRating object) {
         return null;
     }
 }

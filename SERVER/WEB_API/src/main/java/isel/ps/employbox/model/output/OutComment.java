@@ -1,71 +1,38 @@
 package isel.ps.employbox.model.output;
 
-import isel.ps.employbox.model.input.InComment;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import isel.ps.employbox.controllers.CommentController;
+import org.springframework.hateoas.ResourceSupport;
 
-import java.util.List;
+import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 
-public class OutComment {
-    private long accountIdFrom;
-    private long accountIdTo;
-    private long commmentId;
-    private long mainCommentId;
-    private String datetime;
-    private String text;
-    private List<InComment> replies;
+public class OutComment extends ResourceSupport {
 
-    public long getAccountIdFrom() {
-        return accountIdFrom;
-    }
+    @JsonProperty
+    private final long accountIdFrom;
 
-    public void setAccountIdFrom(long accountIdFrom) {
+    @JsonProperty
+    private final long accountIdTo;
+
+    @JsonProperty
+    private final long commmentId;
+
+    @JsonProperty
+    private final long mainCommentId;
+
+    @JsonProperty
+    private final String datetime;
+
+    @JsonProperty
+    private final String text;
+
+    public OutComment(long accountIdFrom, long accountIdTo, long commmentId, long mainCommentId, String datetime, String text) {
         this.accountIdFrom = accountIdFrom;
-    }
-
-    public long getAccountIdTo() {
-        return accountIdTo;
-    }
-
-    public void setAccountIdTo(long accountIdTo) {
         this.accountIdTo = accountIdTo;
-    }
-
-    public long getCommmentId() {
-        return commmentId;
-    }
-
-    public void setCommmentId(long commmentId) {
         this.commmentId = commmentId;
-    }
-
-    public long getMainCommentId() {
-        return mainCommentId;
-    }
-
-    public void setMainCommentId(long mainCommentId) {
         this.mainCommentId = mainCommentId;
-    }
-
-    public String getDatetime() {
-        return datetime;
-    }
-
-    public void setDatetime(String datetime) {
         this.datetime = datetime;
-    }
-
-    public String getText() {
-        return text;
-    }
-
-    public void setText(String text) {
         this.text = text;
-    }
-
-    public List<InComment> getReplies() {
-        return replies;
-    }
-
-    public void setReplies(List<InComment> replies) {
-        this.replies = replies;
+        this.add( linkTo (CommentController.class, accountIdFrom).slash(commmentId).withSelfRel());
     }
 }

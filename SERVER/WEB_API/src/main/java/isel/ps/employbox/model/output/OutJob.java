@@ -1,23 +1,67 @@
 package isel.ps.employbox.model.output;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import isel.ps.employbox.controllers.JobController;
+import isel.ps.employbox.controllers.UserController;
+import org.springframework.hateoas.ResourceSupport;
+
 import java.sql.Date;
 import java.util.List;
 
-public class OutJob {
-    private final long accountID;
-    private final String title;
-    private final List<OutExperience> experiences;
-    private final String address;
-    private final double wage;
-    private final String description;
-    private final String schedule;
-    private final Date offerBeginDate;
-    private final Date offerEndDate;
-    private final String offerType;
-    private final String applications_url;
+import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
+import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 
-    public OutJob(long accountID, String title, List<OutExperience> experiences, String address, double wage, String description, String schedule, Date offerBeginDate, Date offerEndDate, String offerType) {
+public class OutJob extends ResourceSupport {
+
+    @JsonProperty
+    private final long accountID;
+
+    @JsonProperty
+    private final long jobId;
+
+    @JsonProperty
+    private final String title;
+
+    @JsonProperty
+    private final List<OutExperience> experiences;
+
+    @JsonProperty
+    private final String address;
+
+    @JsonProperty
+    private final double wage;
+
+    @JsonProperty
+    private final String description;
+
+    @JsonProperty
+    private final String schedule;
+
+    @JsonProperty
+    private final Date offerBeginDate;
+
+    @JsonProperty
+    private final Date offerEndDate;
+
+    @JsonProperty
+    private final String offerType;
+
+
+    public OutJob(
+            long accountID,
+            long jobId,
+            String title,
+            List<OutExperience> experiences,
+            String address,
+            double wage,
+            String description,
+            String schedule,
+            Date offerBeginDate,
+            Date offerEndDate,
+            String offerType)
+    {
         this.accountID = accountID;
+        this.jobId = jobId;
         this.title = title;
         this.experiences = experiences;
         this.address = address;
@@ -27,70 +71,19 @@ public class OutJob {
         this.offerBeginDate = offerBeginDate;
         this.offerEndDate = offerEndDate;
         this.offerType = offerType;
-        this.applications_url = String.format("/account/user/%d/applications", accountID);
+        this.add( linkTo (JobController.class).slash(jobId).withSelfRel());
+        this.add( linkTo ( methodOn(UserController.class).getAllApplications(accountID,null)).withRel("applications"));
     }
 
-    public long getAccountID() {
-        return accountID;
-    }
+    public class OutExperience extends ResourceSupport{
+        @JsonProperty
+        private final String competence;
 
-    public List<OutExperience> getExperiences() {
-        return experiences;
-    }
+        @JsonProperty
+        private final int years;
 
-    public String getAddress() {
-        return address;
-    }
-
-    public double getWage() {
-        return wage;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public String getSchedule() {
-        return schedule;
-    }
-
-    public Date getOfferBeginDate() {
-        return offerBeginDate;
-    }
-
-    public Date getOfferEndDate() {
-        return offerEndDate;
-    }
-
-    public String getOfferType() {
-        return offerType;
-    }
-
-    public String getApplications_url() {
-        return applications_url;
-    }
-
-    public String getTitle() {
-        return title;
-    }
-
-    public class OutExperience {
-        private String competence;
-        private int years;
-
-        public String getCompetence() {
-            return competence;
-        }
-
-        public void setCompetence(String competence) {
+        public OutExperience(String competence, int years) {
             this.competence = competence;
-        }
-
-        public int getYears() {
-            return years;
-        }
-
-        public void setYears(int years) {
             this.years = years;
         }
     }

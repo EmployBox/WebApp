@@ -1,32 +1,28 @@
 package isel.ps.employbox.model.binder;
 
-import isel.ps.employbox.model.ModelBinder;
+import isel.ps.employbox.model.entities.Comment;
 import isel.ps.employbox.model.input.InComment;
 import isel.ps.employbox.model.output.OutComment;
-import isel.ps.employbox.model.entities.Comment;
+import org.springframework.hateoas.Resource;
 import org.springframework.stereotype.Component;
 
-import java.util.List;
+import java.util.stream.Stream;
 
 @Component
-public class CommentBinder implements ModelBinder<Comment, OutComment, InComment, Long> {
+public class CommentBinder extends ModelBinder<Comment, OutComment, InComment> {
+
     @Override
-    public List<OutComment> bindOutput(List<Comment> list) {
+    Stream<Comment> bindInput(Stream<InComment> list) {
         return null;
     }
 
     @Override
-    public List<Comment> bindInput(List<InComment> list) {
+    Resource<OutComment> bindOutput(Comment object) {
         return null;
     }
 
     @Override
-    public OutComment bindOutput(Comment object) {
-        return null;
-    }
-
-    @Override
-    public Comment bindInput(InComment object) {
+    Comment bindInput(InComment object) {
         return null;
     }
 }

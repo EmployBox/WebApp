@@ -1,35 +1,24 @@
 package isel.ps.employbox.model.binder;
 
+import isel.ps.employbox.model.entities.Application;
 import isel.ps.employbox.model.input.InApplication;
 import isel.ps.employbox.model.output.OutApplication;
-import isel.ps.employbox.model.ModelBinder;
-import isel.ps.employbox.model.entities.Application;
+import org.springframework.hateoas.Resource;
 import org.springframework.stereotype.Component;
 
-import java.util.List;
-import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Component
-public class ApplicationBinder implements ModelBinder<Application, OutApplication, InApplication, String> {
-    @Override
-    public List<OutApplication> bindOutput(List<Application> list) {
-        return list
-                .stream()
-                .map(this::bindOutput)
-                .collect(Collectors.toList());
+public class ApplicationBinder extends ModelBinder<Application, OutApplication, InApplication>{
+
+
+    public Resource<OutApplication> bindOutput(Application obj) {
+        return new Resource( new OutApplication (obj.getUserId(), obj.getJobId(), obj.getCurriculumId(), obj.getDate()));
     }
 
     @Override
-    public List<Application> bindInput(List<InApplication> list) {
-        return list
-                .stream()
-                .map(this::bindInput)
-                .collect(Collectors.toList());
-    }
-
-    @Override
-    public OutApplication bindOutput(Application obj) {
-        return new OutApplication (obj.getUserId(), obj.getJobId(), obj.getCurriculumId(), obj.getDate());
+    Stream<Application> bindInput(Stream<InApplication> list) {
+        return null;
     }
 
     @Override

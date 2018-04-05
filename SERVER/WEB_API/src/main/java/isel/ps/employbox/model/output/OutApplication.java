@@ -1,11 +1,26 @@
 package isel.ps.employbox.model.output;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import isel.ps.employbox.controllers.UserController;
+import org.springframework.hateoas.ResourceSupport;
+
 import java.sql.Date;
 
-public class OutApplication {
+import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
+import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
+
+public class OutApplication extends ResourceSupport {
+
+    @JsonProperty
     private long userId;
+
+    @JsonProperty
     private long jobId;
+
+    @JsonProperty
     private long curriculumId;
+
+    @JsonProperty
     private Date date;
 
     public OutApplication(long userId, long jobId, long curriculumId, Date date){
@@ -13,37 +28,6 @@ public class OutApplication {
         this.jobId = jobId;
         this.curriculumId = curriculumId;
         this.date = date;
-    }
-
-    public long getUserId() {
-        return userId;
-    }
-
-    public void setUserId(long userId) {
-        this.userId = userId;
-    }
-
-    public long getJobId() {
-        return jobId;
-    }
-
-    public void setJobId(long jobId) {
-        this.jobId = jobId;
-    }
-
-    public long getCurriculumId() {
-        return curriculumId;
-    }
-
-    public void setCurriculumId(long curriculumId) {
-        this.curriculumId = curriculumId;
-    }
-
-    public Date getDate() {
-        return date;
-    }
-
-    public void setDate(Date date) {
-        this.date = date;
+        this.add( linkTo( methodOn(UserController.class,userId)).slash(userId).withSelfRel());
     }
 }

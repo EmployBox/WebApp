@@ -1,7 +1,7 @@
 package isel.ps.employbox.controllers;
 
 import isel.ps.employbox.exceptions.BadRequestException;
-import isel.ps.employbox.model.ModelBinder;
+import isel.ps.employbox.model.binder.ModelBinder;
 import isel.ps.employbox.model.input.InRating;
 import isel.ps.employbox.model.output.OutRating;
 import isel.ps.employbox.services.RatingService;

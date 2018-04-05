@@ -1,32 +1,24 @@
 package isel.ps.employbox.model.binder;
 
+import isel.ps.employbox.model.entities.Curriculum;
 import isel.ps.employbox.model.input.InCurriculum;
 import isel.ps.employbox.model.output.OutCurriculum;
-import isel.ps.employbox.model.ModelBinder;
-import isel.ps.employbox.model.entities.Curriculum;
+import org.springframework.hateoas.Resource;
 import org.springframework.stereotype.Component;
 
-import java.util.List;
-import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Component
-public class CurriculumBinder implements ModelBinder<Curriculum, OutCurriculum, InCurriculum, String> {
+public class CurriculumBinder extends ModelBinder<Curriculum, OutCurriculum, InCurriculum > {
+
 
     @Override
-    public List<OutCurriculum> bindOutput(List<Curriculum> list) {
-        return null;
+    public Stream<Curriculum> bindInput(Stream<InCurriculum> list) {
+        return list.map(curr-> new Curriculum(curr.getId(), curr.getTitle()));
     }
 
     @Override
-    public List<Curriculum> bindInput(List<InCurriculum> list) {
-        return list
-                .stream()
-                .map(curr-> new Curriculum(curr.getId(), curr.getTitle()))
-                .collect(Collectors.toList());
-    }
-
-    @Override
-    public OutCurriculum bindOutput(Curriculum object) {
+    public Resource<OutCurriculum> bindOutput(Curriculum object) {
         return null;
     }
 

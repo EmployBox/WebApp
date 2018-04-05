@@ -1,11 +1,9 @@
 package isel.ps.employbox.controllers;
 
-import isel.ps.employbox.model.ModelBinder;
-import isel.ps.employbox.model.input.InAccount;
+import isel.ps.employbox.model.binder.AccountBinder;
 import isel.ps.employbox.model.output.OutAccount;
 import isel.ps.employbox.services.APIService;
 import isel.ps.employbox.services.FollowService;
-import isel.ps.employbox.model.entities.Account;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -14,11 +12,11 @@ import java.util.List;
 @RequestMapping("/accounts/{id}")
 public class FollowsController {
 
-    private final ModelBinder<Account, OutAccount, InAccount, Long> accountBinder;
+    private final AccountBinder accountBinder;
     private final FollowService followService;
     private final APIService apiService;
 
-    public FollowsController(ModelBinder<Account, OutAccount, InAccount, Long> accountBinder, FollowService followService, APIService apiService) {
+    public FollowsController(AccountBinder accountBinder, FollowService followService, APIService apiService) {
         this.accountBinder = accountBinder;
         this.followService = followService;
         this.apiService = apiService;

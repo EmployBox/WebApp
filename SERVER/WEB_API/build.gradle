@@ -25,8 +25,10 @@ repositories {
 
 dependencies {
     compile group: 'org.springframework.boot', name: 'spring-boot-starter-web', version: '2.0.0.RELEASE'
-    compile group: 'org.springframework.hateoas', name: 'spring-hateoas', version: '0.23.0.RELEASE'
+    compile group: 'org.springframework.hateoas', name: 'spring-hateoas', version: '0.24.0.RELEASE'
+    compile group: 'org.springframework.plugin', name: 'spring-plugin-core', version: '1.2.0.RELEASE'
     compile group: 'com.microsoft.sqlserver', name: 'mssql-jdbc', version: '6.3.6.jre8-preview'
+    compile ("org.springframework.boot:spring-boot-starter-security")
     testCompile('org.springframework.boot:spring-boot-starter-test')
     compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
 }

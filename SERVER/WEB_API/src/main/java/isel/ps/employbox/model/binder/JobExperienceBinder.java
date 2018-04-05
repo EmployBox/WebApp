@@ -1,32 +1,28 @@
 package isel.ps.employbox.model.binder;
 
-import isel.ps.employbox.model.ModelBinder;
+import isel.ps.employbox.model.entities.JobExperience;
 import isel.ps.employbox.model.input.InJob;
 import isel.ps.employbox.model.output.OutJob;
-import isel.ps.employbox.model.entities.JobExperience;
+import org.springframework.hateoas.Resource;
 import org.springframework.stereotype.Component;
 
-import java.util.List;
+import java.util.stream.Stream;
 
 @Component
-public class JobExperienceBinder implements ModelBinder<JobExperience, OutJob.OutExperience, InJob.InExperience, Long> {
+public class JobExperienceBinder extends ModelBinder<JobExperience, OutJob.OutExperience, InJob.InExperience> {
+
     @Override
-    public List<OutJob.OutExperience> bindOutput(List<JobExperience> list) {
+    Stream<JobExperience> bindInput(Stream<InJob.InExperience> list) {
         return null;
     }
 
     @Override
-    public List<JobExperience> bindInput(List<InJob.InExperience> list) {
+    Resource<OutJob.OutExperience> bindOutput(JobExperience object) {
         return null;
     }
 
     @Override
-    public OutJob.OutExperience bindOutput(JobExperience object) {
-        return null;
-    }
-
-    @Override
-    public JobExperience bindInput(InJob.InExperience object) {
+    JobExperience bindInput(InJob.InExperience object) {
         return null;
     }
 }

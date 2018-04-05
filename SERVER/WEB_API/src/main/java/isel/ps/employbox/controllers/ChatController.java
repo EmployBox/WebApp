@@ -1,15 +1,15 @@
 package isel.ps.employbox.controllers;
 
 import isel.ps.employbox.exceptions.BadRequestException;
-import isel.ps.employbox.model.ModelBinder;
 import isel.ps.employbox.model.binder.MessageBinder;
+import isel.ps.employbox.model.binder.ModelBinder;
+import isel.ps.employbox.model.entities.Chat;
 import isel.ps.employbox.model.input.InChat;
 import isel.ps.employbox.model.input.InMessage;
-import isel.ps.employbox.model.output.OutChat;
 import isel.ps.employbox.model.output.OutMessage;
 import isel.ps.employbox.services.APIService;
 import isel.ps.employbox.services.ChatService;
-import isel.ps.employbox.model.entities.Chat;
+import org.springframework.hateoas.Resource;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -54,5 +54,10 @@ public class ChatController {
     public void createMessage(@PathVariable long id, @PathVariable long cid, @RequestHeader("apiKey") String apiKey, @RequestBody InMessage msg) {
         apiService.validateAPIKey(apiKey);
         chatService.createNewChatMessage(id, cid, messageBinder.bindInput(msg));
+    }
+
+    @GetMapping("/{cid}/messages/{mid}")
+    public Resource<OutMessage> getChatMessage(@PathVariable long cid, @PathVariable long mid) {
+        return messageBinder.bindOutput( chatService.getAccountChatsMessage(cid, mid) );
     }
 }

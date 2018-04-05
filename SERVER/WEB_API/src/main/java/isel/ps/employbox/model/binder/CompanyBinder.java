@@ -1,37 +1,40 @@
 package isel.ps.employbox.model.binder;
 
+import isel.ps.employbox.model.entities.Company;
 import isel.ps.employbox.model.input.InCompany;
 import isel.ps.employbox.model.output.OutCompany;
-import isel.ps.employbox.model.ModelBinder;
-import isel.ps.employbox.model.entities.Company;
+import org.springframework.hateoas.Resource;
 import org.springframework.stereotype.Component;
 
-import java.util.List;
-import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Component
-public class CompanyBinder implements ModelBinder<Company, OutCompany, InCompany, Long> {
+public class CompanyBinder extends ModelBinder<Company, OutCompany, InCompany> {
+
+
     @Override
-    public List<OutCompany> bindOutput(List<Company> list) {
-        return null;
+    public Stream<Company> bindInput(Stream<InCompany> list) {
+        return list.map(this::bindInput);
     }
 
     @Override
-    public List<Company> bindInput(List<InCompany> list) {
-        return list
-                .stream()
-                .map(this::bindInput)
-                .collect(Collectors.toList());
-    }
-
-    @Override
-    public OutCompany bindOutput(Company object) {
+    public Resource<OutCompany> bindOutput(Company object) {
         return null;
     }
 
     @Override
     public Company bindInput(InCompany obj) {
-        return new Company(obj.getAccountId(), obj.getEmail(), obj.getPassword(), obj.getRating(), obj.getName(), obj.getSpecialization(), obj.getYearFounded(), obj.getLogoUrl(),
-                obj.getWebpageUrl(), obj.getDescription());
+        return new Company(
+                obj.getAccountId(),
+                obj.getEmail(),
+                obj.getPassword(),
+                obj.getRating(),
+                obj.getName(),
+                obj.getSpecialization(),
+                obj.getYearFounded(),
+                obj.getLogoUrl(),
+                obj.getWebpageUrl(),
+                obj.getDescription())
+                ;
     }
 }

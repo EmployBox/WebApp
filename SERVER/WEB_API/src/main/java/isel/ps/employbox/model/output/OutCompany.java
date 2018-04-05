@@ -1,49 +1,50 @@
 package isel.ps.employbox.model.output;
 
-public class OutCompany {
-    private String accountId;
-    private String email;
-    private float rating;
-    private String name;
-    private String specialization;
-    private short yearFounded;
-    private String logoUrl;
-    private String webpageUrl;
-    private String description;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import isel.ps.employbox.controllers.CompanyController;
+import org.springframework.hateoas.ResourceSupport;
 
-    public String getEmail() { return email; }
+import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 
-    public void setEmail(String email) { this.email = email; }
+public class OutCompany extends ResourceSupport {
 
-    public float getRating() { return rating; }
+    @JsonProperty
+    private final String accountId;
 
-    public void setRating(float rating) { this.rating = rating; }
+    @JsonProperty
+    private final String email;
 
-    public String getName() { return name; }
+    @JsonProperty
+    private final float rating;
 
-    public void setName(String name) { this.name = name; }
+    @JsonProperty
+    private final String name;
 
-    public String getSpecialization() { return specialization; }
+    @JsonProperty
+    private final String specialization;
 
-    public void setSpecialization(String specialization) { this.specialization = specialization; }
+    @JsonProperty
+    private final short yearFounded;
 
-    public short getYearFounded() { return yearFounded; }
+    @JsonProperty
+    private final String logoUrl;
 
-    public void setYearFounded(short yearFounded) { this.yearFounded = yearFounded; }
+    @JsonProperty
+    private final String webpageUrl;
 
-    public String getLogoUrl() { return logoUrl; }
+    @JsonProperty
+    private final String description;
 
-    public void setLogoUrl(String logoUrl) { this.logoUrl = logoUrl; }
-
-    public String getWebpageUrl() { return webpageUrl; }
-
-    public void setWebpageUrl(String webpageUrl) { this.webpageUrl = webpageUrl; }
-
-    public String getDescription() { return description; }
-
-    public void setDescription(String description) { this.description = description; }
-
-    public String getAccountId() { return accountId; }
-
-    public void setAccountId(String accountId) { this.accountId = accountId; }
+    public OutCompany(String accountId, String email, float rating, String name, String specialization, short yearFounded, String logoUrl, String webpageUrl, String description) {
+        this.accountId = accountId;
+        this.email = email;
+        this.rating = rating;
+        this.name = name;
+        this.specialization = specialization;
+        this.yearFounded = yearFounded;
+        this.logoUrl = logoUrl;
+        this.webpageUrl = webpageUrl;
+        this.description = description;
+        this.add( linkTo(CompanyController.class).slash(accountId).withSelfRel());
+    }
 }

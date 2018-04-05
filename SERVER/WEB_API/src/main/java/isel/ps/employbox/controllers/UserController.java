@@ -3,14 +3,16 @@ package isel.ps.employbox.controllers;
 import isel.ps.employbox.exceptions.BadRequestException;
 import isel.ps.employbox.model.binder.ApplicationBinder;
 import isel.ps.employbox.model.binder.UserBinder;
+import isel.ps.employbox.model.entities.Application;
+import isel.ps.employbox.model.entities.User;
 import isel.ps.employbox.model.input.InApplication;
 import isel.ps.employbox.model.input.InUser;
+import isel.ps.employbox.model.output.HalCollection;
 import isel.ps.employbox.model.output.OutApplication;
 import isel.ps.employbox.model.output.OutUser;
 import isel.ps.employbox.services.APIService;
 import isel.ps.employbox.services.UserService;
-import isel.ps.employbox.model.entities.Application;
-import isel.ps.employbox.model.entities.User;
+import org.springframework.hateoas.Resource;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -36,19 +38,28 @@ public class UserController {
     }
 
     @GetMapping
-    public List<OutUser> getAllUsers(@RequestParam Map<String,String> queryString){
+    public Resource<HalCollection> getAllUsers(@RequestParam Map<String,String> queryString){
         return userBinder.bindOutput(userService.getAllUsers(queryString));
     }
 
     @GetMapping("/{id}")
-    public Optional<OutUser> getUser(@PathVariable long id){
+    public Resource<OutUser> getUser(@PathVariable long id){
         return userService.getUser(id).map(userBinder::bindOutput);
     }
 
     @GetMapping("/{id}/applications")
-    public List<OutApplication> getAllApplications(@PathVariable long id, @RequestParam Map<String,String> queryString){
+    public Resource<HalCollection> getAllApplications(@PathVariable long id, @RequestParam Map<String,String> queryString){
         return applicationBinder.bindOutput(
-                userService.getAllApplications(id, queryString)
+                userService.getAllApplications(id, queryString),
+                this.getClass(),
+                id
+        );
+    }
+
+    @GetMapping("/{id}/applications/{jid}")
+    public Resource<OutApplication> getApplication(@PathVariable long id, @RequestParam Map<String,String> queryString){
+        return applicationBinder.bindOutput(
+                userService.getApplication(id)
         );
     }
 

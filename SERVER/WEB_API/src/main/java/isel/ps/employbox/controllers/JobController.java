@@ -16,7 +16,7 @@ import java.util.Optional;
 import static isel.ps.employbox.ErrorMessages.BAD_REQUEST_IDS_MISMATCH;
 
 @RestController
-@RequestMapping("/jobs")
+@RequestMapping("/accounts/jobs")
 public class JobController {
     private final JobService jobService;
     private final APIService apiService;

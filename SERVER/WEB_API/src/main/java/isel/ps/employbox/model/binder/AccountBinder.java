@@ -1,33 +1,29 @@
 package isel.ps.employbox.model.binder;
 
-import isel.ps.employbox.model.ModelBinder;
+import isel.ps.employbox.model.entities.Account;
 import isel.ps.employbox.model.input.InAccount;
 import isel.ps.employbox.model.output.OutAccount;
-import isel.ps.employbox.model.entities.Account;
+import org.springframework.hateoas.Resource;
 import org.springframework.stereotype.Component;
 
-import java.util.List;
+import java.util.stream.Stream;
 
 @Component
-public class AccountBinder implements ModelBinder<Account, OutAccount, InAccount, Long> {
+public class AccountBinder extends ModelBinder<Account, OutAccount, InAccount> {
+
 
     @Override
-    public List<OutAccount> bindOutput(List<Account> list) {
+    Stream<Account> bindInput(Stream<InAccount> list) {
         return null;
     }
 
     @Override
-    public List<Account> bindInput(List<InAccount> list) {
+    Resource<OutAccount> bindOutput(Account object) {
         return null;
     }
 
     @Override
-    public OutAccount bindOutput(Account object) {
-        return null;
-    }
-
-    @Override
-    public Account bindInput(InAccount object) {
+    Account bindInput(InAccount object) {
         return null;
     }
 }

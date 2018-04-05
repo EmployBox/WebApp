@@ -18,6 +18,11 @@ public class ChatService {
         throw new NotImplementedException();
     }
 
+    public Message getAccountChatsMessage( long cid, long mid) {
+        throw new NotImplementedException();
+    }
+
+
     public void createNewChat(Chat inChat) {
         throw new NotImplementedException();
     }
