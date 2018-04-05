@@ -1,15 +1,13 @@
 package isel.ps.employbox.controllers;
 
 import isel.ps.employbox.exceptions.BadRequestException;
-import isel.ps.employbox.model.binder.ModelBinder;
+import isel.ps.employbox.model.binder.RatingBinder;
 import isel.ps.employbox.model.input.InRating;
+import isel.ps.employbox.model.output.HalCollection;
 import isel.ps.employbox.model.output.OutRating;
 import isel.ps.employbox.services.RatingService;
-import isel.ps.employbox.model.entities.Rating;
+import org.springframework.hateoas.Resource;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
-import java.util.Optional;
 
 import static isel.ps.employbox.ErrorMessages.BAD_REQUEST_IDS_MISMATCH;
 
@@ -17,26 +15,29 @@ import static isel.ps.employbox.ErrorMessages.BAD_REQUEST_IDS_MISMATCH;
 @RequestMapping("/accounts/{id}/ratings")
 public class RatingController {
 
-    private final ModelBinder<Rating, OutRating, InRating, String> ratingBinder;
+    private final RatingBinder ratingBinder;
     private final RatingService ratingService;
 
-    public RatingController(ModelBinder<Rating, OutRating, InRating, String> ratingBinder, RatingService ratingService) {
+    public RatingController(RatingBinder ratingBinder, RatingService ratingService) {
         this.ratingBinder = ratingBinder;
         this.ratingService = ratingService;
     }
 
     @GetMapping
-    public List<OutRating> getRatings(@PathVariable long id, @RequestParam String type){
+    public Resource<HalCollection> getRatings(@PathVariable long id, @RequestParam String type){
         if(type.equals("done") || type.equals("received"))
-            return ratingBinder.bindOutput(ratingService.getRatings(id, type));
+            return ratingBinder.bindOutput(
+                    ratingService.getRatings(id, type),
+                    this.getClass(),
+                    id
+            );
         else
             throw new BadRequestException("Type must be either \"done\" or \"received\"");
     }
 
     @GetMapping
-    public Optional<OutRating> getRating(@PathVariable long id, @RequestParam long accountTo){
-        return ratingService.getRating(id, accountTo)
-                .map(ratingBinder::bindOutput);
+    public Resource<OutRating> getRating(@PathVariable long id, @RequestParam long accountTo){
+        return ratingBinder.bindOutput(ratingService.getRating(id, accountTo));
     }
 
     @PutMapping

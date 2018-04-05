@@ -4,8 +4,7 @@ import isel.ps.employbox.RapperRepository;
 import isel.ps.employbox.model.entities.Company;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Optional;
+import java.util.stream.Stream;
 
 @Service
 public class CompanyService {
@@ -14,11 +13,11 @@ public class CompanyService {
 
     public CompanyService(RapperRepository<Company, Long> repo){ this.repo = repo; }
 
-    public List<Company> getCompanies() {
-        return repo.findAll();
+    public Stream<Company> getCompanies() {
+        return null;
     }
 
-    public Optional<Company> getCompany(long cid) { return repo.findById(cid); }
+    public Company getCompany(long cid) { return null; }
 
     public void setCompany(Company company) { repo.create(company); }
 

@@ -1,11 +1,10 @@
 package isel.ps.employbox.services;
 
-import isel.ps.employbox.model.entities.Account;
 import isel.ps.employbox.RapperRepository;
+import isel.ps.employbox.model.entities.Account;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Optional;
+import java.util.stream.Stream;
 
 @Service
 public final class AccountService {
@@ -15,11 +14,12 @@ public final class AccountService {
         this.accountRepo = accountRepo;
     }
 
-    public List<Account> getAllAccounts() {
+    public Stream<Account> getAllAccounts() {
         return null;
     }
 
-    public Optional<Account> getAccount(long id) {
-        return accountRepo.findById(id);
+    public Account getAccount(long id) {
+        //return accountRepo.findById(id);
+        return null;
     }
 }

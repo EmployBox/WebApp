@@ -17,7 +17,7 @@ public class ApplicationBinder extends ModelBinder<Application, OutApplication, 
     }
 
     @Override
-    Stream<Application> bindInput(Stream<InApplication> list) {
+    public Stream<Application> bindInput(Stream<InApplication> list) {
         return null;
     }
 

@@ -2,16 +2,16 @@ package isel.ps.employbox.controllers;
 
 import isel.ps.employbox.exceptions.BadRequestException;
 import isel.ps.employbox.model.binder.JobBinder;
+import isel.ps.employbox.model.entities.Job;
 import isel.ps.employbox.model.input.InJob;
+import isel.ps.employbox.model.output.HalCollection;
 import isel.ps.employbox.model.output.OutJob;
 import isel.ps.employbox.services.APIService;
 import isel.ps.employbox.services.JobService;
-import isel.ps.employbox.model.entities.Job;
+import org.springframework.hateoas.Resource;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 import static isel.ps.employbox.ErrorMessages.BAD_REQUEST_IDS_MISMATCH;
 
@@ -29,15 +29,16 @@ public class JobController {
     }
 
     @GetMapping
-    public List<OutJob> getAllJobs(@RequestParam Map<String,String> queryString){
+    public Resource<HalCollection> getAllJobs(@RequestParam Map<String,String> queryString){
         return jobBinder.bindOutput(
-                jobService.getAllJobs(queryString)
+                jobService.getAllJobs(queryString),
+                this.getClass()
         );
     }
 
     @GetMapping("/{jid}")
-    public Optional<OutJob> getJob(@PathVariable long jid){
-        return jobService.getJob(jid).map(jobBinder::bindOutput);
+    public Resource<OutJob> getJob(@PathVariable long jid){
+        return jobBinder.bindOutput(jobService.getJob(jid));
     }
 
     @PutMapping("/{jid}")

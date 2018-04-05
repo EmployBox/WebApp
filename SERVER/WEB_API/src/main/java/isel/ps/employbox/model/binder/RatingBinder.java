@@ -13,17 +13,17 @@ public class RatingBinder extends ModelBinder<Rating, OutRating, InRating> {
 
 
     @Override
-    Stream<Rating> bindInput(Stream<InRating> list) {
+    public Stream<Rating> bindInput(Stream<InRating> list) {
         return null;
     }
 
     @Override
-    Resource<OutRating> bindOutput(Rating object) {
+    public Resource<OutRating> bindOutput(Rating object) {
         return null;
     }
 
     @Override
-    Rating bindInput(InRating object) {
+    public Rating bindInput(InRating object) {
         return null;
     }
 }

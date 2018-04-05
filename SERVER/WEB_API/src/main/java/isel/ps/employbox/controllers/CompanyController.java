@@ -3,15 +3,14 @@ package isel.ps.employbox.controllers;
 import isel.ps.employbox.exceptions.BadRequestException;
 import isel.ps.employbox.model.binder.CompanyBinder;
 import isel.ps.employbox.model.input.InCompany;
+import isel.ps.employbox.model.output.HalCollection;
 import isel.ps.employbox.model.output.OutCompany;
 import isel.ps.employbox.services.APIService;
 import isel.ps.employbox.services.CompanyService;
+import org.springframework.hateoas.Resource;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-import java.util.Optional;
-
-import static isel.ps.employbox.ErrorMessages.*;
+import static isel.ps.employbox.ErrorMessages.BAD_REQUEST_IDS_MISMATCH;
 
 @RestController
 @RequestMapping("/accounts/companies")
@@ -27,15 +26,16 @@ public class CompanyController {
     }
 
     @GetMapping
-    public List<OutCompany> getCompanies(){
+    public Resource<HalCollection> getCompanies(){
         return companyBinder.bindOutput(
-                companyService.getCompanies()
+                companyService.getCompanies(),
+                this.getClass()
         );
     }
 
     @GetMapping("/{cid}")
-    public Optional<OutCompany> getCompany(@PathVariable long cid){
-        return companyService.getCompany(cid).map(companyBinder::bindOutput);
+    public Resource<OutCompany> getCompany(@PathVariable long cid){
+        return companyBinder.bindOutput( companyService.getCompany(cid));
 
     }
 

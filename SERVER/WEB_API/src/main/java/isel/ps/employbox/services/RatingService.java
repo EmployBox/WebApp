@@ -4,18 +4,17 @@ import isel.ps.employbox.model.entities.Rating;
 import org.springframework.stereotype.Service;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
-import java.util.List;
-import java.util.Optional;
+import java.util.stream.Stream;
 
 @Service
 public class RatingService {
 
-    public List<Rating> getRatings(long id, String type) {
+    public Stream<Rating> getRatings(long id, String type) {
         throw new NotImplementedException();
     }
 
-    public Optional<Rating> getRating(long id, long accountTo) {
-        return Optional.empty();
+    public Rating getRating(long id, long accountTo) {
+        return null;
     }
 
     public void updateRating(Rating rating) {

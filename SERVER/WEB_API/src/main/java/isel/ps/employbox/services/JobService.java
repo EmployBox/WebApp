@@ -3,22 +3,21 @@ package isel.ps.employbox.services;
 import isel.ps.employbox.model.entities.Job;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 import java.util.Map;
-import java.util.Optional;
+import java.util.stream.Stream;
 
 @Service
 public class JobService {
 
-    public List<Job> getAccountOffers(long id) {
+    public Stream<Job> getAccountOffers(long id) {
         return null;
     }
 
-    public List<Job> getAllJobs(Map<String, String> queryString) {
+    public Stream<Job> getAllJobs(Map<String, String> queryString) {
         return null;
     }
 
-    public Optional<Job> getJob(long id) {
+    public Job getJob(long id) {
         return null;
     }
 

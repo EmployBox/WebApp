@@ -12,7 +12,7 @@ import java.util.stream.Stream;
 public class UserBinder extends ModelBinder<User, OutUser, InUser> {
 
     @Override
-    Stream<User> bindInput(Stream<InUser> list) {
+    public Stream<User> bindInput(Stream<InUser> list) {
         return null;
     }
 

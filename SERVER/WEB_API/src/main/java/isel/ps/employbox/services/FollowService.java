@@ -4,16 +4,16 @@ import isel.ps.employbox.model.entities.Account;
 import org.springframework.stereotype.Service;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
-import java.util.List;
+import java.util.stream.Stream;
 
 @Service
 public class FollowService {
 
-    public List<Account> getAccountFollowers(long id) {
+    public Stream<Account> getAccountFollowers(long id) {
         throw new NotImplementedException();
     }
 
-    public List<Account> getAccountFollowing(long id) {
+    public Stream<Account> getAccountFollowing(long id) {
         throw new NotImplementedException();
     }
 

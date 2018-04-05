@@ -3,6 +3,7 @@ package isel.ps.employbox.model.input;
 import java.sql.Date;
 
 public class InMessage {
+    private long accountId;
     private long messageId;
     private long chatId;
     private Date date;
@@ -38,5 +39,9 @@ public class InMessage {
 
     public void setMessageId(long messageId) {
         this.messageId = messageId;
+    }
+
+    public long getAccountId() {
+        return accountId;
     }
 }

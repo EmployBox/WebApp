@@ -15,9 +15,7 @@ import isel.ps.employbox.services.UserService;
 import org.springframework.hateoas.Resource;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 import static isel.ps.employbox.ErrorMessages.BAD_REQUEST_IDS_MISMATCH;
 
@@ -39,12 +37,15 @@ public class UserController {
 
     @GetMapping
     public Resource<HalCollection> getAllUsers(@RequestParam Map<String,String> queryString){
-        return userBinder.bindOutput(userService.getAllUsers(queryString));
+        return userBinder.bindOutput(
+                userService.getAllUsers(queryString),
+                this.getClass()
+        );
     }
 
     @GetMapping("/{id}")
     public Resource<OutUser> getUser(@PathVariable long id){
-        return userService.getUser(id).map(userBinder::bindOutput);
+        return userBinder.bindOutput( userService.getUser(id));
     }
 
     @GetMapping("/{id}/applications")

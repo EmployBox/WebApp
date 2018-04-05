@@ -7,9 +7,7 @@ import isel.ps.employbox.model.entities.User;
 import org.springframework.stereotype.Service;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
-import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.stream.Stream;
 
 @Service
@@ -30,15 +28,15 @@ public class UserService {
         return null;//userMapper.getAll().join();
     }
 
-    public Optional<User> getUser(long id) {
-        return userRepo.findById(id);
+    public User getUser(long id) {
+        return null;
     }
 
     public Stream<Application> getAllApplications(long id, Map<String, String> queryString) {
         return null;
     }
 
-    public List<Curriculum> getAllCurriculums(long id, Map<String, String> queryString) {
+    public Stream<Curriculum> getAllCurriculums(long id, Map<String, String> queryString) {
         return null;
     }
 

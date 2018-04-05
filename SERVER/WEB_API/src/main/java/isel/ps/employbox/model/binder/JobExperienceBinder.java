@@ -11,18 +11,19 @@ import java.util.stream.Stream;
 @Component
 public class JobExperienceBinder extends ModelBinder<JobExperience, OutJob.OutExperience, InJob.InExperience> {
 
+
     @Override
-    Stream<JobExperience> bindInput(Stream<InJob.InExperience> list) {
+    public Stream<JobExperience> bindInput(Stream<InJob.InExperience> list) {
         return null;
     }
 
     @Override
-    Resource<OutJob.OutExperience> bindOutput(JobExperience object) {
+    public Resource<OutJob.OutExperience> bindOutput(JobExperience object) {
         return null;
     }
 
     @Override
-    JobExperience bindInput(InJob.InExperience object) {
+    public JobExperience bindInput(InJob.InExperience object) {
         return null;
     }
 }

@@ -12,17 +12,17 @@ import java.util.stream.Stream;
 public class CommentBinder extends ModelBinder<Comment, OutComment, InComment> {
 
     @Override
-    Stream<Comment> bindInput(Stream<InComment> list) {
+    public Stream<Comment> bindInput(Stream<InComment> list) {
         return null;
     }
 
     @Override
-    Resource<OutComment> bindOutput(Comment object) {
+    public Resource<OutComment> bindOutput(Comment object) {
         return null;
     }
 
     @Override
-    Comment bindInput(InComment object) {
+    public Comment bindInput(InComment object) {
         return null;
     }
 }

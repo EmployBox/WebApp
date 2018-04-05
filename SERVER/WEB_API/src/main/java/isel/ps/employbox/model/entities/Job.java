@@ -20,8 +20,21 @@ public class Job {
     private final Supplier<List<Application>> applications;
     private final Supplier<List<JobExperience>> experiences;
 
-    public Job(long id, String title, long accountID, String address, int wage, String description, String schedule, Date offerBeginDate, Date offerEndDate, String offerType, long version,
-            Supplier<List<Application>> applications, Supplier<List<JobExperience>> experiences) {
+    public Job(
+            long id,
+            String title,
+            long accountID,
+            String address,
+            int wage,
+            String description,
+            String schedule,
+            Date offerBeginDate,
+            Date offerEndDate,
+            String offerType,
+            long version,
+            Supplier<List<Application>> applications,
+            Supplier<List<JobExperience>> experiences)
+    {
         this.jobId = id;
         this.title = title;
         this.accountID = accountID;
@@ -37,7 +50,18 @@ public class Job {
         this.experiences = experiences;
     }
 
-    public Job(long accountID, long jobId, String title, String address, int wage, String description, String schedule, Date offerBeginDate, Date offerEndDate, String offerType){
+    public Job(
+            long accountID,
+            long jobId,
+            String title,
+            String address,
+            int wage,
+            String description,
+            String schedule,
+            Date offerBeginDate,
+            Date offerEndDate,
+            String offerType)
+    {
         this.jobId = jobId;
         this.accountID = accountID;
         this.title = title;

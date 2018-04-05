@@ -11,19 +11,18 @@ import java.util.stream.Stream;
 @Component
 public class AccountBinder extends ModelBinder<Account, OutAccount, InAccount> {
 
-
     @Override
-    Stream<Account> bindInput(Stream<InAccount> list) {
+    public Stream<Account> bindInput(Stream<InAccount> list) {
         return null;
     }
 
     @Override
-    Resource<OutAccount> bindOutput(Account object) {
+    public Resource<OutAccount> bindOutput(Account object) {
         return null;
     }
 
     @Override
-    Account bindInput(InAccount object) {
+    public Account bindInput(InAccount object) {
         return null;
     }
 }

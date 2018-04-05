@@ -1,12 +1,11 @@
 package isel.ps.employbox.controllers;
 
 import isel.ps.employbox.model.binder.AccountBinder;
-import isel.ps.employbox.model.output.OutAccount;
+import isel.ps.employbox.model.output.HalCollection;
 import isel.ps.employbox.services.APIService;
 import isel.ps.employbox.services.FollowService;
+import org.springframework.hateoas.Resource;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/accounts/{id}")
@@ -23,13 +22,21 @@ public class FollowsController {
     }
 
     @GetMapping("/followers")
-    public List<OutAccount> getFollowers(@PathVariable long id){
-        return accountBinder.bindOutput(followService.getAccountFollowers(id));
+    public Resource<HalCollection> getFollowers(@PathVariable long id){
+        return accountBinder.bindOutput(
+                followService.getAccountFollowers(id),
+                this.getClass(),
+                id
+        );
     }
 
     @GetMapping("/following")
-    public List<OutAccount> getFollowing(@PathVariable long id){
-        return accountBinder.bindOutput(followService.getAccountFollowing(id));
+    public Resource<HalCollection> getFollowing(@PathVariable long id){
+        return accountBinder.bindOutput(
+                followService.getAccountFollowing(id),
+                this.getClass(),
+                id
+        );
     }
 
     @PutMapping("/followers/{fid}")

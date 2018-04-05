@@ -5,16 +5,16 @@ import isel.ps.employbox.model.entities.Message;
 import org.springframework.stereotype.Service;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
-import java.util.List;
+import java.util.stream.Stream;
 
 @Service
 public class ChatService {
 
-    public List<Chat> getAccountChats(long id) {
+    public Stream<Chat> getAccountChats(long id) {
         throw new NotImplementedException();
     }
 
-    public List<Message> getAccountChatsMessages(long id, long cid, String queryString) {
+    public Stream<Message> getAccountChatsMessages(long id, long cid, String queryString) {
         throw new NotImplementedException();
     }
 

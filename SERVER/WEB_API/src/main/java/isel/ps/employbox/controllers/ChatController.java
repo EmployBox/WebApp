@@ -1,44 +1,43 @@
 package isel.ps.employbox.controllers;
 
 import isel.ps.employbox.exceptions.BadRequestException;
+import isel.ps.employbox.model.binder.ChatBinder;
 import isel.ps.employbox.model.binder.MessageBinder;
-import isel.ps.employbox.model.binder.ModelBinder;
-import isel.ps.employbox.model.entities.Chat;
 import isel.ps.employbox.model.input.InChat;
 import isel.ps.employbox.model.input.InMessage;
+import isel.ps.employbox.model.output.HalCollection;
 import isel.ps.employbox.model.output.OutMessage;
 import isel.ps.employbox.services.APIService;
 import isel.ps.employbox.services.ChatService;
 import org.springframework.hateoas.Resource;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
 import static isel.ps.employbox.ErrorMessages.BAD_REQUEST_IDS_MISMATCH;
 
 @RestController
 @RequestMapping("/accounts/{id}/chats")
 public class ChatController {
-    private final ModelBinder<Chat, OutChat, InChat, Long> chatBinder;
+    private final ChatBinder chatBinder;
     private final ChatService chatService;
     private final MessageBinder messageBinder;
     private final APIService apiService;
 
-    public ChatController(ModelBinder<Chat, OutChat, InChat, Long> chatBinder, ChatService chatService, MessageBinder messageBinder, APIService apiService) {
+    public ChatController(ChatBinder chatBinder, ChatService chatService, MessageBinder messageBinder, APIService apiService) {
         this.chatBinder = chatBinder;
         this.chatService = chatService;
         this.messageBinder = messageBinder;
         this.apiService = apiService;
     }
 
-    @GetMapping
-    public List<OutChat> getChats (@PathVariable long id){
-        return chatBinder.bindOutput(chatService.getAccountChats(id));
-    }
 
     @GetMapping("/{cid}/messages")
-    public List<OutMessage> getChatsMessages (@PathVariable long id, @PathVariable long cid, @RequestParam String page) {
-        return messageBinder.bindOutput(chatService.getAccountChatsMessages(id,cid, page));
+    public Resource<HalCollection> getChatsMessages (@PathVariable long id, @PathVariable long cid, @RequestParam String page) {
+        return messageBinder.bindOutput(
+                chatService.getAccountChatsMessages(id,cid, page),
+                this.getClass(),
+                id,
+                cid
+        );
     }
 
     @PostMapping

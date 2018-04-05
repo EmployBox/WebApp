@@ -2,14 +2,15 @@ package isel.ps.employbox.controllers;
 
 import isel.ps.employbox.exceptions.BadRequestException;
 import isel.ps.employbox.model.binder.CurriculumBinder;
+import isel.ps.employbox.model.entities.Curriculum;
 import isel.ps.employbox.model.input.InCurriculum;
+import isel.ps.employbox.model.output.HalCollection;
 import isel.ps.employbox.model.output.OutCurriculum;
 import isel.ps.employbox.services.APIService;
 import isel.ps.employbox.services.UserService;
-import isel.ps.employbox.model.entities.Curriculum;
+import org.springframework.hateoas.Resource;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import java.util.Map;
 
 import static isel.ps.employbox.ErrorMessages.BAD_REQUEST_IDS_MISMATCH;
@@ -29,14 +30,16 @@ public class CurriculumController {
     }
 
     @GetMapping
-    public List<OutCurriculum> getAllCurriculums(@PathVariable long id, @RequestParam Map<String,String> queryString){
+    public Resource<HalCollection> getAllCurriculums(@PathVariable long id, @RequestParam Map<String,String> queryString){
         return curriculumBinder.bindOutput(
-                userService.getAllCurriculums(id, queryString)
+                userService.getAllCurriculums(id, queryString),
+                this.getClass(),
+                id
         );
     }
 
     @GetMapping("/{cid}")
-    public OutCurriculum getCurriculum(@PathVariable long id, @PathVariable long cid){
+    public Resource<OutCurriculum> getCurriculum(@PathVariable long id, @PathVariable long cid){
         return curriculumBinder.bindOutput(
                 userService.getCurriculum(id, cid));
     }
