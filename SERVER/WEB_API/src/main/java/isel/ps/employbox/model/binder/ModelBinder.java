@@ -13,11 +13,14 @@ import java.util.ArrayList;
 import java.util.stream.Stream;
 
 public abstract class ModelBinder<T, O extends ResourceSupport, I> {
-    public abstract Stream<T> bindInput(Stream<I> list);
     public abstract Resource<O> bindOutput(T object);
     public abstract T bindInput(I object);
 
-    public Resource<HalCollection> bindOutput(Stream<T> list, Class selfController, Object ... pathVariables) {
+    public final Stream<T> bindInput(Stream<I> list){
+        return list.map(this::bindInput);
+    }
+
+    public final Resource<HalCollection> bindOutput(Stream<T> list, Class selfController, Object ... pathVariables) {
         EmbeddedWrappers wrappers = new EmbeddedWrappers(true);
         ArrayList<EmbeddedWrapper> embeddedChecklists = new ArrayList<>();
         list.map(this::bindOutput)

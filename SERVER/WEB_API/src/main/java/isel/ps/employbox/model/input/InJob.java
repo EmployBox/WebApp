@@ -104,7 +104,7 @@ public class InJob {
 
     public class InExperience {
         private String competence;
-        private int years;
+        private short years;
 
         public String getCompetence() {
             return competence;
@@ -114,11 +114,11 @@ public class InJob {
             this.competence = competence;
         }
 
-        public int getYears() {
+        public short getYears() {
             return years;
         }
 
-        public void setYears(int years) {
+        public void setYears(short years) {
             this.years = years;
         }
     }

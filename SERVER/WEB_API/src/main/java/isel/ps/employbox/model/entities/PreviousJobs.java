@@ -16,7 +16,7 @@ public class PreviousJobs {
         this.userId = userId;
         this.curriculumId = curriculumId;
         this.beginDate = beginDate;
-        this. companyName = companyName;
+        this.companyName = companyName;
         this.workLoad = workLoad;
         this.role = role;
         this.endDate = endDate;

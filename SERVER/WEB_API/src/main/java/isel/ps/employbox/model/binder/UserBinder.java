@@ -6,15 +6,8 @@ import isel.ps.employbox.model.output.OutUser;
 import org.springframework.hateoas.Resource;
 import org.springframework.stereotype.Component;
 
-import java.util.stream.Stream;
-
 @Component
 public class UserBinder extends ModelBinder<User, OutUser, InUser> {
-
-    @Override
-    public Stream<User> bindInput(Stream<InUser> list) {
-        return null;
-    }
 
     @Override
     public Resource<OutUser> bindOutput(User user) {

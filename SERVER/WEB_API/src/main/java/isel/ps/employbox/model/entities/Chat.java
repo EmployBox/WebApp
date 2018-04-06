@@ -4,11 +4,11 @@ import java.util.List;
 import java.util.function.Supplier;
 
 public class Chat {
-    private final long chadId;
+    private long chadId;
     private final long accountIdFirst;
     private final long accountIdSecond;
-    private final long version;
-    private final Supplier<List<Message>> messages;
+    private long version;
+    private Supplier<List<Message>> messages;
 
     public Chat(long chatId, long accountIdFirst, long accountIdSecond, long version, Supplier<List<Message>> messages) {
         this.chadId = chatId;
@@ -16,6 +16,11 @@ public class Chat {
         this.accountIdSecond = accountIdSecond;
         this.version = version;
         this.messages = messages;
+    }
+
+    public Chat(long accountIdFirst, long accountIdSecond){
+        this.accountIdFirst = accountIdFirst;
+        this.accountIdSecond = accountIdSecond;
     }
 
     public long getVersion() {

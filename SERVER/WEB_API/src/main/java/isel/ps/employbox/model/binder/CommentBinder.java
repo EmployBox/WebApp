@@ -6,19 +6,21 @@ import isel.ps.employbox.model.output.OutComment;
 import org.springframework.hateoas.Resource;
 import org.springframework.stereotype.Component;
 
-import java.util.stream.Stream;
-
 @Component
 public class CommentBinder extends ModelBinder<Comment, OutComment, InComment> {
 
-    @Override
-    public Stream<Comment> bindInput(Stream<InComment> list) {
-        return null;
-    }
 
     @Override
     public Resource<OutComment> bindOutput(Comment object) {
-        return null;
+        return new Resource(
+                new OutComment(
+                        object.getAccountIdFrom(),
+                        object.getAccountIdTo(),
+                        object.getCommentID(),
+                        object.getMainCommendID(),
+                        object.getDate().toString(),
+                        object.getText())
+        );
     }
 
     @Override

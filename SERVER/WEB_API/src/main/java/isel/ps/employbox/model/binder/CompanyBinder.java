@@ -6,20 +6,23 @@ import isel.ps.employbox.model.output.OutCompany;
 import org.springframework.hateoas.Resource;
 import org.springframework.stereotype.Component;
 
-import java.util.stream.Stream;
-
 @Component
 public class CompanyBinder extends ModelBinder<Company, OutCompany, InCompany> {
 
-
-    @Override
-    public Stream<Company> bindInput(Stream<InCompany> list) {
-        return list.map(this::bindInput);
-    }
-
     @Override
     public Resource<OutCompany> bindOutput(Company object) {
-        return null;
+        return new Resource<>(
+                new OutCompany(
+                        object.getAccountID(),
+                        object.getEmail(),
+                        object.getRating(),
+                        object.getName(),
+                        object.getSpecialization(),
+                        object.getYearFounded(),
+                        object.getLogoUrl(),
+                        object.getWebPageUrl(),
+                        object.getDescription()
+                        ));
     }
 
     @Override

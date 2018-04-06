@@ -46,7 +46,7 @@ public class OutCurriculum extends ResourceSupport {
         this.add( linkTo (CurriculumController.class, userId).slash(id).withSelfRel());
     }
 
-    private class OutExperience {
+    public static class OutExperience {
         @JsonProperty
         private final String competence;
 
@@ -60,7 +60,7 @@ public class OutCurriculum extends ResourceSupport {
         }
     }
 
-    private class OutPreviousJobs {
+    public static class OutPreviousJobs {
         @JsonProperty
         private final String companyName;
 
@@ -85,7 +85,7 @@ public class OutCurriculum extends ResourceSupport {
         }
     }
 
-    private class OutProject {
+    public static class OutProject {
         @JsonProperty
         private final String name;
 
@@ -98,7 +98,7 @@ public class OutCurriculum extends ResourceSupport {
         }
     }
 
-    private class OutAcademicBackground {
+    public static class OutAcademicBackground {
         @JsonProperty
         private final String institution;
 

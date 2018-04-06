@@ -6,14 +6,8 @@ import isel.ps.employbox.model.input.InChat;
 import org.springframework.hateoas.Resource;
 import org.springframework.hateoas.ResourceSupport;
 
-import java.util.stream.Stream;
-
 public class ChatBinder extends ModelBinder <Chat, ResourceSupport, InChat> {
 
-    @Override
-    public Stream<Chat> bindInput(Stream<InChat> list) {
-        return null;
-    }
 
     @Override
     public Resource<ResourceSupport> bindOutput(Chat object) {
@@ -22,6 +16,6 @@ public class ChatBinder extends ModelBinder <Chat, ResourceSupport, InChat> {
 
     @Override
     public Chat bindInput(InChat object) {
-        return null;
+        return new Chat(object.getAccountIdFirst(), object.getAccountIdSecond());
     }
 }

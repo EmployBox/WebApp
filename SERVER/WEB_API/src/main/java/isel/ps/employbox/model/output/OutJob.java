@@ -75,7 +75,7 @@ public class OutJob extends ResourceSupport {
         this.add( linkTo ( methodOn(UserController.class).getAllApplications(accountID,null)).withRel("applications"));
     }
 
-    public class OutExperience extends ResourceSupport{
+    public static class OutExperience extends ResourceSupport{
         @JsonProperty
         private final String competence;
 

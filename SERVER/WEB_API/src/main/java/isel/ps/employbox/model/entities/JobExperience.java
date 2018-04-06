@@ -4,13 +4,19 @@ public class JobExperience {
     private final long jobId;
     private final String competences;
     private final short years;
-    private final long version;
+    private  long version;
 
     public JobExperience(long jobId, String competences, short years, long version){
         this.jobId = jobId;
         this.competences = competences;
         this.years = years;
         this.version = version;
+    }
+
+    public JobExperience(long jobId, String competences, short years){
+        this.jobId = jobId;
+        this.competences = competences;
+        this.years = years;
     }
 
     public long getVersion() {

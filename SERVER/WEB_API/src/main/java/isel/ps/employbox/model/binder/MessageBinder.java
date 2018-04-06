@@ -6,16 +6,8 @@ import isel.ps.employbox.model.output.OutMessage;
 import org.springframework.hateoas.Resource;
 import org.springframework.stereotype.Component;
 
-import java.util.stream.Stream;
-
 @Component
 public class MessageBinder extends ModelBinder<Message, OutMessage, InMessage> {
-
-
-    @Override
-    public Stream<Message> bindInput(Stream<InMessage> list) {
-        return null;
-    }
 
     @Override
     public Resource<OutMessage> bindOutput(Message obj) {

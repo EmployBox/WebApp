@@ -5,24 +5,24 @@ import isel.ps.employbox.model.input.InAccount;
 import isel.ps.employbox.model.output.OutAccount;
 import org.springframework.hateoas.Resource;
 import org.springframework.stereotype.Component;
-
-import java.util.stream.Stream;
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 @Component
 public class AccountBinder extends ModelBinder<Account, OutAccount, InAccount> {
 
-    @Override
-    public Stream<Account> bindInput(Stream<InAccount> list) {
-        return null;
-    }
 
     @Override
     public Resource<OutAccount> bindOutput(Account object) {
-        return null;
+        return new Resource(
+                new OutAccount(
+                    object.getAccountID(),
+                    object.getEmail(),
+                    object.getRating())
+        );
     }
 
     @Override
     public Account bindInput(InAccount object) {
-        return null;
+        throw new NotImplementedException();
     }
 }

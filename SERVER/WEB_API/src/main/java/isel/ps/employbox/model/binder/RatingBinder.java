@@ -6,24 +6,36 @@ import isel.ps.employbox.model.output.OutRating;
 import org.springframework.hateoas.Resource;
 import org.springframework.stereotype.Component;
 
-import java.util.stream.Stream;
-
 @Component
 public class RatingBinder extends ModelBinder<Rating, OutRating, InRating> {
 
-
-    @Override
-    public Stream<Rating> bindInput(Stream<InRating> list) {
-        return null;
-    }
-
     @Override
     public Resource<OutRating> bindOutput(Rating object) {
-        return null;
+        return new Resource<>(new OutRating(
+                object.getAccountIDFrom(),
+                object.getAccountIDTo(),
+                object.getWorkLoad(),
+                object.getWage(),
+                object.getWorkEnvironment(),
+                object.getCompetence(),
+                object.getPontuality(),
+                object.getAssiduity(),
+                object.getDemeanor())
+        );
     }
 
     @Override
     public Rating bindInput(InRating object) {
-        return null;
+        return new Rating(
+                object.getAccountIDFrom(),
+                object.getAccountIDTo(),
+                object.getWorkLoad(),
+                object.getWage(),
+                object.getWorkEnvironment(),
+                object.getCompetence(),
+                object.getPontuality(),
+                object.getAssiduity(),
+                object.getDemeanor()
+        );
     }
 }
