@@ -12,7 +12,7 @@ import isel.ps.employbox.services.ChatService;
 import org.springframework.hateoas.Resource;
 import org.springframework.web.bind.annotation.*;
 
-import static isel.ps.employbox.ErrorMessages.BAD_REQUEST_IDS_MISMATCH;
+import static isel.ps.employbox.ErrorMessages.badRequest_IdsMismatch;
 
 @RestController
 @RequestMapping("/accounts/{id}/chats")
@@ -31,9 +31,9 @@ public class ChatController {
 
 
     @GetMapping("/{cid}/messages")
-    public Resource<HalCollection> getChatsMessages (@PathVariable long id, @PathVariable long cid, @RequestParam String page) {
+    public Resource<HalCollection> getChatsMessages (@PathVariable long id, @PathVariable long cid) {
         return messageBinder.bindOutput(
-                chatService.getAccountChatsMessages(id,cid, page),
+                chatService.getAccountChatsMessages(id,cid),
                 this.getClass(),
                 id,
                 cid
@@ -41,17 +41,16 @@ public class ChatController {
     }
 
     @PostMapping
-    public void createChat(@PathVariable long id, @RequestHeader("apiKey") String apiKey, @RequestBody InChat inChat) {
-        if(id != inChat.getAccountIdFirst()) throw new BadRequestException(BAD_REQUEST_IDS_MISMATCH);
-        apiService.validateAPIKey(apiKey);
+    public void createChat(@PathVariable long id, @RequestBody InChat inChat) {
+        if(id != inChat.getAccountIdFirst()) throw new BadRequestException(badRequest_IdsMismatch);
         chatService.createNewChat(
                 chatBinder.bindInput(inChat)
         );
     }
 
     @PostMapping("/{cid}/messages")
-    public void createMessage(@PathVariable long id, @PathVariable long cid, @RequestHeader("apiKey") String apiKey, @RequestBody InMessage msg) {
-        apiService.validateAPIKey(apiKey);
+    public void createMessage(@PathVariable long id, @PathVariable long cid,  @RequestBody InMessage msg) {
+        if(cid != msg.getChatId())
         chatService.createNewChatMessage(id, cid, messageBinder.bindInput(msg));
     }
 

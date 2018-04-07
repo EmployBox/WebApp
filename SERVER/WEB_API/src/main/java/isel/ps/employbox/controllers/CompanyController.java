@@ -10,7 +10,7 @@ import isel.ps.employbox.services.CompanyService;
 import org.springframework.hateoas.Resource;
 import org.springframework.web.bind.annotation.*;
 
-import static isel.ps.employbox.ErrorMessages.BAD_REQUEST_IDS_MISMATCH;
+import static isel.ps.employbox.ErrorMessages.badRequest_IdsMismatch;
 
 @RestController
 @RequestMapping("/accounts/companies")
@@ -52,11 +52,9 @@ public class CompanyController {
     @PutMapping("/{id}")
     public void updateCompany(
             @PathVariable long id,
-            @RequestBody InCompany inCompany,
-            @RequestHeader("apiKey") String apiKey
+            @RequestBody InCompany inCompany
     ){
-        if(id != inCompany.getAccountId()) throw new BadRequestException(BAD_REQUEST_IDS_MISMATCH);
-        apiService.validateAPIKey(apiKey);
+        if(id != inCompany.getAccountId()) throw new BadRequestException(badRequest_IdsMismatch);
         companyService.updateCompany(
                 companyBinder.bindInput(inCompany)
         );
@@ -64,10 +62,7 @@ public class CompanyController {
 
     @DeleteMapping("/{cid}")
     public void deleteCompany(
-            @PathVariable long cid,
-            @RequestHeader("apiKey") String apiKey){
-        apiService.validateAPIKey(apiKey);
+            @PathVariable long cid){
         companyService.deleteCompany(cid);
     }
-
 }

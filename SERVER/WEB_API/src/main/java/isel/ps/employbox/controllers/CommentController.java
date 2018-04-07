@@ -9,7 +9,7 @@ import isel.ps.employbox.services.CommentService;
 import org.springframework.hateoas.Resource;
 import org.springframework.web.bind.annotation.*;
 
-import static isel.ps.employbox.ErrorMessages.BAD_REQUEST_IDS_MISMATCH;
+import static isel.ps.employbox.ErrorMessages.badRequest_IdsMismatch;
 
 @RestController
 @RequestMapping("/accounts/{id}/comments")
@@ -23,31 +23,31 @@ public class CommentController {
     }
 
     @GetMapping
-    public Resource<HalCollection> getAllComments(@PathVariable long id, @RequestParam String type){
+    public Resource<HalCollection> getAllComments(@PathVariable long accId, @RequestParam String type){
         if(type.equals("done") || type.equals("received"))
             return commentBinder.bindOutput(
-                    commentService.getComments(id, type),
+                    commentService.getComments(accId, type),
                     this.getClass(),
-                    id
+                    accId
             );
         else
             throw new BadRequestException("Type must be either \"done\" or \"received\"");
     }
 
     @GetMapping
-    public Resource<OutComment> getComment(@PathVariable long id, @RequestParam long accountTo){
-        return commentBinder.bindOutput(commentService.getComment(id, accountTo));
+    public Resource<OutComment> getComment(@PathVariable long accountId, @RequestParam long accountTo){
+        return commentBinder.bindOutput(commentService.getComment(accountId, accountTo));
     }
 
     @PutMapping
     public void updateComment(@PathVariable long id, @RequestParam long accountTo, @RequestBody InComment comment){
-        if(id != comment.getAccountIdFrom() || accountTo != comment.getAccountIdTo()) throw new BadRequestException(BAD_REQUEST_IDS_MISMATCH);
+        if(id != comment.getAccountIdFrom() || accountTo != comment.getAccountIdTo()) throw new BadRequestException(badRequest_IdsMismatch);
         commentService.updateComment(commentBinder.bindInput(comment));
     }
 
     @PostMapping
     public void createComment(@PathVariable long id, @RequestParam long accountTo, @RequestBody InComment comment){
-        if(id != comment.getAccountIdFrom() || accountTo != comment.getAccountIdTo()) throw new BadRequestException(BAD_REQUEST_IDS_MISMATCH);
+        if(id != comment.getAccountIdFrom() || accountTo != comment.getAccountIdTo()) throw new BadRequestException(badRequest_IdsMismatch);
         commentService.createComment(commentBinder.bindInput(comment));
     }
 

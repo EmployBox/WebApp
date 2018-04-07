@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
 
-import static isel.ps.employbox.ErrorMessages.BAD_REQUEST_IDS_MISMATCH;
+import static isel.ps.employbox.ErrorMessages.badRequest_IdsMismatch;
 
 @RestController
 @RequestMapping("/accounts/jobs")
@@ -42,25 +42,22 @@ public class JobController {
     }
 
     @PutMapping("/{jid}")
-    public void updateJob(@PathVariable long jid, @RequestHeader String apiKey, @RequestBody InJob job){
-        apiService.validateAPIKey(apiKey);
+    public void updateJob(@PathVariable long jid, @RequestBody InJob job){
 
-        if(job.getJobID() != jid) throw new BadRequestException(BAD_REQUEST_IDS_MISMATCH);
+        if(job.getJobID() != jid) throw new BadRequestException(badRequest_IdsMismatch);
         Job updateJob = jobBinder.bindInput(job);
 
         jobService.updateJob(updateJob);
     }
 
     @PostMapping
-    public void createJob(@RequestHeader String apiKey, @RequestBody InJob job){
-        apiService.validateAPIKey(apiKey);
+    public void createJob( @RequestBody InJob job){
         Job newJob = jobBinder.bindInput(job);
         jobService.createJob(newJob);
     }
 
     @DeleteMapping("/{jid}")
-    public void deleteJob(@PathVariable long jid, @RequestHeader String apiKey){
-        apiService.validateAPIKey(apiKey);
+    public void deleteJob(@PathVariable long jid){
         jobService.deleteJob(jid);
     }
 }

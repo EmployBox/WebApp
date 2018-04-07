@@ -1,10 +1,15 @@
 package isel.ps.employbox.services;
 
 import isel.ps.employbox.RapperRepository;
+import isel.ps.employbox.exceptions.ResourceNotFoundException;
 import isel.ps.employbox.model.entities.Account;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
 import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
+
+import static isel.ps.employbox.ErrorMessages.resourceNotfound_account;
 
 @Service
 public final class AccountService {
@@ -15,11 +20,14 @@ public final class AccountService {
     }
 
     public Stream<Account> getAllAccounts() {
-        return null;
+        return StreamSupport.stream(accountRepo.findAll().spliterator(),false);
     }
 
     public Account getAccount(long id) {
-        //return accountRepo.findById(id);
-        return null;
+       Optional<Account> oacc = accountRepo.findById(id);
+       if(!oacc.isPresent())
+           throw new ResourceNotFoundException( resourceNotfound_account);
+
+       return oacc.get();
     }
 }

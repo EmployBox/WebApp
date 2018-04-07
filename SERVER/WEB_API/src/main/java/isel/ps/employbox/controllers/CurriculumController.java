@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
 
-import static isel.ps.employbox.ErrorMessages.BAD_REQUEST_IDS_MISMATCH;
+import static isel.ps.employbox.ErrorMessages.badRequest_IdsMismatch;
 
 @RestController
 @RequestMapping("/accounts/users/{id}/curriculum")
@@ -46,26 +46,22 @@ public class CurriculumController {
 
     @PutMapping("/{cid}")
     public void updateCurriculum(
-            @RequestHeader("apiKey") String apiKey,
             @PathVariable long id,
             @PathVariable long cid,
             @RequestBody InCurriculum inCurriculum
     ){
-        apiService.validateAPIKey(apiKey);
-        if(inCurriculum.getAccountID() != id || inCurriculum.getId() != cid) throw new BadRequestException(BAD_REQUEST_IDS_MISMATCH);
+        if(inCurriculum.getAccountID() != id || inCurriculum.getId() != cid) throw new BadRequestException(badRequest_IdsMismatch);
         Curriculum curriculum = curriculumBinder.bindInput(inCurriculum);
         userService.updateCurriculum(curriculum);
     }
 
     @PostMapping
-    public void createCurriculum(@RequestHeader("apiKey") String apiKey, @PathVariable long id, @RequestBody InCurriculum inCurriculum){
-        apiService.validateAPIKey(apiKey);
+    public void createCurriculum( @PathVariable long id, @RequestBody InCurriculum inCurriculum){
         userService.createCurriculum(curriculumBinder.bindInput(inCurriculum));
     }
 
     @DeleteMapping("/{cid}")
-    public void deleteCurriculum(@RequestHeader("apiKey") String apiKey, @PathVariable long id, @PathVariable long cid){
-        apiService.validateAPIKey(apiKey);
+    public void deleteCurriculum( @PathVariable long id, @PathVariable long cid){
         userService.deleteCurriculum(id, cid);
     }
 }

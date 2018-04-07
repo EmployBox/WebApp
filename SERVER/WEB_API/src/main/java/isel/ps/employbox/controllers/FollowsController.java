@@ -40,14 +40,12 @@ public class FollowsController {
     }
 
     @PutMapping("/followers/{fid}")
-    public void setFollower(@PathVariable long id, @PathVariable long fid, @RequestHeader("apiKey") String apiKey){
-        apiService.validateAPIKey(apiKey);
+    public void setFollower(@PathVariable long id, @PathVariable long fid){
         followService.setFollower(id,fid);
     }
 
     @DeleteMapping("/followers/{fid}")
-    public void deleteFollower(@PathVariable long id, @PathVariable long fid, @RequestHeader("apiKey") String apiKey){
-        apiService.validateAPIKey(apiKey);
+    public void deleteFollower(@PathVariable long id, @PathVariable long fid){
         followService.deleteFollower(id,fid);
     }
 }

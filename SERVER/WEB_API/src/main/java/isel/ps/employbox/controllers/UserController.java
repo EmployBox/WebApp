@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
 
-import static isel.ps.employbox.ErrorMessages.BAD_REQUEST_IDS_MISMATCH;
+import static isel.ps.employbox.ErrorMessages.badRequest_IdsMismatch;
 
 @RestController
 @RequestMapping("/accounts/users")
@@ -65,45 +65,39 @@ public class UserController {
     }
 
     @PutMapping("/{id}")
-    public void updateUser(@RequestHeader("apiKey") String apiKey, @PathVariable long id, @RequestBody InUser inUser){
-        apiService.validateAPIKey(apiKey);
-        if(inUser.getId() != id) throw new BadRequestException(BAD_REQUEST_IDS_MISMATCH);
+    public void updateUser( @PathVariable long id, @RequestBody InUser inUser){
+        if(inUser.getId() != id) throw new BadRequestException(badRequest_IdsMismatch);
         User user = userBinder.bindInput(inUser);
         userService.updateUser(user);
     }
 
     @PutMapping("/{id}/applications/{jid}")
-    public void updateApplication(@RequestHeader("apiKey") String apiKey, @PathVariable long id, @PathVariable long jid, @RequestBody InApplication inApplication){
-        apiService.validateAPIKey(apiKey);
-        if(inApplication.getUserId() != id || inApplication.getJobId() != jid) throw new BadRequestException(BAD_REQUEST_IDS_MISMATCH);
+    public void updateApplication( @PathVariable long id, @PathVariable long jid, @RequestBody InApplication inApplication){
+        if(inApplication.getUserId() != id || inApplication.getJobId() != jid) throw new BadRequestException(badRequest_IdsMismatch);
         Application application = applicationBinder.bindInput(inApplication);
         userService.updateApplication(application);
     }
 
     @PostMapping
-    public void createUser(@RequestHeader("apiKey") String apiKey, @RequestBody InUser inUser){
-        apiService.validateAPIKey(apiKey);
+    public void createUser( @RequestBody InUser inUser){
         User user = userBinder.bindInput(inUser);
         userService.createUser(user);
     }
 
     @PostMapping("/{id}/applications/{jid}")
-    public void createApplication(@PathVariable long id, @PathVariable long jid, @RequestHeader("apiKey") String apiKey, @RequestBody InApplication inApplication){
-        if(id != inApplication.getUserId() || jid != inApplication.getJobId()) throw new BadRequestException(BAD_REQUEST_IDS_MISMATCH);
-        apiService.validateAPIKey(apiKey);
+    public void createApplication(@PathVariable long id, @PathVariable long jid,  @RequestBody InApplication inApplication){
+        if(id != inApplication.getUserId() || jid != inApplication.getJobId()) throw new BadRequestException(badRequest_IdsMismatch);
         Application application = applicationBinder.bindInput(inApplication);
         userService.createApplication(application);
     }
 
     @DeleteMapping("/{id}")
-    public void deleteUser(@RequestHeader("apiKey") String apiKey, @PathVariable long id){
-        apiService.validateAPIKey(apiKey);
+    public void deleteUser( @PathVariable long id){
         userService.deleteUser(id);
     }
 
     @DeleteMapping("/{id}/applications/{jid}")
-    public void deleteApplication(@RequestHeader("apiKey") String apiKey, @PathVariable long id, @PathVariable long jid){
-        apiService.validateAPIKey(apiKey);
+    public void deleteApplication( @PathVariable long id, @PathVariable long jid){
         userService.deleteApplication(id, jid);
     }
 }

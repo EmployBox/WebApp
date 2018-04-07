@@ -9,7 +9,7 @@ import isel.ps.employbox.services.RatingService;
 import org.springframework.hateoas.Resource;
 import org.springframework.web.bind.annotation.*;
 
-import static isel.ps.employbox.ErrorMessages.BAD_REQUEST_IDS_MISMATCH;
+import static isel.ps.employbox.ErrorMessages.badRequest_IdsMismatch;
 
 @RestController
 @RequestMapping("/accounts/{id}/ratings")
@@ -42,13 +42,13 @@ public class RatingController {
 
     @PutMapping
     public void updateRating(@PathVariable long id, @RequestParam long accountTo, @RequestBody InRating rating){
-        if(id != rating.getAccountIDFrom() || accountTo != rating.getAccountIDTo()) throw new BadRequestException(BAD_REQUEST_IDS_MISMATCH);
+        if(id != rating.getAccountIDFrom() || accountTo != rating.getAccountIDTo()) throw new BadRequestException(badRequest_IdsMismatch);
         ratingService.updateRating(ratingBinder.bindInput(rating));
     }
 
     @PostMapping
     public void createRating(@PathVariable long id, @RequestParam long accountTo, @RequestBody InRating rating){
-        if(id != rating.getAccountIDFrom() || accountTo != rating.getAccountIDTo()) throw new BadRequestException(BAD_REQUEST_IDS_MISMATCH);
+        if(id != rating.getAccountIDFrom() || accountTo != rating.getAccountIDTo()) throw new BadRequestException(badRequest_IdsMismatch);
         ratingService.createRating(ratingBinder.bindInput(rating));
     }
 
