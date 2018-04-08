@@ -34,9 +34,9 @@ public class CommentController {
             throw new BadRequestException("Type must be either \"done\" or \"received\"");
     }
 
-    @GetMapping
-    public Resource<OutComment> getComment(@PathVariable long accountId, @RequestParam long accountTo){
-        return commentBinder.bindOutput(commentService.getComment(accountId, accountTo));
+    @GetMapping("{commentId}")
+    public Resource<OutComment> getComment(@PathVariable long accountId, @RequestBody long accountTo, @PathVariable long commentId){
+        return commentBinder.bindOutput(commentService.getComment(accountId, accountTo, commentId));
     }
 
     @PutMapping
@@ -46,13 +46,13 @@ public class CommentController {
     }
 
     @PostMapping
-    public void createComment(@PathVariable long id, @RequestParam long accountTo, @RequestBody InComment comment){
-        if(id != comment.getAccountIdFrom() || accountTo != comment.getAccountIdTo()) throw new BadRequestException(badRequest_IdsMismatch);
+    public void createComment(@PathVariable long accountFromId, @RequestParam long accountTo, @RequestBody InComment comment){
+        if(accountFromId != comment.getAccountIdFrom() || accountTo != comment.getAccountIdTo()) throw new BadRequestException(badRequest_IdsMismatch);
         commentService.createComment(commentBinder.bindInput(comment));
     }
 
-    @DeleteMapping
-    public void deleteComment(@PathVariable long id, @RequestParam long accountTo){
-        commentService.deleteComment(id, accountTo);
+    @DeleteMapping("{commentId}")
+    public void deleteComment(@PathVariable long accountFromId, @PathVariable long commentId){
+        commentService.deleteComment(accountFromId, commentId);
     }
 }

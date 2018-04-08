@@ -44,6 +44,7 @@ public class ChatController {
     public void createChat(@PathVariable long id, @RequestBody InChat inChat) {
         if(id != inChat.getAccountIdFirst()) throw new BadRequestException(badRequest_IdsMismatch);
         chatService.createNewChat(
+                id,
                 chatBinder.bindInput(inChat)
         );
     }

@@ -20,10 +20,12 @@ import static isel.ps.employbox.ErrorMessages.resourceNotFound_message;
 public class ChatService {
     private final RapperRepository<Chat, Long> chatRepo;
     private final RapperRepository<Message, Long> msgRepo;
+    private final AccountService accountService;
 
-    public ChatService(RapperRepository<Chat, Long> chatRepo, RapperRepository<Message, Long> msgRepo) {
+    public ChatService(RapperRepository<Chat, Long> chatRepo, RapperRepository<Message, Long> msgRepo, AccountService accountService) {
         this.chatRepo = chatRepo;
         this.msgRepo = msgRepo;
+        this.accountService = accountService;
     }
 
 
@@ -60,8 +62,9 @@ public class ChatService {
         return ochat.get();
     }
 
-    public void createNewChat( Chat inChat) {
-        chatRepo.create(inChat);
+    public void createNewChat(long accountIdFrom, Chat inChat) {
+         accountService.getAccount(accountIdFrom);
+         accountService.getAccount(inChat.getAccountIdSecond());
+         chatRepo.create(inChat);
     }
-
 }

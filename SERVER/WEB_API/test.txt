@@ -31,8 +31,8 @@
 	MapperSettings{query='update [Curriculum] set title = ? ,[version] = ?  where accountId = ?  and curriculumId = ? '},
 	MapperSettings{query='delete from [Curriculum] where accountIdandcurriculumId'}}
 {FollowMapper:
-	MapperSettings{query='insert into [Follow] (accountIdFrom,accountIdDest,[version]) values( ?  ,  ?  ,  ? )'},
-	MapperSettings{query='update [Follow] set accountIdFrom = ? ,accountIdDest = ? ,[version] = ?  where '},
+	MapperSettings{query='insert into [Follow] (accountIdFrom,accountIdFollowed,[version]) values( ?  ,  ?  ,  ? )'},
+	MapperSettings{query='update [Follow] set accountIdFrom = ? ,accountIdFollowed = ? ,[version] = ?  where '},
 	MapperSettings{query='delete from [Follow] where '}}
 {JobExperienceMapper:
 	MapperSettings{query='insert into [JobExperience] (jobId,competeces,years,[version]) values( ?  ,  ?  ,  ?  ,  ? )'},
