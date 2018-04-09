@@ -16,7 +16,7 @@ import java.util.Map;
 import static isel.ps.employbox.ErrorMessages.badRequest_IdsMismatch;
 
 @RestController
-@RequestMapping("/accounts/users/{id}/curriculum")
+@RequestMapping("/accounts/users/{id}/curricula")
 public class CurriculumController {
 
     private APIService apiService;
@@ -30,9 +30,9 @@ public class CurriculumController {
     }
 
     @GetMapping
-    public Resource<HalCollection> getAllCurriculums(@PathVariable long id, @RequestParam Map<String,String> queryString){
+    public Resource<HalCollection> getCurricula(@PathVariable long id, @RequestParam Map<String,String> queryString){
         return curriculumBinder.bindOutput(
-                userService.getAllCurriculums(id, queryString),
+                userService.getCurricula(id, queryString),
                 this.getClass(),
                 id
         );

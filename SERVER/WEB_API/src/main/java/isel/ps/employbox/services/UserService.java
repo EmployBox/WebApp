@@ -71,7 +71,7 @@ public class UserService {
     }
 
 
-    public Stream<Curriculum> getAllCurriculums(long userId ) /**, Map<String, String> queryString) {*/
+    public Stream<Curriculum> getCurricula(long userId ) /**, Map<String, String> queryString) {*/
     {
         return StreamSupport.stream(curriculumRepo.findAll().spliterator(), false)
                 .filter(curr-> curr.getUserId() == userId);

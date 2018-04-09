@@ -53,10 +53,11 @@ CREATE TABLE ApiDatabase.[User] (
 
 CREATE TABLE ApiDatabase.[Curriculum](
 	userId BIGINT references ApiDatabase.[User],
-	curriculumId BIGINT,
+	curriculumId BIGINT identity primary key,
+	tile nvarchar(50),
+  [version] rowversion
 
-	FOREIGN KEY (userId) REFERENCES ApiDatabase.[User] ( accountId),	
-	primary key(userId,curriculumId)
+	FOREIGN KEY (userId) REFERENCES ApiDatabase.[User] (accountId)
 )
 
 CREATE TABLE ApiDatabase.[Project] (
