@@ -27,8 +27,8 @@
 	MapperSettings{query='update [CurriculumExperience] set userId = ? ,curriculumId = ? ,competences = ? ,years = ? ,[version] = ?  where '},
 	MapperSettings{query='delete from [CurriculumExperience] where '}}
 {CurriculumMapper:
-	MapperSettings{query='insert into [Curriculum] (accountId,curriculumId,title,[version]) values( ?  ,  ?  ,  ?  ,  ? )'},
-	MapperSettings{query='update [Curriculum] set title = ? ,[version] = ?  where accountId = ?  and curriculumId = ? '},
+	MapperSettings{query='insert into [Curriculum] (userId,curriculumId,title,[version]) values( ?  ,  ?  ,  ?  ,  ? )'},
+	MapperSettings{query='update [Curriculum] set title = ? ,[version] = ?  where userId = ?  and curriculumId = ? '},
 	MapperSettings{query='delete from [Curriculum] where accountIdandcurriculumId'}}
 {FollowMapper:
 	MapperSettings{query='insert into [Follow] (accountIdFrom,accountIdFollowed,[version]) values( ?  ,  ?  ,  ? )'},

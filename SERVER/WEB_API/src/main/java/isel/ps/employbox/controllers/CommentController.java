@@ -52,7 +52,7 @@ public class CommentController {
     }
 
     @DeleteMapping("{commentId}")
-    public void deleteComment(@PathVariable long accountFromId, @PathVariable long commentId){
-        commentService.deleteComment(accountFromId, commentId);
+    public void deleteComment( @PathVariable long commentId){
+        commentService.deleteComment( commentId);
     }
 }

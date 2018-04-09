@@ -51,16 +51,16 @@ public class UserController {
     @GetMapping("/{id}/applications")
     public Resource<HalCollection> getAllApplications(@PathVariable long id, @RequestParam Map<String,String> queryString){
         return applicationBinder.bindOutput(
-                userService.getAllApplications(id, queryString),
+                userService.getAllApplications(id),//, queryString),
                 this.getClass(),
                 id
         );
     }
 
     @GetMapping("/{id}/applications/{jid}")
-    public Resource<OutApplication> getApplication(@PathVariable long id, @RequestParam Map<String,String> queryString){
+    public Resource<OutApplication> getApplication(@PathVariable long id, @PathVariable long jid, @RequestParam Map<String,String> queryString){
         return applicationBinder.bindOutput(
-                userService.getApplication(id)
+                userService.getApplication(id, jid)
         );
     }
 
@@ -88,7 +88,7 @@ public class UserController {
     public void createApplication(@PathVariable long id, @PathVariable long jid,  @RequestBody InApplication inApplication){
         if(id != inApplication.getUserId() || jid != inApplication.getJobId()) throw new BadRequestException(badRequest_IdsMismatch);
         Application application = applicationBinder.bindInput(inApplication);
-        userService.createApplication(application);
+        userService.createApplication(id, application);
     }
 
     @DeleteMapping("/{id}")

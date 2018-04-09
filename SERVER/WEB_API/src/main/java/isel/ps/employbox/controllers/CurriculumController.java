@@ -57,7 +57,7 @@ public class CurriculumController {
 
     @PostMapping
     public void createCurriculum( @PathVariable long id, @RequestBody InCurriculum inCurriculum){
-        userService.createCurriculum(curriculumBinder.bindInput(inCurriculum));
+        userService.createCurriculum(id, curriculumBinder.bindInput(inCurriculum));
     }
 
     @DeleteMapping("/{cid}")

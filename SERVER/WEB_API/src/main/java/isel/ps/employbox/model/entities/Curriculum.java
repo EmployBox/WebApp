@@ -6,7 +6,7 @@ import java.util.function.Supplier;
 
 public class Curriculum {
 
-    private final long accountId;
+    private final long userId;
     private long curriculumId;
     private final String title;
     private final long version;
@@ -15,9 +15,9 @@ public class Curriculum {
     private final Supplier<List<Project>> projects;
     private final Supplier<List<CurriculumExperience>> experiences;
 
-    public Curriculum(long accountId, long curriculumId, String title, long version, Supplier<List<PreviousJobs>> previousJobs, Supplier<List<AcademicBackground>> academicBackground,
-            Supplier<List<Project>> projects, Supplier<List<CurriculumExperience>> experiences) {
-        this.accountId = accountId;
+    public Curriculum(long userId, long curriculumId, String title, long version, Supplier<List<PreviousJobs>> previousJobs, Supplier<List<AcademicBackground>> academicBackground,
+                      Supplier<List<Project>> projects, Supplier<List<CurriculumExperience>> experiences) {
+        this.userId = userId;
         this.curriculumId = curriculumId;
         this.title = title;
         this.version = version;
@@ -28,7 +28,7 @@ public class Curriculum {
     }
 
     public Curriculum(long id, String title) {
-        this.accountId = id;
+        this.userId = id;
         this.title= title;
         this.previousJobs = Collections::emptyList;
         this.academicBackground = Collections::emptyList;
@@ -41,8 +41,8 @@ public class Curriculum {
         return version;
     }
 
-    public long getAccountId() {
-        return accountId;
+    public long getUserId() {
+        return userId;
     }
 
     public long getCurriculumId() {

@@ -36,7 +36,7 @@ public class RatingController {
     }
 
     @GetMapping
-    public Resource<OutRating> getRating(@PathVariable long id, @RequestParam long accountTo){
+    public Resource<OutRating> getRating(@PathVariable long id, @RequestBody long accountTo){
         return ratingBinder.bindOutput(ratingService.getRating(id, accountTo));
     }
 

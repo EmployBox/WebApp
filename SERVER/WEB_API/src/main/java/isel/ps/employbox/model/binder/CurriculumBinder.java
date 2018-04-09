@@ -16,7 +16,7 @@ public class CurriculumBinder extends ModelBinder<Curriculum, OutCurriculum, InC
     @Override
     public Resource<OutCurriculum> bindOutput(Curriculum object) {
         return new Resource<>( new OutCurriculum(
-                object.getAccountId(),
+                object.getUserId(),
                 object.getCurriculumId(),
                 object.getTitle(),
                 bindExperience(object.getExperiences().get()),
