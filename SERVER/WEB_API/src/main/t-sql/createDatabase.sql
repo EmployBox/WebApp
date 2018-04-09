@@ -53,10 +53,11 @@ CREATE TABLE ApiDatabase.[User] (
 
 CREATE TABLE ApiDatabase.[Curriculum](
 	userId BIGINT references ApiDatabase.[User],
-	curriculumId BIGINT,
+	curriculumId BIGINT identity primary key,
+	tile nvarchar(50),
+  [version] rowversion
 
-	FOREIGN KEY (userId) REFERENCES ApiDatabase.[User] ( accountId),	
-	primary key(userId,curriculumId)
+	FOREIGN KEY (userId) REFERENCES ApiDatabase.[User] (accountId)
 )
 
 CREATE TABLE ApiDatabase.[Project] (
@@ -204,15 +205,14 @@ CREATE TABLE ApiDatabase.[Chat](
 
 CREATE TABLE ApiDatabase.[Message](
 	accountId BIGINT,
-	messageId BIGINT IDENTITY,
+	messageId BIGINT IDENTITY primary key,
 	chatId BIGINT REFERENCES ApiDatabase.Chat,
 	[text] NVARCHAR(200),
 	[date] datetime default(getdate()),
 	[version] rowversion,
 
 	FOREIGN KEY (chatId) REFERENCES ApiDatabase.Chat(chatId) ON DELETE CASCADE,
-	FOREIGN KEY (accountId) REFERENCES ApiDatabase.Account ON DELETE CASCADE,
-	PRIMARY KEY(messageId,chatId)
+	FOREIGN KEY (accountId) REFERENCES ApiDatabase.Account ON DELETE CASCADE
 )
 
 CREATE TABLE ApiDatabase.[Comment] (
