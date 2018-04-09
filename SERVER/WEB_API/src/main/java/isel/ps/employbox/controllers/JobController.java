@@ -26,7 +26,7 @@ public class JobController {
     }
 
     @GetMapping
-    public Resource<HalCollection> getAllJobs(@RequestParam Map<String,String> queryString){
+    public HalCollection getAllJobs(@RequestParam Map<String,String> queryString){
         return jobBinder.bindOutput(
                 jobService.getAllJobs(queryString),
                 this.getClass()
@@ -34,7 +34,7 @@ public class JobController {
     }
 
     @GetMapping("/{jid}")
-    public Resource<OutJob> getJob(@PathVariable long jid){
+    public OutJob getJob(@PathVariable long jid){
         return jobBinder.bindOutput(jobService.getJob(jid));
     }
 

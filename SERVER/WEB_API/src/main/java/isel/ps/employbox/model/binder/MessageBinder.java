@@ -3,15 +3,14 @@ package isel.ps.employbox.model.binder;
 import isel.ps.employbox.model.entities.Message;
 import isel.ps.employbox.model.input.InMessage;
 import isel.ps.employbox.model.output.OutMessage;
-import org.springframework.hateoas.Resource;
 import org.springframework.stereotype.Component;
 
 @Component
 public class MessageBinder extends ModelBinder<Message, OutMessage, InMessage> {
 
     @Override
-    public Resource<OutMessage> bindOutput(Message obj) {
-        return new Resource<>( new OutMessage(obj.getAccountId(), obj.getMessageId(), obj.getChadId() , obj.getDate(), obj.getText()) );
+    public OutMessage bindOutput(Message obj) {
+        return new OutMessage(obj.getAccountId(), obj.getMessageId(), obj.getChadId() , obj.getDate(), obj.getText());
     }
 
     @Override

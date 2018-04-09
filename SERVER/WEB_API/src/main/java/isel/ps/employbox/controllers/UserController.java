@@ -36,7 +36,7 @@ public class UserController {
     }
 
     @GetMapping
-    public Resource<HalCollection> getAllUsers(@RequestParam Map<String,String> queryString){
+    public HalCollection getAllUsers(@RequestParam Map<String,String> queryString){
         return userBinder.bindOutput(
                 userService.getAllUsers(queryString),
                 this.getClass()
@@ -44,12 +44,12 @@ public class UserController {
     }
 
     @GetMapping("/{id}")
-    public Resource<OutUser> getUser(@PathVariable long id){
+    public OutUser getUser(@PathVariable long id){
         return userBinder.bindOutput( userService.getUser(id));
     }
 
     @GetMapping("/{id}/applications")
-    public Resource<HalCollection> getAllApplications(@PathVariable long id, @RequestParam Map<String,String> queryString){
+    public HalCollection getAllApplications(@PathVariable long id, @RequestParam Map<String,String> queryString){
         return applicationBinder.bindOutput(
                 userService.getAllApplications(id),//, queryString),
                 this.getClass(),
@@ -58,7 +58,7 @@ public class UserController {
     }
 
     @GetMapping("/{id}/applications/{jid}")
-    public Resource<OutApplication> getApplication(@PathVariable long id, @PathVariable long jid, @RequestParam Map<String,String> queryString){
+    public OutApplication getApplication(@PathVariable long id, @PathVariable long jid, @RequestParam Map<String,String> queryString){
         return applicationBinder.bindOutput(
                 userService.getApplication(id, jid)
         );

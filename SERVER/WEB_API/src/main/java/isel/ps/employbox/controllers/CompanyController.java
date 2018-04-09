@@ -26,7 +26,7 @@ public class CompanyController {
     }
 
     @GetMapping
-    public Resource<HalCollection> getCompanies(){
+    public HalCollection getCompanies(){
         return companyBinder.bindOutput(
                 companyService.getCompanies(),
                 this.getClass()
@@ -34,7 +34,7 @@ public class CompanyController {
     }
 
     @GetMapping("/{cid}")
-    public Resource<OutCompany> getCompany(@PathVariable long cid){
+    public OutCompany getCompany(@PathVariable long cid){
         return companyBinder.bindOutput( companyService.getCompany(cid));
 
     }

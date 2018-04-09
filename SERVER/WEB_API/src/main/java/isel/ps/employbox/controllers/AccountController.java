@@ -23,7 +23,7 @@ public class AccountController {
     }
 
     @GetMapping
-    public Resource<HalCollection> getAccounts(){
+    public HalCollection getAccounts(){
         return accountBinder.bindOutput(
                 accountService.getAllAccounts(),
                 this.getClass()
@@ -31,7 +31,7 @@ public class AccountController {
     }
 
     @GetMapping("/{id}")
-    public Resource<OutAccount> getAccount(@PathVariable long id){
+    public OutAccount getAccount(@PathVariable long id){
         return accountBinder.bindOutput( accountService.getAccount(id));
     }
 }

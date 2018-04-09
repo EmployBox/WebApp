@@ -23,7 +23,7 @@ public class CommentController {
     }
 
     @GetMapping
-    public Resource<HalCollection> getAllComments(@PathVariable long accId, @RequestParam String type){
+    public HalCollection getAllComments(@PathVariable long accId, @RequestParam String type){
         if(type.equals("done") || type.equals("received"))
             return commentBinder.bindOutput(
                     commentService.getComments(accId, type),
@@ -35,7 +35,7 @@ public class CommentController {
     }
 
     @GetMapping("{commentId}")
-    public Resource<OutComment> getComment(@PathVariable long accountId, @RequestBody long accountTo, @PathVariable long commentId){
+    public OutComment getComment(@PathVariable long accountId, @RequestBody long accountTo, @PathVariable long commentId){
         return commentBinder.bindOutput(commentService.getComment(accountId, accountTo, commentId));
     }
 

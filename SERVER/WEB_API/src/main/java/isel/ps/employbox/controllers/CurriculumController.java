@@ -8,7 +8,6 @@ import isel.ps.employbox.model.output.HalCollection;
 import isel.ps.employbox.model.output.OutCurriculum;
 import isel.ps.employbox.services.APIService;
 import isel.ps.employbox.services.UserService;
-import org.springframework.hateoas.Resource;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
@@ -30,16 +29,16 @@ public class CurriculumController {
     }
 
     @GetMapping
-    public Resource<HalCollection> getAllCurriculums(@PathVariable long id, @RequestParam Map<String,String> queryString){
+    public HalCollection getAllCurriculums(@PathVariable long id, @RequestParam Map<String,String> queryString){
         return curriculumBinder.bindOutput(
-                userService.getAllCurriculums(id, queryString),
+                userService.getAllCurriculums(id),
                 this.getClass(),
                 id
         );
     }
 
     @GetMapping("/{cid}")
-    public Resource<OutCurriculum> getCurriculum(@PathVariable long id, @PathVariable long cid){
+    public OutCurriculum getCurriculum(@PathVariable long id, @PathVariable long cid){
         return curriculumBinder.bindOutput(
                 userService.getCurriculum(id, cid));
     }

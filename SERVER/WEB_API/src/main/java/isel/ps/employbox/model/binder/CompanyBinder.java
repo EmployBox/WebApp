@@ -3,16 +3,14 @@ package isel.ps.employbox.model.binder;
 import isel.ps.employbox.model.entities.Company;
 import isel.ps.employbox.model.input.InCompany;
 import isel.ps.employbox.model.output.OutCompany;
-import org.springframework.hateoas.Resource;
 import org.springframework.stereotype.Component;
 
 @Component
 public class CompanyBinder extends ModelBinder<Company, OutCompany, InCompany> {
 
     @Override
-    public Resource<OutCompany> bindOutput(Company object) {
-        return new Resource<>(
-                new OutCompany(
+    public OutCompany bindOutput(Company object) {
+        return new OutCompany(
                         object.getAccountID(),
                         object.getEmail(),
                         object.getRating(),
@@ -22,7 +20,7 @@ public class CompanyBinder extends ModelBinder<Company, OutCompany, InCompany> {
                         object.getLogoUrl(),
                         object.getWebPageUrl(),
                         object.getDescription()
-                        ));
+        );
     }
 
     @Override

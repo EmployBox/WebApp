@@ -3,7 +3,6 @@ package isel.ps.employbox.model.binder;
 import isel.ps.employbox.model.entities.*;
 import isel.ps.employbox.model.input.InCurriculum;
 import isel.ps.employbox.model.output.OutCurriculum;
-import org.springframework.hateoas.Resource;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -14,15 +13,15 @@ import java.util.stream.StreamSupport;
 public class CurriculumBinder extends ModelBinder<Curriculum, OutCurriculum, InCurriculum > {
 
     @Override
-    public Resource<OutCurriculum> bindOutput(Curriculum object) {
-        return new Resource<>( new OutCurriculum(
+    public OutCurriculum bindOutput(Curriculum object) {
+        return new OutCurriculum(
                 object.getUserId(),
                 object.getCurriculumId(),
                 object.getTitle(),
                 bindExperience(object.getExperiences().get()),
                 bindPreviousJobs(object.getPreviousJobs().get()),
                 bindOutProject(object.getProjects().get()),
-                bindAcademicBackground(object.getAcademicBackground().get()))
+                bindAcademicBackground(object.getAcademicBackground().get())
         );
     }
 

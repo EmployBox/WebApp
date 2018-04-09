@@ -3,15 +3,14 @@ package isel.ps.employbox.model.binder;
 import isel.ps.employbox.model.entities.User;
 import isel.ps.employbox.model.input.InUser;
 import isel.ps.employbox.model.output.OutUser;
-import org.springframework.hateoas.Resource;
 import org.springframework.stereotype.Component;
 
 @Component
 public class UserBinder extends ModelBinder<User, OutUser, InUser> {
 
     @Override
-    public Resource<OutUser> bindOutput(User user) {
-        return new Resource( new OutUser(user.getAccountID(), user.getName(), user.getEmail(), user.getPhotoUrl(), user.getSummary(), user.getRating()));
+    public OutUser bindOutput(User user) {
+        return new OutUser(user.getAccountID(), user.getName(), user.getEmail(), user.getPhotoUrl(), user.getSummary(), user.getRating());
     }
 
     @Override

@@ -31,7 +31,7 @@ public class ChatController {
 
 
     @GetMapping("/{cid}/messages")
-    public Resource<HalCollection> getChatsMessages (@PathVariable long id, @PathVariable long cid) {
+    public HalCollection getChatsMessages (@PathVariable long id, @PathVariable long cid) {
         return messageBinder.bindOutput(
                 chatService.getAccountChatsMessages(id,cid),
                 this.getClass(),
@@ -56,7 +56,7 @@ public class ChatController {
     }
 
     @GetMapping("/{cid}/messages/{mid}")
-    public Resource<OutMessage> getChatMessage(@PathVariable long cid, @PathVariable long mid) {
+    public OutMessage getChatMessage(@PathVariable long cid, @PathVariable long mid) {
         return messageBinder.bindOutput( chatService.getAccountChatsMessage(cid, mid) );
     }
 }

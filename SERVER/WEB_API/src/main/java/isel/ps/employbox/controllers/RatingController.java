@@ -24,7 +24,7 @@ public class RatingController {
     }
 
     @GetMapping
-    public Resource<HalCollection> getRatings(@PathVariable long id, @RequestParam String type){
+    public HalCollection getRatings(@PathVariable long id, @RequestParam String type){
         if(type.equals("done") || type.equals("received"))
             return ratingBinder.bindOutput(
                     ratingService.getRatings(id, type),
@@ -36,7 +36,7 @@ public class RatingController {
     }
 
     @GetMapping
-    public Resource<OutRating> getRating(@PathVariable long id, @RequestBody long accountTo){
+    public OutRating getRating(@PathVariable long id, @RequestBody long accountTo){
         return ratingBinder.bindOutput(ratingService.getRating(id, accountTo));
     }
 

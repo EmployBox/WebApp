@@ -4,7 +4,6 @@ import isel.ps.employbox.model.entities.Job;
 import isel.ps.employbox.model.entities.JobExperience;
 import isel.ps.employbox.model.input.InJob;
 import isel.ps.employbox.model.output.OutJob;
-import org.springframework.hateoas.Resource;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -20,8 +19,8 @@ public class JobBinder extends ModelBinder<Job, OutJob, InJob> {
     }
 
     @Override
-    public Resource<OutJob> bindOutput(Job job) {
-        return new Resource( new OutJob(
+    public OutJob bindOutput(Job job) {
+        return new OutJob(
                 job.getAccountID(),
                 job.getJobId(),
                 job.getTitle(),
@@ -32,7 +31,7 @@ public class JobBinder extends ModelBinder<Job, OutJob, InJob> {
                 job.getSchedule(),
                 job.getOfferBeginDate(),
                 job.getOfferEndDate(),
-                job.getOfferType()));
+                job.getOfferType());
     }
 
     @Override

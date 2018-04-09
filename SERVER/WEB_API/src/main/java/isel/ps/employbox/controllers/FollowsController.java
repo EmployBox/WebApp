@@ -22,7 +22,7 @@ public class FollowsController {
     }
 
     @GetMapping("/followers")
-    public Resource<HalCollection> getFollowers(@PathVariable long id){
+    public HalCollection getFollowers(@PathVariable long id){
         return accountBinder.bindOutput(
                 followService.getAccountFollowers(id),
                 this.getClass(),
@@ -31,7 +31,7 @@ public class FollowsController {
     }
 
     @GetMapping("/following")
-    public Resource<HalCollection> getFollowing(@PathVariable long id){
+    public HalCollection getFollowing(@PathVariable long id){
         return accountBinder.bindOutput(
                 followService.getAccountFollowing(id),
                 this.getClass(),
