@@ -4,7 +4,9 @@ import isel.ps.employbox.exceptions.BadRequestException;
 import isel.ps.employbox.model.entities.Chat;
 import isel.ps.employbox.model.input.InChat;
 import org.springframework.hateoas.ResourceSupport;
+import org.springframework.stereotype.Component;
 
+@Component
 public class ChatBinder extends ModelBinder <Chat, ResourceSupport, InChat> {
 
 

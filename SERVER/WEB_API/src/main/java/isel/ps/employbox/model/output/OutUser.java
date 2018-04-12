@@ -37,11 +37,11 @@ public class OutUser extends ResourceSupport {
         this.add( linkTo ( UserController.class).slash(id).withSelfRel());
         this.add( linkTo ( JobController.class,id).withRel("offered_jobs"));
         this.add( linkTo ( CurriculumController.class,id).withRel("curricula"));
-        this.add( linkTo ( methodOn(UserController.class).getAllApplications(id,null)).withRel("applications"));
+        this.add( linkTo ( methodOn(UserController.class).getAllApplications(id)).withRel("applications"));
         this.add( linkTo ( ChatController.class,id).withRel("chats"));
         this.add( linkTo ( CommentController.class,id).withRel("comments"));
         this.add( linkTo ( RatingController.class,id).withRel("ratings"));
         this.add( linkTo( methodOn(FollowsController.class,id).getFollowers(id) ).withRel("followers"));
-        this.add( linkTo( methodOn(FollowsController.class,id).getFollowing(id) ).withRel("following"));
+        this.add( linkTo( methodOn(FollowsController.class,id).getFollowing(id, null) ).withRel("following"));
     }
 }

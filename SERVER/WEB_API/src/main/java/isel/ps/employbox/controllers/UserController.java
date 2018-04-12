@@ -10,12 +10,9 @@ import isel.ps.employbox.model.input.InUser;
 import isel.ps.employbox.model.output.HalCollection;
 import isel.ps.employbox.model.output.OutApplication;
 import isel.ps.employbox.model.output.OutUser;
-import isel.ps.employbox.services.APIService;
 import isel.ps.employbox.services.UserService;
-import org.springframework.hateoas.Resource;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.Map;
 
 import static isel.ps.employbox.ErrorMessages.badRequest_IdsMismatch;
 
@@ -24,21 +21,19 @@ import static isel.ps.employbox.ErrorMessages.badRequest_IdsMismatch;
 public class UserController {
 
     private final UserService userService;
-    private final APIService apiService;
     private final UserBinder userBinder;
     private final ApplicationBinder applicationBinder;
 
-    public UserController(UserService userService, APIService apiService, UserBinder userBinder, ApplicationBinder applicationBinder) {
+    public UserController(UserService userService, UserBinder userBinder, ApplicationBinder applicationBinder) {
         this.userService = userService;
-        this.apiService = apiService;
         this.userBinder = userBinder;
         this.applicationBinder = applicationBinder;
     }
 
     @GetMapping
-    public HalCollection getAllUsers(@RequestParam Map<String,String> queryString){
+    public HalCollection getAllUsers(){
         return userBinder.bindOutput(
-                userService.getAllUsers(queryString),
+                userService.getAllUsers(),
                 this.getClass()
         );
     }
@@ -49,7 +44,7 @@ public class UserController {
     }
 
     @GetMapping("/{id}/applications")
-    public HalCollection getAllApplications(@PathVariable long id, @RequestParam Map<String,String> queryString){
+    public HalCollection getAllApplications(@PathVariable long id){
         return applicationBinder.bindOutput(
                 userService.getAllApplications(id),//, queryString),
                 this.getClass(),
@@ -58,46 +53,55 @@ public class UserController {
     }
 
     @GetMapping("/{id}/applications/{jid}")
-    public OutApplication getApplication(@PathVariable long id, @PathVariable long jid, @RequestParam Map<String,String> queryString){
+    public OutApplication getApplication(@PathVariable long id, @PathVariable long jid){
         return applicationBinder.bindOutput(
                 userService.getApplication(id, jid)
         );
     }
 
     @PutMapping("/{id}")
-    public void updateUser( @PathVariable long id, @RequestBody InUser inUser){
+    public void updateUser(
+            @PathVariable long id,
+            @RequestBody InUser inUser,
+            Authentication authentication)
+    {
         if(inUser.getId() != id) throw new BadRequestException(badRequest_IdsMismatch);
         User user = userBinder.bindInput(inUser);
-        userService.updateUser(user);
+        userService.updateUser(user, authentication.getName());
     }
 
     @PutMapping("/{id}/applications/{jid}")
-    public void updateApplication( @PathVariable long id, @PathVariable long jid, @RequestBody InApplication inApplication){
+    public void updateApplication(
+            @PathVariable long id,
+            @PathVariable long jid,
+            @RequestBody InApplication inApplication,
+            Authentication authentication)
+    {
         if(inApplication.getUserId() != id || inApplication.getJobId() != jid) throw new BadRequestException(badRequest_IdsMismatch);
         Application application = applicationBinder.bindInput(inApplication);
-        userService.updateApplication(application);
+        userService.updateApplication(application, authentication.getName());
     }
 
     @PostMapping
-    public void createUser( @RequestBody InUser inUser){
+    public void createUser( @RequestBody InUser inUser ){
         User user = userBinder.bindInput(inUser);
         userService.createUser(user);
     }
 
     @PostMapping("/{id}/applications/{jid}")
-    public void createApplication(@PathVariable long id, @PathVariable long jid,  @RequestBody InApplication inApplication){
+    public void createApplication(@PathVariable long id, @PathVariable long jid,  @RequestBody InApplication inApplication, Authentication authentication){
         if(id != inApplication.getUserId() || jid != inApplication.getJobId()) throw new BadRequestException(badRequest_IdsMismatch);
         Application application = applicationBinder.bindInput(inApplication);
-        userService.createApplication(id, application);
+        userService.createApplication(id, application, authentication.getName());
     }
 
     @DeleteMapping("/{id}")
-    public void deleteUser( @PathVariable long id){
-        userService.deleteUser(id);
+    public void deleteUser( @PathVariable long id, Authentication authentication){
+        userService.deleteUser(id, authentication.getName());
     }
 
     @DeleteMapping("/{id}/applications/{jid}")
-    public void deleteApplication( @PathVariable long id, @PathVariable long jid){
-        userService.deleteApplication(id, jid);
+    public void deleteApplication( @PathVariable long id, @PathVariable long jid, Authentication authentication){
+        userService.deleteApplication(id, jid, authentication.getName());
     }
 }

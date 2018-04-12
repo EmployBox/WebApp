@@ -7,10 +7,8 @@ import isel.ps.employbox.model.input.InJob;
 import isel.ps.employbox.model.output.HalCollection;
 import isel.ps.employbox.model.output.OutJob;
 import isel.ps.employbox.services.JobService;
-import org.springframework.hateoas.Resource;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.Map;
 
 import static isel.ps.employbox.ErrorMessages.badRequest_IdsMismatch;
 
@@ -26,9 +24,9 @@ public class JobController {
     }
 
     @GetMapping
-    public HalCollection getAllJobs(@RequestParam Map<String,String> queryString){
+    public HalCollection getAllJobs(){
         return jobBinder.bindOutput(
-                jobService.getAllJobs(queryString),
+                jobService.getAllJobs(),
                 this.getClass()
         );
     }
@@ -39,22 +37,22 @@ public class JobController {
     }
 
     @PutMapping("/{jid}")
-    public void updateJob(@PathVariable long jid, @RequestBody InJob job){
+    public void updateJob(@PathVariable long jid, @RequestBody InJob job, Authentication authentication){
 
         if(job.getJobID() != jid) throw new BadRequestException(badRequest_IdsMismatch);
         Job updateJob = jobBinder.bindInput(job);
 
-        jobService.updateJob(updateJob);
+        jobService.updateJob(updateJob, authentication.getName());
     }
 
     @PostMapping
-    public void createJob( @RequestBody InJob job){
+    public void createJob( @RequestBody InJob job, Authentication authentication){
         Job newJob = jobBinder.bindInput(job);
-        jobService.createJob(newJob);
+        jobService.createJob(newJob, authentication.getName());
     }
 
     @DeleteMapping("/{jid}")
-    public void deleteJob(@PathVariable long jid){
-        jobService.deleteJob(jid);
+    public void deleteJob(@PathVariable long jid, Authentication authentication){
+        jobService.deleteJob(jid, authentication.getName() );
     }
 }

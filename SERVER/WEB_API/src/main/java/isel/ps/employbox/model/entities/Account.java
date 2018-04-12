@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.function.Supplier;
 
 public abstract class Account {
-    protected final long accountID;
+    protected long accountID;
     protected final String email;
     protected final String password;
     protected final float rating;

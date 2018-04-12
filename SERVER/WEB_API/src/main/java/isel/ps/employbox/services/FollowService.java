@@ -12,32 +12,32 @@ import java.util.stream.StreamSupport;
 @Service
 public class FollowService {
     private final RapperRepository<Follow, Pair<Long,Long>> followsRepo;
-    private final AccountService accountService;
+    private final UserService accountService;
 
-    public FollowService(RapperRepository<Follow, Pair<Long, Long>> followeRepo, AccountService accountService) {
+    public FollowService(RapperRepository<Follow, Pair<Long, Long>> followeRepo, UserService userService) {
         this.followsRepo = followeRepo;
-        this.accountService = accountService;
+        this.accountService = userService;
     }
 
 
 
     public Stream<Account> getAccountFollowers(long followedAccountId) {
-       return StreamSupport.stream( followsRepo.findAll().spliterator(), false)
+       return StreamSupport.stream( followsRepo.findAll().join().spliterator(), false)
                .filter(curr-> curr.getAccountIdFollowed() == followedAccountId)
-               .map( curr-> accountService.getAccount(curr.getAccountIdFollower()));
+               .map( curr-> accountService.getUser(curr.getAccountIdFollower()));
     }
 
-    public Stream<Account> getAccountFollowing(long followerAccountId) {
-        return StreamSupport.stream( followsRepo.findAll().spliterator(), false)
+    public Stream<Account> getAccountFollowing(long followerAccountId, String email) {
+        return StreamSupport.stream( followsRepo.findAll().join().spliterator(), false)
                 .filter(curr-> curr.getAccountIdFollower() == followerAccountId)
-                .map( curr-> accountService.getAccount(curr.getAccountIdFollowed()));
+                .map( curr-> accountService.getUser(curr.getAccountIdFollowed(), email));
     }
 
-    public void setFollower(long accountToBeFollowedId, long accountToFollowId){
+    public void setFollower(long accountToBeFollowedId, long accountToFollowId, String name){
         followsRepo.create( new Follow(accountToBeFollowedId, accountToFollowId));
     }
 
-    public void deleteFollower(long id, long fid) {
+    public void deleteFollower(long id, long fid, String name) {
         followsRepo.deleteById( new Pair(id,fid) );
     }
 }

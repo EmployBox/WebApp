@@ -6,7 +6,7 @@ import isel.ps.employbox.model.input.InComment;
 import isel.ps.employbox.model.output.HalCollection;
 import isel.ps.employbox.model.output.OutComment;
 import isel.ps.employbox.services.CommentService;
-import org.springframework.hateoas.Resource;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import static isel.ps.employbox.ErrorMessages.badRequest_IdsMismatch;
@@ -35,24 +35,34 @@ public class CommentController {
     }
 
     @GetMapping("{commentId}")
-    public OutComment getComment(@PathVariable long accountId, @RequestBody long accountTo, @PathVariable long commentId){
-        return commentBinder.bindOutput(commentService.getComment(accountId, accountTo, commentId));
+    public OutComment getComment(@PathVariable long accountId, @RequestBody long accountTo, @PathVariable long commentId, Authentication authentication){
+        return commentBinder.bindOutput(commentService.getComment(accountId, accountTo, commentId,  authentication.getName()));
     }
 
     @PutMapping
-    public void updateComment(@PathVariable long id, @RequestParam long accountTo, @RequestBody InComment comment){
+    public void updateComment(
+            @PathVariable long id,
+            @RequestParam long accountTo,
+            @RequestBody InComment comment,
+            Authentication authentication
+    ){
         if(id != comment.getAccountIdFrom() || accountTo != comment.getAccountIdTo()) throw new BadRequestException(badRequest_IdsMismatch);
-        commentService.updateComment(commentBinder.bindInput(comment));
+        commentService.updateComment(commentBinder.bindInput(comment), authentication.getName());
     }
 
     @PostMapping
-    public void createComment(@PathVariable long accountFromId, @RequestParam long accountTo, @RequestBody InComment comment){
+    public void createComment(
+            @PathVariable long accountFromId,
+            @RequestParam long accountTo,
+            @RequestBody InComment comment,
+            Authentication authentication
+    ){
         if(accountFromId != comment.getAccountIdFrom() || accountTo != comment.getAccountIdTo()) throw new BadRequestException(badRequest_IdsMismatch);
-        commentService.createComment(commentBinder.bindInput(comment));
+        commentService.createComment(commentBinder.bindInput(comment), authentication.getName());
     }
 
     @DeleteMapping("{commentId}")
-    public void deleteComment( @PathVariable long commentId){
-        commentService.deleteComment( commentId);
+    public void deleteComment( @PathVariable long commentId, Authentication authentication){
+        commentService.deleteComment( commentId,  authentication.getName());
     }
 }

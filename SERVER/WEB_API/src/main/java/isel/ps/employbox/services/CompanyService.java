@@ -11,25 +11,26 @@ import java.util.stream.StreamSupport;
 
 @Service
 public class CompanyService {
-
     private RapperRepository<Company, Long> companyRepo;
 
     public CompanyService(RapperRepository<Company, Long> companyRepo){ this.companyRepo = companyRepo; }
 
     public Stream<Company> getCompanies() {
-        return StreamSupport.stream(companyRepo.findAll().spliterator(),false);
+        return StreamSupport.stream(companyRepo.findAll().join().spliterator(),false);
     }
 
     public Company getCompany(long cid) {
-        Optional<Company> ocomp = companyRepo.findById(cid);
+        Optional<Company> ocomp = companyRepo.findById(cid).join();
         if(!ocomp.isPresent())
             throw new ResourceNotFoundException("Company doesnt exist");
         return ocomp.get();
     }
 
-    public void setCompany(Company company) { companyRepo.create(company); }
+    public void createCompany(Company company, String name) { companyRepo.create(company); }
 
-    public void deleteCompany(long cid) { companyRepo.deleteById(cid); }
+    public void deleteCompany(long cid, String email) {
+        companyRepo.deleteById(cid);
+    }
 
-    public void updateCompany(Company company) { companyRepo.update(company); }
+    public void updateCompany(Company company, String name) { companyRepo.update(company); }
 }

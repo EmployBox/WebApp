@@ -5,9 +5,8 @@ import isel.ps.employbox.model.binder.CompanyBinder;
 import isel.ps.employbox.model.input.InCompany;
 import isel.ps.employbox.model.output.HalCollection;
 import isel.ps.employbox.model.output.OutCompany;
-import isel.ps.employbox.services.APIService;
 import isel.ps.employbox.services.CompanyService;
-import org.springframework.hateoas.Resource;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import static isel.ps.employbox.ErrorMessages.badRequest_IdsMismatch;
@@ -17,12 +16,10 @@ import static isel.ps.employbox.ErrorMessages.badRequest_IdsMismatch;
 public class CompanyController {
     private final CompanyBinder companyBinder;
     private final CompanyService companyService;
-    private final APIService apiService;
 
-    public CompanyController(CompanyBinder companyBinder,CompanyService companyService, APIService apiservice){
+    public CompanyController(CompanyBinder companyBinder,CompanyService companyService){
         this.companyBinder = companyBinder;
         this.companyService = companyService;
-        this.apiService = apiservice;
     }
 
     @GetMapping
@@ -40,29 +37,35 @@ public class CompanyController {
     }
 
     @PostMapping
-    public void setCompany(
+    public void createCompany(
             @RequestBody InCompany inCompany,
-            @RequestHeader("apiKey") String apiKey){
-        apiService.validateAPIKey(apiKey);
-        companyService.setCompany(
-                companyBinder.bindInput(inCompany)
+            Authentication authentication
+    ){
+        companyService.createCompany(
+                companyBinder.bindInput(inCompany),
+                authentication.getName()
         );
     }
 
     @PutMapping("/{id}")
     public void updateCompany(
             @PathVariable long id,
-            @RequestBody InCompany inCompany
+            @RequestBody InCompany inCompany,
+            Authentication authentication
     ){
         if(id != inCompany.getAccountId()) throw new BadRequestException(badRequest_IdsMismatch);
         companyService.updateCompany(
-                companyBinder.bindInput(inCompany)
+                companyBinder.bindInput(inCompany),
+                authentication.getName()
+
         );
     }
 
     @DeleteMapping("/{cid}")
     public void deleteCompany(
-            @PathVariable long cid){
-        companyService.deleteCompany(cid);
+            @PathVariable long cid,
+            Authentication authentication
+    ){
+        companyService.deleteCompany(cid, authentication.getName());
     }
 }

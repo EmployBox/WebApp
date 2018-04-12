@@ -28,6 +28,6 @@ public class OutMessage extends ResourceSupport {
         this.chatId = chadId;
         this.date = date;
         this.text = text;
-        this.add( linkTo( methodOn(ChatController.class, accountId).getChatMessage(chatId, messageId)).withSelfRel());
+        this.add( linkTo( methodOn(ChatController.class, accountId).getChatMessage(chatId, messageId, null)).withSelfRel());
     }
 }

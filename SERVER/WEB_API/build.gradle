@@ -29,6 +29,8 @@ dependencies {
     compile group: 'org.springframework.plugin', name: 'spring-plugin-core', version: '1.2.0.RELEASE'
     compile group: 'com.microsoft.sqlserver', name: 'mssql-jdbc', version: '6.3.6.jre8-preview'
     compile ("org.springframework.boot:spring-boot-starter-security")
+    compile group: 'org.springframework.security.oauth', name: 'spring-security-oauth2', version: '2.3.0.RELEASE'
+    compile group: 'com.auth0', name: 'jwks-rsa', version: '0.3.0'
     testCompile('org.springframework.boot:spring-boot-starter-test')
     compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
 }
