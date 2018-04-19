@@ -1,8 +1,8 @@
 package isel.ps.employbox.services;
 
-import isel.ps.employbox.RapperRepository;
 import isel.ps.employbox.exceptions.ResourceNotFoundException;
 import isel.ps.employbox.model.entities.Company;
+import org.github.isel.rapper.DataRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -11,9 +11,9 @@ import java.util.stream.StreamSupport;
 
 @Service
 public class CompanyService {
-    private RapperRepository<Company, Long> companyRepo;
+    private DataRepository<Company, Long> companyRepo;
 
-    public CompanyService(RapperRepository<Company, Long> companyRepo){ this.companyRepo = companyRepo; }
+    public CompanyService(DataRepository<Company, Long> companyRepo){ this.companyRepo = companyRepo; }
 
     public Stream<Company> getCompanies() {
         return StreamSupport.stream(companyRepo.findAll().join().spliterator(),false);

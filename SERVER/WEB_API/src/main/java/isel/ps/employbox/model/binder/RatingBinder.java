@@ -11,8 +11,8 @@ public class RatingBinder extends ModelBinder<Rating, OutRating, InRating> {
     @Override
     public OutRating bindOutput(Rating object) {
         return new OutRating(
-                object.getAccountIDFrom(),
-                object.getAccountIDTo(),
+                object.getAccountIdFrom(),
+                object.getAccountIdTo(),
                 object.getWorkLoad(),
                 object.getWage(),
                 object.getWorkEnvironment(),
@@ -33,7 +33,7 @@ public class RatingBinder extends ModelBinder<Rating, OutRating, InRating> {
                 object.getCompetence(),
                 object.getPontuality(),
                 object.getAssiduity(),
-                object.getDemeanor()
-        );
+                object.getDemeanor(),
+                -1);
     }
 }

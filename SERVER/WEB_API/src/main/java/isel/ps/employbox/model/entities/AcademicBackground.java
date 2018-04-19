@@ -1,8 +1,12 @@
 package isel.ps.employbox.model.entities;
 
+import isel.ps.employbox.model.entities.composedKeys.AcademicBackgroundKey;
+import org.github.isel.rapper.DomainObject;
+
 import java.sql.Date;
 
-public class AcademicBackground {
+public class AcademicBackground implements DomainObject<AcademicBackgroundKey>{
+    private final AcademicBackgroundKey academicBackgroundKey;
     private final long accountID;
     private final long curriculumId;
     private final Date beginDate;
@@ -21,6 +25,12 @@ public class AcademicBackground {
         this.institution = institution;
         this.degreeObtained = degreeObtained;
         this.version = version;
+        academicBackgroundKey = new AcademicBackgroundKey(accountID, curriculumId);
+    }
+
+    @Override
+    public AcademicBackgroundKey getIdentityKey() {
+        return academicBackgroundKey;
     }
 
     public long getVersion() {

@@ -1,9 +1,12 @@
 package isel.ps.employbox.model.entities;
 
-public class Rating {
+import isel.ps.employbox.model.entities.composedKeys.UserToUserKey;
+import org.github.isel.rapper.DomainObject;
 
-    private final long accountIDFrom;
-    private final long accountIDTo;
+public class Rating implements DomainObject<UserToUserKey>{
+    private final UserToUserKey ratingKey;
+    private final long accountIdFrom;
+    private final long accountIdTo;
     private final float workLoad;
     private final float wage;
     private final float workEnvironment;
@@ -11,6 +14,7 @@ public class Rating {
     private final float pontuality;
     private final float assiduity;
     private final float demeanor;
+    private final long version;
 
     public Rating(long accountIDFrom,
                   long accountIDTo,
@@ -20,10 +24,11 @@ public class Rating {
                   float competence,
                   float pontuality,
                   float assiduity,
-                  float demeanor)
-    {
-        this.accountIDFrom = accountIDFrom;
-        this.accountIDTo = accountIDTo;
+                  float demeanor,
+                  long version
+    ) {
+        this.accountIdFrom = accountIDFrom;
+        this.accountIdTo = accountIDTo;
         this.workLoad = workLoad;
         this.wage = wage;
         this.workEnvironment = workEnvironment;
@@ -31,14 +36,16 @@ public class Rating {
         this.pontuality = pontuality;
         this.assiduity = assiduity;
         this.demeanor = demeanor;
+        this.version = version;
+        ratingKey = new UserToUserKey(accountIDFrom, accountIDTo);
     }
 
-    public long getAccountIDFrom() {
-        return accountIDFrom;
+    public long getAccountIdFrom() {
+        return accountIdFrom;
     }
 
-    public long getAccountIDTo() {
-        return accountIDTo;
+    public long getAccountIdTo() {
+        return accountIdTo;
     }
 
     public float getWorkLoad() {
@@ -67,5 +74,15 @@ public class Rating {
 
     public float getDemeanor() {
         return demeanor;
+    }
+
+    @Override
+    public UserToUserKey getIdentityKey() {
+        return ratingKey;
+    }
+
+    @Override
+    public long getVersion() {
+        return version;
     }
 }

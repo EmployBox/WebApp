@@ -9,7 +9,6 @@ import org.springframework.stereotype.Component;
 @Component
 public class ChatBinder extends ModelBinder <Chat, ResourceSupport, InChat> {
 
-
     @Override
     public ResourceSupport bindOutput(Chat object) {
         throw new BadRequestException("Method bindOutput cannot be called for chats");

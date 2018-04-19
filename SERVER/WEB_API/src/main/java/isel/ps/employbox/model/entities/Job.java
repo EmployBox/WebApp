@@ -1,11 +1,13 @@
 package isel.ps.employbox.model.entities;
 
+import org.github.isel.rapper.DomainObject;
+
 import java.sql.Date;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Supplier;
 
-public class Job {
+public class Job implements DomainObject<Long> {
     private long jobId;
     private final String title;
     private final long accountID;
@@ -77,6 +79,11 @@ public class Job {
         this.version = -1;
     }
 
+    @Override
+    public Long getIdentityKey() {
+        return jobId;
+    }
+
     public long getVersion() {
         return version;
     }
@@ -119,10 +126,6 @@ public class Job {
 
     public Supplier<List<JobExperience>> getExperiences() {
         return experiences;
-    }
-
-    public long getJobId() {
-        return jobId;
     }
 
     public String getTitle() {

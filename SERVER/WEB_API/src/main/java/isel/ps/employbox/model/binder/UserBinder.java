@@ -10,7 +10,7 @@ public class UserBinder extends ModelBinder<User, OutUser, InUser> {
 
     @Override
     public OutUser bindOutput(User user) {
-        return new OutUser(user.getAccountID(), user.getName(), user.getEmail(), user.getPhotoUrl(), user.getSummary(), user.getRating());
+        return new OutUser(user.getIdentityKey(), user.getName(), user.getEmail(), user.getPhotoUrl(), user.getSummary(), user.getRating());
     }
 
     @Override

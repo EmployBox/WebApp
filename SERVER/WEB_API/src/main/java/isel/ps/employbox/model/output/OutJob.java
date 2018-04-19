@@ -72,7 +72,7 @@ public class OutJob extends ResourceSupport {
         this.offerEndDate = offerEndDate;
         this.offerType = offerType;
         this.add( linkTo (JobController.class).slash(jobId).withSelfRel());
-        this.add( linkTo ( methodOn(UserController.class).getAllApplications(accountID)).withRel("applications"));
+        this.add( linkTo ( methodOn(UserController.class).getAllApplications(accountID, null)).withRel("applications"));
     }
 
     public static class OutExperience extends ResourceSupport{

@@ -1,10 +1,12 @@
 package isel.ps.employbox.model.entities;
 
+import org.github.isel.rapper.DomainObject;
+
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Supplier;
 
-public class Curriculum {
+public class Curriculum implements DomainObject<Long> {
 
     private final long userId;
     private long curriculumId;
@@ -37,16 +39,17 @@ public class Curriculum {
         this.version = -1;
     }
 
+    @Override
+    public Long getIdentityKey() {
+        return curriculumId;
+    }
+
     public long getVersion() {
         return version;
     }
 
     public long getUserId() {
         return userId;
-    }
-
-    public long getCurriculumId() {
-        return curriculumId;
     }
 
     public String getTitle() {

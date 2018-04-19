@@ -27,10 +27,9 @@ public class CurriculumController {
     @GetMapping
     public HalCollection getCurricula(@PathVariable long id,  Authentication authentication){
         return curriculumBinder.bindOutput(
-                userService.getCurricula(id),
+                userService.getCurricula(id, authentication.getName()),
                 this.getClass(),
-                id,
-                authentication.getName()
+                id
         );
     }
 

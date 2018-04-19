@@ -57,4 +57,5 @@ public class Company extends Account {
     public String getDescription() {
         return description;
     }
+
 }

@@ -1,6 +1,8 @@
 package isel.ps.employbox.model.entities;
 
-public class Local {
+import org.github.isel.rapper.DomainObject;
+
+public class Local implements DomainObject<String>{
     private final String address;
     private final String country;
     private final String district;
@@ -19,12 +21,13 @@ public class Local {
         this.latitude = latitude;
     }
 
-    public long getVersion() {
-        return version;
+    @Override
+    public String getIdentityKey() {
+        return address;
     }
 
-    public String getAddress() {
-        return address;
+    public long getVersion() {
+        return version;
     }
 
     public String getCountry() {

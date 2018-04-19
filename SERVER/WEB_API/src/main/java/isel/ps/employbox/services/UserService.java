@@ -1,20 +1,21 @@
 package isel.ps.employbox.services;
 
 import isel.ps.employbox.ErrorMessages;
-import isel.ps.employbox.RapperRepository;
 import isel.ps.employbox.exceptions.BadRequestException;
 import isel.ps.employbox.exceptions.ResourceNotFoundException;
 import isel.ps.employbox.exceptions.UnauthorizedException;
 import isel.ps.employbox.model.entities.Application;
+import isel.ps.employbox.model.entities.composedKeys.ApplicationKey;
 import isel.ps.employbox.model.entities.Curriculum;
 import isel.ps.employbox.model.entities.User;
-import javafx.util.Pair;
+import org.github.isel.rapper.DataRepository;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.security.InvalidParameterException;
+import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
@@ -24,14 +25,16 @@ import static isel.ps.employbox.ErrorMessages.resourceNotfound_user;
 @Service
 public class UserService implements UserDetailsService {
 
-    private final RapperRepository<User, Long> userRepo;
-    private final JobService jobService;
-    private final RapperRepository<Curriculum, Long> curriculumRepo;
-    private final RapperRepository<Application, Pair<Long,Long>> applicationRepo;
+    private final DataRepository<User, Long> userRepo;
+    private final DataRepository<Curriculum, Long> curriculumRepo;
+    private final DataRepository<Application, ApplicationKey> applicationRepo;
 
-    public UserService(RapperRepository<User, Long> userRepo, JobService jobService, RapperRepository<Curriculum, Long> curriculumRepo, RapperRepository<Application, Pair<Long, Long>> applicationRepo) {
+    public UserService(
+            DataRepository<User, Long> userRepo,
+            DataRepository<Curriculum, Long> curriculumRepo,
+            DataRepository<Application, ApplicationKey> applicationRepo)
+    {
         this.userRepo = userRepo;
-        this.jobService = jobService;
         this.curriculumRepo = curriculumRepo;
         this.applicationRepo = applicationRepo;
     }
@@ -56,50 +59,42 @@ public class UserService implements UserDetailsService {
     }
 
     public Application getApplication(long userId, long jobId) {
-        getUser(userId);
-        jobService.getJob(jobId);
-        Optional<Application> oaplication = ( Optional<Application>)applicationRepo.findById(new Pair(userId, jobId)).join();
-        if(!oaplication.isPresent())
+
+        List<Application> aplications = getUser(userId).getApplications().get();
+
+        Optional<Application> oret;
+        if(aplications.isEmpty() ||(oret = aplications.parallelStream().filter(curr-> curr.getUserId() == userId && curr.getJobId() == jobId).findFirst()).isPresent())
             throw new ResourceNotFoundException(ErrorMessages.resourceNotfound_application);
 
-        Application application = oaplication.get();
-        if(application.getUserId() != userId)
-            throw new UnauthorizedException( ErrorMessages.unAuthorized_application );
-
-        return application;
+        return oret.get();
     }
 
 
-    public Stream<Application> getAllApplications(long userId)/**), Map<String, String> queryString) {*/
+    public Stream<Application> getAllApplications(long userId, String email)/**), Map<String, String> queryString) {*/
     {
-        return StreamSupport.stream(applicationRepo.findAll().join().spliterator(), false)
+        return StreamSupport.stream( getUser(userId, email).getApplications().get().spliterator(), false)
                 .filter(curr-> curr.getUserId() == userId);
     }
 
 
-    public Stream<Curriculum> getCurricula(long userId ) /**, Map<String, String> queryString) {*/
+    public Stream<Curriculum> getCurricula(long userId, String email ) /**, Map<String, String> queryString) {*/
     {
-        return StreamSupport.stream(curriculumRepo.findAll().join().spliterator(), false)
+        return StreamSupport.stream( getUser(userId, email).getCurricula().get().spliterator(), false)
                 .filter(curr-> curr.getUserId() == userId);
     }
 
     public Curriculum getCurriculum(long userId, long cid, String email) {
-        getUser(userId, email);
+        List<Curriculum> curricula = getUser(userId, email).getCurricula().get();
 
-        Optional<Curriculum> ocurriculum = curriculumRepo.findById(cid).join();
-
-        if(!ocurriculum.isPresent())
+        Optional<Curriculum> oret;
+        if(curricula.isEmpty() || ! (oret = curricula.parallelStream().filter(curr-> curr.getIdentityKey() == cid).findFirst()).isPresent())
             throw new ResourceNotFoundException(ErrorMessages.resourceNotfound_curriculum);
-        Curriculum curriculum = ocurriculum.get();
 
-        if(curriculum.getUserId()!= userId)
-            throw new UnauthorizedException(ErrorMessages.unAuthorized_curriculum);
-
-        return curriculum;
+        return oret.get();
     }
 
     public void updateUser(User user, String email) {
-        getUser(user.getAccountID(), email);
+        getUser(user.getIdentityKey(), email);
         userRepo.update(user);
     }
 
@@ -111,7 +106,7 @@ public class UserService implements UserDetailsService {
 
     public void updateCurriculum(Curriculum curriculum, String email) {
         getUser(curriculum.getUserId(), email);
-        getCurriculum(curriculum.getUserId(), curriculum.getCurriculumId(), email);
+        getCurriculum(curriculum.getUserId(), curriculum.getIdentityKey(), email);
         curriculumRepo.update(curriculum);
     }
 

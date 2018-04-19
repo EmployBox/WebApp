@@ -26,8 +26,8 @@ CREATE TABLE ApiDatabase.[Company] (
 	accountId BIGINT primary key references ApiDatabase.Account,
 	name NVARCHAR(40),
 	yearFounded SMALLINT,
-	Specialization NVARCHAR(20),
-	WebPageUrl NVARCHAR(50),
+	specialization NVARCHAR(20),
+	webPageUrl NVARCHAR(50),
 	LogoUrl NVARCHAR(100),
 	[description] NVARCHAR(50),
 	[version] rowversion,
@@ -111,18 +111,18 @@ CREATE TABLE Apidatabase.[PreviousJobs](
 
 CREATE TABLE ApiDatabase.[Local] (
 	[Address] NVARCHAR(50) primary key,
-	Country NVARCHAR(15),
-	ZIPCode NVARCHAR(40),
-  District NVARCHAR(40),
-  Longitude decimal(9, 6),
-  Latitude decimal(9,6),
+	country NVARCHAR(15),
+	zipCode NVARCHAR(40),
+    district NVARCHAR(40),
+    longitude decimal(9, 6),
+    latitude decimal(9,6),
 	[version] rowversion
 )
 
 
 CREATE TABLE ApiDatabase.[Job](
 	jobId BIGINT identity primary key,
-  title nvarchar(50) not null,
+    title nvarchar(50) not null,
 	accountId BIGINT,
 	schedule NVARCHAR(20),
 	wage INT check(wage > 0),
@@ -162,19 +162,19 @@ CREATE TABLE Apidatabase.[Job_Experience](
 )
 
 CREATE TABLE ApiDatabase.[Application](
-	UserId BIGINT,
-	CurriculumId BIGINT,
-	JobId BIGINT,
+	userId BIGINT,
+	curriculumId BIGINT,
+	jobId BIGINT,
 	[date] datetime default(GETDATE()),
 	[version] rowversion,
 
-	FOREIGN KEY (userId,curriculumId) REFERENCES ApiDatabase.Curriculum(userId,curriculumId),
+	FOREIGN KEY (userId,curriculumId) REFERENCES ApiDatabase.Curriculum(userId, curriculumId),
 	FOREIGN KEY (jobId) REFERENCES ApiDatabase.Job(jobId),
-	primary key (UserId, JobId)
+	primary key (userId, jobId)
 )
 CREATE TABLE ApiDatabase.[Rating](
-	AccountIdFrom BIGINT,
-	AccountIdTo BIGINT,
+	accountIdFrom BIGINT,
+	accountIdTo BIGINT,
 	moderatorId BIGINT references ApiDatabase.Moderator,
 	[workLoad] decimal(3,1) DEFAULT 0.0  check ([workLoad] >= 0.0 AND [workLoad] <= 10.0),
 	wage decimal(3,1) DEFAULT 0.0 check (wage >= 0.0 AND wage <= 10.0),
@@ -193,8 +193,8 @@ CREATE TABLE ApiDatabase.[Rating](
 
 CREATE TABLE ApiDatabase.[Chat](
 	chatId BIGINT IDENTITY PRIMARY KEY,
-	AccountIdFirst BIGINT,
-	AccountIdSecond BIGINT,
+	accountIdFirst BIGINT,
+	accountIdSecond BIGINT,
 	[version] rowversion
 
 	FOREIGN KEY (accountIdFirst) REFERENCES ApiDatabase.Account(accountID),
@@ -216,12 +216,12 @@ CREATE TABLE ApiDatabase.[Message](
 )
 
 CREATE TABLE ApiDatabase.[Comment] (
-	CommentId BIGINT identity primary key,
-	AccountIdFrom BIGINT,
-	AccountIdDest BIGINT,
+	commentId BIGINT identity primary key,
+	accountIdFrom BIGINT,
+	accountIdDest BIGINT,
 	[date] DATETIME default(getdate()),
 	[text] NVARCHAR(300),
-	MainCommentId BIGINT,
+	mainCommentId BIGINT,
 	[status] bit,
 	[version] rowversion
 
@@ -231,12 +231,12 @@ CREATE TABLE ApiDatabase.[Comment] (
 )
 
 CREATE TABLE ApiDatabase.[Follows] (
-	AccountIdFrom BIGINT references ApiDatabase.Account,
-	AccountIdDest BIGINT references ApiDatabase.Account,
+	accountIdFollowed BIGINT references ApiDatabase.Account,
+	accountIdFollower BIGINT references ApiDatabase.Account,
 	[version] rowversion
 
-	FOREIGN KEY (accountIdFrom) REFERENCES ApiDatabase.Account(accountID),
-	FOREIGN KEY (accountIdDest) REFERENCES ApiDatabase.Account(accountID),
-	primary key (AccountIdFrom,AccountIdDest)
+	FOREIGN KEY (accountIdFollowed) REFERENCES ApiDatabase.Account(accountId),
+	FOREIGN KEY (accountIdFollower) REFERENCES ApiDatabase.Account(accountId),
+	primary key (accountIdFollowed, accountIdFollower)
 )
 GO

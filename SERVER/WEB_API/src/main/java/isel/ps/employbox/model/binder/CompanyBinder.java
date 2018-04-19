@@ -11,7 +11,7 @@ public class CompanyBinder extends ModelBinder<Company, OutCompany, InCompany> {
     @Override
     public OutCompany bindOutput(Company object) {
         return new OutCompany(
-                        object.getAccountID(),
+                        object.getIdentityKey(),
                         object.getEmail(),
                         object.getRating(),
                         object.getName(),

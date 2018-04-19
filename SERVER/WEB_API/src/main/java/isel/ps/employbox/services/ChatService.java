@@ -1,12 +1,12 @@
 package isel.ps.employbox.services;
 
 import isel.ps.employbox.ErrorMessages;
-import isel.ps.employbox.RapperRepository;
 import isel.ps.employbox.exceptions.BadRequestException;
 import isel.ps.employbox.exceptions.ResourceNotFoundException;
 import isel.ps.employbox.exceptions.UnauthorizedException;
 import isel.ps.employbox.model.entities.Chat;
 import isel.ps.employbox.model.entities.Message;
+import org.github.isel.rapper.DataRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -18,11 +18,11 @@ import static isel.ps.employbox.ErrorMessages.resourceNotFound_message;
 
 @Service
 public class ChatService {
-    private final RapperRepository<Chat, Long> chatRepo;
-    private final RapperRepository<Message, Long> msgRepo;
+    private final DataRepository<Chat, Long> chatRepo;
+    private final DataRepository<Message, Long> msgRepo;
     private final AccountService accountService;
 
-    public ChatService(RapperRepository<Chat, Long> chatRepo, RapperRepository<Message, Long> msgRepo, AccountService accountService) {
+    public ChatService(DataRepository<Chat, Long> chatRepo, DataRepository<Message, Long> msgRepo, AccountService accountService) {
         this.chatRepo = chatRepo;
         this.msgRepo = msgRepo;
         this.accountService = accountService;

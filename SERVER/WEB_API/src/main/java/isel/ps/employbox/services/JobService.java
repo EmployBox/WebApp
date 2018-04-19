@@ -1,9 +1,9 @@
 package isel.ps.employbox.services;
 
 import isel.ps.employbox.ErrorMessages;
-import isel.ps.employbox.RapperRepository;
 import isel.ps.employbox.exceptions.ResourceNotFoundException;
 import isel.ps.employbox.model.entities.Job;
+import org.github.isel.rapper.DataRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -12,10 +12,10 @@ import java.util.stream.StreamSupport;
 
 @Service
 public class JobService {
-    private final RapperRepository<Job, Long> jobRepo;
+    private final DataRepository<Job, Long> jobRepo;
     private final UserService userService;
 
-    public JobService(RapperRepository<Job, Long> jobRepo, UserService userService) {
+    public JobService(DataRepository<Job, Long> jobRepo, UserService userService) {
         this.jobRepo = jobRepo;
         this.userService = userService;
     }
@@ -32,7 +32,7 @@ public class JobService {
     }
 
     public void updateJob(Job job, String email) {
-        getJob(job.getJobId());
+        getJob(job.getIdentityKey());
         userService.getUser(job.getAccountID(), email);
         jobRepo.update(job);
     }

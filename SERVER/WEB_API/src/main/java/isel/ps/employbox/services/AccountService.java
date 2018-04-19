@@ -1,10 +1,10 @@
 package isel.ps.employbox.services;
 
 import isel.ps.employbox.ErrorMessages;
-import isel.ps.employbox.RapperRepository;
 import isel.ps.employbox.exceptions.ResourceNotFoundException;
 import isel.ps.employbox.exceptions.UnauthorizedException;
 import isel.ps.employbox.model.entities.Account;
+import org.github.isel.rapper.DataRepository;
 import org.springframework.stereotype.Service;
 
 import java.security.InvalidParameterException;
@@ -16,9 +16,9 @@ import static isel.ps.employbox.ErrorMessages.resourceNotfound_account;
 
 @Service
 public final class AccountService {
-    private RapperRepository<Account, Long> accountRepo;
+    private DataRepository<Account, Long> accountRepo;
 
-    public AccountService(RapperRepository<Account, Long> accountRepo) {
+    public AccountService(DataRepository<Account, Long> accountRepo) {
         this.accountRepo = accountRepo;
     }
 

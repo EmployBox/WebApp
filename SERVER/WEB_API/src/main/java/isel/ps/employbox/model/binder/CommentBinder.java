@@ -14,7 +14,7 @@ public class CommentBinder extends ModelBinder<Comment, OutComment, InComment> {
         return new OutComment(
                 object.getAccountIdFrom(),
                 object.getAccountIdTo(),
-                object.getCommentID(),
+                object.getIdentityKey(),
                 object.getMainCommendID(),
                 object.getDate().toString(),
                 object.getText()

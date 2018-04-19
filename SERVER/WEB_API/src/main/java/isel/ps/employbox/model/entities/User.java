@@ -13,7 +13,6 @@ public class User extends Account implements UserDetails, Serializable {
     private final String name;
     private final String summary;
     private final String photoUrl;
-
     private final Supplier<List<Curriculum>> curricula;
     private final Supplier<List<Application>> applications;
 

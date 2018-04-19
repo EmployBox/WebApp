@@ -1,9 +1,9 @@
 package isel.ps.employbox.services;
 
-import isel.ps.employbox.RapperRepository;
 import isel.ps.employbox.model.entities.Account;
 import isel.ps.employbox.model.entities.Follow;
-import javafx.util.Pair;
+import isel.ps.employbox.model.entities.composedKeys.UserToUserKey;
+import org.github.isel.rapper.DataRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.stream.Stream;
@@ -11,15 +11,13 @@ import java.util.stream.StreamSupport;
 
 @Service
 public class FollowService {
-    private final RapperRepository<Follow, Pair<Long,Long>> followsRepo;
+    private final DataRepository<Follow, UserToUserKey> followsRepo;
     private final UserService accountService;
 
-    public FollowService(RapperRepository<Follow, Pair<Long, Long>> followeRepo, UserService userService) {
+    public FollowService(DataRepository<Follow, UserToUserKey> followeRepo, UserService userService) {
         this.followsRepo = followeRepo;
         this.accountService = userService;
     }
-
-
 
     public Stream<Account> getAccountFollowers(long followedAccountId) {
        return StreamSupport.stream( followsRepo.findAll().join().spliterator(), false)
@@ -38,6 +36,6 @@ public class FollowService {
     }
 
     public void deleteFollower(long id, long fid, String name) {
-        followsRepo.deleteById( new Pair(id,fid) );
+        followsRepo.deleteById( new UserToUserKey(id,fid) );
     }
 }

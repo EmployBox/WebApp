@@ -1,8 +1,10 @@
 package isel.ps.employbox.model.entities;
 
+import org.github.isel.rapper.DomainObject;
+
 import java.sql.Date;
 
-public class Message {
+public class Message implements DomainObject<Long> {
     private final long accountId;
     private final long messageId;
     private final long version;
@@ -26,6 +28,11 @@ public class Message {
         this.text = text;
         this.messageId = -1;
         this.version = -1;
+    }
+
+    @Override
+    public Long getIdentityKey() {
+        return messageId;
     }
 
     public long getVersion() {

@@ -22,7 +22,7 @@ public class JobBinder extends ModelBinder<Job, OutJob, InJob> {
     public OutJob bindOutput(Job job) {
         return new OutJob(
                 job.getAccountID(),
-                job.getJobId(),
+                job.getIdentityKey(),
                 job.getTitle(),
                 bindExperience(job.getExperiences().get()),
                 job.getAddress(),

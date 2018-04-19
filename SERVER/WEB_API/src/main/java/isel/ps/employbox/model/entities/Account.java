@@ -1,10 +1,12 @@
 package isel.ps.employbox.model.entities;
 
+import org.github.isel.rapper.DomainObject;
+
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Supplier;
 
-public abstract class Account {
+public class Account implements DomainObject<Long> {
     protected long accountID;
     protected final String email;
     protected final String password;
@@ -43,8 +45,15 @@ public abstract class Account {
         this.following = Collections::emptyList;
     }
 
+
+
     public long getAccountID() {
         return accountID;
+    }
+
+    @Override
+    public Long getIdentityKey() {
+        return null;
     }
 
     public long getVersion() {

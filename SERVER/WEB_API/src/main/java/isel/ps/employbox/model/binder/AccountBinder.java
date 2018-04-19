@@ -13,7 +13,7 @@ public class AccountBinder extends ModelBinder<Account, OutAccount, InAccount> {
     @Override
     public OutAccount bindOutput(Account object) {
         return new OutAccount(
-                    object.getAccountID(),
+                    object.getIdentityKey(),
                     object.getEmail(),
                     object.getRating());
     }

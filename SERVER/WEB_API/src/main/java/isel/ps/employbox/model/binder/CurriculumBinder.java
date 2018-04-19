@@ -1,6 +1,8 @@
 package isel.ps.employbox.model.binder;
 
 import isel.ps.employbox.model.entities.*;
+import isel.ps.employbox.model.entities.AcademicBackground;
+import isel.ps.employbox.model.entities.CurriculumExperience;
 import isel.ps.employbox.model.input.InCurriculum;
 import isel.ps.employbox.model.output.OutCurriculum;
 import org.springframework.stereotype.Component;
@@ -16,7 +18,7 @@ public class CurriculumBinder extends ModelBinder<Curriculum, OutCurriculum, InC
     public OutCurriculum bindOutput(Curriculum object) {
         return new OutCurriculum(
                 object.getUserId(),
-                object.getCurriculumId(),
+                object.getIdentityKey(),
                 object.getTitle(),
                 bindExperience(object.getExperiences().get()),
                 bindPreviousJobs(object.getPreviousJobs().get()),

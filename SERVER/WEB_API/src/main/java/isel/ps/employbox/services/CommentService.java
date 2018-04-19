@@ -1,10 +1,10 @@
 package isel.ps.employbox.services;
 
 import isel.ps.employbox.ErrorMessages;
-import isel.ps.employbox.RapperRepository;
 import isel.ps.employbox.exceptions.BadRequestException;
 import isel.ps.employbox.exceptions.ResourceNotFoundException;
 import isel.ps.employbox.model.entities.Comment;
+import org.github.isel.rapper.DataRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -13,10 +13,10 @@ import java.util.stream.StreamSupport;
 
 @Service
 public class CommentService {
-    private final RapperRepository<Comment,Long> commentRepo;
+    private final DataRepository<Comment,Long> commentRepo;
     private final UserService userService;
 
-    public CommentService(RapperRepository<Comment, Long> commentRepo, UserService userService) {
+    public CommentService(DataRepository<Comment, Long> commentRepo, UserService userService) {
         this.commentRepo = commentRepo;
         this.userService = userService;
     }
@@ -40,7 +40,7 @@ public class CommentService {
     }
 
     public void updateComment(Comment comment, String username) {
-        getComment(comment.getAccountIdFrom(), comment.getAccountIdTo(), comment.getCommentID(), username);
+        getComment(comment.getAccountIdFrom(), comment.getAccountIdTo(), comment.getIdentityKey(), username);
         commentRepo.update(comment);
     }
 

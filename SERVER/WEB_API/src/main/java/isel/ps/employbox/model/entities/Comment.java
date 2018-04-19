@@ -1,10 +1,12 @@
 package isel.ps.employbox.model.entities;
 
+import org.github.isel.rapper.DomainObject;
+
 import java.sql.Date;
 import java.util.List;
 import java.util.function.Supplier;
 
-public class Comment {
+public class Comment implements DomainObject<Long>{
     private long commentID;
     private final long accountIdFrom;
     private final long accountIdTo;
@@ -35,12 +37,13 @@ public class Comment {
         return status;
     }
 
-    public long getVersion() {
-        return version;
+    @Override
+    public Long getIdentityKey() {
+        return commentID;
     }
 
-    public long getCommentID() {
-        return commentID;
+    public long getVersion() {
+        return version;
     }
 
     public long getAccountIdFrom() {
