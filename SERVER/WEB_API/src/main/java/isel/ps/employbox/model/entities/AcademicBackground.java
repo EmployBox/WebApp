@@ -1,11 +1,10 @@
 package isel.ps.employbox.model.entities;
 
-import isel.ps.employbox.model.entities.composedKeys.AcademicBackgroundKey;
 import org.github.isel.rapper.DomainObject;
 
 import java.sql.Date;
 
-public class AcademicBackground implements DomainObject<AcademicBackgroundKey>{
+public class AcademicBackground implements DomainObject<AcademicBackground.AcademicBackgroundKey>{
     private final AcademicBackgroundKey academicBackgroundKey;
     private final long accountID;
     private final long curriculumId;
@@ -15,6 +14,19 @@ public class AcademicBackground implements DomainObject<AcademicBackgroundKey>{
     private final String institution;
     private final String degreeObtained;
     private final long version;
+
+    public AcademicBackground(){
+
+        academicBackgroundKey = null;
+        accountID = 0;
+        curriculumId = 0;
+        beginDate = null;
+        endDate = null;
+        studyArea = null;
+        institution = null;
+        degreeObtained = null;
+        version = 0;
+    }
 
     public AcademicBackground(long userId, long curriculumId, Date beginDate, Date endDate, String studyArea, String institution, String degreeObtained, long version) {
         this.accountID = userId;
@@ -63,5 +75,23 @@ public class AcademicBackground implements DomainObject<AcademicBackgroundKey>{
 
     public String getInstitution() {
         return institution;
+    }
+
+    public static class AcademicBackgroundKey {
+            private Long userId;
+            private Long CurriculumId;
+
+            public AcademicBackgroundKey(Long userId, Long curriculumId) {
+                this.userId = userId;
+                CurriculumId = curriculumId;
+            }
+
+            public Long getUserId() {
+                return userId;
+            }
+
+            public Long getCurriculumId() {
+                return CurriculumId;
+            }
     }
 }

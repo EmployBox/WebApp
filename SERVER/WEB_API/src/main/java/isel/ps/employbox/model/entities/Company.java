@@ -11,9 +11,33 @@ public class Company extends Account {
     private final String webPageUrl;
     private final String description;
 
-    public Company(long accountID, String email, String password, float rating, long version, String name, String Specialization, short yearFounded, String logoUrl, String webPageUrl,
-            String description, Supplier<List<Job>> offeredJobs, Supplier<List<Chat>> chats, Supplier<List<Comment>> comments, Supplier<List<Rating>> ratings,
-                   Supplier<List<User>> following){
+    public Company(){
+        name = null;
+        Specialization = null;
+        yearFounded = 0;
+        logoUrl = null;
+        webPageUrl = null;
+        description = null;
+    }
+
+    public Company(
+            long accountID,
+            String email,
+            String password,
+            float rating,
+            long version,
+            String name,
+            String Specialization,
+            short yearFounded,
+            String logoUrl,
+            String webPageUrl,
+            String description,
+            Supplier<List<Job>> offeredJobs,
+            Supplier<List<Chat>> chats,
+            Supplier<List<Comment>> comments,
+            Supplier<List<Rating>> ratings,
+            Supplier<List<User>> following)
+    {
         super(accountID, email, password, rating, version, offeredJobs,comments, chats, ratings, following);
         this.name = name;
         this.Specialization = Specialization;

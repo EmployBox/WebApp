@@ -35,7 +35,7 @@ public class RatingController {
             throw new BadRequestException("Type must be either \"done\" or \"received\"");
     }
 
-    @GetMapping
+    @GetMapping("/single")
     public OutRating getRating(@PathVariable long id, @RequestBody long accountTo){
         return ratingBinder.bindOutput(ratingService.getRating(id, accountTo));
     }

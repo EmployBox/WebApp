@@ -16,9 +16,30 @@ public class User extends Account implements UserDetails, Serializable {
     private final Supplier<List<Curriculum>> curricula;
     private final Supplier<List<Application>> applications;
 
-    public User(long accountID, String email, String password, float rating, long version, String name, String summary, String photoUrl, Supplier<List<Job>> offeredJobs,
-                Supplier<List<Curriculum>> curricula, Supplier<List<Application>> applications, Supplier<List<Chat>> chats, Supplier<List<Comment>> comments, Supplier<List<Rating>> ratings,
-                Supplier<List<User>> followers){
+    public User(){
+        name = null;
+        summary = null;
+        photoUrl = null;
+        curricula = Collections::emptyList;
+        applications = Collections::emptyList;
+    }
+
+    public User(long accountID,
+                String email,
+                String password,
+                float rating,
+                long version,
+                String name,
+                String summary,
+                String photoUrl,
+                Supplier<List<Job>> offeredJobs,
+                Supplier<List<Curriculum>> curricula,
+                Supplier<List<Application>> applications,
+                Supplier<List<Chat>> chats,
+                Supplier<List<Comment>> comments,
+                Supplier<List<Rating>> ratings,
+                Supplier<List<User>> followers)
+    {
         super(accountID, email, password, rating, version, offeredJobs, comments, chats, ratings, followers);
         this.name = name;
         this.summary = summary;

@@ -1,10 +1,9 @@
 package isel.ps.employbox.model.entities;
 
-import isel.ps.employbox.model.entities.composedKeys.UserToUserKey;
 import org.github.isel.rapper.DomainObject;
 
-public class Rating implements DomainObject<UserToUserKey>{
-    private final UserToUserKey ratingKey;
+public class Rating implements DomainObject<Rating.RatingKey>{
+    private final RatingKey ratingKey;
     private final long accountIdFrom;
     private final long accountIdTo;
     private final float workLoad;
@@ -15,6 +14,20 @@ public class Rating implements DomainObject<UserToUserKey>{
     private final float assiduity;
     private final float demeanor;
     private final long version;
+
+    public Rating(){
+        ratingKey = null;
+        accountIdFrom = 0;
+        accountIdTo = 0;
+        workLoad = 0;
+        wage = 0;
+        workEnvironment = 0;
+        competence = 0;
+        pontuality = 0;
+        assiduity = 0;
+        demeanor = 0;
+        version = 0;
+    }
 
     public Rating(long accountIDFrom,
                   long accountIDTo,
@@ -37,7 +50,7 @@ public class Rating implements DomainObject<UserToUserKey>{
         this.assiduity = assiduity;
         this.demeanor = demeanor;
         this.version = version;
-        ratingKey = new UserToUserKey(accountIDFrom, accountIDTo);
+        ratingKey = new RatingKey(accountIDFrom, accountIDTo);
     }
 
     public long getAccountIdFrom() {
@@ -77,12 +90,36 @@ public class Rating implements DomainObject<UserToUserKey>{
     }
 
     @Override
-    public UserToUserKey getIdentityKey() {
+    public RatingKey getIdentityKey() {
         return ratingKey;
     }
 
     @Override
     public long getVersion() {
         return version;
+    }
+
+    public static class RatingKey {
+        private final long accountIdFollower;
+        private final long accountIdFollowed;
+
+        public RatingKey(){
+            accountIdFollower = 0;
+            accountIdFollowed = 0;
+        }
+
+        public RatingKey(long accountIdFollowed, long accountIdFollower) {
+
+            this.accountIdFollower = accountIdFollowed;
+            this.accountIdFollowed = accountIdFollower;
+        }
+
+        public long getAccountIdFollower() {
+            return accountIdFollower;
+        }
+
+        public long getAccountIdFollowed() {
+            return accountIdFollowed;
+        }
     }
 }

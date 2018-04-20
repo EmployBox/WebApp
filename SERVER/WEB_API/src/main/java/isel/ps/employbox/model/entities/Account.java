@@ -18,6 +18,19 @@ public class Account implements DomainObject<Long> {
     protected final Supplier<List<Chat>> chats;
     protected final Supplier<List<Rating>> ratings;
 
+    public Account(){
+        accountID = 0;
+        email = null;
+        password = null;
+        rating = 0;
+        version = 0;
+        offeredJobs = Collections::emptyList;
+        comments = Collections::emptyList;
+        following = Collections::emptyList;
+        chats = Collections::emptyList;
+        ratings = Collections::emptyList;
+    }
+
     protected Account(long accountID, String email, String password, float rating, long version, Supplier<List<Job>> offeredJobs, Supplier<List<Comment>> comments,
             Supplier<List<Chat>> chats, Supplier<List<Rating>> ratings, Supplier<List<User>> following){
         this.accountID = accountID;
@@ -44,8 +57,6 @@ public class Account implements DomainObject<Long> {
         this.comments = Collections::emptyList;
         this.following = Collections::emptyList;
     }
-
-
 
     public long getAccountID() {
         return accountID;

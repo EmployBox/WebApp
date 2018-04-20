@@ -11,6 +11,16 @@ public class Local implements DomainObject<String>{
     private final float longitude;
     private final float latitude;
 
+    public Local(){
+        address = null;
+        country = null;
+        district = null;
+        zipCode = null;
+        version = 0;
+        longitude = 0;
+        latitude = 0;
+    }
+
     public Local(String address, String country, String district, String zipCode, long version, float longitude, float latitude) {
         this.address = address;
         this.country = country;

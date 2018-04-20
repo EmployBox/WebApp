@@ -4,8 +4,9 @@ package isel.ps.employbox.model.binder;
 import isel.ps.employbox.model.entities.JobExperience;
 import isel.ps.employbox.model.input.InJob;
 import isel.ps.employbox.model.output.OutJob;
+import org.springframework.stereotype.Component;
 
-
+@Component
 public class ExperienceBinder extends ModelBinder<JobExperience,OutJob.OutExperience,InJob.InExperience> {
 
 

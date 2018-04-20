@@ -17,8 +17,25 @@ public class Curriculum implements DomainObject<Long> {
     private final Supplier<List<Project>> projects;
     private final Supplier<List<CurriculumExperience>> experiences;
 
-    public Curriculum(long userId, long curriculumId, String title, long version, Supplier<List<PreviousJobs>> previousJobs, Supplier<List<AcademicBackground>> academicBackground,
-                      Supplier<List<Project>> projects, Supplier<List<CurriculumExperience>> experiences) {
+    public Curriculum(){
+        userId = 0;
+        title = null;
+        version = 0;
+        previousJobs = Collections::emptyList;
+        academicBackground = Collections::emptyList;
+        projects = Collections::emptyList;
+        experiences = Collections::emptyList;
+    }
+
+    public Curriculum(long userId,
+                      long curriculumId,
+                      String title,
+                      long version,
+                      Supplier<List<PreviousJobs>> previousJobs,
+                      Supplier<List<AcademicBackground>> academicBackground,
+                      Supplier<List<Project>> projects,
+                      Supplier<List<CurriculumExperience>> experiences)
+    {
         this.userId = userId;
         this.curriculumId = curriculumId;
         this.title = title;

@@ -1,17 +1,25 @@
 package isel.ps.employbox.model.entities;
 
-import isel.ps.employbox.model.entities.composedKeys.ApplicationKey;
 import org.github.isel.rapper.DomainObject;
 
 import java.sql.Date;
 
-public class Application implements DomainObject<ApplicationKey>{
-    private final ApplicationKey applicationKey;
+public class Application implements DomainObject<Application.ApplicationKeys>{
+    private final ApplicationKeys applicationKey;
     private final long userId;
     private final long jobId;
     private final long curriculumId;
     private final Date date;
     private final long version;
+
+    public Application(){
+        applicationKey = null;
+        userId = 0;
+        jobId = 0;
+        curriculumId = 0;
+        date = null;
+        version = 0;
+    }
 
     public Application(long userId, long jobId, long curriculumId, Date date, long version) {
         this.userId = userId;
@@ -19,7 +27,7 @@ public class Application implements DomainObject<ApplicationKey>{
         this.curriculumId = curriculumId;
         this.date = date;
         this.version = version;
-        applicationKey = new ApplicationKey(userId, jobId);
+        applicationKey = new ApplicationKeys(userId, jobId);
     }
 
     public Application(long userId, long jobId, long curriculumId, Date date) {
@@ -28,11 +36,11 @@ public class Application implements DomainObject<ApplicationKey>{
         this.curriculumId = curriculumId;
         this.date = date;
         this.version = -1;
-        applicationKey = new ApplicationKey(userId, jobId);
+        applicationKey = new ApplicationKeys(userId, jobId);
     }
 
     @Override
-    public ApplicationKey getIdentityKey() {
+    public ApplicationKeys getIdentityKey() {
         return applicationKey;
     }
 
@@ -54,5 +62,25 @@ public class Application implements DomainObject<ApplicationKey>{
 
     public long getUserId() {
         return userId;
+    }
+
+    public static class ApplicationKeys {
+        private long userId;
+        private long jobId;
+
+        public ApplicationKeys(){ }
+
+        public ApplicationKeys(long userId, long jobId) {
+            this.userId = userId;
+            this.jobId = jobId;
+        }
+
+        public long getUserId() {
+            return userId;
+        }
+
+        public long getJobId() {
+            return jobId;
+        }
     }
 }

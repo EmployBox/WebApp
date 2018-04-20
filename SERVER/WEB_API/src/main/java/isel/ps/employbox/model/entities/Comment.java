@@ -17,6 +17,17 @@ public class Comment implements DomainObject<Long>{
     private final Supplier<List<Comment>> replies;
     private final long version;
 
+    public Comment(){
+        accountIdFrom = 0;
+        accountIdTo = 0;
+        parentCommendID = 0;
+        date = null;
+        text = null;
+        status = false;
+        replies = null;
+        version = 0;
+    }
+
     public Comment(long commentID, long accountIdFrom, long accountIdTo, long parentCommendID, Date date, String text, boolean status, Supplier<List<Comment>> replies, long version){
         this.commentID = commentID;
         this.accountIdFrom = accountIdFrom;

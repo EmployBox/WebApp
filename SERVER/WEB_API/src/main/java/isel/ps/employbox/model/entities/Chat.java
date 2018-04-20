@@ -12,6 +12,13 @@ public class Chat implements DomainObject<Long>{
     private long version;
     private Supplier<List<Message>> messages;
 
+    public Chat(){
+        accountIdFirst = 0;
+        accountIdSecond = 0;
+        version = 0;
+        messages = null;
+    }
+
     public Chat(long chatId, long accountIdFirst, long accountIdSecond, long version, Supplier<List<Message>> messages) {
         this.chadId = chatId;
         this.accountIdFirst = accountIdFirst;
@@ -45,4 +52,5 @@ public class Chat implements DomainObject<Long>{
     public Supplier<List<Message>> getMessages() {
         return messages;
     }
+
 }

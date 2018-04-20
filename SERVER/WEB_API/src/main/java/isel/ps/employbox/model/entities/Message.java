@@ -12,6 +12,15 @@ public class Message implements DomainObject<Long> {
     private final String text;
     private final Date date;
 
+    public Message(){
+        accountId = 0;
+        messageId = 0;
+        version = 0;
+        chadId = 0;
+        text = null;
+        date = null;
+    }
+
     public Message(long accountId, long messageId, long chatId, String text, Date date, long version) {
         this.accountId = accountId;
         this.chadId = chatId;

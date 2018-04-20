@@ -17,10 +17,25 @@ public class Job implements DomainObject<Long> {
     private final String schedule;
     private final Date offerBeginDate;
     private final Date offerEndDate;
-    private final String offerType; //TODO change to enum
+    private final String offerType;
     private final long version;
     private final Supplier<List<Application>> applications;
     private final Supplier<List<JobExperience>> experiences;
+
+    public Job(){
+        title = null;
+        accountID = 0;
+        address = null;
+        wage = 0;
+        description = null;
+        schedule = null;
+        offerBeginDate = null;
+        offerEndDate = null;
+        offerType = null;
+        applications = Collections::emptyList;
+        experiences = Collections::emptyList;
+        version = 0;
+    }
 
     public Job(
             long id,

@@ -5,7 +5,6 @@ import isel.ps.employbox.exceptions.BadRequestException;
 import isel.ps.employbox.exceptions.ResourceNotFoundException;
 import isel.ps.employbox.exceptions.UnauthorizedException;
 import isel.ps.employbox.model.entities.Application;
-import isel.ps.employbox.model.entities.composedKeys.ApplicationKey;
 import isel.ps.employbox.model.entities.Curriculum;
 import isel.ps.employbox.model.entities.User;
 import org.github.isel.rapper.DataRepository;
@@ -27,12 +26,12 @@ public class UserService implements UserDetailsService {
 
     private final DataRepository<User, Long> userRepo;
     private final DataRepository<Curriculum, Long> curriculumRepo;
-    private final DataRepository<Application, ApplicationKey> applicationRepo;
+    private final DataRepository<Application, Application.ApplicationKeys> applicationRepo;
 
     public UserService(
             DataRepository<User, Long> userRepo,
             DataRepository<Curriculum, Long> curriculumRepo,
-            DataRepository<Application, ApplicationKey> applicationRepo)
+            DataRepository<Application, Application.ApplicationKeys> applicationRepo)
     {
         this.userRepo = userRepo;
         this.curriculumRepo = curriculumRepo;

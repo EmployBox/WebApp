@@ -1,14 +1,20 @@
 package isel.ps.employbox.model.entities;
 
-import isel.ps.employbox.model.entities.composedKeys.JobExperienceKey;
 import org.github.isel.rapper.DomainObject;
 
-public class JobExperience implements DomainObject<JobExperienceKey> {
+public class JobExperience implements DomainObject<JobExperience.JobExperienceKey> {
     private final long jobId;
     private final String competences;
     private final short years;
     private long version;
     private final JobExperienceKey jobExperienceKey;
+
+    public JobExperience(){
+        jobId = 0;
+        competences = null;
+        years = 0;
+        jobExperienceKey = null;
+    }
 
     public JobExperience(long jobId, String competences, short years, long version){
         this.jobId = jobId;
@@ -44,5 +50,28 @@ public class JobExperience implements DomainObject<JobExperienceKey> {
 
     public short getYears() {
         return years;
+    }
+
+    public static class JobExperienceKey {
+        private final long jobId;
+        private final String competences;
+
+        public JobExperienceKey(){
+            jobId = 0;
+            competences = null;
+        }
+
+        public JobExperienceKey(long jobId, String competences) {
+            this.jobId = jobId;
+            this.competences = competences;
+        }
+
+        public long getJobId() {
+            return jobId;
+        }
+
+        public String getCompetences() {
+            return competences;
+        }
     }
 }

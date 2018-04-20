@@ -3,7 +3,6 @@ package isel.ps.employbox.services;
 import isel.ps.employbox.ErrorMessages;
 import isel.ps.employbox.exceptions.ResourceNotFoundException;
 import isel.ps.employbox.model.entities.Rating;
-import isel.ps.employbox.model.entities.composedKeys.UserToUserKey;
 import org.github.isel.rapper.DataRepository;
 import org.springframework.stereotype.Service;
 
@@ -13,10 +12,10 @@ import java.util.stream.StreamSupport;
 
 @Service
 public class RatingService {
-    private final DataRepository<Rating, UserToUserKey> ratingRepo;
+    private final DataRepository<Rating, Rating.RatingKey> ratingRepo;
     private final UserService userService;
 
-    public RatingService(DataRepository<Rating, UserToUserKey> ratingRepo, UserService userService) {
+    public RatingService(DataRepository<Rating, Rating.RatingKey> ratingRepo, UserService userService) {
         this.ratingRepo = ratingRepo;
         this.userService = userService;
     }
@@ -27,7 +26,7 @@ public class RatingService {
     }
 
     public Rating getRating(long accountFrom, long accountTo) {
-        Optional<Rating> orating = ratingRepo.findById( new UserToUserKey(accountFrom, accountTo)).join();
+        Optional<Rating> orating = ratingRepo.findById( new Rating.RatingKey(accountFrom, accountTo)).join();
         if(!orating.isPresent())
             throw new ResourceNotFoundException(ErrorMessages.resourceNotfound_Rating);
         return orating.get();

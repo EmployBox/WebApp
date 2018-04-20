@@ -6,6 +6,10 @@ import java.util.function.Supplier;
 public class Moderator extends Account {
     private final Supplier<List<Rating>> ratingsModerated;
 
+    public Moderator(){
+        ratingsModerated = null;
+    }
+
     public Moderator(
             long accountID,
             String email,
