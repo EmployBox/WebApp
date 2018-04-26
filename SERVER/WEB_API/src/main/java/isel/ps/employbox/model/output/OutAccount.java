@@ -12,11 +12,15 @@ public class OutAccount extends ResourceSupport {
     private final String email;
 
     @JsonProperty
-    private final float rating;
+    private final double rating;
 
-    public OutAccount(long accountID, String email, float rating) {
+    @JsonProperty
+    private final long version;
+
+    public OutAccount(long accountID, String email, double rating, long version) {
         this.accountID = accountID;
         this.email = email;
         this.rating = rating;
+        this.version = version;
     }
 }

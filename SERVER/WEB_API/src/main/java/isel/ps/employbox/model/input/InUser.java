@@ -7,6 +7,8 @@ public class InUser {
     private String name;
     private String photo_url;
     private String summary;
+    private long userVersion;
+    private long accountVersion;
 
     public long getId() {
         return id;
@@ -54,5 +56,19 @@ public class InUser {
 
     public void setSummary(String summary) {
         this.summary = summary;
+    }
+
+    public long getUserVersion() { return userVersion; }
+
+    public void setUserVersion(long userVersion) {
+        this.userVersion = userVersion;
+    }
+
+    public long getAccountVersion() {
+        return accountVersion;
+    }
+
+    public void setAccountVersion(long accountVersion) {
+        this.accountVersion = accountVersion;
     }
 }

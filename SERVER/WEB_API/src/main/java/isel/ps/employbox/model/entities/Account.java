@@ -1,25 +1,40 @@
 package isel.ps.employbox.model.entities;
 
+import org.github.isel.rapper.ColumnName;
 import org.github.isel.rapper.DomainObject;
+import org.github.isel.rapper.Id;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Supplier;
 
 public class Account implements DomainObject<Long> {
-    protected long accountID;
+
+    private final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+
+    @Id (isIdentity =  true)
+    protected long accountId;
+
     protected final String email;
     protected final String password;
-    protected final float rating;
-    protected final long version;
+    protected final double rating;
+
+    private final long version;
+    @ColumnName(name = "accountId")
     protected final Supplier<List<Job>> offeredJobs;
+    @ColumnName(name = "accountId")
     protected final Supplier<List<Comment>> comments;
+    @ColumnName(name = "accountId")
     protected final Supplier<List<User>> following;
+    @ColumnName(name = "accountId")
     protected final Supplier<List<Chat>> chats;
+    @ColumnName(name = "accountId")
     protected final Supplier<List<Rating>> ratings;
 
     public Account(){
-        accountID = 0;
+        accountId = 0;
         email = null;
         password = null;
         rating = 0;
@@ -31,11 +46,21 @@ public class Account implements DomainObject<Long> {
         ratings = Collections::emptyList;
     }
 
-    protected Account(long accountID, String email, String password, float rating, long version, Supplier<List<Job>> offeredJobs, Supplier<List<Comment>> comments,
-            Supplier<List<Chat>> chats, Supplier<List<Rating>> ratings, Supplier<List<User>> following){
-        this.accountID = accountID;
+    protected Account(
+            long accountID,
+            String email,
+            String password,
+            float rating,
+            long version,
+            Supplier<List<Job>> offeredJobs,
+            Supplier<List<Comment>> comments,
+            Supplier<List<Chat>> chats,
+            Supplier<List<Rating>> ratings,
+            Supplier<List<User>> following
+    ) {
+        this.accountId = accountID;
         this.email = email;
-        this.password = password;
+        this.password = passwordEncoder.encode(password);
         this.rating = rating;
         this.version = version;
         this.offeredJobs = offeredJobs;
@@ -45,11 +70,11 @@ public class Account implements DomainObject<Long> {
         this.following = following;
     }
 
-    protected Account(String email, String password, float rating){
-        this.accountID = -1;
-        this.version = -1;
+    protected Account(long accountId, String email, String password, float rating, long version){
+        this.accountId = accountId;
+        this.version = version;
         this.email = email;
-        this.password = password;
+        this.password =  passwordEncoder.encode(password);
         this.rating = rating;
         this.offeredJobs = Collections::emptyList;
         this.chats = Collections::emptyList;
@@ -58,13 +83,9 @@ public class Account implements DomainObject<Long> {
         this.following = Collections::emptyList;
     }
 
-    public long getAccountID() {
-        return accountID;
-    }
-
     @Override
     public Long getIdentityKey() {
-        return null;
+        return accountId;
     }
 
     public long getVersion() {
@@ -79,7 +100,7 @@ public class Account implements DomainObject<Long> {
         return password;
     }
 
-    public float getRating() {
+    public double getRating() {
         return rating;
     }
 
@@ -102,4 +123,5 @@ public class Account implements DomainObject<Long> {
     public Supplier<List<Rating>> getRatings() {
         return ratings;
     }
+
 }

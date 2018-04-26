@@ -1,5 +1,6 @@
 package isel.ps.employbox.model.entities;
 
+import org.github.isel.rapper.ColumnName;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
@@ -13,7 +14,12 @@ public class User extends Account implements UserDetails, Serializable {
     private final String name;
     private final String summary;
     private final String photoUrl;
+    private final long version;
+
+
+    @ColumnName(name = "userId")
     private final Supplier<List<Curriculum>> curricula;
+    @ColumnName(name = "userId")
     private final Supplier<List<Application>> applications;
 
     public User(){
@@ -22,6 +28,7 @@ public class User extends Account implements UserDetails, Serializable {
         photoUrl = null;
         curricula = Collections::emptyList;
         applications = Collections::emptyList;
+        version = 0;
     }
 
     public User(long accountID,
@@ -38,7 +45,7 @@ public class User extends Account implements UserDetails, Serializable {
                 Supplier<List<Chat>> chats,
                 Supplier<List<Comment>> comments,
                 Supplier<List<Rating>> ratings,
-                Supplier<List<User>> followers)
+                Supplier<List<User>> followers, long version1)
     {
         super(accountID, email, password, rating, version, offeredJobs, comments, chats, ratings, followers);
         this.name = name;
@@ -46,13 +53,21 @@ public class User extends Account implements UserDetails, Serializable {
         this.photoUrl = photoUrl;
         this.curricula = curricula;
         this.applications = applications;
+        this.version = version1;
     }
 
-    public User(String email, String password, float rating, String name, String summary, String photoUrl){
-        super(email, password, rating);
+    public User(
+            long accountId,
+            String email,
+            String password,
+            float rating,
+            String name,
+            String summary, String photoUrl, long accountVersion, long version){
+        super(accountId, email, password, rating, accountVersion);
         this.name = name;
         this.summary = summary;
         this.photoUrl = photoUrl;
+        this.version = version;
         this.curricula = Collections::emptyList;
         this.applications = Collections::emptyList;
     }
@@ -83,6 +98,11 @@ public class User extends Account implements UserDetails, Serializable {
     }
 
     @Override
+    public String getPassword() {
+        return super.password;
+    }
+
+    @Override
     public String getUsername() {
         return email;
     }
@@ -105,5 +125,10 @@ public class User extends Account implements UserDetails, Serializable {
     @Override
     public boolean isEnabled() {
         return true;
+    }
+
+    @Override
+    public long getVersion() {
+        return version;
     }
 }

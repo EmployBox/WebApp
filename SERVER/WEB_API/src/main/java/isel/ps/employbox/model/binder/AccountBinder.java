@@ -11,11 +11,13 @@ public class AccountBinder extends ModelBinder<Account, OutAccount, InAccount> {
 
 
     @Override
-    public OutAccount bindOutput(Account object) {
+    public OutAccount bindOutput(Account acount) {
         return new OutAccount(
-                    object.getIdentityKey(),
-                    object.getEmail(),
-                    object.getRating());
+                    acount.getIdentityKey(),
+                    acount.getEmail(),
+                    acount.getRating(),
+                    acount.getVersion()
+        );
     }
 
     @Override

@@ -35,6 +35,9 @@ public class CompanyBinder extends ModelBinder<Company, OutCompany, InCompany> {
                 obj.getYearFounded(),
                 obj.getLogoUrl(),
                 obj.getWebpageUrl(),
-                obj.getDescription());
+                obj.getDescription(),
+                obj.getCompanyVersion(),
+                obj.getAccountVersion()
+        );
     }
 }

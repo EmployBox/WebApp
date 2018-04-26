@@ -5,107 +5,42 @@ IF DB_ID ('PS_API_DATABASE') IS NOT NULL
 		USE PS_API_DATABASE
 		--USE PS_TEST_API_DATABASE
 
-		IF OBJECT_ID(N'dbo.[Project]') IS NOT NULL
-			DROP VIEW dbo.[Project];
-		IF OBJECT_ID(N'dbo.[Follows]') IS NOT NULL
-			DROP VIEW dbo.[Follows];
-		IF OBJECT_ID(N'dbo.[Comment]') IS NOT NULL
-			DROP VIEW dbo.[Comment];
-		IF OBJECT_ID(N'dbo.[Message]') IS NOT NULL
-			DROP VIEW dbo.[Message];
-		IF OBJECT_ID(N'dbo.[PersonRating]') IS NOT NULL
-			DROP VIEW dbo.[PersonRating];
-		IF OBJECT_ID(N'dbo.[CompanyRating]') IS NOT NULL
-			DROP VIEW dbo.[CompanyRating];
-		IF OBJECT_ID(N'dbo.[Chat]') IS NOT NULL
-			DROP VIEW dbo.[Chat];
-		IF OBJECT_ID(N'dbo.[Application]') IS NOT NULL
-			DROP VIEW dbo.[Application];
-		IF OBJECT_ID(N'dbo.[Job_Experience]') IS NOT NULL
-			DROP VIEW dbo.[Job_Experience];
-		IF OBJECT_ID(N'dbo.[Curriculum_Experience]') IS NOT NULL
-			DROP VIEW dbo.[Curriculum_Experience];
-		IF OBJECT_ID(N'dbo.[AcademicBackground]') IS NOT NULL
-			DROP VIEW dbo.[AcademicBackground];
-		IF OBJECT_ID(N'dbo.[Curriculum]') IS NOT NULL
-			DROP VIEW dbo.[Curriculum];
-		IF OBJECT_ID(N'dbo.[Job]') IS NOT NULL
-			DROP VIEW dbo.[Job];
-		IF OBJECT_ID(N'dbo.[Local]') IS NOT NULL
-			DROP VIEW dbo.[Local];
-		IF OBJECT_ID(N'dbo.[Company]') IS NOT NULL
-			DROP VIEW dbo.[Company];
-		IF OBJECT_ID(N'dbo.[Moderator]') IS NOT NULL
-			DROP VIEW dbo.[Moderator];
-		IF OBJECT_ID(N'dbo.[User]') IS NOT NULL
-			DROP VIEW dbo.[User];
-		IF OBJECT_ID(N'dbo.[Account]') IS NOT NULL
-			DROP VIEW dbo.[Account];
-
-		IF OBJECT_ID(N'ApiDatabase.[Project]') IS NOT NULL
-			DROP TABLE ApiDatabase.[Project];
-		IF OBJECT_ID(N'ApiDatabase.[Follows]') IS NOT NULL
-			DROP TABLE ApiDatabase.[Follows];
-		IF OBJECT_ID(N'ApiDatabase.[Comment]') IS NOT NULL
-			DROP TABLE ApiDatabase.[Comment];
-		IF OBJECT_ID(N'ApiDatabase.[Message]') IS NOT NULL
-			DROP TABLE ApiDatabase.[Message];
-		IF OBJECT_ID(N'ApiDatabase.[Chat]') IS NOT NULL
-			DROP TABLE ApiDatabase.[Chat];
-		IF OBJECT_ID(N'ApiDatabase.[Rating]') IS NOT NULL
-			DROP TABLE ApiDatabase.[Rating];
-		IF OBJECT_ID(N'ApiDatabase.[Application]') IS NOT NULL
-			DROP TABLE ApiDatabase.[Application];
-		IF OBJECT_ID(N'ApiDatabase.[Job_Experience]') IS NOT NULL
-			DROP TABLE ApiDatabase.[Job_Experience];
-		IF OBJECT_ID(N'ApiDatabase.[Curriculum_Experience]') IS NOT NULL
-			DROP TABLE ApiDatabase.[Curriculum_Experience];
-		IF OBJECT_ID(N'ApiDatabase.[Job]') IS NOT NULL
-			DROP TABLE ApiDatabase.[Job];
-		IF OBJECT_ID(N'ApiDatabase.[PreviousJobs]') IS NOT NULL
-			DROP TABLE ApiDatabase.[PreviousJobs];
-		IF OBJECT_ID(N'ApiDatabase.[AcademicBackground]') IS NOT NULL
-			DROP TABLE ApiDatabase.[AcademicBackground];
-		IF OBJECT_ID(N'ApiDatabase.[Local]') IS NOT NULL
-			DROP TABLE ApiDatabase.[Local];
-		IF OBJECT_ID(N'ApiDatabase.[Curriculum]') IS NOT NULL
-			DROP TABLE ApiDatabase.[Curriculum];
-		IF OBJECT_ID(N'ApiDatabase.[Moderator]') IS NOT NULL
-			DROP TABLE ApiDatabase.[Moderator];
-		IF OBJECT_ID(N'ApiDatabase.[User]') IS NOT NULL
-			DROP TABLE ApiDatabase.[User];
-		IF OBJECT_ID(N'ApiDatabase.[Company]') IS NOT NULL
-			DROP TABLE ApiDatabase.[Company];
-		IF OBJECT_ID(N'ApiDatabase.[Account]') IS NOT NULL
-			DROP TABLE ApiDatabase.[Account];
-
-		IF OBJECT_ID(N'dbo.AddAccount') IS NOT NULL
-			DROP PROC dbo.AddAccount;
-		IF OBJECT_ID(N'dbo.DeleteAccount') IS NOT NULL
-			DROP PROC dbo.DeleteAccount;
-		IF OBJECT_ID(N'dbo.getNewPasswordHash') IS NOT NULL
-			DROP PROC dbo.getNewPasswordHash;
-		IF OBJECT_ID(N'dbo.AddUser') IS NOT NULL
-			DROP PROC dbo.AddUser;
-		IF OBJECT_ID(N'dbo.UpdateUser') IS NOT NULL
-			DROP PROC dbo.UpdateUser;
-		IF OBJECT_ID(N'dbo.AddCompany') IS NOT NULL
-			DROP PROC dbo.AddCompany;
-		IF OBJECT_ID(N'dbo.UpdateCompany') IS NOT NULL
-			DROP PROC dbo.UpdateCompany;
-		IF OBJECT_ID(N'dbo.AddModerator') IS NOT NULL
-			DROP PROC dbo.AddModerator;
-		IF OBJECT_ID(N'dbo.UpdateModerator') IS NOT NULL
-			DROP PROC dbo.UpdateModerator;
-
-		IF OBJECT_ID(N'Apidatabase.deleteCascadeAccount') IS NOT NULL
-			DROP TRIGGER Apidatabase.deleteCascadeAccount;
-		IF OBJECT_ID(N'Apidatabase.deleteCascadeCurriculum') IS NOT NULL
-			DROP TRIGGER Apidatabase.deleteCascadeCurriculum;
-		IF OBJECT_ID(N'Apidatabase.deleteCascadeJob') IS NOT NULL
-			DROP TRIGGER Apidatabase.deleteCascadeJob;
-		IF OBJECT_ID(N'Apidatabase.deleteCascadeComment') IS NOT NULL
-			DROP TRIGGER Apidatabase.deleteCascadeComment;
+		IF OBJECT_ID(N'[Project]') IS NOT NULL
+			DROP TABLE [Project];
+		IF OBJECT_ID(N'[Follows]') IS NOT NULL
+			DROP TABLE [Follows];
+		IF OBJECT_ID(N'[Comment]') IS NOT NULL
+			DROP TABLE [Comment];
+		IF OBJECT_ID(N'[Message]') IS NOT NULL
+			DROP TABLE [Message];
+		IF OBJECT_ID(N'[Chat]') IS NOT NULL
+			DROP TABLE [Chat];
+		IF OBJECT_ID(N'[Rating]') IS NOT NULL
+			DROP TABLE [Rating];
+		IF OBJECT_ID(N'[Application]') IS NOT NULL
+			DROP TABLE [Application];
+		IF OBJECT_ID(N'[Job_Experience]') IS NOT NULL
+			DROP TABLE [Job_Experience];
+		IF OBJECT_ID(N'[Curriculum_Experience]') IS NOT NULL
+			DROP TABLE [Curriculum_Experience];
+		IF OBJECT_ID(N'[Job]') IS NOT NULL
+			DROP TABLE [Job];
+		IF OBJECT_ID(N'[PreviousJobs]') IS NOT NULL
+			DROP TABLE [PreviousJobs];
+		IF OBJECT_ID(N'[AcademicBackground]') IS NOT NULL
+			DROP TABLE [AcademicBackground];
+		IF OBJECT_ID(N'[Local]') IS NOT NULL
+			DROP TABLE [Local];
+		IF OBJECT_ID(N'[Curriculum]') IS NOT NULL
+			DROP TABLE [Curriculum];
+		IF OBJECT_ID(N'[Moderator]') IS NOT NULL
+			DROP TABLE [Moderator];
+		IF OBJECT_ID(N'[User]') IS NOT NULL
+			DROP TABLE [User];
+		IF OBJECT_ID(N'[Company]') IS NOT NULL
+			DROP TABLE [Company];
+		IF OBJECT_ID(N'[Account]') IS NOT NULL
+			DROP TABLE [Account];
 
 		IF OBJECT_ID ('ApiDatabase') IS NOT NULL
 			DROP SCHEMA ApiDatabase;

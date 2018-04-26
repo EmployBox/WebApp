@@ -4,9 +4,11 @@ import isel.ps.employbox.ErrorMessages;
 import isel.ps.employbox.exceptions.BadRequestException;
 import isel.ps.employbox.exceptions.ResourceNotFoundException;
 import isel.ps.employbox.exceptions.UnauthorizedException;
+import isel.ps.employbox.model.entities.Account;
 import isel.ps.employbox.model.entities.Application;
 import isel.ps.employbox.model.entities.Curriculum;
 import isel.ps.employbox.model.entities.User;
+import javafx.util.Pair;
 import org.github.isel.rapper.DataRepository;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -24,15 +26,17 @@ import static isel.ps.employbox.ErrorMessages.resourceNotfound_user;
 @Service
 public class UserService implements UserDetailsService {
 
+    private final DataRepository<Account, Long> accRepo;
     private final DataRepository<User, Long> userRepo;
     private final DataRepository<Curriculum, Long> curriculumRepo;
     private final DataRepository<Application, Application.ApplicationKeys> applicationRepo;
 
     public UserService(
-            DataRepository<User, Long> userRepo,
+            DataRepository<Account, Long> accRepo, DataRepository<User, Long> userRepo,
             DataRepository<Curriculum, Long> curriculumRepo,
             DataRepository<Application, Application.ApplicationKeys> applicationRepo)
     {
+        this.accRepo = accRepo;
         this.userRepo = userRepo;
         this.curriculumRepo = curriculumRepo;
         this.applicationRepo = applicationRepo;
@@ -69,10 +73,17 @@ public class UserService implements UserDetailsService {
     }
 
 
-    public Stream<Application> getAllApplications(long userId, String email)/**), Map<String, String> queryString) {*/
+    public Stream<Application> getAllApplications(long accountId)/**), Map<String, String> queryString) {*/
     {
-        return StreamSupport.stream( getUser(userId, email).getApplications().get().spliterator(), false)
-                .filter(curr-> curr.getUserId() == userId);
+        List<User> luser = userRepo.findWhere(new Pair<>("accountId",accountId)).join();
+        if(luser.isEmpty())
+            return Stream.empty();
+
+        return luser
+                .get(0)
+                .getApplications()
+                .get()
+                .stream();
     }
 
 
@@ -94,7 +105,8 @@ public class UserService implements UserDetailsService {
 
     public void updateUser(User user, String email) {
         getUser(user.getIdentityKey(), email);
-        userRepo.update(user);
+        if(!userRepo.update(user).join())
+            throw new ResourceNotFoundException("something went wrong updating this item") ;
     }
 
     public void updateApplication(Application application, String email) {
@@ -147,8 +159,10 @@ public class UserService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        Optional<User> ouser =  StreamSupport.stream(
-                userRepo.findAll().join().spliterator(), false)
+        Optional<User> ouser = userRepo
+                .findAll()
+                .join()
+                .stream()
                 .filter(curr-> curr.getEmail().equals(username))
                 .findFirst();
 

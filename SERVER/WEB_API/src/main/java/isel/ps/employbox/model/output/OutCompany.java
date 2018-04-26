@@ -15,7 +15,7 @@ public class OutCompany extends ResourceSupport {
     private final String email;
 
     @JsonProperty
-    private final float rating;
+    private final double rating;
 
     @JsonProperty
     private final String name;
@@ -35,7 +35,7 @@ public class OutCompany extends ResourceSupport {
     @JsonProperty
     private final String description;
 
-    public OutCompany(long accountId, String email, float rating, String name, String specialization, short yearFounded, String logoUrl, String webpageUrl, String description) {
+    public OutCompany(long accountId, String email, double rating, String name, String specialization, short yearFounded, String logoUrl, String webpageUrl, String description) {
         this.accountId = accountId;
         this.email = email;
         this.rating = rating;

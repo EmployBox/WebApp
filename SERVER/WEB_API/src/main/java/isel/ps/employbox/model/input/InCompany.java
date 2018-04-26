@@ -11,6 +11,8 @@ public class InCompany {
     private String logoUrl;
     private String webpageUrl;
     private String description;
+    private long companyVersion;
+    private long accountVersion;
 
 
     public String getEmail() { return email; }
@@ -52,4 +54,20 @@ public class InCompany {
     public long getAccountId() { return accountId; }
 
     public void setAccountId(long accountId) { this.accountId = accountId; }
+
+    public long getCompanyVersion() {
+        return companyVersion;
+    }
+
+    public void setCompanyVersion(long companyVersion) {
+        this.companyVersion = companyVersion;
+    }
+
+    public long getAccountVersion() {
+        return accountVersion;
+    }
+
+    public void setAccountVersion(long accountVersion) {
+        this.accountVersion = accountVersion;
+    }
 }

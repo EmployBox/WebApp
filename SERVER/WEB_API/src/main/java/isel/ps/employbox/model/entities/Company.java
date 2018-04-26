@@ -10,6 +10,7 @@ public class Company extends Account {
     private final String logoUrl;
     private final String webPageUrl;
     private final String description;
+    private final long version;
 
     public Company(){
         name = null;
@@ -18,6 +19,7 @@ public class Company extends Account {
         logoUrl = null;
         webPageUrl = null;
         description = null;
+        version = 0;
     }
 
     public Company(
@@ -45,17 +47,25 @@ public class Company extends Account {
         this.webPageUrl = webPageUrl;
         this.description = description;
         this.yearFounded = yearFounded;
+        this.version = 0;
     }
 
-    public Company(long accountID, String email, String password, float rating, String name, String Specialization, short yearFounded, String logoUrl, String webPageUrl, String description) {
-        super(email, password, rating);
-        this.accountID = accountID;
+    public Company(
+            long accountID,
+            String email,
+            String password,
+            float rating,
+            String name,
+            String Specialization,
+            short yearFounded, String logoUrl, String webPageUrl, String description, long version, long accountVersion) {
+        super(accountID, email, password, rating, accountVersion);
         this.name = name;
         this.Specialization = Specialization;
         this.logoUrl = logoUrl;
         this.webPageUrl = webPageUrl;
         this.description = description;
         this.yearFounded = yearFounded;
+        this.version = version;
     }
 
     public String getName() {

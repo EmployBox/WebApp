@@ -1,10 +1,11 @@
 package isel.ps.employbox.model.entities;
 
+
 import org.github.isel.rapper.DomainObject;
 
 import java.sql.Date;
 
-public class Application implements DomainObject<Application.ApplicationKeys>{
+public class Application implements DomainObject<Application.ApplicationKeys> {
     private final ApplicationKeys applicationKey;
     private final long userId;
     private final long jobId;

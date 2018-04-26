@@ -44,9 +44,9 @@ public class UserController {
     }
 
     @GetMapping("/{id}/applications")
-    public HalCollection getAllApplications(@PathVariable long id, Authentication authentication){
+    public HalCollection getAllApplications(@PathVariable long id){
         return applicationBinder.bindOutput(
-                userService.getAllApplications(id, authentication.getName()),//, queryString),
+                userService.getAllApplications(id),
                 this.getClass(),
                 id
         );
