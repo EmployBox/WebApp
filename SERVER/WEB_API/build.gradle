@@ -32,6 +32,7 @@ dependencies {
     compile group: 'com.auth0', name: 'jwks-rsa', version: '0.3.0'
     testCompile('org.springframework.boot:spring-boot-starter-test')
     compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
+    compile group: 'com.github.jayield', name: 'rapper', version: '1.0.1'
 }
 compileKotlin {
     kotlinOptions {
