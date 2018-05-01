@@ -24,11 +24,12 @@ public class CommentController {
     }
 
     @GetMapping
-    public Mono<HalCollection> getAllComments(@PathVariable long accId, @RequestParam String type){
+    public Mono<HalCollection> getAllComments(@PathVariable long id, @RequestParam String type){
         if(type.equals("done") || type.equals("received"))
             return commentBinder.bindOutput(
-                    commentService.getComments(accId, type),
-                    this.getClass()
+                    commentService.getComments(id, type),
+                    this.getClass(),
+                    id
             );
         else
             throw new BadRequestException("Type must be either \"done\" or \"received\"");

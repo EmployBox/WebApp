@@ -23,7 +23,8 @@ public class FollowsController {
     public Mono<HalCollection> getFollowers(@PathVariable long id){
         return accountBinder.bindOutput(
                 followService.getAccountFollowers(id),
-                this.getClass()
+                this.getClass(),
+                id
         );
     }
 
@@ -31,7 +32,8 @@ public class FollowsController {
     public Mono<HalCollection> getFollowing(@PathVariable long id){
         return accountBinder.bindOutput(
                 followService.getAccountFollowing(id),
-                this.getClass()
+                this.getClass(),
+                id
         );
     }
 

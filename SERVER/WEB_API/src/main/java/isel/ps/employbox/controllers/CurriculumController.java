@@ -29,7 +29,8 @@ public class CurriculumController {
     public Mono<HalCollection> getCurricula(@PathVariable long id, Authentication authentication){
         return curriculumBinder.bindOutput(
                 userService.getCurricula(id, authentication.getName()),
-                this.getClass()
+                this.getClass(),
+                id
         );
     }
 
@@ -46,7 +47,7 @@ public class CurriculumController {
             @RequestBody InCurriculum inCurriculum,
             Authentication authentication
     ){
-        if(inCurriculum.getAccountID() != id || inCurriculum.getId() != cid) throw new BadRequestException(badRequest_IdsMismatch);
+        if(inCurriculum.getAccountId() != id || inCurriculum.getCurriculumId() != cid) throw new BadRequestException(badRequest_IdsMismatch);
         Curriculum curriculum = curriculumBinder.bindInput(inCurriculum);
         return userService.updateCurriculum(curriculum,authentication.getName() );
     }

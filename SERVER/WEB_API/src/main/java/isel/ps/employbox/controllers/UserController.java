@@ -48,7 +48,8 @@ public class UserController {
     public Mono<HalCollection> getAllApplications(@PathVariable long id){
         return applicationBinder.bindOutput(
                 userService.getAllApplications(id),
-                this.getClass()
+                this.getClass(),
+                id
         );
     }
 
@@ -75,7 +76,7 @@ public class UserController {
             @RequestBody InApplication inApplication,
             Authentication authentication)
     {
-        if(inApplication.getUserId() != id || inApplication.getJobId() != jid)
+        if(inApplication.getAccountId() != id || inApplication.getJobId() != jid)
             throw new BadRequestException(badRequest_IdsMismatch);
         Application application = applicationBinder.bindInput(inApplication);
         return userService.updateApplication(application, authentication.getName());
@@ -89,7 +90,7 @@ public class UserController {
 
     @PostMapping("/{id}/applications/{jid}")
     public Mono<OutApplication> createApplication(@PathVariable long id, @PathVariable long jid,  @RequestBody InApplication inApplication, Authentication authentication){
-        if(id != inApplication.getUserId() || jid != inApplication.getJobId())
+        if(id != inApplication.getAccountId() || jid != inApplication.getJobId())
             throw new BadRequestException(badRequest_IdsMismatch);
         Application application = applicationBinder.bindInput(inApplication);
         return applicationBinder.bindOutput( userService.createApplication(id, application, authentication.getName()));

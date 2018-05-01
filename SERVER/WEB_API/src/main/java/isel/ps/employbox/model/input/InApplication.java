@@ -3,24 +3,17 @@ package isel.ps.employbox.model.input;
 import java.sql.Date;
 
 public class InApplication {
-    private long userId;
+    private long accountId;
     private long jobId;
     private long curriculumId;
     private Date date;
 
-    public InApplication(long userId, long jobId, long curriculumId, Date date){
-        this.userId = userId;
-        this.jobId = jobId;
-        this.curriculumId = curriculumId;
-        this.date = date;
+    public long getAccountId() {
+        return accountId;
     }
 
-    public long getUserId() {
-        return userId;
-    }
-
-    public void setUserId(long userId) {
-        this.userId = userId;
+    public void setAccountId(long accountId) {
+        this.accountId = accountId;
     }
 
     public long getJobId() {

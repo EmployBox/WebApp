@@ -34,7 +34,9 @@ public class ChatController {
     public Mono<HalCollection> getChatsMessages (@PathVariable long id, @PathVariable long cid, Authentication authentication) {
         return messageBinder.bindOutput(
                 chatService.getAccountChatsMessages(id, cid, authentication.getName()),
-                this.getClass()
+                this.getClass(),
+                id,
+                cid
         );
     }
 

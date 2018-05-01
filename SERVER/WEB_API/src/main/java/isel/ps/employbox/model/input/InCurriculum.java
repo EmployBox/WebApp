@@ -5,30 +5,20 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.List;
 
 public class InCurriculum {
-    private final long accountID;
-    private final long id;
-    private final String title;
-    private final List<Experience> experiences;
-    private final List<PreviousJobs> previousJobs;
-    private final List<Project> projects;
-    private final List<AcademicBackground> academicBackground;
+    private long accountId;
+    private long curriculumId;
+    private String title;
+    private List<Experience> experiences;
+    private List<PreviousJobs> previousJobs;
+    private List<Project> projects;
+    private List<AcademicBackground> academicBackground;
 
-    public InCurriculum(long accountID, long id, String title, List<Experience> experiences, List<PreviousJobs> previousJobs, List<Project> projects, List<AcademicBackground> academicBackground){
-        this.accountID = accountID;
-        this.id = id;
-        this.title = title;
-        this.experiences = experiences;
-        this.previousJobs = previousJobs;
-        this.projects = projects;
-        this.academicBackground = academicBackground;
+    public long getAccountId() {
+        return accountId;
     }
 
-    public long getAccountID() {
-        return accountID;
-    }
-
-    public long getId() {
-        return id;
+    public long getCurriculumId() {
+        return curriculumId;
     }
 
     public String getTitle() {
@@ -49,6 +39,34 @@ public class InCurriculum {
 
     public List<AcademicBackground> getAcademicBackground() {
         return academicBackground;
+    }
+
+    public void setAccountId(long accountId) {
+        this.accountId = accountId;
+    }
+
+    public void setCurriculumId(long curriculumId) {
+        this.curriculumId = curriculumId;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public void setExperiences(List<Experience> experiences) {
+        this.experiences = experiences;
+    }
+
+    public void setPreviousJobs(List<PreviousJobs> previousJobs) {
+        this.previousJobs = previousJobs;
+    }
+
+    public void setProjects(List<Project> projects) {
+        this.projects = projects;
+    }
+
+    public void setAcademicBackground(List<AcademicBackground> academicBackground) {
+        this.academicBackground = academicBackground;
     }
 
     private class Experience {

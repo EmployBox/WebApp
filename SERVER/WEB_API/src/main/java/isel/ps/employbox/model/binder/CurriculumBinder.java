@@ -32,7 +32,7 @@ public class CurriculumBinder implements ModelBinder<Curriculum,OutCurriculum,In
 
     @Override
     public Curriculum bindInput(InCurriculum obj) {
-        return new Curriculum(obj.getId(), obj.getTitle());
+        return new Curriculum(obj.getAccountId(), obj.getCurriculumId(), obj.getTitle());
     }
 
     private List<OutCurriculum.OutExperience> bindExperience(List<CurriculumExperience> list){

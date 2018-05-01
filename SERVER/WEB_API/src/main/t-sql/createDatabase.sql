@@ -53,8 +53,8 @@ CREATE TABLE [User] (
 CREATE TABLE [Curriculum](
 	accountId BIGINT references [User],
 	curriculumId BIGINT identity primary key,
-	tile nvarchar(50),
-  [version] rowversion
+	title nvarchar(50),
+    [version] rowversion
 
 	FOREIGN KEY (accountId) REFERENCES [User] (accountId)
 )

@@ -30,7 +30,8 @@ public class RatingController {
         if(type.equals("done") || type.equals("received"))
             return ratingBinder.bindOutput(
                     ratingService.getRatings(id, type),
-                    this.getClass()
+                    this.getClass(),
+                    id
             );
         else
             throw new BadRequestException("Type must be either \"done\" or \"received\"");

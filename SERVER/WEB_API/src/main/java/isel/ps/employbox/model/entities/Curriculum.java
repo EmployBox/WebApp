@@ -49,8 +49,9 @@ public class Curriculum implements DomainObject<Long> {
         this.experiences = experiences;
     }
 
-    public Curriculum(long id, String title) {
-        this.accountId = id;
+    public Curriculum(long accountId, long curriculumId, String title) {
+        this.accountId = accountId;
+        this.curriculumId = curriculumId;
         this.title= title;
         this.previousJobs = Collections::emptyList;
         this.academicBackground = Collections::emptyList;

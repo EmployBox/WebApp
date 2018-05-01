@@ -11,7 +11,7 @@ import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 public class OutCurriculum extends ResourceSupport {
 
     @JsonProperty
-    private final long id;
+    private final long curriculumId;
 
     @JsonProperty
     private final String title;
@@ -30,20 +30,20 @@ public class OutCurriculum extends ResourceSupport {
 
     public OutCurriculum(
             long userId,
-            long id,
+            long curriculumId,
             String title,
             List<OutExperience> experiences,
             List<OutPreviousJobs> previousJobs,
             List<OutProject> projects,
             List<OutAcademicBackground> academicBackground
     ){
-        this.id = id;
+        this.curriculumId = curriculumId;
         this.title = title;
         this.experiences = experiences;
         this.previousJobs = previousJobs;
         this.projects = projects;
         this.academicBackground = academicBackground;
-        this.add( linkTo (CurriculumController.class, userId).slash(id).withSelfRel());
+        this.add( linkTo (CurriculumController.class, userId).slash(curriculumId).withSelfRel());
     }
 
     public static class OutExperience {

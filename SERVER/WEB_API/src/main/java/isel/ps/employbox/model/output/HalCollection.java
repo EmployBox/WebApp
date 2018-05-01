@@ -18,9 +18,9 @@ public class HalCollection extends ResourceSupport{
     private final Resources<EmbeddedWrapper> embeddedItems;
 
     @JsonCreator
-    public HalCollection(long size, Resources<EmbeddedWrapper> embeddedItems, Class selfController) {
+    public HalCollection(long size, Resources<EmbeddedWrapper> embeddedItems, Class selfController, Object[] parameters) {
         this.size = size;
         this.embeddedItems = embeddedItems;
-        this.add( linkTo(selfController).withSelfRel());
+        this.add( linkTo(selfController, parameters).withSelfRel());
     }
 }
