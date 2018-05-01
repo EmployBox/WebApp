@@ -1,13 +1,16 @@
 package isel.ps.employbox.model.entities;
 
 import org.github.isel.rapper.DomainObject;
+import org.github.isel.rapper.Id;
 
 import java.sql.Date;
 import java.util.List;
 import java.util.function.Supplier;
 
 public class Comment implements DomainObject<Long>{
-    private long commentID;
+    @Id(isIdentity = true)
+    private long commentId;
+
     private final long accountIdFrom;
     private final long accountIdTo;
     private final long parentCommendID;
@@ -29,7 +32,7 @@ public class Comment implements DomainObject<Long>{
     }
 
     public Comment(long commentID, long accountIdFrom, long accountIdTo, long parentCommendID, Date date, String text, boolean status, Supplier<List<Comment>> replies, long version){
-        this.commentID = commentID;
+        this.commentId = commentID;
         this.accountIdFrom = accountIdFrom;
         this.accountIdTo = accountIdTo;
         this.parentCommendID = parentCommendID;
@@ -46,7 +49,7 @@ public class Comment implements DomainObject<Long>{
 
     @Override
     public Long getIdentityKey() {
-        return commentID;
+        return commentId;
     }
 
     public long getVersion() {

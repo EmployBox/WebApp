@@ -20,7 +20,7 @@ public class CurriculumBinder implements ModelBinder<Curriculum,OutCurriculum,In
                 curriculumCompletableFuture.thenApply(
                         curriculum ->
                                 new OutCurriculum(
-                                        curriculum.getUserId(),
+                                        curriculum.getAccountId(),
                                         curriculum.getIdentityKey(),
                                         curriculum.getTitle(),
                                         bindExperience(curriculum.getExperiences().get()),

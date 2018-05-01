@@ -92,4 +92,8 @@ public class Company extends Account {
         return description;
     }
 
+    @Override
+    public long getVersion() {
+        return version;
+    }
 }

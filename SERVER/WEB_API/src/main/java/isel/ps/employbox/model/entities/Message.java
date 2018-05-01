@@ -1,12 +1,16 @@
 package isel.ps.employbox.model.entities;
 
 import org.github.isel.rapper.DomainObject;
+import org.github.isel.rapper.Id;
 
 import java.sql.Date;
 
 public class Message implements DomainObject<Long> {
-    private final long accountId;
+
+    @Id(isIdentity = true)
     private final long messageId;
+
+    private final long accountId;
     private final long version;
     private final long chadId;
     private final String text;

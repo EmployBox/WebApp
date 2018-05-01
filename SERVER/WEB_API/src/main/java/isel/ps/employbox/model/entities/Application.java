@@ -2,12 +2,14 @@ package isel.ps.employbox.model.entities;
 
 
 import org.github.isel.rapper.DomainObject;
+import org.github.isel.rapper.EmbeddedId;
 
 import java.sql.Date;
 
 public class Application implements DomainObject<Application.ApplicationKeys> {
+    @EmbeddedId
     private final ApplicationKeys applicationKey;
-    private final long userId;
+    private final long accountId;
     private final long jobId;
     private final long curriculumId;
     private final Date date;
@@ -15,7 +17,7 @@ public class Application implements DomainObject<Application.ApplicationKeys> {
 
     public Application(){
         applicationKey = null;
-        userId = 0;
+        accountId = 0;
         jobId = 0;
         curriculumId = 0;
         date = null;
@@ -23,7 +25,7 @@ public class Application implements DomainObject<Application.ApplicationKeys> {
     }
 
     public Application(long userId, long jobId, long curriculumId, Date date, long version) {
-        this.userId = userId;
+        this.accountId = userId;
         this.jobId = jobId;
         this.curriculumId = curriculumId;
         this.date = date;
@@ -32,7 +34,7 @@ public class Application implements DomainObject<Application.ApplicationKeys> {
     }
 
     public Application(long userId, long jobId, long curriculumId, Date date) {
-        this.userId = userId;
+        this.accountId = userId;
         this.jobId = jobId;
         this.curriculumId = curriculumId;
         this.date = date;
@@ -61,8 +63,8 @@ public class Application implements DomainObject<Application.ApplicationKeys> {
         return jobId;
     }
 
-    public long getUserId() {
-        return userId;
+    public long getAccountId() {
+        return accountId;
     }
 
     public static class ApplicationKeys {

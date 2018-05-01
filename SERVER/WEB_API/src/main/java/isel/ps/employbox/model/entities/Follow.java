@@ -1,9 +1,13 @@
 package isel.ps.employbox.model.entities;
 
 import org.github.isel.rapper.DomainObject;
+import org.github.isel.rapper.EmbeddedId;
 
 public class Follow implements DomainObject<Follow.FollowKey>{
+
+    @EmbeddedId
     private final FollowKey followKey;
+
     private final long accountIdFollower;
     private final long accountIdFollowed;
     private final long version;

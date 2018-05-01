@@ -1,10 +1,14 @@
 package isel.ps.employbox.model.entities;
 
 import org.github.isel.rapper.DomainObject;
+import org.github.isel.rapper.EmbeddedId;
 
 public class CurriculumExperience implements DomainObject<CurriculumExperience.CurriculumExperienceKey>{
+
+    @EmbeddedId
     private final CurriculumExperienceKey curriculumExperienceKey;
-    private final long userId;
+
+    private final long accountId;
     private final long curriculumId;
     private final String competences;
     private final short years;
@@ -12,7 +16,7 @@ public class CurriculumExperience implements DomainObject<CurriculumExperience.C
 
     public CurriculumExperience(){
         curriculumExperienceKey = null;
-        userId = 0;
+        accountId = 0;
         curriculumId = 0;
         competences = null;
         years = 0;
@@ -20,7 +24,7 @@ public class CurriculumExperience implements DomainObject<CurriculumExperience.C
     }
 
     public CurriculumExperience(long userId, long curriculumId, String competences, short years, long version){
-        this.userId = userId;
+        this.accountId = userId;
         this.curriculumId = curriculumId;
         this.competences = competences;
         this.years = years;
@@ -37,8 +41,8 @@ public class CurriculumExperience implements DomainObject<CurriculumExperience.C
         return version;
     }
 
-    public long getUserId() {
-        return userId;
+    public long getAccountId() {
+        return accountId;
     }
 
     public long getCurriculumId() {

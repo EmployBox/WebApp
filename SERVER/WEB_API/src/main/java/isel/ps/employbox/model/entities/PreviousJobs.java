@@ -1,11 +1,15 @@
 package isel.ps.employbox.model.entities;
 
 import org.github.isel.rapper.DomainObject;
+import org.github.isel.rapper.EmbeddedId;
 
 import java.sql.Date;
 
 public class PreviousJobs implements DomainObject<PreviousJobs.PreviousJobsKey> {
-    private final long userId;
+    @EmbeddedId
+    private final PreviousJobsKey previousJobsKey;
+
+    private final long accountId;
     private final long curriculumId;
     private final Date beginDate;
     private final Date endDate;
@@ -13,10 +17,10 @@ public class PreviousJobs implements DomainObject<PreviousJobs.PreviousJobsKey> 
     private final String companyName;
     private final String workLoad;
     private final String role;
-    private final PreviousJobsKey previousJobsKey;
+
 
     public PreviousJobs(){
-        userId = 0;
+        accountId = 0;
         curriculumId = 0;
         beginDate = null;
         endDate = null;
@@ -28,7 +32,7 @@ public class PreviousJobs implements DomainObject<PreviousJobs.PreviousJobsKey> 
     }
 
     public PreviousJobs(long userId, long curriculumId, Date beginDate, Date endDate, String companyName, String workLoad, String role, long version) {
-        this.userId = userId;
+        this.accountId = userId;
         this.curriculumId = curriculumId;
         this.beginDate = beginDate;
         this.companyName = companyName;
@@ -48,8 +52,8 @@ public class PreviousJobs implements DomainObject<PreviousJobs.PreviousJobsKey> 
         return version;
     }
 
-    public long getUserId() {
-        return userId;
+    public long getAccountId() {
+        return accountId;
     }
 
     public long getCurriculumId() {

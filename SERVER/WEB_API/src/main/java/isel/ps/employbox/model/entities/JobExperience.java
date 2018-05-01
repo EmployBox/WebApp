@@ -1,12 +1,15 @@
 package isel.ps.employbox.model.entities;
 
 import org.github.isel.rapper.DomainObject;
+import org.github.isel.rapper.EmbeddedId;
 
 public class JobExperience implements DomainObject<JobExperience.JobExperienceKey> {
     private final long jobId;
     private final String competences;
     private final short years;
     private long version;
+
+    @EmbeddedId
     private final JobExperienceKey jobExperienceKey;
 
     public JobExperience(){

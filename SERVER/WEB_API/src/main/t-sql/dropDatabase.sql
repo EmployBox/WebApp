@@ -19,10 +19,10 @@ IF DB_ID ('PS_API_DATABASE') IS NOT NULL
 			DROP TABLE [Rating];
 		IF OBJECT_ID(N'[Application]') IS NOT NULL
 			DROP TABLE [Application];
-		IF OBJECT_ID(N'[Job_Experience]') IS NOT NULL
-			DROP TABLE [Job_Experience];
-		IF OBJECT_ID(N'[Curriculum_Experience]') IS NOT NULL
-			DROP TABLE [Curriculum_Experience];
+		IF OBJECT_ID(N'[JobExperience]') IS NOT NULL
+			DROP TABLE [JobExperience];
+		IF OBJECT_ID(N'[CurriculumExperience]') IS NOT NULL
+			DROP TABLE [CurriculumExperience];
 		IF OBJECT_ID(N'[Job]') IS NOT NULL
 			DROP TABLE [Job];
 		IF OBJECT_ID(N'[PreviousJobs]') IS NOT NULL

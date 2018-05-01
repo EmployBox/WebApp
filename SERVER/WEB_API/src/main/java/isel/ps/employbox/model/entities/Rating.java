@@ -1,9 +1,12 @@
 package isel.ps.employbox.model.entities;
 
 import org.github.isel.rapper.DomainObject;
+import org.github.isel.rapper.EmbeddedId;
 
 public class Rating implements DomainObject<Rating.RatingKey>{
+    @EmbeddedId
     private final RatingKey ratingKey;
+
     private final long accountIdFrom;
     private final long accountIdTo;
     private final float workLoad;

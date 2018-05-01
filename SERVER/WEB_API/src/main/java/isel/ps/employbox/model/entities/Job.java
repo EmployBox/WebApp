@@ -15,7 +15,7 @@ public class Job implements DomainObject<Long> {
     private long jobId;
 
     private final String title;
-    private final long accountID;
+    private final long accountId;
     private final String address;
     private final int wage;
     private final String description;
@@ -33,7 +33,7 @@ public class Job implements DomainObject<Long> {
 
     public Job(){
         title = null;
-        accountID = 0;
+        accountId = 0;
         address = null;
         wage = 0;
         description = null;
@@ -63,7 +63,7 @@ public class Job implements DomainObject<Long> {
     {
         this.jobId = id;
         this.title = title;
-        this.accountID = accountID;
+        this.accountId = accountID;
         this.address = address;
         this.wage = wage;
         this.description = description;
@@ -91,7 +91,7 @@ public class Job implements DomainObject<Long> {
     )
     {
         this.jobId = jobId;
-        this.accountID = accountID;
+        this.accountId = accountID;
         this.title = title;
         this.address = address;
         this.wage = wage;
@@ -114,8 +114,8 @@ public class Job implements DomainObject<Long> {
         return version;
     }
 
-    public long getAccountID() {
-        return accountID;
+    public long getAccountId() {
+        return accountId;
     }
 
     public int getWage() {

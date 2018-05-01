@@ -12,10 +12,9 @@ public class User extends Account {
     private final String photoUrl;
     private final long version;
 
-
-    @ColumnName(name = "userId")
+    @ColumnName(name = "accountId")
     private final Supplier<List<Curriculum>> curricula;
-    @ColumnName(name = "userId")
+    @ColumnName(name = "accountId")
     private final Supplier<List<Application>> applications;
 
     public User(){
@@ -88,4 +87,8 @@ public class User extends Account {
         return curricula;
     }
 
+    @Override
+    public long getVersion() {
+        return version;
+    }
 }

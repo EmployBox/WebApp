@@ -1,11 +1,13 @@
 package isel.ps.employbox.model.entities;
 
 import org.github.isel.rapper.DomainObject;
+import org.github.isel.rapper.Id;
 
 import java.util.List;
 import java.util.function.Supplier;
 
 public class Chat implements DomainObject<Long>{
+    @Id(isIdentity = true)
     private long chadId;
     private final long accountIdFirst;
     private final long accountIdSecond;

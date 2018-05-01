@@ -3,7 +3,7 @@ package isel.ps.employbox.model.entities;
 import org.github.isel.rapper.DomainObject;
 
 public class Project implements DomainObject<Project.ProjectKey> {
-    private final long userId;
+    private final long companyId;
     private final long curriculumId;
     private final String name;
     private final String description;
@@ -11,7 +11,7 @@ public class Project implements DomainObject<Project.ProjectKey> {
     private final ProjectKey key;
 
     public Project(){
-        userId = 0;
+        companyId = 0;
         curriculumId = 0;
         name = null;
         description = null;
@@ -20,7 +20,7 @@ public class Project implements DomainObject<Project.ProjectKey> {
     }
 
     public Project(long userId, long curriculumId, String name, String description, long version){
-        this.userId = userId;
+        this.companyId = userId;
         this.curriculumId = curriculumId;
         this.name = name;
         this.description = description;
@@ -37,8 +37,8 @@ public class Project implements DomainObject<Project.ProjectKey> {
         return version;
     }
 
-    public long getUserId() {
-        return userId;
+    public long getCompanyId() {
+        return companyId;
     }
 
     public long getCurriculumId() {

@@ -38,7 +38,7 @@ public class JobService {
         return Mono.fromFuture(
                 CompletableFuture.allOf(
                         getJob(job.getIdentityKey()),
-                        userService.getUser(job.getAccountID(), email)
+                        userService.getUser(job.getAccountId(), email)
                 ).thenCompose( __-> jobRepo.update(job))
                  .thenAccept( res -> {
                     if(!res) throw new BadRequestException(ErrorMessages.badRequest_ItemCreation);
@@ -47,7 +47,7 @@ public class JobService {
     }
 
     public CompletableFuture<Job> createJob(Job job, String email) {
-        return userService.getUser(job.getAccountID(), email)
+        return userService.getUser(job.getAccountId(), email)
                 .thenCompose( __-> jobRepo.create(job) )
                 .thenApply( res -> {
                     if(!res) throw new BadRequestException(ErrorMessages.badRequest_ItemCreation);
@@ -59,7 +59,7 @@ public class JobService {
        return Mono.fromFuture(
            userService.getUser(id, email)
                    .thenAccept(user -> getJob(id).thenCompose( job -> {
-                           if(job.getAccountID() != user.getIdentityKey())
+                           if(job.getAccountId() != user.getIdentityKey())
                                throw new BadRequestException(ErrorMessages.unAuthorized_IdAndEmailMismatch);
                             return jobRepo.delete(job);
                        }).thenAccept( res -> {

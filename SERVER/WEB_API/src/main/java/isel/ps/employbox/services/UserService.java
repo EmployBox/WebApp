@@ -59,7 +59,7 @@ public class UserService {
         return getUser(userId)
                 .thenApply(user -> user.getApplications().get())
                 .thenApply(applications -> {
-                    Optional<Application> application = applications.stream().filter(curr -> curr.getUserId() == userId && curr.getJobId() == jobId).findFirst();
+                    Optional<Application> application = applications.stream().filter(curr -> curr.getAccountId() == userId && curr.getJobId() == jobId).findFirst();
                     if (applications.isEmpty() || !application.isPresent())
                         throw new ResourceNotFoundException(ErrorMessages.resourceNotfound_application);
                     return application.get();
@@ -67,7 +67,7 @@ public class UserService {
     }
 
 
-    public CompletableFuture<Stream<Application>> getAllApplications(long accountId)/**), Map<String, String> queryString) {*/
+    public CompletableFuture<Stream<Application>> getAllApplications(long accountId)
     {
         return userRepo.findWhere(new Pair<>("accountId", accountId))
                 .thenApply(users -> users.get(0).getApplications().get().stream())
@@ -77,13 +77,13 @@ public class UserService {
     }
 
 
-    public CompletableFuture<Stream<Curriculum>> getCurricula(long userId, String email) /**, Map<String, String> queryString) {*/
+    public CompletableFuture<Stream<Curriculum>> getCurricula(long userId, String email)
     {
         return getUser(userId, email).thenApply(
                 user -> user.getCurricula()
                         .get()
                         .stream()
-                        .filter(curr -> curr.getUserId() == userId)
+                        .filter(curr -> curr.getAccountId() == userId)
         );
     }
 
@@ -110,8 +110,8 @@ public class UserService {
 
     public Mono<Void> updateApplication(Application application, String email) {
         return Mono.fromFuture(
-                getUser(application.getUserId(), email)
-                        .thenCompose(__ -> getApplication(application.getUserId(), application.getJobId()))
+                getUser(application.getAccountId(), email)
+                        .thenCompose(__ -> getApplication(application.getAccountId(), application.getJobId()))
                         .thenCompose(___ -> applicationRepo.update(application))
                         .thenAccept(res -> {
                             if (!res) throw new BadRequestException(ErrorMessages.badRequest_ItemCreation);
@@ -121,8 +121,8 @@ public class UserService {
 
     public Mono<Void> updateCurriculum(Curriculum curriculum, String email) {
         return Mono.fromFuture(
-                getUser(curriculum.getUserId(), email)
-                        .thenCompose(__ -> getCurriculum(curriculum.getUserId(), curriculum.getIdentityKey(), email))
+                getUser(curriculum.getAccountId(), email)
+                        .thenCompose(__ -> getCurriculum(curriculum.getAccountId(), curriculum.getIdentityKey(), email))
                         .thenCompose(___ -> curriculumRepo.update(curriculum))
                         .thenAccept(res -> {
                             if (!res) throw new BadRequestException(ErrorMessages.badRequest_ItemCreation);
@@ -140,7 +140,7 @@ public class UserService {
     }
 
     public CompletableFuture<Application> createApplication(long userId, Application application, String email) {
-        if (application.getUserId() != userId)
+        if (application.getAccountId() != userId)
             throw new BadRequestException(ErrorMessages.badRequest_IdsMismatch);
 
         return getUser(userId, email)
@@ -152,7 +152,7 @@ public class UserService {
     }
 
     public CompletableFuture<Curriculum> createCurriculum(long userId, Curriculum curriculum, String email) {
-        if (curriculum.getUserId() != userId)
+        if (curriculum.getAccountId() != userId)
             throw new BadRequestException(ErrorMessages.badRequest_IdsMismatch);
 
         return getUser(userId, email)
