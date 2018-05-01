@@ -4,19 +4,26 @@ import isel.ps.employbox.model.entities.Account;
 import isel.ps.employbox.model.input.InAccount;
 import isel.ps.employbox.model.output.OutAccount;
 import org.springframework.stereotype.Component;
+import reactor.core.publisher.Mono;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
+import java.util.concurrent.CompletableFuture;
+
 @Component
-public class AccountBinder extends ModelBinder<Account, OutAccount, InAccount> {
+public class AccountBinder implements ModelBinder<Account,OutAccount,InAccount> {
 
 
     @Override
-    public OutAccount bindOutput(Account acount) {
-        return new OutAccount(
-                    acount.getIdentityKey(),
-                    acount.getEmail(),
-                    acount.getRating(),
-                    acount.getVersion()
+    public Mono<OutAccount> bindOutput(CompletableFuture<Account> accountCompletableFuture) {
+        return Mono.fromFuture(
+                    accountCompletableFuture.thenApply(
+                            account ->
+                                    new OutAccount(
+                                            account.getIdentityKey(),
+                                            account.getEmail(),
+                                            account.getRating(),
+                                            account.getVersion())
+                    )
         );
     }
 

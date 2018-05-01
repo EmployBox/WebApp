@@ -8,10 +8,10 @@ import isel.ps.employbox.model.entities.Chat;
 import isel.ps.employbox.model.entities.Message;
 import org.github.isel.rapper.DataRepository;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Mono;
 
-import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
 
 import static isel.ps.employbox.ErrorMessages.badRequest_IdsMismatch;
 import static isel.ps.employbox.ErrorMessages.resourceNotFound_message;
@@ -29,52 +29,63 @@ public class ChatService {
     }
 
 
-    public Stream<Chat> getAccountChats(long accountId) {
-        return StreamSupport.stream(chatRepo.findAll().join().spliterator(), false)
-                .filter(curr-> curr.getAccountIdFirst() == accountId);
+    public CompletableFuture<Stream<Chat>> getAccountChats(long accountId) {
+        return chatRepo.findAll()
+                .thenApply(list -> list
+                        .stream()
+                        .filter(curr -> curr.getAccountIdFirst() == accountId));
     }
 
-    public Stream<Message> getAccountChatsMessages(long accountId, long cid, String email) {
-        accountService.getAccount(accountId, email);
-
-        return StreamSupport.stream(msgRepo.findAll().join().spliterator(),false)
-                .filter(curr-> curr.getAccountId() == accountId && curr.getChadId() == cid);
+    public CompletableFuture<Stream<Message>> getAccountChatsMessages(long accountId, long cid, String email) {
+        return accountService.getAccount(accountId, email).thenCompose(__ ->
+                msgRepo.findAll()
+                        .thenApply(list -> list
+                                .stream()
+                                .filter(curr -> curr.getAccountId() == accountId && curr.getChadId() == cid))
+        );
     }
 
-    public Message getAccountChatsMessage(long cid, long mid, String email) {
-        Optional<Message> omsg = msgRepo.findById(mid).join();
-        if(!omsg.isPresent())
-            throw new ResourceNotFoundException(resourceNotFound_message);
 
-        Message msg = omsg.get();
-        accountService.getAccount(msg.getAccountId(), email);
-
-        if(msg.getChadId() != cid )
-            throw new BadRequestException( badRequest_IdsMismatch );
-
-        return msg;
+    public CompletableFuture<Message> getAccountChatsMessage(long cid, long mid, String email) {
+        return msgRepo.findById(mid)
+                .thenApply(omsg -> omsg.orElseThrow(() -> new ResourceNotFoundException(resourceNotFound_message)))
+                .thenCompose(msg -> {
+                    if (msg.getChadId() != cid)
+                        throw new BadRequestException(badRequest_IdsMismatch);
+                    return accountService.getAccount(msg.getAccountId(), email)//throws exceptions
+                            .thenApply(__ -> msg);
+                });
     }
 
-    public void createNewChatMessage(long accountId, long chatId, Message msg, String email) {
-        accountService.getAccount(accountId, email);
-
-        Chat chat = getChat(chatId);
-        if(chat.getAccountIdFirst() != accountId)
-            throw new UnauthorizedException( ErrorMessages.unAuthorized_message );
-        msgRepo.create(msg);
+    public CompletableFuture<Message> createNewChatMessage(long accountId, long chatId, Message msg, String email) {
+        return accountService.getAccount(accountId, email)
+                .thenCompose(__ -> getChat(chatId))
+                .thenCompose(chat -> {
+                    if (chat.getAccountIdFirst() != accountId)
+                        throw new UnauthorizedException(ErrorMessages.unAuthorized_message);
+                    return msgRepo.create(msg);
+                })
+                .thenApply(res -> {
+                    if (!res) throw new BadRequestException(ErrorMessages.badRequest_ItemCreation);
+                    return msg;
+                });
     }
 
-    public Chat getChat(long chatId){
-        Optional<Chat> ochat = chatRepo.findById(chatId).join();
-        if(!ochat.isPresent())
-            throw new ResourceNotFoundException(ErrorMessages.resourceNotFound_chat);
-        return ochat.get();
+    public CompletableFuture<Chat> getChat(long chatId){
+        return chatRepo.findById(chatId)
+                .thenApply(ochat -> ochat.orElseThrow( () -> new ResourceNotFoundException(ErrorMessages.resourceNotFound_chat)));
     }
 
-    public void createNewChat(long accountIdFrom, Chat inChat, String username) {
-        accountService.getAccount(accountIdFrom,username);
-
-        accountService.getAccount(inChat.getAccountIdSecond());
-        chatRepo.create(inChat);
+    public Mono<Chat> createNewChat(long accountIdFrom, Chat inChat, String username) {
+        return Mono.fromFuture(
+                CompletableFuture.allOf(
+                        accountService.getAccount(accountIdFrom, username),
+                        accountService.getAccount(inChat.getAccountIdSecond())
+                ).thenCompose(__ -> chatRepo.create(inChat)
+                ).thenApply(res -> {
+                    if (!res) throw new BadRequestException(ErrorMessages.badRequest_ItemCreation);
+                    return inChat;
+                })
+        );
     }
 }

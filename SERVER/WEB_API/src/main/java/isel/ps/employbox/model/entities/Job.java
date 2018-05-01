@@ -1,6 +1,8 @@
 package isel.ps.employbox.model.entities;
 
+import org.github.isel.rapper.ColumnName;
 import org.github.isel.rapper.DomainObject;
+import org.github.isel.rapper.Id;
 
 import java.sql.Date;
 import java.util.Collections;
@@ -8,7 +10,10 @@ import java.util.List;
 import java.util.function.Supplier;
 
 public class Job implements DomainObject<Long> {
+
+    @Id(isIdentity =  true)
     private long jobId;
+
     private final String title;
     private final long accountID;
     private final String address;
@@ -19,7 +24,11 @@ public class Job implements DomainObject<Long> {
     private final Date offerEndDate;
     private final String offerType;
     private final long version;
+
+    @ColumnName(name = "jobId")
     private final Supplier<List<Application>> applications;
+
+    @ColumnName(name = "jobId")
     private final Supplier<List<JobExperience>> experiences;
 
     public Job(){
@@ -77,7 +86,9 @@ public class Job implements DomainObject<Long> {
             String schedule,
             Date offerBeginDate,
             Date offerEndDate,
-            String offerType)
+            String offerType,
+            long version
+    )
     {
         this.jobId = jobId;
         this.accountID = accountID;
@@ -91,7 +102,7 @@ public class Job implements DomainObject<Long> {
         this.offerType = offerType;
         this.applications = Collections::emptyList;
         this.experiences = Collections::emptyList;
-        this.version = -1;
+        this.version = version;
     }
 
     @Override

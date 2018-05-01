@@ -8,6 +8,7 @@ import isel.ps.employbox.model.output.OutComment;
 import isel.ps.employbox.services.CommentService;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+import reactor.core.publisher.Mono;
 
 import static isel.ps.employbox.ErrorMessages.badRequest_IdsMismatch;
 
@@ -23,42 +24,43 @@ public class CommentController {
     }
 
     @GetMapping
-    public HalCollection getAllComments(@PathVariable long accId, @RequestParam String type){
+    public Mono<HalCollection> getAllComments(@PathVariable long accId, @RequestParam String type){
         if(type.equals("done") || type.equals("received"))
             return commentBinder.bindOutput(
                     commentService.getComments(accId, type),
-                    this.getClass(),
-                    accId
+                    this.getClass()
             );
         else
             throw new BadRequestException("Type must be either \"done\" or \"received\"");
     }
 
     @GetMapping("{commentId}")
-    public OutComment getComment(@PathVariable long accountId, @RequestBody long accountTo, @PathVariable long commentId, Authentication authentication){
-        return commentBinder.bindOutput(commentService.getComment(accountId, accountTo, commentId,  authentication.getName()));
+    public Mono<OutComment> getComment(@PathVariable long accountId, @RequestBody long accountTo, @PathVariable long commentId, Authentication authentication){
+        return commentBinder.bindOutput(
+                commentService.getComment(accountId, accountTo, commentId,  authentication.getName())
+        );
     }
 
     @PutMapping
-    public void updateComment(
+    public Mono<Void> updateComment(
             @PathVariable long id,
             @RequestParam long accountTo,
             @RequestBody InComment comment,
             Authentication authentication
     ){
         if(id != comment.getAccountIdFrom() || accountTo != comment.getAccountIdTo()) throw new BadRequestException(badRequest_IdsMismatch);
-        commentService.updateComment(commentBinder.bindInput(comment), authentication.getName());
+        return commentService.updateComment(commentBinder.bindInput(comment), authentication.getName());
     }
 
     @PostMapping
-    public void createComment(
+    public Mono<OutComment> createComment(
             @PathVariable long accountFromId,
             @RequestParam long accountTo,
             @RequestBody InComment comment,
             Authentication authentication
     ){
         if(accountFromId != comment.getAccountIdFrom() || accountTo != comment.getAccountIdTo()) throw new BadRequestException(badRequest_IdsMismatch);
-        commentService.createComment(commentBinder.bindInput(comment), authentication.getName());
+        return commentBinder.bindOutput( commentService.createComment(commentBinder.bindInput(comment), authentication.getName()));
     }
 
     @DeleteMapping("{commentId}")

@@ -3,20 +3,27 @@ package isel.ps.employbox.model.binder;
 import isel.ps.employbox.model.entities.User;
 import isel.ps.employbox.model.input.InUser;
 import isel.ps.employbox.model.output.OutUser;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
+import reactor.core.publisher.Mono;
+
+import java.util.concurrent.CompletableFuture;
 
 @Component
-public class UserBinder extends ModelBinder<User, OutUser, InUser> {
-    private PasswordEncoder passwordEncoder;
-
-    public UserBinder(PasswordEncoder passwordEncoder) {
-        this.passwordEncoder = passwordEncoder;
-    }
+public class UserBinder implements ModelBinder<User,OutUser,InUser> {
 
     @Override
-    public OutUser bindOutput(User user) {
-        return new OutUser(user.getIdentityKey(), user.getName(), user.getEmail(), user.getPhotoUrl(), user.getSummary(), user.getRating());
+    public Mono<OutUser> bindOutput(CompletableFuture<User> userCompletableFuture) {
+        return Mono.fromFuture(
+                userCompletableFuture.thenApply(
+                        user -> new OutUser(
+                                user.getIdentityKey(),
+                                user.getName(),
+                                user.getEmail(),
+                                user.getPhotoUrl(),
+                                user.getSummary(),
+                                user.getRating())
+                )
+        );
     }
 
     @Override

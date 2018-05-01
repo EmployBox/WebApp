@@ -1,13 +1,12 @@
 package isel.ps.employbox.model.input;
 
 import java.sql.Date;
-import java.util.List;
 
 public class InJob {
     private long jobID;
     private String title;
-    private long accountID;
-    private List<InExperience> experiences;
+    private long accountId;
+    private InJobExperience[] experiences;
     private String address;
     private int wage;
     private String description;
@@ -15,6 +14,7 @@ public class InJob {
     private Date offerBeginDate;
     private Date offerEndDate;
     private String offerType;
+    private long version;
 
     public String getTitle() {
         return title;
@@ -32,19 +32,19 @@ public class InJob {
         this.jobID = jobID;
     }
 
-    public long getAccountID() {
-        return accountID;
+    public long getAccountId() {
+        return accountId;
     }
 
-    public void setAccountID(long accountID) {
-        this.accountID = accountID;
+    public void setAccountId(long accountId) {
+        this.accountId = accountId;
     }
 
-    public List<InExperience> getExperiences() {
+    public InJobExperience[] getExperiences() {
         return experiences;
     }
 
-    public void setExperiences(List<InExperience> experiences) {
+    public void setExperiences(InJobExperience[] experiences) {
         this.experiences = experiences;
     }
 
@@ -102,24 +102,11 @@ public class InJob {
         this.offerType = offerType;
     }
 
-    public class InExperience {
-        private String competence;
-        private short years;
+    public long getVersion() {
+        return version;
+    }
 
-        public String getCompetence() {
-            return competence;
-        }
-
-        public void setCompetence(String competence) {
-            this.competence = competence;
-        }
-
-        public short getYears() {
-            return years;
-        }
-
-        public void setYears(short years) {
-            this.years = years;
-        }
+    public void setVersion(long version) {
+        this.version = version;
     }
 }

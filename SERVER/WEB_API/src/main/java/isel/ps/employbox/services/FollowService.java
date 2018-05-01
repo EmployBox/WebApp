@@ -1,40 +1,66 @@
 package isel.ps.employbox.services;
 
+import isel.ps.employbox.ErrorMessages;
+import isel.ps.employbox.exceptions.BadRequestException;
 import isel.ps.employbox.model.entities.Account;
 import isel.ps.employbox.model.entities.Follow;
+import javafx.util.Pair;
 import org.github.isel.rapper.DataRepository;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Mono;
 
+import java.util.ArrayList;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
 
 @Service
 public class FollowService {
     private final DataRepository<Follow, Follow.FollowKey> followsRepo;
-    private final UserService accountService;
+    private final AccountService accountService;
 
-    public FollowService(DataRepository<Follow, Follow.FollowKey> followeRepo, UserService userService) {
+    public FollowService(DataRepository<Follow, Follow.FollowKey> followeRepo, AccountService accountRepo) {
         this.followsRepo = followeRepo;
-        this.accountService = userService;
+        this.accountService = accountRepo;
     }
 
-    public Stream<Account> getAccountFollowers(long followedAccountId) {
-       return StreamSupport.stream( followsRepo.findAll().join().spliterator(), false)
-               .filter(curr-> curr.getAccountIdFollowed() == followedAccountId)
-               .map( curr-> accountService.getUser(curr.getAccountIdFollower()));
+    public CompletableFuture<Stream<Account>> getAccountFollowers(long followedAccountId) {
+        ArrayList<CompletableFuture<Account>> arr = new ArrayList<>();
+        return followsRepo.findWhere(new Pair<>("accountIdFollowed", followedAccountId))
+                .thenAccept(accounts -> accounts
+                        .forEach(elem -> arr.add(accountService.getAccount(elem.getAccountIdFollower()))))
+                .thenCompose(__ -> CompletableFuture.allOf(arr.toArray(new CompletableFuture[arr.size()])))
+                .thenApply(__ -> arr.stream().map(CompletableFuture::join));
     }
 
-    public Stream<Account> getAccountFollowing(long followerAccountId, String email) {
-        return StreamSupport.stream( followsRepo.findAll().join().spliterator(), false)
-                .filter(curr-> curr.getAccountIdFollower() == followerAccountId)
-                .map( curr-> accountService.getUser(curr.getAccountIdFollowed(), email));
+    public CompletableFuture<Stream<Account>> getAccountFollowing(long followerAccountId) {
+        ArrayList<CompletableFuture<Account>> arr = new ArrayList<>();
+        return followsRepo.findWhere(new Pair<>("accountIdFollower", followerAccountId))
+                .thenAccept(accounts -> accounts
+                        .forEach(elem -> arr.add(accountService.getAccount(elem.getAccountIdFollowed()))))
+                .thenCompose(__ -> CompletableFuture.allOf(arr.toArray(new CompletableFuture[arr.size()])))
+                .thenApply(__ -> arr.stream().map(CompletableFuture::join));
     }
 
-    public void setFollower(long accountToBeFollowedId, long accountToFollowId, String name){
-        followsRepo.create( new Follow(accountToBeFollowedId, accountToFollowId));
+    public Mono<Void> createFollower(long accountToBeFollowedId, long accountToFollowId, String username) {
+        return Mono.fromFuture(
+                accountService.getAccount(accountToFollowId, username)
+                        .thenCompose(
+                                __ -> followsRepo.create(new Follow(accountToBeFollowedId, accountToFollowId))
+                                        .thenAccept(res -> {
+                                            if (!res)
+                                                throw new BadRequestException(ErrorMessages.badRequest_ItemDeletion);
+                                        }))
+        );
     }
 
-    public void deleteFollower(long id, long fid, String name) {
-        followsRepo.deleteById( new Follow.FollowKey(id,fid) );
+    public Mono<Void> deleteFollower(long id, long fid, String username) {
+        return Mono.fromFuture(
+                accountService.getAccount(id, username)
+                        .thenCompose(__ -> followsRepo.deleteById(new Follow.FollowKey(id, fid)))
+                        .thenAccept(res -> {
+                            if (!res)
+                                throw new BadRequestException(ErrorMessages.badRequest_ItemDeletion);
+                        })
+        );
     }
 }

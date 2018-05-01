@@ -1,6 +1,6 @@
 {AcademicBackgroundMapper:
-	MapperSettings{query='insert into [AcademicBackground] (accountID,curriculumId,beginDate,endDate,studyArea,institution,degreeObtained,[userVersion]) values( ?  ,  ?  ,  ?  ,  ?  ,  ?  ,  ?  ,  ?  ,  ? )'},
-	MapperSettings{query='update [AcademicBackground] set beginDate = ? ,endDate = ? ,studyArea = ? ,institution = ? ,degreeObtained = ? ,[userVersion] = ?  where accountID = ?  and curriculumId = ? '},
+	MapperSettings{query='insert into [AcademicBackground] (accountId,curriculumId,beginDate,endDate,studyArea,institution,degreeObtained,[userVersion]) values( ?  ,  ?  ,  ?  ,  ?  ,  ?  ,  ?  ,  ?  ,  ? )'},
+	MapperSettings{query='update [AcademicBackground] set beginDate = ? ,endDate = ? ,studyArea = ? ,institution = ? ,degreeObtained = ? ,[userVersion] = ?  where accountId = ?  and curriculumId = ? '},
 	MapperSettings{query='delete from [AcademicBackground] where accountIDandcurriculumId'}}
 {ApplicationMapper:
 	MapperSettings{query='insert into [Application] (userId,jobId,curriculumId,[date],[userVersion]) values( ?  ,  ?  ,  ?  ,  ?  ,  ? )'},
@@ -39,8 +39,8 @@
 	MapperSettings{query='update [JobExperience] set jobId = ? ,competeces = ? ,years = ? ,[userVersion] = ?  where '},
 	MapperSettings{query='delete from [JobExperience] where '}}
 {JobMapper:
-	MapperSettings{query='insert into [Job] (accountID,address,wage,description,schedule,offerBeginDate,offerEndDate,offerType,[userVersion]) values( ?  ,  ?  ,  ?  ,  ?  ,  ?  ,  ?  ,  ?  ,  ?  ,  ? )'},
-	MapperSettings{query='update [Job] set accountID = ? ,address = ? ,wage = ? ,description = ? ,schedule = ? ,offerBeginDate = ? ,offerEndDate = ? ,offerType = ? ,[userVersion] = ?  where jobId = ? '},
+	MapperSettings{query='insert into [Job] (accountId,address,wage,description,schedule,offerBeginDate,offerEndDate,offerType,[userVersion]) values( ?  ,  ?  ,  ?  ,  ?  ,  ?  ,  ?  ,  ?  ,  ?  ,  ? )'},
+	MapperSettings{query='update [Job] set accountId = ? ,address = ? ,wage = ? ,description = ? ,schedule = ? ,offerBeginDate = ? ,offerEndDate = ? ,offerType = ? ,[userVersion] = ?  where jobId = ? '},
 	MapperSettings{query='delete from [Job] where jobId'}}
 {LocalMapper:
 	MapperSettings{query='insert into [Local] (address,country,district,zipCode,[userVersion]) values( ?  ,  ?  ,  ?  ,  ?  ,  ? )'},

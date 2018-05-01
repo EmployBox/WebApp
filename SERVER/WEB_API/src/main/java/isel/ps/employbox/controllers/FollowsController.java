@@ -5,6 +5,7 @@ import isel.ps.employbox.model.output.HalCollection;
 import isel.ps.employbox.services.FollowService;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+import reactor.core.publisher.Mono;
 
 @RestController
 @RequestMapping("/accounts/{id}")
@@ -19,30 +20,28 @@ public class FollowsController {
     }
 
     @GetMapping("/followers")
-    public HalCollection getFollowers(@PathVariable long id){
+    public Mono<HalCollection> getFollowers(@PathVariable long id){
         return accountBinder.bindOutput(
                 followService.getAccountFollowers(id),
-                this.getClass(),
-                id
+                this.getClass()
         );
     }
 
     @GetMapping("/following")
-    public HalCollection getFollowing(@PathVariable long id,  Authentication authentication){
+    public Mono<HalCollection> getFollowing(@PathVariable long id){
         return accountBinder.bindOutput(
-                followService.getAccountFollowing(id, authentication.getName()),
-                this.getClass(),
-                id
+                followService.getAccountFollowing(id),
+                this.getClass()
         );
     }
 
     @PutMapping("/followers/{fid}")
-    public void setFollower(@PathVariable long id, @PathVariable long fid,  Authentication authentication){
-        followService.setFollower(id, fid, authentication.getName());
+    public Mono<Void> setFollower(@PathVariable long id, @PathVariable long fid,  Authentication authentication){
+        return followService.createFollower(id, fid, authentication.getName());
     }
 
     @DeleteMapping("/followers/{fid}")
-    public void deleteFollower(@PathVariable long id, @PathVariable long fid, Authentication authentication){
-        followService.deleteFollower(id, fid, authentication.getName());
+    public Mono<Void> deleteFollower(@PathVariable long id, @PathVariable long fid, Authentication authentication){
+        return followService.deleteFollower(id, fid, authentication.getName());
     }
 }

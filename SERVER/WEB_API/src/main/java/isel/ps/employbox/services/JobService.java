@@ -1,14 +1,15 @@
 package isel.ps.employbox.services;
 
 import isel.ps.employbox.ErrorMessages;
+import isel.ps.employbox.exceptions.BadRequestException;
 import isel.ps.employbox.exceptions.ResourceNotFoundException;
 import isel.ps.employbox.model.entities.Job;
 import org.github.isel.rapper.DataRepository;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Mono;
 
-import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
 
 @Service
 public class JobService {
@@ -20,30 +21,51 @@ public class JobService {
         this.userService = userService;
     }
 
-    public Stream<Job> getAllJobs() {
-        return StreamSupport.stream( jobRepo.findAll().join().spliterator(), false);
+    public CompletableFuture<Stream<Job> > getAllJobs() {
+        return  jobRepo.findAll().thenApply( list -> list.stream());
     }
 
-    public Job getJob(long jid) {
-        Optional<Job> ojob= jobRepo.findById(jid).join();
-        if(!ojob.isPresent())
-            throw new ResourceNotFoundException(ErrorMessages.resourceNotfound_job );
-        return ojob.get();
+    public CompletableFuture<Job> getJob(long jid) {
+        return jobRepo.findById(jid)
+                .thenApply(opt -> {
+                    if(opt.isPresent())
+                        return opt.get();
+                    throw new ResourceNotFoundException(ErrorMessages.resourceNotfound_job);
+                });
     }
 
-    public void updateJob(Job job, String email) {
-        getJob(job.getIdentityKey());
-        userService.getUser(job.getAccountID(), email);
-        jobRepo.update(job);
+    public Mono<Void> updateJob(Job job, String email) {
+        return Mono.fromFuture(
+                CompletableFuture.allOf(
+                        getJob(job.getIdentityKey()),
+                        userService.getUser(job.getAccountID(), email)
+                ).thenCompose( __-> jobRepo.update(job))
+                 .thenAccept( res -> {
+                    if(!res) throw new BadRequestException(ErrorMessages.badRequest_ItemCreation);
+                })
+        );
     }
 
-    public void createJob(Job job, String email) {
-        userService.getUser(job.getAccountID(), email);
-        jobRepo.create(job);
+    public CompletableFuture<Job> createJob(Job job, String email) {
+        return userService.getUser(job.getAccountID(), email)
+                .thenCompose( __-> jobRepo.create(job) )
+                .thenApply( res -> {
+                    if(!res) throw new BadRequestException(ErrorMessages.badRequest_ItemCreation);
+                    return job;
+                });
     }
 
-    public void deleteJob(long id, String email) {
-        userService.getUser(id, email);
-        jobRepo.delete(getJob(id));
+    public Mono<Void> deleteJob(long id, String email) {
+       return Mono.fromFuture(
+           userService.getUser(id, email)
+                   .thenAccept(user -> getJob(id).thenCompose( job -> {
+                           if(job.getAccountID() != user.getIdentityKey())
+                               throw new BadRequestException(ErrorMessages.unAuthorized_IdAndEmailMismatch);
+                            return jobRepo.delete(job);
+                       }).thenAccept( res -> {
+                           if(!res) throw new BadRequestException(ErrorMessages.badRequest_ItemDeletion );
+                       })
+                   )
+       );
     }
 }

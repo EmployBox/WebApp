@@ -4,171 +4,193 @@ import isel.ps.employbox.ErrorMessages;
 import isel.ps.employbox.exceptions.BadRequestException;
 import isel.ps.employbox.exceptions.ResourceNotFoundException;
 import isel.ps.employbox.exceptions.UnauthorizedException;
-import isel.ps.employbox.model.entities.Account;
 import isel.ps.employbox.model.entities.Application;
 import isel.ps.employbox.model.entities.Curriculum;
 import isel.ps.employbox.model.entities.User;
 import javafx.util.Pair;
 import org.github.isel.rapper.DataRepository;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Mono;
 
 import java.security.InvalidParameterException;
-import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
 
 import static isel.ps.employbox.ErrorMessages.resourceNotfound_user;
 
 @Service
-public class UserService implements UserDetailsService {
+public class UserService {
 
-    private final DataRepository<Account, Long> accRepo;
     private final DataRepository<User, Long> userRepo;
     private final DataRepository<Curriculum, Long> curriculumRepo;
     private final DataRepository<Application, Application.ApplicationKeys> applicationRepo;
 
     public UserService(
-            DataRepository<Account, Long> accRepo, DataRepository<User, Long> userRepo,
+            DataRepository<User, Long> userRepo,
             DataRepository<Curriculum, Long> curriculumRepo,
-            DataRepository<Application, Application.ApplicationKeys> applicationRepo)
-    {
-        this.accRepo = accRepo;
+            DataRepository<Application, Application.ApplicationKeys> applicationRepo) {
         this.userRepo = userRepo;
         this.curriculumRepo = curriculumRepo;
         this.applicationRepo = applicationRepo;
     }
 
-    public Stream<User> getAllUsers() {
-        return StreamSupport.stream(userRepo.findAll().join().spliterator(), false);
+    public CompletableFuture<Stream<User>> getAllUsers() {
+        return userRepo.findAll()
+                .thenApply(list -> list.stream());
     }
 
-    public User getUser(long id, String... email) {
-        if(email.length > 1)
+    public CompletableFuture<User> getUser(long id, String... email) {
+        if (email.length > 1)
             throw new InvalidParameterException("Only 1 or 2 parameters are allowed for this method");
 
-        Optional<User> ouser = userRepo.findById(id).join();
-        if(!ouser.isPresent())
-            throw new ResourceNotFoundException(resourceNotfound_user);
-        User user = ouser.get();
-
-        if(email.length == 1 && !user.getEmail().equals(email[0]))
-            throw new UnauthorizedException(ErrorMessages.unAuthorized_IdAndEmailMismatch);
-
-        return user;
+        return userRepo.findById(id)
+                .thenApply(res -> {
+                            if (!res.isPresent())
+                                throw new ResourceNotFoundException(resourceNotfound_user);
+                            if (email.length == 1 && !res.get().getEmail().equals(email[0]))
+                                throw new UnauthorizedException(ErrorMessages.unAuthorized_IdAndEmailMismatch);
+                            return res.get();
+                        }
+                );
     }
 
-    public Application getApplication(long userId, long jobId) {
-
-        List<Application> aplications = getUser(userId).getApplications().get();
-
-        Optional<Application> oret;
-        if(aplications.isEmpty() ||(oret = aplications.parallelStream().filter(curr-> curr.getUserId() == userId && curr.getJobId() == jobId).findFirst()).isPresent())
-            throw new ResourceNotFoundException(ErrorMessages.resourceNotfound_application);
-
-        return oret.get();
+    public CompletableFuture<Application> getApplication(long userId, long jobId) {
+        return getUser(userId)
+                .thenApply(user -> user.getApplications().get())
+                .thenApply(applications -> {
+                    Optional<Application> application = applications.stream().filter(curr -> curr.getUserId() == userId && curr.getJobId() == jobId).findFirst();
+                    if (applications.isEmpty() || !application.isPresent())
+                        throw new ResourceNotFoundException(ErrorMessages.resourceNotfound_application);
+                    return application.get();
+                });
     }
 
 
-    public Stream<Application> getAllApplications(long accountId)/**), Map<String, String> queryString) {*/
+    public CompletableFuture<Stream<Application>> getAllApplications(long accountId)/**), Map<String, String> queryString) {*/
     {
-        List<User> luser = userRepo.findWhere(new Pair<>("accountId",accountId)).join();
-        if(luser.isEmpty())
-            return Stream.empty();
-
-        return luser
-                .get(0)
-                .getApplications()
-                .get()
-                .stream();
+        return userRepo.findWhere(new Pair<>("accountId", accountId))
+                .thenApply(users -> users.get(0).getApplications().get().stream())
+                .exceptionally(__ -> {
+                    throw new ResourceNotFoundException(ErrorMessages.resourceNotfound_user);
+                });
     }
 
 
-    public Stream<Curriculum> getCurricula(long userId, String email ) /**, Map<String, String> queryString) {*/
+    public CompletableFuture<Stream<Curriculum>> getCurricula(long userId, String email) /**, Map<String, String> queryString) {*/
     {
-        return StreamSupport.stream( getUser(userId, email).getCurricula().get().spliterator(), false)
-                .filter(curr-> curr.getUserId() == userId);
+        return getUser(userId, email).thenApply(
+                user -> user.getCurricula()
+                        .get()
+                        .stream()
+                        .filter(curr -> curr.getUserId() == userId)
+        );
     }
 
-    public Curriculum getCurriculum(long userId, long cid, String email) {
-        List<Curriculum> curricula = getUser(userId, email).getCurricula().get();
-
-        Optional<Curriculum> oret;
-        if(curricula.isEmpty() || ! (oret = curricula.parallelStream().filter(curr-> curr.getIdentityKey() == cid).findFirst()).isPresent())
-            throw new ResourceNotFoundException(ErrorMessages.resourceNotfound_curriculum);
-
-        return oret.get();
+    public CompletableFuture<Curriculum> getCurriculum(long userId, long cid, String email) {
+        return getUser(userId, email)
+                .thenApply(user -> user.getCurricula().get())
+                .thenApply(curricula -> {
+                    Optional<Curriculum> oret;
+                    if (curricula.isEmpty() || !(oret = curricula.stream().filter(curr -> curr.getIdentityKey() == cid).findFirst()).isPresent())
+                        throw new ResourceNotFoundException(ErrorMessages.resourceNotfound_curriculum);
+                    return oret.get();
+                });
     }
 
-    public void updateUser(User user, String email) {
-        getUser(user.getIdentityKey(), email);
-        if(!userRepo.update(user).join())
-            throw new ResourceNotFoundException("something went wrong updating this item") ;
+    public Mono<Void> updateUser(User user, String email) {
+        return Mono.fromFuture(
+                getUser(user.getIdentityKey(), email)
+                        .thenCompose(__ -> userRepo.update(user))
+                        .thenAccept(res -> {
+                            if (!res) throw new BadRequestException(ErrorMessages.badRequest_ItemCreation);
+                        })
+        );
     }
 
-    public void updateApplication(Application application, String email) {
-        getUser(application.getUserId(), email);
-        getApplication(application.getUserId(), application. getJobId());
-        applicationRepo.update(application);
+    public Mono<Void> updateApplication(Application application, String email) {
+        return Mono.fromFuture(
+                getUser(application.getUserId(), email)
+                        .thenCompose(__ -> getApplication(application.getUserId(), application.getJobId()))
+                        .thenCompose(___ -> applicationRepo.update(application))
+                        .thenAccept(res -> {
+                            if (!res) throw new BadRequestException(ErrorMessages.badRequest_ItemCreation);
+                        })
+        );
     }
 
-    public void updateCurriculum(Curriculum curriculum, String email) {
-        getUser(curriculum.getUserId(), email);
-        getCurriculum(curriculum.getUserId(), curriculum.getIdentityKey(), email);
-        curriculumRepo.update(curriculum);
+    public Mono<Void> updateCurriculum(Curriculum curriculum, String email) {
+        return Mono.fromFuture(
+                getUser(curriculum.getUserId(), email)
+                        .thenCompose(__ -> getCurriculum(curriculum.getUserId(), curriculum.getIdentityKey(), email))
+                        .thenCompose(___ -> curriculumRepo.update(curriculum))
+                        .thenAccept(res -> {
+                            if (!res) throw new BadRequestException(ErrorMessages.badRequest_ItemCreation);
+                        })
+        );
     }
 
 
-    public void createUser(User user) {
-        userRepo.create(user);
+    public CompletableFuture<User> createUser(User user) {
+        return userRepo.create(user).thenApply(
+                res -> {
+                    if (!res) throw new BadRequestException(ErrorMessages.badRequest_ItemCreation);
+                    return user;
+                });
     }
 
-    public void createApplication(long userId, Application application, String email) {
-        getUser(userId, email);
+    public CompletableFuture<Application> createApplication(long userId, Application application, String email) {
+        if (application.getUserId() != userId)
+            throw new BadRequestException(ErrorMessages.badRequest_IdsMismatch);
 
-        if(application.getUserId() != userId)
-            throw new BadRequestException( ErrorMessages.badRequest_IdsMismatch);
-
-        applicationRepo.create(application);
+        return getUser(userId, email)
+                .thenCompose(__ -> applicationRepo.create(application))
+                .thenApply(res -> {
+                    if (!res) throw new BadRequestException(ErrorMessages.badRequest_ItemCreation);
+                    return application;
+                });
     }
 
-    public void createCurriculum(long userId, Curriculum curriculum, String email) {
-        getUser(userId, email);
+    public CompletableFuture<Curriculum> createCurriculum(long userId, Curriculum curriculum, String email) {
+        if (curriculum.getUserId() != userId)
+            throw new BadRequestException(ErrorMessages.badRequest_IdsMismatch);
 
-        if(curriculum.getUserId() != userId)
-            throw new BadRequestException( ErrorMessages.badRequest_IdsMismatch);
-
-        curriculumRepo.create(curriculum);
+        return getUser(userId, email)
+                .thenCompose(__ -> curriculumRepo.create(curriculum))
+                .thenApply(res -> {
+                    if (!res) throw new BadRequestException(ErrorMessages.badRequest_ItemCreation);
+                    return curriculum;
+                });
     }
 
-    public void deleteUser(long id, String email) {
-        userRepo.delete(getUser(id,email));
+    public Mono<Void> deleteUser(long id, String email) {
+        return Mono.fromFuture(
+                getUser(id, email)
+                        .thenCompose(userRepo::delete)
+                        .thenAccept(res -> {
+                            if (!res) throw new BadRequestException(ErrorMessages.badRequest_ItemDeletion);
+                        })
+        );
     }
 
-    public void deleteApplication(long userId, long jobId, String email) {
-        getUser(userId, email);
-        applicationRepo.delete( getApplication(userId,jobId));
+    public Mono<Void> deleteApplication(long userId, long jobId, String email) {
+        return Mono.fromFuture(
+                getUser(userId, email)
+                        .thenCompose(__ -> getApplication(userId, jobId))
+                        .thenCompose(applicationRepo::delete)
+                        .thenAccept(res -> {
+                            if (!res) throw new BadRequestException(ErrorMessages.badRequest_ItemDeletion);
+                        })
+        );
     }
 
-    public void deleteCurriculum(long userId, long cid, String name) {
-        curriculumRepo.delete( getCurriculum(userId, cid, name) );
-    }
-
-    @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        Optional<User> ouser = userRepo
-                .findAll()
-                .join()
-                .stream()
-                .filter(curr-> curr.getEmail().equals(username))
-                .findFirst();
-
-        if( !ouser.isPresent())
-            throw new UsernameNotFoundException( resourceNotfound_user );
-
-        return ouser.get();
+    public Mono<Void> deleteCurriculum(long userId, long cid, String name) {
+        return Mono.fromFuture(
+                getCurriculum(userId, cid, name)
+                        .thenCompose(curriculumRepo::delete)
+                        .thenAccept(res -> {
+                            if (!res) throw new BadRequestException(ErrorMessages.badRequest_ItemDeletion);
+                        })
+        );
     }
 }

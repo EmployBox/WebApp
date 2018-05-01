@@ -9,6 +9,7 @@ import isel.ps.employbox.model.output.OutCurriculum;
 import isel.ps.employbox.services.UserService;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+import reactor.core.publisher.Mono;
 
 import static isel.ps.employbox.ErrorMessages.badRequest_IdsMismatch;
 
@@ -25,22 +26,21 @@ public class CurriculumController {
     }
 
     @GetMapping
-    public HalCollection getCurricula(@PathVariable long id,  Authentication authentication){
+    public Mono<HalCollection> getCurricula(@PathVariable long id, Authentication authentication){
         return curriculumBinder.bindOutput(
                 userService.getCurricula(id, authentication.getName()),
-                this.getClass(),
-                id
+                this.getClass()
         );
     }
 
     @GetMapping("/{cid}")
-    public OutCurriculum getCurriculum(@PathVariable long id, @PathVariable long cid,  Authentication authentication){
+    public Mono<OutCurriculum> getCurriculum(@PathVariable long id, @PathVariable long cid,  Authentication authentication){
         return curriculumBinder.bindOutput(
                 userService.getCurriculum(id, cid, authentication.getName()));
     }
 
     @PutMapping("/{cid}")
-    public void updateCurriculum(
+    public Mono<Void> updateCurriculum(
             @PathVariable long id,
             @PathVariable long cid,
             @RequestBody InCurriculum inCurriculum,
@@ -48,16 +48,18 @@ public class CurriculumController {
     ){
         if(inCurriculum.getAccountID() != id || inCurriculum.getId() != cid) throw new BadRequestException(badRequest_IdsMismatch);
         Curriculum curriculum = curriculumBinder.bindInput(inCurriculum);
-        userService.updateCurriculum(curriculum,authentication.getName() );
+        return userService.updateCurriculum(curriculum,authentication.getName() );
     }
 
     @PostMapping
-    public void createCurriculum( @PathVariable long id, @RequestBody InCurriculum inCurriculum, Authentication authentication){
-        userService.createCurriculum(id, curriculumBinder.bindInput(inCurriculum), authentication.getName());
+    public Mono<OutCurriculum> createCurriculum( @PathVariable long id, @RequestBody InCurriculum inCurriculum, Authentication authentication){
+        return curriculumBinder.bindOutput(
+                userService.createCurriculum(id, curriculumBinder.bindInput(inCurriculum), authentication.getName())
+        );
     }
 
     @DeleteMapping("/{cid}")
-    public void deleteCurriculum( @PathVariable long id, @PathVariable long cid, Authentication authentication){
-        userService.deleteCurriculum(id, cid, authentication.getName());
+    public Mono<Void> deleteCurriculum( @PathVariable long id, @PathVariable long cid, Authentication authentication){
+        return userService.deleteCurriculum(id, cid, authentication.getName());
     }
 }

@@ -7,34 +7,59 @@ import org.springframework.hateoas.Resources;
 import org.springframework.hateoas.core.EmbeddedWrapper;
 import org.springframework.hateoas.core.EmbeddedWrappers;
 import org.springframework.hateoas.core.Relation;
+import reactor.core.publisher.Mono;
 
 import java.util.ArrayList;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Stream;
 
-public abstract class ModelBinder<T, O extends ResourceSupport, I> {
-    public abstract O bindOutput(T object);
-    public abstract T bindInput(I object);
+public interface ModelBinder<T, O extends ResourceSupport, I> {
+    Mono<O> bindOutput(CompletableFuture<T> object);
+    T bindInput(I object);
 
-    public final Stream<T> bindInput(Stream<I> list){
+    default Stream<T> bindInput(Stream<I> list){
         return list.map(this::bindInput);
     }
 
-    public final HalCollection bindOutput(Stream<T> list, Class selfController, Object ... pathVariables) {
-        EmbeddedWrappers wrappers = new EmbeddedWrappers(true);
-        ArrayList<EmbeddedWrapper> embeddedChecklists = new ArrayList<>();
-        list.map(this::bindOutput)
-                .forEach(curr -> embeddedChecklists.add( wrappers.wrap( new CollectionItem( curr.getId()))));
 
-        return new HalCollection(
-                embeddedChecklists.size(),
-                new Resources<>(embeddedChecklists),
-                selfController,
-                pathVariables
+    default Mono<HalCollection> bindOutput(CompletableFuture<Stream<T>> listCompletableFuture, Class selfController) {
+        return Mono.fromFuture(
+                listCompletableFuture
+                        .thenApply(
+                                (Stream<T> stream) -> {
+                                    EmbeddedWrappers wrappers = new EmbeddedWrappers(true);
+                                    ArrayList<EmbeddedWrapper> embeddedChecklists = new ArrayList<>();
+                                    stream.map(curr -> bindOutput(CompletableFuture.completedFuture(curr)).block())
+                                            .forEach(curr -> embeddedChecklists.add(wrappers.wrap(new CollectionItem(curr.getId()))));
+
+                                    return new HalCollection(
+                                            embeddedChecklists.size(),
+                                            new Resources<>(embeddedChecklists),
+                                            selfController);
+                                }
+                        )
         );
     }
 
+    /*
+    default Mono<HalCollection> bindOutput(CompletableFuture<Stream<T>> listCompletableFuture, Class selfController) {
+        EmbeddedWrappers wrappers = new EmbeddedWrappers(true);
+        ArrayList<EmbeddedWrapper> embeddedChecklists = new ArrayList<>();
+        Stream<T> list = listCompletableFuture.join();
+
+        list.map(curr-> bindOutput( CompletableFuture.completedFuture(curr)).block())
+                .forEach(curr -> embeddedChecklists.add( wrappers.wrap(new CollectionItem( curr.getId() ))));
+
+        HalCollection ret = new HalCollection(
+                embeddedChecklists.size(),
+                new Resources<>(embeddedChecklists),
+                selfController
+        );
+        return Mono.fromFuture( CompletableFuture.completedFuture(ret));
+    }*/
+
     @Relation(value= "item", collectionRelation = "items")
-    private class CollectionItem extends ResourceSupport {
+    class CollectionItem extends ResourceSupport {
 
         public CollectionItem(Link self){
             this.add(self);

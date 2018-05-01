@@ -1,8 +1,10 @@
 package isel.ps.employbox.controllers;
 
+import isel.ps.employbox.ErrorMessages;
 import isel.ps.employbox.exceptions.BadRequestException;
 import isel.ps.employbox.model.binder.ChatBinder;
 import isel.ps.employbox.model.binder.MessageBinder;
+import isel.ps.employbox.model.entities.Chat;
 import isel.ps.employbox.model.input.InChat;
 import isel.ps.employbox.model.input.InMessage;
 import isel.ps.employbox.model.output.HalCollection;
@@ -10,6 +12,7 @@ import isel.ps.employbox.model.output.OutMessage;
 import isel.ps.employbox.services.ChatService;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+import reactor.core.publisher.Mono;
 
 import static isel.ps.employbox.ErrorMessages.badRequest_IdsMismatch;
 
@@ -28,19 +31,17 @@ public class ChatController {
 
 
     @GetMapping("/{cid}/messages")
-    public HalCollection getChatsMessages (@PathVariable long id, @PathVariable long cid, Authentication authentication) {
+    public Mono<HalCollection> getChatsMessages (@PathVariable long id, @PathVariable long cid, Authentication authentication) {
         return messageBinder.bindOutput(
                 chatService.getAccountChatsMessages(id, cid, authentication.getName()),
-                this.getClass(),
-                id,
-                cid
+                this.getClass()
         );
     }
 
     @PostMapping
-    public void createChat(@PathVariable long id, @RequestBody InChat inChat, Authentication authentication) {
+    public Mono<Chat> createChat(@PathVariable long id, @RequestBody InChat inChat, Authentication authentication) {
         if(id != inChat.getAccountIdFirst()) throw new BadRequestException(badRequest_IdsMismatch);
-        chatService.createNewChat(
+        return chatService.createNewChat(
                 id,
                 chatBinder.bindInput(inChat),
                 authentication.getName()
@@ -48,13 +49,14 @@ public class ChatController {
     }
 
     @PostMapping("/{cid}/messages")
-    public void createMessage(@PathVariable long id, @PathVariable long cid,  @RequestBody InMessage msg, Authentication authentication) {
-        if(cid != msg.getChatId())
-        chatService.createNewChatMessage(id, cid, messageBinder.bindInput(msg), authentication.getName());
+    public Mono<OutMessage> createMessage(@PathVariable long id, @PathVariable long cid, @RequestBody InMessage msg, Authentication authentication) {
+        if (cid != msg.getChatId())
+            throw new BadRequestException(ErrorMessages.badRequest_IdsMismatch);
+        return messageBinder.bindOutput(chatService.createNewChatMessage(id, cid, messageBinder.bindInput(msg), authentication.getName()));
     }
 
     @GetMapping("/{cid}/messages/{mid}")
-    public OutMessage getChatMessage(@PathVariable long cid, @PathVariable long mid, Authentication authentication) {
+    public Mono<OutMessage> getChatMessage(@PathVariable long cid, @PathVariable long mid, Authentication authentication) {
         return messageBinder.bindOutput( chatService.getAccountChatsMessage(cid, mid, authentication.getName()));
     }
 }

@@ -4,13 +4,25 @@ import isel.ps.employbox.model.entities.Message;
 import isel.ps.employbox.model.input.InMessage;
 import isel.ps.employbox.model.output.OutMessage;
 import org.springframework.stereotype.Component;
+import reactor.core.publisher.Mono;
+
+import java.util.concurrent.CompletableFuture;
 
 @Component
-public class MessageBinder extends ModelBinder<Message, OutMessage, InMessage> {
+public class MessageBinder implements ModelBinder<Message,OutMessage,InMessage> {
 
     @Override
-    public OutMessage bindOutput(Message obj) {
-        return new OutMessage(obj.getAccountId(), obj.getMessageId(), obj.getChadId() , obj.getDate(), obj.getText());
+    public Mono<OutMessage> bindOutput(CompletableFuture<Message> messageCompletableFuture) {
+        return Mono.fromFuture(
+                messageCompletableFuture.thenApply(
+                        message -> new OutMessage(
+                                message.getAccountId(),
+                                message.getMessageId(),
+                                message.getChadId() ,
+                                message.getDate(),
+                                message.getText())
+                        )
+                );
     }
 
     @Override

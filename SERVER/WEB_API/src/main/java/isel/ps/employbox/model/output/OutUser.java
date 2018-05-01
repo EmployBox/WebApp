@@ -42,6 +42,6 @@ public class OutUser extends ResourceSupport {
         this.add( linkTo ( CommentController.class,id).withRel("comments"));
         this.add( linkTo ( RatingController.class,id).withRel("ratings"));
         this.add( linkTo( methodOn(FollowsController.class,id).getFollowers(id) ).withRel("followers"));
-        this.add( linkTo( methodOn(FollowsController.class,id).getFollowing(id, null) ).withRel("following"));
+        this.add( linkTo( methodOn(FollowsController.class,id).getFollowing(id) ).withRel("following"));
     }
 }

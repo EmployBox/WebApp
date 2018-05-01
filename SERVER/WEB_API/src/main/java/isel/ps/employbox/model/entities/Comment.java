@@ -40,10 +40,6 @@ public class Comment implements DomainObject<Long>{
         this.version = version;
     }
 
-    public long getParentCommendID() {
-        return parentCommendID;
-    }
-
     public boolean isStatus() {
         return status;
     }

@@ -8,6 +8,7 @@ import isel.ps.employbox.model.output.OutCompany;
 import isel.ps.employbox.services.CompanyService;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+import reactor.core.publisher.Mono;
 
 import static isel.ps.employbox.ErrorMessages.badRequest_IdsMismatch;
 
@@ -23,7 +24,7 @@ public class CompanyController {
     }
 
     @GetMapping
-    public HalCollection getCompanies(){
+    public Mono<HalCollection> getCompanies(){
         return companyBinder.bindOutput(
                 companyService.getCompanies(),
                 this.getClass()
@@ -31,41 +32,39 @@ public class CompanyController {
     }
 
     @GetMapping("/{cid}")
-    public OutCompany getCompany(@PathVariable long cid){
+    public Mono<OutCompany> getCompany(@PathVariable long cid){
         return companyBinder.bindOutput( companyService.getCompany(cid));
 
     }
 
     @PostMapping
-    public void createCompany(
+    public Mono<OutCompany> createCompany(
             @RequestBody InCompany inCompany,
             Authentication authentication
     ){
-        companyService.createCompany(
-                companyBinder.bindInput(inCompany),
-                authentication.getName()
+        return companyBinder.bindOutput(
+                companyService.createCompany(companyBinder.bindInput(inCompany), authentication.getName())
         );
     }
 
     @PutMapping("/{id}")
-    public void updateCompany(
+    public Mono<Void> updateCompany(
             @PathVariable long id,
             @RequestBody InCompany inCompany,
             Authentication authentication
     ){
         if(id != inCompany.getAccountId()) throw new BadRequestException(badRequest_IdsMismatch);
-        companyService.updateCompany(
+        return companyService.updateCompany(
                 companyBinder.bindInput(inCompany),
                 authentication.getName()
-
         );
     }
 
     @DeleteMapping("/{cid}")
-    public void deleteCompany(
+    public Mono<Void> deleteCompany(
             @PathVariable long cid,
             Authentication authentication
     ){
-        companyService.deleteCompany(cid, authentication.getName());
+        return companyService.deleteCompany(cid, authentication.getName());
     }
 }

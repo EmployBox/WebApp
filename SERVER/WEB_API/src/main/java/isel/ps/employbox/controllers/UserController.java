@@ -13,6 +13,7 @@ import isel.ps.employbox.model.output.OutUser;
 import isel.ps.employbox.services.UserService;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+import reactor.core.publisher.Mono;
 
 import static isel.ps.employbox.ErrorMessages.badRequest_IdsMismatch;
 
@@ -31,7 +32,7 @@ public class UserController {
     }
 
     @GetMapping
-    public HalCollection getAllUsers(){
+    public Mono<HalCollection> getAllUsers(){
         return userBinder.bindOutput(
                 userService.getAllUsers(),
                 this.getClass()
@@ -39,69 +40,68 @@ public class UserController {
     }
 
     @GetMapping("/{id}")
-    public OutUser getUser(@PathVariable long id){
+    public Mono<OutUser> getUser(@PathVariable long id){
         return userBinder.bindOutput( userService.getUser(id));
     }
 
     @GetMapping("/{id}/applications")
-    public HalCollection getAllApplications(@PathVariable long id){
+    public Mono<HalCollection> getAllApplications(@PathVariable long id){
         return applicationBinder.bindOutput(
                 userService.getAllApplications(id),
-                this.getClass(),
-                id
+                this.getClass()
         );
     }
 
     @GetMapping("/{id}/applications/{jid}")
-    public OutApplication getApplication(@PathVariable long id, @PathVariable long jid){
-        return applicationBinder.bindOutput(
-                userService.getApplication(id, jid)
-        );
+    public Mono<OutApplication> getApplication(@PathVariable long id, @PathVariable long jid){
+        return applicationBinder.bindOutput( userService.getApplication(id, jid) );
     }
 
     @PutMapping("/{id}")
-    public void updateUser(
+    public Mono<Void> updateUser(
             @PathVariable long id,
             @RequestBody InUser inUser,
             Authentication authentication)
     {
         if(inUser.getId() != id) throw new BadRequestException(badRequest_IdsMismatch);
         User user = userBinder.bindInput(inUser);
-        userService.updateUser(user, authentication.getName());
+        return userService.updateUser(user, authentication.getName());
     }
 
     @PutMapping("/{id}/applications/{jid}")
-    public void updateApplication(
+    public Mono<Void> updateApplication(
             @PathVariable long id,
             @PathVariable long jid,
             @RequestBody InApplication inApplication,
             Authentication authentication)
     {
-        if(inApplication.getUserId() != id || inApplication.getJobId() != jid) throw new BadRequestException(badRequest_IdsMismatch);
+        if(inApplication.getUserId() != id || inApplication.getJobId() != jid)
+            throw new BadRequestException(badRequest_IdsMismatch);
         Application application = applicationBinder.bindInput(inApplication);
-        userService.updateApplication(application, authentication.getName());
+        return userService.updateApplication(application, authentication.getName());
     }
 
     @PostMapping
-    public void createUser( @RequestBody InUser inUser ){
+    public Mono<OutUser> createUser( @RequestBody InUser inUser ){
         User user = userBinder.bindInput(inUser);
-        userService.createUser(user);
+        return userBinder.bindOutput( userService.createUser(user) );
     }
 
     @PostMapping("/{id}/applications/{jid}")
-    public void createApplication(@PathVariable long id, @PathVariable long jid,  @RequestBody InApplication inApplication, Authentication authentication){
-        if(id != inApplication.getUserId() || jid != inApplication.getJobId()) throw new BadRequestException(badRequest_IdsMismatch);
+    public Mono<OutApplication> createApplication(@PathVariable long id, @PathVariable long jid,  @RequestBody InApplication inApplication, Authentication authentication){
+        if(id != inApplication.getUserId() || jid != inApplication.getJobId())
+            throw new BadRequestException(badRequest_IdsMismatch);
         Application application = applicationBinder.bindInput(inApplication);
-        userService.createApplication(id, application, authentication.getName());
+        return applicationBinder.bindOutput( userService.createApplication(id, application, authentication.getName()));
     }
 
     @DeleteMapping("/{id}")
-    public void deleteUser( @PathVariable long id, Authentication authentication){
-        userService.deleteUser(id, authentication.getName());
+    public Mono<Void> deleteUser( @PathVariable long id, Authentication authentication){
+        return userService.deleteUser(id, authentication.getName());
     }
 
     @DeleteMapping("/{id}/applications/{jid}")
-    public void deleteApplication( @PathVariable long id, @PathVariable long jid, Authentication authentication){
-        userService.deleteApplication(id, jid, authentication.getName());
+    public Mono<Void> deleteApplication( @PathVariable long id, @PathVariable long jid, Authentication authentication){
+        return userService.deleteApplication(id, jid, authentication.getName());
     }
 }

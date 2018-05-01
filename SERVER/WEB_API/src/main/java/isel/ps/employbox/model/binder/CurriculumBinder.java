@@ -1,30 +1,33 @@
 package isel.ps.employbox.model.binder;
 
 import isel.ps.employbox.model.entities.*;
-import isel.ps.employbox.model.entities.AcademicBackground;
-import isel.ps.employbox.model.entities.CurriculumExperience;
 import isel.ps.employbox.model.input.InCurriculum;
 import isel.ps.employbox.model.output.OutCurriculum;
 import org.springframework.stereotype.Component;
+import reactor.core.publisher.Mono;
 
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 @Component
-public class CurriculumBinder extends ModelBinder<Curriculum, OutCurriculum, InCurriculum > {
+public class CurriculumBinder implements ModelBinder<Curriculum,OutCurriculum,InCurriculum> {
 
     @Override
-    public OutCurriculum bindOutput(Curriculum object) {
-        return new OutCurriculum(
-                object.getUserId(),
-                object.getIdentityKey(),
-                object.getTitle(),
-                bindExperience(object.getExperiences().get()),
-                bindPreviousJobs(object.getPreviousJobs().get()),
-                bindOutProject(object.getProjects().get()),
-                bindAcademicBackground(object.getAcademicBackground().get())
-        );
+    public Mono<OutCurriculum> bindOutput(CompletableFuture<Curriculum> curriculumCompletableFuture) {
+        return Mono.fromFuture(
+                curriculumCompletableFuture.thenApply(
+                        curriculum ->
+                                new OutCurriculum(
+                                        curriculum.getUserId(),
+                                        curriculum.getIdentityKey(),
+                                        curriculum.getTitle(),
+                                        bindExperience(curriculum.getExperiences().get()),
+                                        bindPreviousJobs(curriculum.getPreviousJobs().get()),
+                                        bindOutProject(curriculum.getProjects().get()),
+                                        bindAcademicBackground(curriculum.getAcademicBackground().get())
+                                )));
     }
 
     @Override
@@ -33,13 +36,13 @@ public class CurriculumBinder extends ModelBinder<Curriculum, OutCurriculum, InC
     }
 
     private List<OutCurriculum.OutExperience> bindExperience(List<CurriculumExperience> list){
-        return StreamSupport.stream(list.spliterator(),false)
+        return list.stream()
                 .map(curr-> new OutCurriculum.OutExperience(curr.getCompetences(), curr.getYears()))
                 .collect(Collectors.toList());
     }
 
     private List<OutCurriculum.OutAcademicBackground> bindAcademicBackground(List<AcademicBackground> list){
-        return StreamSupport.stream(list.spliterator(),false)
+        return list.stream()
                 .map(curr-> new OutCurriculum.OutAcademicBackground(
                         curr.getInstitution(),
                         curr.getDegreeObtained(),
@@ -50,7 +53,7 @@ public class CurriculumBinder extends ModelBinder<Curriculum, OutCurriculum, InC
     }
 
     private List<OutCurriculum.OutPreviousJobs> bindPreviousJobs(List<PreviousJobs> list){
-        return StreamSupport.stream(list.spliterator(),false)
+        return list.stream()
                 .map(curr-> new OutCurriculum.OutPreviousJobs(
                     curr.getCompanyName(),
                     curr.getBeginDate().toString(),

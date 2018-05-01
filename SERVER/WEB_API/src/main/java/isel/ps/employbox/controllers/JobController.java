@@ -9,6 +9,7 @@ import isel.ps.employbox.model.output.OutJob;
 import isel.ps.employbox.services.JobService;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+import reactor.core.publisher.Mono;
 
 import static isel.ps.employbox.ErrorMessages.badRequest_IdsMismatch;
 
@@ -23,8 +24,9 @@ public class JobController {
         this.jobBinder = jobBinder;
     }
 
+
     @GetMapping
-    public HalCollection getAllJobs(){
+    public Mono<HalCollection> getAllJobs(){
         return jobBinder.bindOutput(
                 jobService.getAllJobs(),
                 this.getClass()
@@ -32,27 +34,30 @@ public class JobController {
     }
 
     @GetMapping("/{jid}")
-    public OutJob getJob(@PathVariable long jid){
-        return jobBinder.bindOutput(jobService.getJob(jid));
+    public Mono<OutJob> getJob(@PathVariable long jid){
+        return jobBinder.bindOutput(
+                jobService.getJob(jid)
+        );
     }
 
     @PutMapping("/{jid}")
-    public void updateJob(@PathVariable long jid, @RequestBody InJob job, Authentication authentication){
+    public Mono<Void> updateJob(@PathVariable long jid, @RequestBody InJob job, Authentication authentication){
 
         if(job.getJobID() != jid) throw new BadRequestException(badRequest_IdsMismatch);
         Job updateJob = jobBinder.bindInput(job);
 
-        jobService.updateJob(updateJob, authentication.getName());
+        return jobService.updateJob(updateJob, authentication.getName());
     }
 
+
     @PostMapping
-    public void createJob( @RequestBody InJob job, Authentication authentication){
+    public Mono<OutJob> createJob( @RequestBody InJob job, Authentication authentication){
         Job newJob = jobBinder.bindInput(job);
-        jobService.createJob(newJob, authentication.getName());
+        return jobBinder.bindOutput(jobService.createJob(newJob, authentication.getName()));
     }
 
     @DeleteMapping("/{jid}")
-    public void deleteJob(@PathVariable long jid, Authentication authentication){
-        jobService.deleteJob(jid, authentication.getName() );
+    public Mono<Void> deleteJob(@PathVariable long jid, Authentication authentication){
+        return jobService.deleteJob(jid, authentication.getName() );
     }
 }

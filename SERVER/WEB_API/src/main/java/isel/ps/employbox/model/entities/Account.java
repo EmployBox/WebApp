@@ -3,14 +3,20 @@ package isel.ps.employbox.model.entities;
 import org.github.isel.rapper.ColumnName;
 import org.github.isel.rapper.DomainObject;
 import org.github.isel.rapper.Id;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import java.io.Serializable;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Supplier;
 
-public class Account implements DomainObject<Long> {
+import static isel.ps.employbox.model.entities.Role.DEFAULT;
+
+public class Account implements DomainObject<Long>,UserDetails, Serializable {
 
     private final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
@@ -20,18 +26,24 @@ public class Account implements DomainObject<Long> {
     protected final String email;
     protected final String password;
     protected final double rating;
+    private final Role role = DEFAULT;
 
     private final long version;
+
     @ColumnName(name = "accountId")
     protected final Supplier<List<Job>> offeredJobs;
     @ColumnName(name = "accountId")
     protected final Supplier<List<Comment>> comments;
-    @ColumnName(name = "accountId")
+
+    @ColumnName(table = "Follows", foreignName = "accountIdFollower", name = "accountIdFollowed")
     protected final Supplier<List<User>> following;
+
     @ColumnName(name = "accountId")
     protected final Supplier<List<Chat>> chats;
-    @ColumnName(name = "accountId")
+
+    @ColumnName(name = "accountIdTo")
     protected final Supplier<List<Rating>> ratings;
+
 
     public Account(){
         accountId = 0;
@@ -88,17 +100,11 @@ public class Account implements DomainObject<Long> {
         return accountId;
     }
 
-    public long getVersion() {
-        return version;
-    }
 
     public String getEmail() {
         return email;
     }
 
-    public String getPassword() {
-        return password;
-    }
 
     public double getRating() {
         return rating;
@@ -124,4 +130,47 @@ public class Account implements DomainObject<Long> {
         return ratings;
     }
 
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return null;
+    }
+
+    @Override
+    public String getPassword() {
+        return password;
+    }
+
+    @Override
+    public String getUsername() {
+        return email;
+    }
+
+    @Override
+    public boolean isAccountNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return true;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return true;
+    }
+
+    @Override
+    public long getVersion() {
+        return version;
+    }
+
+    public Role getRole() {
+        return role;
+    }
 }

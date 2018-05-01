@@ -5,12 +5,15 @@ import isel.ps.employbox.model.entities.Chat;
 import isel.ps.employbox.model.input.InChat;
 import org.springframework.hateoas.ResourceSupport;
 import org.springframework.stereotype.Component;
+import reactor.core.publisher.Mono;
+
+import java.util.concurrent.CompletableFuture;
 
 @Component
-public class ChatBinder extends ModelBinder <Chat, ResourceSupport, InChat> {
+public class ChatBinder implements ModelBinder<Chat,ResourceSupport,InChat> {
 
     @Override
-    public ResourceSupport bindOutput(Chat object) {
+    public Mono<ResourceSupport> bindOutput(CompletableFuture<Chat> object) {
         throw new BadRequestException("Method bindOutput cannot be called for chats");
     }
 
