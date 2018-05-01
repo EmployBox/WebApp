@@ -1,18 +1,19 @@
 package isel.ps.employbox.services;
 
+import com.github.jayield.rapper.DataRepository;
 import isel.ps.employbox.ErrorMessages;
 import isel.ps.employbox.exceptions.BadRequestException;
+import isel.ps.employbox.exceptions.ConflictException;
 import isel.ps.employbox.exceptions.ResourceNotFoundException;
 import isel.ps.employbox.exceptions.UnauthorizedException;
 import isel.ps.employbox.model.entities.Application;
 import isel.ps.employbox.model.entities.Curriculum;
 import isel.ps.employbox.model.entities.User;
-import javafx.util.Pair;
-import org.github.isel.rapper.DataRepository;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
 import java.security.InvalidParameterException;
+import java.util.Collection;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Stream;
@@ -37,7 +38,7 @@ public class UserService {
 
     public CompletableFuture<Stream<User>> getAllUsers() {
         return userRepo.findAll()
-                .thenApply(list -> list.stream());
+                .thenApply(Collection::stream);
     }
 
     public CompletableFuture<User> getUser(long id, String... email) {
@@ -57,7 +58,7 @@ public class UserService {
 
     public CompletableFuture<Application> getApplication(long userId, long jobId) {
         return getUser(userId)
-                .thenApply(user -> user.getApplications().get())
+                .thenCompose(User::getApplications)
                 .thenApply(applications -> {
                     Optional<Application> application = applications.stream().filter(curr -> curr.getAccountId() == userId && curr.getJobId() == jobId).findFirst();
                     if (applications.isEmpty() || !application.isPresent())
@@ -69,8 +70,9 @@ public class UserService {
 
     public CompletableFuture<Stream<Application>> getAllApplications(long accountId)
     {
-        return userRepo.findWhere(new Pair<>("accountId", accountId))
-                .thenApply(users -> users.get(0).getApplications().get().stream())
+        return userRepo.findById(accountId)
+                .thenApply( ouser -> ouser.orElseThrow( ()-> new ResourceNotFoundException(ErrorMessages.resourceNotfound_user)))
+                .thenApply(user -> user.getApplications().join().stream())
                 .exceptionally(__ -> {
                     throw new ResourceNotFoundException(ErrorMessages.resourceNotfound_user);
                 });
@@ -81,7 +83,7 @@ public class UserService {
     {
         return getUser(userId, email).thenApply(
                 user -> user.getCurricula()
-                        .get()
+                        .join()
                         .stream()
                         .filter(curr -> curr.getAccountId() == userId)
         );
@@ -89,7 +91,7 @@ public class UserService {
 
     public CompletableFuture<Curriculum> getCurriculum(long userId, long cid, String email) {
         return getUser(userId, email)
-                .thenApply(user -> user.getCurricula().get())
+                .thenCompose(User::getCurricula)
                 .thenApply(curricula -> {
                     Optional<Curriculum> oret;
                     if (curricula.isEmpty() || !(oret = curricula.stream().filter(curr -> curr.getIdentityKey() == cid).findFirst()).isPresent())
@@ -136,7 +138,10 @@ public class UserService {
                 res -> {
                     if (!res) throw new BadRequestException(ErrorMessages.badRequest_ItemCreation);
                     return user;
-                });
+                }).exceptionally(e -> {
+                    throw new ConflictException(ErrorMessages.conflit_UsernameTaken);
+                }
+        );
     }
 
     public CompletableFuture<Application> createApplication(long userId, Application application, String email) {

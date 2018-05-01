@@ -1,5 +1,6 @@
 package isel.ps.employbox.services;
 
+import com.github.jayield.rapper.DataRepository;
 import isel.ps.employbox.ErrorMessages;
 import isel.ps.employbox.exceptions.BadRequestException;
 import isel.ps.employbox.exceptions.ResourceNotFoundException;
@@ -7,7 +8,6 @@ import isel.ps.employbox.exceptions.UnauthorizedException;
 import isel.ps.employbox.model.entities.Account;
 import isel.ps.employbox.model.entities.Comment;
 import javafx.util.Pair;
-import org.github.isel.rapper.DataRepository;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
@@ -31,7 +31,7 @@ public class CommentService {
         return commentRepo.findAll().thenApply(
                 list -> list
                         .stream()
-                        .filter(curr -> type.equals("done") && curr.getAccountIdFrom() == accountFromId || type.equals("received") && curr.getAccountIdTo() == accountFromId));
+                        .filter(curr -> type.equals("done") && curr.getAccountIdFrom() == accountFromId || type.equals("received") && curr.getAccountIdDest() == accountFromId));
     }
 
     public CompletableFuture<Comment> getComment(long accountFromId, long accountToId, long commentId, String email) {
@@ -40,7 +40,7 @@ public class CommentService {
                         __ -> commentRepo.findById(commentId)
                                 .thenApply(ocomment -> {
                                             Comment comment = ocomment.orElseThrow(() -> new ResourceNotFoundException(ErrorMessages.resourceNotfound_comment));
-                                            if (comment.getAccountIdFrom() != accountFromId && comment.getAccountIdTo() != accountToId)
+                                            if (comment.getAccountIdFrom() != accountFromId && comment.getAccountIdDest() != accountToId)
                                                 throw new BadRequestException(ErrorMessages.badRequest_IdsMismatch);
                                             return comment;
                                         }
@@ -49,7 +49,7 @@ public class CommentService {
 
     public Mono<Void> updateComment(Comment comment, String username) {
         return Mono.fromFuture(
-                getComment(comment.getAccountIdFrom(), comment.getAccountIdTo(), comment.getIdentityKey(), username)
+                getComment(comment.getAccountIdFrom(), comment.getAccountIdDest(), comment.getIdentityKey(), username)
                         .thenCompose(__ -> commentRepo.update(comment))
                         .thenAccept(res -> {
                             if (!res) throw new BadRequestException(ErrorMessages.badRequest_ItemCreation);
@@ -60,7 +60,7 @@ public class CommentService {
     public CompletableFuture<Comment> createComment(Comment comment, String email) {
         return CompletableFuture.allOf(
                 accountService.getAccount(comment.getAccountIdFrom(), email),
-                accountService.getAccount(comment.getAccountIdTo())
+                accountService.getAccount(comment.getAccountIdDest())
         ).thenCompose(__ -> commentRepo.create(comment)
         ).thenApply(res -> {
             if (!res) throw new BadRequestException(ErrorMessages.badRequest_ItemCreation);

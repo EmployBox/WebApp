@@ -1,10 +1,12 @@
 package isel.ps.employbox.model.binder;
 
 import isel.ps.employbox.model.output.HalCollection;
+import org.springframework.hateoas.Link;
 import org.springframework.hateoas.ResourceSupport;
 import org.springframework.hateoas.Resources;
 import org.springframework.hateoas.core.EmbeddedWrapper;
 import org.springframework.hateoas.core.EmbeddedWrappers;
+import org.springframework.hateoas.core.Relation;
 import reactor.core.publisher.Mono;
 
 import java.util.ArrayList;
@@ -28,7 +30,7 @@ public interface ModelBinder<T, O extends ResourceSupport, I> {
                                     EmbeddedWrappers wrappers = new EmbeddedWrappers(true);
                                     ArrayList<EmbeddedWrapper> embeddedPropertieList = new ArrayList<>();
                                     stream.map(curr -> bindOutput(CompletableFuture.completedFuture(curr)).block())
-                                            .forEach(curr -> embeddedPropertieList.add(wrappers.wrap(curr.getId())));
+                                            .forEach(curr -> embeddedPropertieList.add(wrappers.wrap(new CollectionItem(curr.getId()))));
 
                                     return new HalCollection(
                                             embeddedPropertieList.size(),
@@ -57,4 +59,11 @@ public interface ModelBinder<T, O extends ResourceSupport, I> {
         return Mono.fromFuture( CompletableFuture.completedFuture(ret));
     }*/
 
+    @Relation(value= "item", collectionRelation = "items")
+    class CollectionItem extends ResourceSupport {
+
+        public CollectionItem(Link self){
+            this.add(self);
+        }
+    }
 }

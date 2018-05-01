@@ -1,11 +1,11 @@
 package isel.ps.employbox.services;
 
+import com.github.jayield.rapper.DataRepository;
 import isel.ps.employbox.ErrorMessages;
 import isel.ps.employbox.exceptions.ResourceNotFoundException;
 import isel.ps.employbox.exceptions.UnauthorizedException;
 import isel.ps.employbox.model.entities.Account;
 import javafx.util.Pair;
-import org.github.isel.rapper.DataRepository;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -13,7 +13,6 @@ import org.springframework.stereotype.Service;
 
 import java.security.InvalidParameterException;
 import java.util.Collection;
-import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Stream;
@@ -50,7 +49,7 @@ public final class AccountService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         Optional<Account> oacc=
-                ((List<Account>)accountRepo.findWhere(new Pair("email", email)).join())
+                accountRepo.findWhere(new Pair<>("email", email)).join()
                         .stream()
                         .filter(curr-> curr.getEmail().equals(email))
                         .findFirst();

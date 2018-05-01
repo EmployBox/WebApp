@@ -1,18 +1,21 @@
 package isel.ps.employbox.model.entities;
 
-import org.github.isel.rapper.DomainObject;
-import org.github.isel.rapper.Id;
+import com.github.jayield.rapper.ColumnName;
+import com.github.jayield.rapper.DomainObject;
+import com.github.jayield.rapper.Id;
 
 import java.util.List;
-import java.util.function.Supplier;
+import java.util.concurrent.CompletableFuture;
 
-public class Chat implements DomainObject<Long>{
+public class Chat implements DomainObject<Long> {
     @Id(isIdentity = true)
-    private long chadId;
+    private long chatId;
     private final long accountIdFirst;
     private final long accountIdSecond;
     private long version;
-    private Supplier<List<Message>> messages;
+
+    @ColumnName(foreignName = "chatId")
+    private CompletableFuture<List<Message>> messages;
 
     public Chat(){
         accountIdFirst = 0;
@@ -21,8 +24,8 @@ public class Chat implements DomainObject<Long>{
         messages = null;
     }
 
-    public Chat(long chatId, long accountIdFirst, long accountIdSecond, long version, Supplier<List<Message>> messages) {
-        this.chadId = chatId;
+    public Chat(long chatId, long accountIdFirst, long accountIdSecond, long version, CompletableFuture<List<Message>> messages) {
+        this.chatId = chatId;
         this.accountIdFirst = accountIdFirst;
         this.accountIdSecond = accountIdSecond;
         this.version = version;
@@ -36,7 +39,7 @@ public class Chat implements DomainObject<Long>{
 
     @Override
     public Long getIdentityKey() {
-        return chadId;
+        return chatId;
     }
 
     public long getVersion() {
@@ -51,7 +54,7 @@ public class Chat implements DomainObject<Long>{
         return accountIdSecond;
     }
 
-    public Supplier<List<Message>> getMessages() {
+    public CompletableFuture<List<Message>> getMessages() {
         return messages;
     }
 

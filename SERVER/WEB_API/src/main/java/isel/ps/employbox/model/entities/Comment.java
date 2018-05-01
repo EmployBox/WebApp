@@ -1,29 +1,32 @@
 package isel.ps.employbox.model.entities;
 
-import org.github.isel.rapper.DomainObject;
-import org.github.isel.rapper.Id;
+import com.github.jayield.rapper.ColumnName;
+import com.github.jayield.rapper.DomainObject;
+import com.github.jayield.rapper.Id;
 
 import java.sql.Date;
 import java.util.List;
-import java.util.function.Supplier;
+import java.util.concurrent.CompletableFuture;
 
-public class Comment implements DomainObject<Long>{
+public class Comment implements DomainObject<Long> {
     @Id(isIdentity = true)
     private long commentId;
 
     private final long accountIdFrom;
-    private final long accountIdTo;
-    private final long parentCommendID;
+    private final long accountIdDest;
+    private final long mainCommentId;
     private final Date date;
     private final String text;
     private final boolean status; //moderated or not
-    private final Supplier<List<Comment>> replies;
     private final long version;
+
+    @ColumnName(foreignName = "mainCommentId")
+    private final CompletableFuture<List<Comment>> replies;
 
     public Comment(){
         accountIdFrom = 0;
-        accountIdTo = 0;
-        parentCommendID = 0;
+        accountIdDest = 0;
+        mainCommentId = 0;
         date = null;
         text = null;
         status = false;
@@ -31,11 +34,11 @@ public class Comment implements DomainObject<Long>{
         version = 0;
     }
 
-    public Comment(long commentID, long accountIdFrom, long accountIdTo, long parentCommendID, Date date, String text, boolean status, Supplier<List<Comment>> replies, long version){
+    public Comment(long commentID, long accountIdFrom, long accountIdTo, long parentCommendID, Date date, String text, boolean status, CompletableFuture<List<Comment>> replies, long version){
         this.commentId = commentID;
         this.accountIdFrom = accountIdFrom;
-        this.accountIdTo = accountIdTo;
-        this.parentCommendID = parentCommendID;
+        this.accountIdDest = accountIdTo;
+        this.mainCommentId = parentCommendID;
         this.date = date;
         this.text = text;
         this.status = status;
@@ -60,12 +63,12 @@ public class Comment implements DomainObject<Long>{
         return accountIdFrom;
     }
 
-    public long getAccountIdTo() {
-        return accountIdTo;
+    public long getAccountIdDest() {
+        return accountIdDest;
     }
 
     public long getMainCommendID() {
-        return parentCommendID;
+        return mainCommentId;
     }
 
     public Date getDate() {
@@ -80,7 +83,7 @@ public class Comment implements DomainObject<Long>{
         return status;
     }
 
-    public Supplier<List<Comment>> getReplies() {
+    public CompletableFuture<List<Comment>> getReplies() {
         return replies;
     }
 }

@@ -1,3 +1,4 @@
+
 IF DB_ID ('PS_API_DATABASE') IS NULL
 	CREATE DATABASE PS_API_DATABASE;
 GO
@@ -154,7 +155,7 @@ CREATE TABLE [JobExperience](
 	years SMALLINT,
 	[version] rowversion
 
-	FOREIGN KEY (jobId) REFERENCES Job(jobId),
+	FOREIGN KEY (jobId) REFERENCES Job,
 
 	primary key(jobId,competences)
 )
@@ -167,7 +168,7 @@ CREATE TABLE [Application](
 	[version] rowversion,
 
 	FOREIGN KEY (curriculumId) REFERENCES curriculum(curriculumId),
-	FOREIGN KEY (jobId) REFERENCES Job(jobId),
+	FOREIGN KEY (jobId) REFERENCES Job,
 	primary key (accountId, jobId)
 )
 CREATE TABLE [Rating](

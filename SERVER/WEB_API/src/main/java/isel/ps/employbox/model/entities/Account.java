@@ -1,8 +1,8 @@
 package isel.ps.employbox.model.entities;
 
-import org.github.isel.rapper.ColumnName;
-import org.github.isel.rapper.DomainObject;
-import org.github.isel.rapper.Id;
+import com.github.jayield.rapper.ColumnName;
+import com.github.jayield.rapper.DomainObject;
+import com.github.jayield.rapper.Id;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -10,9 +10,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.io.Serializable;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
-import java.util.function.Supplier;
+import java.util.concurrent.CompletableFuture;
 
 import static isel.ps.employbox.model.entities.Role.DEFAULT;
 
@@ -30,19 +29,20 @@ public class Account implements DomainObject<Long>,UserDetails, Serializable {
 
     private final long version;
 
-    @ColumnName(name = "accountId")
-    protected final Supplier<List<Job>> offeredJobs;
-    @ColumnName(name = "accountId")
-    protected final Supplier<List<Comment>> comments;
+    @ColumnName(foreignName = "accountId")
+    protected final CompletableFuture<List<Job>> offeredJobs;
 
-    @ColumnName(table = "Follows", foreignName = "accountIdFollower", name = "accountIdFollowed")
-    protected final Supplier<List<User>> following;
+    @ColumnName(foreignName = "accountIdFrom")
+    protected final CompletableFuture<List<Comment>> comments;
 
-    @ColumnName(name = "accountId")
-    protected final Supplier<List<Chat>> chats;
+    @ColumnName(table = "Follows", foreignName = "accountIdFollowed", externalName = "accountIdFollower")
+    protected final CompletableFuture<List<User>> following;
 
-    @ColumnName(name = "accountIdTo")
-    protected final Supplier<List<Rating>> ratings;
+    @ColumnName( foreignName = "accountIdFirst")
+    protected final CompletableFuture<List<Chat>> chats;
+
+    @ColumnName(foreignName = "accountIdTo")
+    protected final CompletableFuture<List<Rating>> ratings;
 
 
     public Account(){
@@ -51,11 +51,11 @@ public class Account implements DomainObject<Long>,UserDetails, Serializable {
         password = null;
         rating = 0;
         version = 0;
-        offeredJobs = Collections::emptyList;
-        comments = Collections::emptyList;
-        following = Collections::emptyList;
-        chats = Collections::emptyList;
-        ratings = Collections::emptyList;
+        offeredJobs = null;
+        comments = null;
+        following = null;
+        chats = null;
+        ratings = null;
     }
 
     protected Account(
@@ -64,11 +64,11 @@ public class Account implements DomainObject<Long>,UserDetails, Serializable {
             String password,
             float rating,
             long version,
-            Supplier<List<Job>> offeredJobs,
-            Supplier<List<Comment>> comments,
-            Supplier<List<Chat>> chats,
-            Supplier<List<Rating>> ratings,
-            Supplier<List<User>> following
+            CompletableFuture<List<Job>> offeredJobs,
+            CompletableFuture<List<Comment>> comments,
+            CompletableFuture<List<Chat>> chats,
+            CompletableFuture<List<Rating>> ratings,
+            CompletableFuture<List<User>> following
     ) {
         this.accountId = accountID;
         this.email = email;
@@ -88,11 +88,11 @@ public class Account implements DomainObject<Long>,UserDetails, Serializable {
         this.email = email;
         this.password =  passwordEncoder.encode(password);
         this.rating = rating;
-        this.offeredJobs = Collections::emptyList;
-        this.chats = Collections::emptyList;
-        this.ratings = Collections::emptyList;
-        this.comments = Collections::emptyList;
-        this.following = Collections::emptyList;
+        this.offeredJobs = null;
+        this.chats = null;
+        this.ratings = null;
+        this.comments = null;
+        this.following = null;
     }
 
     @Override
@@ -110,23 +110,23 @@ public class Account implements DomainObject<Long>,UserDetails, Serializable {
         return rating;
     }
 
-    public Supplier<List<Job>> getOfferedJobs() {
+    public CompletableFuture<List<Job>> getOfferedJobs() {
         return offeredJobs;
     }
 
-    public Supplier<List<User>> getFollowing() {
+    public CompletableFuture<List<User>> getFollowing() {
         return following;
     }
 
-    public Supplier<List<Comment>> getComments() {
+    public CompletableFuture<List<Comment>> getComments() {
         return comments;
     }
 
-    public Supplier<List<Chat>> getChats() {
+    public CompletableFuture<List<Chat>> getChats() {
         return chats;
     }
 
-    public Supplier<List<Rating>> getRatings() {
+    public CompletableFuture<List<Rating>> getRatings() {
         return ratings;
     }
 

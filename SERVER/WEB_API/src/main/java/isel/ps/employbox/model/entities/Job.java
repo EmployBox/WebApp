@@ -1,13 +1,13 @@
 package isel.ps.employbox.model.entities;
 
-import org.github.isel.rapper.ColumnName;
-import org.github.isel.rapper.DomainObject;
-import org.github.isel.rapper.Id;
+import com.github.jayield.rapper.ColumnName;
+import com.github.jayield.rapper.DomainObject;
+import com.github.jayield.rapper.Id;
 
 import java.sql.Date;
-import java.util.Collections;
 import java.util.List;
-import java.util.function.Supplier;
+import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
 
 public class Job implements DomainObject<Long> {
 
@@ -25,11 +25,11 @@ public class Job implements DomainObject<Long> {
     private final String offerType;
     private final long version;
 
-    @ColumnName(name = "jobId")
-    private final Supplier<List<Application>> applications;
+    @ColumnName(foreignName = "jobId")
+    private final CompletableFuture<List<Application>> applications;
 
-    @ColumnName(name = "jobId")
-    private final Supplier<List<JobExperience>> experiences;
+    @ColumnName(foreignName = "jobId")
+    private final CompletableFuture<List<JobExperience>> experiences;
 
     public Job(){
         title = null;
@@ -41,8 +41,8 @@ public class Job implements DomainObject<Long> {
         offerBeginDate = null;
         offerEndDate = null;
         offerType = null;
-        applications = Collections::emptyList;
-        experiences = Collections::emptyList;
+        applications = null;
+        experiences = null;
         version = 0;
     }
 
@@ -58,8 +58,8 @@ public class Job implements DomainObject<Long> {
             Date offerEndDate,
             String offerType,
             long version,
-            Supplier<List<Application>> applications,
-            Supplier<List<JobExperience>> experiences)
+            CompletableFuture<List<Application>> applications,
+            CompletableFuture<List<JobExperience>> experiences)
     {
         this.jobId = id;
         this.title = title;
@@ -87,6 +87,7 @@ public class Job implements DomainObject<Long> {
             Date offerBeginDate,
             Date offerEndDate,
             String offerType,
+            List<JobExperience> experiences,
             long version
     )
     {
@@ -100,8 +101,8 @@ public class Job implements DomainObject<Long> {
         this.offerBeginDate = offerBeginDate;
         this.offerEndDate = offerEndDate;
         this.offerType = offerType;
-        this.applications = Collections::emptyList;
-        this.experiences = Collections::emptyList;
+        this.applications = null;
+        this.experiences = CompletableFuture.completedFuture(experiences);
         this.version = version;
     }
 
@@ -146,15 +147,22 @@ public class Job implements DomainObject<Long> {
         return address;
     }
 
-    public Supplier<List<Application>> getApplications() {
-        return applications;
-    }
-
-    public Supplier<List<JobExperience>> getExperiences() {
-        return experiences;
-    }
 
     public String getTitle() {
         return title;
+    }
+
+    public CompletableFuture<List<Application>> getApplications() {
+        return applications;
+    }
+
+    public CompletableFuture<List<JobExperience>> getExperiences() {
+        return experiences.thenApply(
+                experiences -> experiences
+                        .stream()
+                        .peek(experience -> {
+                            experience.getIdentityKey().setJobId(jobId);
+                        }).collect(Collectors.toList())
+        );
     }
 }

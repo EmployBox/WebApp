@@ -1,12 +1,12 @@
 package isel.ps.employbox.services;
 
+import com.github.jayield.rapper.DataRepository;
 import isel.ps.employbox.ErrorMessages;
 import isel.ps.employbox.exceptions.BadRequestException;
 import isel.ps.employbox.exceptions.ResourceNotFoundException;
 import isel.ps.employbox.exceptions.UnauthorizedException;
 import isel.ps.employbox.model.entities.Chat;
 import isel.ps.employbox.model.entities.Message;
-import org.github.isel.rapper.DataRepository;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
@@ -41,7 +41,7 @@ public class ChatService {
                 msgRepo.findAll()
                         .thenApply(list -> list
                                 .stream()
-                                .filter(curr -> curr.getAccountId() == accountId && curr.getChadId() == cid))
+                                .filter(curr -> curr.getAccountId() == accountId && curr.getChatId() == cid))
         );
     }
 
@@ -50,7 +50,7 @@ public class ChatService {
         return msgRepo.findById(mid)
                 .thenApply(omsg -> omsg.orElseThrow(() -> new ResourceNotFoundException(resourceNotFound_message)))
                 .thenCompose(msg -> {
-                    if (msg.getChadId() != cid)
+                    if (msg.getChatId() != cid)
                         throw new BadRequestException(badRequest_IdsMismatch);
                     return accountService.getAccount(msg.getAccountId(), email)//throws exceptions
                             .thenApply(__ -> msg);

@@ -1,10 +1,10 @@
 package isel.ps.employbox.model.entities;
 
 import java.util.List;
-import java.util.function.Supplier;
+import java.util.concurrent.CompletableFuture;
 
 public class Moderator extends Account {
-    private final Supplier<List<Rating>> ratingsModerated;
+    private final CompletableFuture<List<Rating>> ratingsModerated;
 
     public Moderator(){
         ratingsModerated = null;
@@ -16,15 +16,15 @@ public class Moderator extends Account {
             String password,
             float rating,
             long version,
-            Supplier<List<Comment>> comments,
-            Supplier<List<Chat>> chats,
-            Supplier<List<Rating>> ratings,
-            Supplier<List<Rating>> ratingsModerated) {
+            CompletableFuture<List<Comment>> comments,
+            CompletableFuture<List<Chat>> chats,
+            CompletableFuture<List<Rating>> ratings,
+            CompletableFuture<List<Rating>> ratingsModerated) {
         super(accountID, email, password, rating, version, null, comments, chats, ratings, null);
         this.ratingsModerated = ratingsModerated;
     }
 
-    public Supplier<List<Rating>> getRatingsModerated() {
+    public CompletableFuture<List<Rating>> getRatingsModerated() {
         return ratingsModerated;
     }
 }

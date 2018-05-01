@@ -1,10 +1,10 @@
 package isel.ps.employbox.services;
 
+import com.github.jayield.rapper.DataRepository;
 import isel.ps.employbox.ErrorMessages;
 import isel.ps.employbox.exceptions.BadRequestException;
 import isel.ps.employbox.exceptions.ResourceNotFoundException;
 import isel.ps.employbox.model.entities.Rating;
-import org.github.isel.rapper.DataRepository;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 

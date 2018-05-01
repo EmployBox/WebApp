@@ -1,9 +1,9 @@
 package isel.ps.employbox.model.entities;
 
-import org.github.isel.rapper.DomainObject;
-import org.github.isel.rapper.EmbeddedId;
+import com.github.jayield.rapper.DomainObject;
+import com.github.jayield.rapper.EmbeddedId;
 
-public class CurriculumExperience implements DomainObject<CurriculumExperience.CurriculumExperienceKey>{
+public class CurriculumExperience implements DomainObject<CurriculumExperience.CurriculumExperienceKey> {
 
     @EmbeddedId
     private final CurriculumExperienceKey curriculumExperienceKey;
@@ -58,21 +58,21 @@ public class CurriculumExperience implements DomainObject<CurriculumExperience.C
     }
 
     public static class CurriculumExperienceKey {
-        private final long userId;
+        private final long accountId;
         private final long curriculumId;
 
         public CurriculumExperienceKey(){
-            userId = 0;
+            accountId = 0;
             curriculumId = 0;
         }
 
         public CurriculumExperienceKey(long userId, long curriculumId) {
-            this.userId = userId;
+            this.accountId = userId;
             this.curriculumId = curriculumId;
         }
 
-        public long getUserId() {
-            return userId;
+        public long getAccountId() {
+            return accountId;
         }
 
         public long getCurriculumId() {

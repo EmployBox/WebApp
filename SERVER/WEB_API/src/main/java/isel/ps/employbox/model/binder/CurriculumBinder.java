@@ -23,10 +23,10 @@ public class CurriculumBinder implements ModelBinder<Curriculum,OutCurriculum,In
                                         curriculum.getAccountId(),
                                         curriculum.getIdentityKey(),
                                         curriculum.getTitle(),
-                                        bindExperience(curriculum.getExperiences().get()),
-                                        bindPreviousJobs(curriculum.getPreviousJobs().get()),
-                                        bindOutProject(curriculum.getProjects().get()),
-                                        bindAcademicBackground(curriculum.getAcademicBackground().get())
+                                        bindExperience(curriculum.getExperiences().join()),
+                                        bindPreviousJobs(curriculum.getPreviousJobs().join()),
+                                        bindOutProject(curriculum.getProjects().join()),
+                                        bindAcademicBackground(curriculum.getAcademicBackground().join())
                                 )));
     }
 

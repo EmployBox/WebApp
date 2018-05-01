@@ -1,11 +1,10 @@
 package isel.ps.employbox.model.entities;
 
-import org.github.isel.rapper.DomainObject;
-import org.github.isel.rapper.EmbeddedId;
+import com.github.jayield.rapper.DomainObject;
+import com.github.jayield.rapper.EmbeddedId;
 
 public class JobExperience implements DomainObject<JobExperience.JobExperienceKey> {
-    private final long jobId;
-    private final String competences;
+
     private final short years;
     private long version;
 
@@ -13,23 +12,17 @@ public class JobExperience implements DomainObject<JobExperience.JobExperienceKe
     private final JobExperienceKey jobExperienceKey;
 
     public JobExperience(){
-        jobId = 0;
-        competences = null;
         years = 0;
         jobExperienceKey = null;
     }
 
     public JobExperience(long jobId, String competences, short years, long version){
-        this.jobId = jobId;
-        this.competences = competences;
         this.years = years;
         this.version = version;
         jobExperienceKey = new JobExperienceKey(jobId, competences);
     }
 
     public JobExperience(long jobId, String competences, short years){
-        this.jobId = jobId;
-        this.competences = competences;
         this.years = years;
         jobExperienceKey = new JobExperienceKey(jobId, competences);
     }
@@ -39,16 +32,9 @@ public class JobExperience implements DomainObject<JobExperience.JobExperienceKe
         return jobExperienceKey;
     }
 
+    @Override
     public long getVersion() {
         return version;
-    }
-
-    public long getJobId() {
-        return jobId;
-    }
-
-    public String getCompetences() {
-        return competences;
     }
 
     public short getYears() {
@@ -56,7 +42,7 @@ public class JobExperience implements DomainObject<JobExperience.JobExperienceKe
     }
 
     public static class JobExperienceKey {
-        private final long jobId;
+        private long jobId;
         private final String competences;
 
         public JobExperienceKey(){
@@ -75,6 +61,10 @@ public class JobExperience implements DomainObject<JobExperience.JobExperienceKe
 
         public String getCompetences() {
             return competences;
+        }
+
+        public void setJobId(long jobId){
+            this.jobId = jobId;
         }
     }
 }

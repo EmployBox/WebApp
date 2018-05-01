@@ -1,17 +1,18 @@
 package isel.ps.employbox.model.input;
 
 public class InJobExperience {
-    private String competence;
+    private long jobId;
+    private String competences;
     private short years;
 
     public InJobExperience(){}
 
-    public String getCompetence() {
-        return competence;
+    public String getCompetences() {
+        return competences;
     }
 
-    public void setCompetence(String competence) {
-        this.competence = competence;
+    public void setCompetences(String competences) {
+        this.competences = competences;
     }
 
     public short getYears() {
@@ -20,5 +21,13 @@ public class InJobExperience {
 
     public void setYears(short years) {
         this.years = years;
+    }
+
+    public long getJobId() {
+        return jobId;
+    }
+
+    public void setJobId(long jobId) {
+        this.jobId = jobId;
     }
 }

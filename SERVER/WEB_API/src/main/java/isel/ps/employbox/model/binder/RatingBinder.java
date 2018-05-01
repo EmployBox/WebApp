@@ -20,9 +20,9 @@ public class RatingBinder implements ModelBinder<Rating,OutRating,InRating> {
                                 rating.getAccountIdTo(),
                                 rating.getWorkLoad(),
                                 rating.getWage(),
-                                rating.getWorkEnvironment(),
-                                rating.getCompetence(),
-                                rating.getPontuality(),
+                                rating.getWorkEnviroment(),
+                                rating.getCompetences(),
+                                rating.getPonctuality(),
                                 rating.getAssiduity(),
                                 rating.getDemeanor())
                 )

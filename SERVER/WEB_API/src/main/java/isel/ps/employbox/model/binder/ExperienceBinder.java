@@ -18,7 +18,7 @@ public class ExperienceBinder implements ModelBinder<JobExperience,OutJob.OutExp
         return Mono.fromFuture(
                 jobExperienceCompletableFuture.thenApply(
                         jobExperience ->
-                                new OutJob.OutExperience(jobExperience.getCompetences(),
+                                new OutJob.OutExperience(jobExperience.getIdentityKey().getCompetences(),
                                         jobExperience.getYears())
                 )
         );
@@ -26,6 +26,6 @@ public class ExperienceBinder implements ModelBinder<JobExperience,OutJob.OutExp
 
     @Override
     public JobExperience bindInput(InJobExperience object) {
-        return new JobExperience( object.getYears(), object.getCompetence(),object.getYears());
+        return new JobExperience( object.getYears(), object.getCompetences(),object.getYears());
     }
 }

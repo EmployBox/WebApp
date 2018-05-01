@@ -1,8 +1,8 @@
 package isel.ps.employbox.model.entities;
 
 
-import org.github.isel.rapper.DomainObject;
-import org.github.isel.rapper.EmbeddedId;
+import com.github.jayield.rapper.DomainObject;
+import com.github.jayield.rapper.EmbeddedId;
 
 import java.sql.Date;
 
@@ -68,18 +68,18 @@ public class Application implements DomainObject<Application.ApplicationKeys> {
     }
 
     public static class ApplicationKeys {
-        private long userId;
+        private long accountId;
         private long jobId;
 
         public ApplicationKeys(){ }
 
         public ApplicationKeys(long userId, long jobId) {
-            this.userId = userId;
+            this.accountId = userId;
             this.jobId = jobId;
         }
 
-        public long getUserId() {
-            return userId;
+        public long getAccountId() {
+            return accountId;
         }
 
         public long getJobId() {

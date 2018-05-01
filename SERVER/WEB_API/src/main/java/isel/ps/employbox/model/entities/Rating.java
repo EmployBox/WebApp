@@ -1,9 +1,10 @@
 package isel.ps.employbox.model.entities;
 
-import org.github.isel.rapper.DomainObject;
-import org.github.isel.rapper.EmbeddedId;
 
-public class Rating implements DomainObject<Rating.RatingKey>{
+import com.github.jayield.rapper.DomainObject;
+import com.github.jayield.rapper.EmbeddedId;
+
+public class Rating implements DomainObject<Rating.RatingKey> {
     @EmbeddedId
     private final RatingKey ratingKey;
 
@@ -11,9 +12,9 @@ public class Rating implements DomainObject<Rating.RatingKey>{
     private final long accountIdTo;
     private final float workLoad;
     private final float wage;
-    private final float workEnvironment;
-    private final float competence;
-    private final float pontuality;
+    private final float workEnviroment;
+    private final float competences;
+    private final float ponctuality;
     private final float assiduity;
     private final float demeanor;
     private final long version;
@@ -24,9 +25,9 @@ public class Rating implements DomainObject<Rating.RatingKey>{
         accountIdTo = 0;
         workLoad = 0;
         wage = 0;
-        workEnvironment = 0;
-        competence = 0;
-        pontuality = 0;
+        workEnviroment = 0;
+        competences = 0;
+        ponctuality = 0;
         assiduity = 0;
         demeanor = 0;
         version = 0;
@@ -47,9 +48,9 @@ public class Rating implements DomainObject<Rating.RatingKey>{
         this.accountIdTo = accountIDTo;
         this.workLoad = workLoad;
         this.wage = wage;
-        this.workEnvironment = workEnvironment;
-        this.competence = competence;
-        this.pontuality = pontuality;
+        this.workEnviroment = workEnvironment;
+        this.competences = competence;
+        this.ponctuality = pontuality;
         this.assiduity = assiduity;
         this.demeanor = demeanor;
         this.version = version;
@@ -72,16 +73,16 @@ public class Rating implements DomainObject<Rating.RatingKey>{
         return wage;
     }
 
-    public float getWorkEnvironment() {
-        return workEnvironment;
+    public float getWorkEnviroment() {
+        return workEnviroment;
     }
 
-    public float getCompetence() {
-        return competence;
+    public float getCompetences() {
+        return competences;
     }
 
-    public float getPontuality() {
-        return pontuality;
+    public float getPonctuality() {
+        return ponctuality;
     }
 
     public float getAssiduity() {
@@ -103,26 +104,26 @@ public class Rating implements DomainObject<Rating.RatingKey>{
     }
 
     public static class RatingKey {
-        private final long accountIdFollower;
-        private final long accountIdFollowed;
+        private final long accountIdFrom;
+        private final long accountIdTo;
 
         public RatingKey(){
-            accountIdFollower = 0;
-            accountIdFollowed = 0;
+            accountIdFrom = 0;
+            accountIdTo = 0;
         }
 
         public RatingKey(long accountIdFollowed, long accountIdFollower) {
 
-            this.accountIdFollower = accountIdFollowed;
-            this.accountIdFollowed = accountIdFollower;
+            this.accountIdFrom = accountIdFollowed;
+            this.accountIdTo = accountIdFollower;
         }
 
-        public long getAccountIdFollower() {
-            return accountIdFollower;
+        public long getAccountIdFrom() {
+            return accountIdFrom;
         }
 
-        public long getAccountIdFollowed() {
-            return accountIdFollowed;
+        public long getAccountIdTo() {
+            return accountIdTo;
         }
     }
 }

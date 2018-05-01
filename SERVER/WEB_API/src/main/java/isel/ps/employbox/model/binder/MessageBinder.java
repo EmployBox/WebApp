@@ -18,7 +18,7 @@ public class MessageBinder implements ModelBinder<Message,OutMessage,InMessage> 
                         message -> new OutMessage(
                                 message.getAccountId(),
                                 message.getMessageId(),
-                                message.getChadId() ,
+                                message.getChatId() ,
                                 message.getDate(),
                                 message.getText())
                         )

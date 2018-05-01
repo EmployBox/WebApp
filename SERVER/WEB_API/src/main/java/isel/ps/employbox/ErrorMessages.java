@@ -22,4 +22,5 @@ public class ErrorMessages {
     public static final String badRequest_ItemDeletion = "Item could not be deleted, check if the object your are trying to delete can be deleted";
     public static final String badRequest_ItemUpdate = "Item could not be updated, check if the object your are trying to update exists or you can update it";
     public static final String resourceNotfound_company = "Company could not be found";
+    public static final String jobExperience_ItemCreation = "The job experience list you tried to create with a job couldn't be added to the database";
 }

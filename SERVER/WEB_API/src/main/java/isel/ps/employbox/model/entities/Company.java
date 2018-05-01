@@ -1,7 +1,7 @@
 package isel.ps.employbox.model.entities;
 
 import java.util.List;
-import java.util.function.Supplier;
+import java.util.concurrent.CompletableFuture;
 
 public class Company extends Account {
     private final String name;
@@ -34,11 +34,11 @@ public class Company extends Account {
             String logoUrl,
             String webPageUrl,
             String description,
-            Supplier<List<Job>> offeredJobs,
-            Supplier<List<Chat>> chats,
-            Supplier<List<Comment>> comments,
-            Supplier<List<Rating>> ratings,
-            Supplier<List<User>> following)
+            CompletableFuture<List<Job>> offeredJobs,
+            CompletableFuture<List<Chat>> chats,
+            CompletableFuture<List<Comment>> comments,
+            CompletableFuture<List<Rating>> ratings,
+            CompletableFuture<List<User>> following)
     {
         super(accountID, email, password, rating, version, offeredJobs,comments, chats, ratings, following);
         this.name = name;

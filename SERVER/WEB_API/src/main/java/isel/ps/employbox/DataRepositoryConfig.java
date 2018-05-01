@@ -1,9 +1,9 @@
 package isel.ps.employbox;
 
+import com.github.jayield.rapper.DataRepository;
+import com.github.jayield.rapper.utils.MapperRegistry;
 import isel.ps.employbox.model.entities.*;
 import isel.ps.employbox.model.entities.Application.ApplicationKeys;
-import org.github.isel.rapper.DataRepository;
-import org.github.isel.rapper.utils.MapperRegistry;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 

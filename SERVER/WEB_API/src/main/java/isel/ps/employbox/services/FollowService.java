@@ -1,11 +1,11 @@
 package isel.ps.employbox.services;
 
+import com.github.jayield.rapper.DataRepository;
 import isel.ps.employbox.ErrorMessages;
 import isel.ps.employbox.exceptions.BadRequestException;
 import isel.ps.employbox.model.entities.Account;
 import isel.ps.employbox.model.entities.Follow;
 import javafx.util.Pair;
-import org.github.isel.rapper.DataRepository;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 

@@ -12,7 +12,7 @@ import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 public class OutApplication extends ResourceSupport {
 
     @JsonProperty
-    private long userId;
+    private long accountId;
 
     @JsonProperty
     private long jobId;
@@ -24,7 +24,7 @@ public class OutApplication extends ResourceSupport {
     private Date date;
 
     public OutApplication(long userId, long jobId, long curriculumId, Date date){
-        this.userId = userId;
+        this.accountId = userId;
         this.jobId = jobId;
         this.curriculumId = curriculumId;
         this.date = date;

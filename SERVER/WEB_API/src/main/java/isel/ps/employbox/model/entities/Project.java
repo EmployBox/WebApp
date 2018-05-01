@@ -1,17 +1,21 @@
 package isel.ps.employbox.model.entities;
 
-import org.github.isel.rapper.DomainObject;
+import com.github.jayield.rapper.DomainObject;
+import com.github.jayield.rapper.EmbeddedId;
 
 public class Project implements DomainObject<Project.ProjectKey> {
-    private final long companyId;
+    @EmbeddedId
+    private final ProjectKey key;
+
+    private final long accountId;
     private final long curriculumId;
     private final String name;
     private final String description;
     private final long version;
-    private final ProjectKey key;
+
 
     public Project(){
-        companyId = 0;
+        accountId = 0;
         curriculumId = 0;
         name = null;
         description = null;
@@ -20,7 +24,7 @@ public class Project implements DomainObject<Project.ProjectKey> {
     }
 
     public Project(long userId, long curriculumId, String name, String description, long version){
-        this.companyId = userId;
+        this.accountId = userId;
         this.curriculumId = curriculumId;
         this.name = name;
         this.description = description;
@@ -37,8 +41,8 @@ public class Project implements DomainObject<Project.ProjectKey> {
         return version;
     }
 
-    public long getCompanyId() {
-        return companyId;
+    public long getAccountId() {
+        return accountId;
     }
 
     public long getCurriculumId() {
@@ -54,21 +58,21 @@ public class Project implements DomainObject<Project.ProjectKey> {
     }
 
     public static class ProjectKey {
-        private final long userId;
+        private final long accountId;
         private final long curriculumId;
 
         public ProjectKey(){
-            userId = 0;
+            accountId = 0;
             curriculumId = 0;
         }
 
         public ProjectKey(long userId, long curriculumId) {
-            this.userId = userId;
+            this.accountId = userId;
             this.curriculumId = curriculumId;
         }
 
-        public long getUserId() {
-            return userId;
+        public long getAccountId() {
+            return accountId;
         }
 
         public long getCurriculumId() {

@@ -1,10 +1,9 @@
 package isel.ps.employbox.model.entities;
 
-import org.github.isel.rapper.ColumnName;
+import com.github.jayield.rapper.ColumnName;
 
-import java.util.Collections;
 import java.util.List;
-import java.util.function.Supplier;
+import java.util.concurrent.CompletableFuture;
 
 public class User extends Account {
     private final String name;
@@ -12,17 +11,17 @@ public class User extends Account {
     private final String photoUrl;
     private final long version;
 
-    @ColumnName(name = "accountId")
-    private final Supplier<List<Curriculum>> curricula;
-    @ColumnName(name = "accountId")
-    private final Supplier<List<Application>> applications;
+    @ColumnName(foreignName = "accountId")
+    private final CompletableFuture<List<Curriculum>> curricula;
+    @ColumnName(foreignName = "accountId")
+    private final CompletableFuture<List<Application>> applications;
 
     public User(){
         name = null;
         summary = null;
         photoUrl = null;
-        curricula = Collections::emptyList;
-        applications = Collections::emptyList;
+        curricula = null;
+        applications = null;
         version = 0;
     }
 
@@ -34,13 +33,13 @@ public class User extends Account {
                 String name,
                 String summary,
                 String photoUrl,
-                Supplier<List<Job>> offeredJobs,
-                Supplier<List<Curriculum>> curricula,
-                Supplier<List<Application>> applications,
-                Supplier<List<Chat>> chats,
-                Supplier<List<Comment>> comments,
-                Supplier<List<Rating>> ratings,
-                Supplier<List<User>> followers, long version1)
+                CompletableFuture<List<Job>> offeredJobs,
+                CompletableFuture<List<Curriculum>> curricula,
+                CompletableFuture<List<Application>> applications,
+                CompletableFuture<List<Chat>> chats,
+                CompletableFuture<List<Comment>> comments,
+                CompletableFuture<List<Rating>> ratings,
+                CompletableFuture<List<User>> followers, long version1)
     {
         super(accountID, email, password, rating, version, offeredJobs, comments, chats, ratings, followers);
         this.name = name;
@@ -63,8 +62,8 @@ public class User extends Account {
         this.summary = summary;
         this.photoUrl = photoUrl;
         this.version = version;
-        this.curricula = Collections::emptyList;
-        this.applications = Collections::emptyList;
+        this.curricula = null;
+        this.applications = null;
     }
 
     public String getName() {
@@ -79,11 +78,11 @@ public class User extends Account {
         return photoUrl;
     }
 
-    public Supplier<List<Application>> getApplications() {
+    public CompletableFuture<List<Application>> getApplications() {
         return applications;
     }
 
-    public Supplier<List<Curriculum>> getCurricula() {
+    public CompletableFuture<List<Curriculum>> getCurricula() {
         return curricula;
     }
 

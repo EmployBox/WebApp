@@ -1,9 +1,9 @@
 package isel.ps.employbox.model.entities;
 
-import org.github.isel.rapper.DomainObject;
-import org.github.isel.rapper.EmbeddedId;
+import com.github.jayield.rapper.DomainObject;
+import com.github.jayield.rapper.EmbeddedId;
 
-public class Follow implements DomainObject<Follow.FollowKey>{
+public class Follow implements DomainObject<Follow.FollowKey> {
 
     @EmbeddedId
     private final FollowKey followKey;

@@ -1,11 +1,11 @@
 package isel.ps.employbox.model.entities;
 
-import org.github.isel.rapper.DomainObject;
-import org.github.isel.rapper.EmbeddedId;
+import com.github.jayield.rapper.DomainObject;
+import com.github.jayield.rapper.EmbeddedId;
 
 import java.sql.Date;
 
-public class AcademicBackground implements DomainObject<AcademicBackground.AcademicBackgroundKey>{
+public class AcademicBackground implements DomainObject<AcademicBackground.AcademicBackgroundKey> {
 
     @EmbeddedId
     private final AcademicBackgroundKey academicBackgroundKey;
@@ -81,16 +81,21 @@ public class AcademicBackground implements DomainObject<AcademicBackground.Acade
     }
 
     public static class AcademicBackgroundKey {
-            private Long userId;
-            private Long CurriculumId;
+            private final Long accountId;
+            private final Long CurriculumId;
+
+            public AcademicBackgroundKey(){
+                accountId = null;
+                CurriculumId = null;
+            }
 
             public AcademicBackgroundKey(Long userId, Long curriculumId) {
-                this.userId = userId;
+                this.accountId = userId;
                 CurriculumId = curriculumId;
             }
 
-            public Long getUserId() {
-                return userId;
+            public Long getAccountId() {
+                return accountId;
             }
 
             public Long getCurriculumId() {

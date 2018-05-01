@@ -1,8 +1,8 @@
 package isel.ps.employbox.model.entities;
 
-import org.github.isel.rapper.DomainObject;
+import com.github.jayield.rapper.DomainObject;
 
-public class Local implements DomainObject<String>{
+public class Local implements DomainObject<String> {
     private final String address;
     private final String country;
     private final String district;

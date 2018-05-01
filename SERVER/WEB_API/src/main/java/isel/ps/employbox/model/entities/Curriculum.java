@@ -1,43 +1,51 @@
 package isel.ps.employbox.model.entities;
 
-import org.github.isel.rapper.DomainObject;
-import org.github.isel.rapper.Id;
+import com.github.jayield.rapper.ColumnName;
+import com.github.jayield.rapper.DomainObject;
+import com.github.jayield.rapper.Id;
 
-import java.util.Collections;
 import java.util.List;
-import java.util.function.Supplier;
+import java.util.concurrent.CompletableFuture;
 
 public class Curriculum implements DomainObject<Long> {
 
     @Id(isIdentity = true)
     private long curriculumId;
+
     private final long accountId;
     private final String title;
     private final long version;
 
-    private final Supplier<List<PreviousJobs>> previousJobs;
-    private final Supplier<List<AcademicBackground>> academicBackground;
-    private final Supplier<List<Project>> projects;
-    private final Supplier<List<CurriculumExperience>> experiences;
+    @ColumnName(foreignName = "curriculumId" )
+    private final CompletableFuture<List<PreviousJobs>> previousJobs;
+
+    @ColumnName(foreignName = "curriculumId" )
+    private final CompletableFuture<List<AcademicBackground>> academicBackground;
+
+    @ColumnName(foreignName = "curriculumId" )
+    private final CompletableFuture<List<Project>> projects;
+
+    @ColumnName(foreignName = "curriculumId" )
+    private final CompletableFuture<List<CurriculumExperience>> experiences;
 
     public Curriculum(){
         accountId = 0;
         title = null;
         version = 0;
-        previousJobs = Collections::emptyList;
-        academicBackground = Collections::emptyList;
-        projects = Collections::emptyList;
-        experiences = Collections::emptyList;
+        previousJobs = null;
+        academicBackground = null;
+        projects = null;
+        experiences = null;
     }
 
     public Curriculum(long userId,
                       long curriculumId,
                       String title,
                       long version,
-                      Supplier<List<PreviousJobs>> previousJobs,
-                      Supplier<List<AcademicBackground>> academicBackground,
-                      Supplier<List<Project>> projects,
-                      Supplier<List<CurriculumExperience>> experiences)
+                      CompletableFuture<List<PreviousJobs>> previousJobs,
+                      CompletableFuture<List<AcademicBackground>> academicBackground,
+                      CompletableFuture<List<Project>> projects,
+                      CompletableFuture<List<CurriculumExperience>> experiences)
     {
         this.accountId = userId;
         this.curriculumId = curriculumId;
@@ -53,10 +61,10 @@ public class Curriculum implements DomainObject<Long> {
         this.accountId = accountId;
         this.curriculumId = curriculumId;
         this.title= title;
-        this.previousJobs = Collections::emptyList;
-        this.academicBackground = Collections::emptyList;
-        this.projects = Collections::emptyList;
-        this.experiences = Collections::emptyList;
+        this.previousJobs = null;
+        this.academicBackground = null;
+        this.projects = null;
+        this.experiences = null;
         this.version = -1;
     }
 
@@ -77,19 +85,19 @@ public class Curriculum implements DomainObject<Long> {
         return title;
     }
 
-    public Supplier<List<PreviousJobs>> getPreviousJobs() {
+    public CompletableFuture<List<PreviousJobs>> getPreviousJobs() {
         return previousJobs;
     }
 
-    public Supplier<List<AcademicBackground>> getAcademicBackground() {
+    public CompletableFuture<List<AcademicBackground>> getAcademicBackground() {
         return academicBackground;
     }
 
-    public Supplier<List<Project>> getProjects() {
+    public CompletableFuture<List<Project>> getProjects() {
         return projects;
     }
 
-    public Supplier<List<CurriculumExperience>> getExperiences() {
+    public CompletableFuture<List<CurriculumExperience>> getExperiences() {
         return experiences;
     }
 }

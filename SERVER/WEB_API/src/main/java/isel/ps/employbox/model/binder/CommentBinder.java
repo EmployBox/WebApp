@@ -18,7 +18,7 @@ public class CommentBinder implements ModelBinder<Comment,OutComment,InComment> 
                 commentCompletableFuture.thenApply(
                         comment -> new OutComment(
                                 comment.getAccountIdFrom(),
-                                comment.getAccountIdTo(),
+                                comment.getAccountIdDest(),
                                 comment.getIdentityKey(),
                                 comment.getMainCommendID(),
                                 comment.getDate().toString(),
