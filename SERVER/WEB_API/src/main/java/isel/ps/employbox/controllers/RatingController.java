@@ -61,7 +61,7 @@ public class RatingController {
             Authentication authentication)
     {
         if(id != rating.getAccountIDFrom() || accountTo != rating.getAccountIDTo()) throw new BadRequestException(badRequest_IdsMismatch);
-        return ratingService.createRating(ratingBinder.bindInput(rating), authentication.getName());
+        return ratingService.createRating( ratingBinder.bindInput(rating), authentication.getName());
     }
 
     @DeleteMapping

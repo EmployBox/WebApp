@@ -1,25 +1,15 @@
 package isel.ps.employbox.model.binder;
 
 import isel.ps.employbox.model.entities.Job;
-import isel.ps.employbox.model.entities.JobExperience;
 import isel.ps.employbox.model.input.InJob;
-import isel.ps.employbox.model.input.InJobExperience;
 import isel.ps.employbox.model.output.OutJob;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.CompletableFuture;
-import java.util.stream.Collectors;
 
 @Component
 public class JobBinder implements ModelBinder<Job,OutJob,InJob> {
-    private final ExperienceBinder experienceBinder;
-
-    public JobBinder(ExperienceBinder experienceBinder){
-        this.experienceBinder = experienceBinder;
-    }
 
     @Override
     public Mono<OutJob> bindOutput(CompletableFuture<Job> jobCompletableFuture) {
@@ -29,7 +19,6 @@ public class JobBinder implements ModelBinder<Job,OutJob,InJob> {
                                     job.getAccountId(),
                                     job.getIdentityKey(),
                                     job.getTitle(),
-                                    bindOutExperience(job.getExperiences().join()),
                                     job.getAddress(),
                                     job.getWage(),
                                     job.getDescription(),
@@ -43,41 +32,20 @@ public class JobBinder implements ModelBinder<Job,OutJob,InJob> {
     }
 
     @Override
-    public Job bindInput(InJob curr) {
+    public Job bindInput(InJob inJob) {
         return new Job(
-                curr.getAccountId(),
-                curr.getJobID(),
-                curr.getTitle(),
-                curr.getAddress(),
-                curr.getWage(),
-                curr.getDescription(),
-                curr.getSchedule(),
-                curr.getOfferBeginDate(),
-                curr.getOfferEndDate(),
-                curr.getOfferType(),
-                bindInJobExperience(curr.getExperiences()),
-                curr.getVersion()
+                inJob.getAccountId(),
+                inJob.getJobID(),
+                inJob.getTitle(),
+                inJob.getAddress(),
+                inJob.getWage(),
+                inJob.getDescription(),
+                inJob.getSchedule(),
+                inJob.getOfferBeginDate(),
+                inJob.getOfferEndDate(),
+                inJob.getOfferType(),
+                inJob.getExperiences(),
+                inJob.getVersion()
         );
-    }
-
-    private List<OutJob.OutExperience> bindOutExperience(List<JobExperience> list){
-        return list.stream()
-                .map(curr-> new OutJob.OutExperience(curr.getIdentityKey().getCompetences(), curr.getYears()))
-                .collect(Collectors.toList());
-    }
-
-    private List<JobExperience> bindInJobExperience(InJobExperience[] arr){
-        ArrayList<JobExperience> ret = new ArrayList<>();
-
-        for(int i = 0; i< arr.length; i++) {
-            InJobExperience inJobExperience = arr[i];
-
-            ret.add(new JobExperience(
-                    inJobExperience.getJobId(),
-                    inJobExperience.getCompetences(),
-                    inJobExperience.getYears()
-            ));
-        }
-        return ret;
     }
 }

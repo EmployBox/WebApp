@@ -1,12 +1,15 @@
 package isel.ps.employbox.model.input;
 
+import isel.ps.employbox.model.entities.JobExperience;
+
 import java.sql.Date;
+import java.util.List;
 
 public class InJob {
     private long jobID;
     private String title;
     private long accountId;
-    private InJobExperience[] experiences;
+    private List<JobExperience> experiences;
     private String address;
     private int wage;
     private String description;
@@ -40,11 +43,11 @@ public class InJob {
         this.accountId = accountId;
     }
 
-    public InJobExperience[] getExperiences() {
+    public List<JobExperience> getExperiences() {
         return experiences;
     }
 
-    public void setExperiences(InJobExperience[] experiences) {
+    public void setExperiences(List<JobExperience> experiences) {
         this.experiences = experiences;
     }
 

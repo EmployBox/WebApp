@@ -1,23 +1,37 @@
 package isel.ps.employbox.model.entities;
 
 import com.github.jayield.rapper.ColumnName;
+import com.github.jayield.rapper.DataRepository;
 import com.github.jayield.rapper.DomainObject;
 import com.github.jayield.rapper.Id;
+import isel.ps.employbox.model.entities.CurriculumChilds.AcademicBackground;
+import isel.ps.employbox.model.entities.CurriculumChilds.CurriculumExperience;
+import isel.ps.employbox.model.entities.CurriculumChilds.PreviousJob;
+import isel.ps.employbox.model.entities.CurriculumChilds.Project;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 public class Curriculum implements DomainObject<Long> {
+    @Autowired
+    private DataRepository<PreviousJob, Long> previousJobsRepo;
+    @Autowired
+    private DataRepository<AcademicBackground, Long> academicBackgroundRepo;
+    @Autowired
+    private DataRepository<Project, Long> projectRepo;
+    @Autowired
+    private DataRepository<CurriculumExperience, Long> curriculumExperienceRepo;
 
     @Id(isIdentity = true)
-    private long curriculumId;
+    private final long curriculumId;
 
     private final long accountId;
     private final String title;
     private final long version;
 
     @ColumnName(foreignName = "curriculumId" )
-    private final CompletableFuture<List<PreviousJobs>> previousJobs;
+    private final CompletableFuture<List<PreviousJob>> previousJobs;
 
     @ColumnName(foreignName = "curriculumId" )
     private final CompletableFuture<List<AcademicBackground>> academicBackground;
@@ -36,25 +50,7 @@ public class Curriculum implements DomainObject<Long> {
         academicBackground = null;
         projects = null;
         experiences = null;
-    }
-
-    public Curriculum(long userId,
-                      long curriculumId,
-                      String title,
-                      long version,
-                      CompletableFuture<List<PreviousJobs>> previousJobs,
-                      CompletableFuture<List<AcademicBackground>> academicBackground,
-                      CompletableFuture<List<Project>> projects,
-                      CompletableFuture<List<CurriculumExperience>> experiences)
-    {
-        this.accountId = userId;
-        this.curriculumId = curriculumId;
-        this.title = title;
-        this.version = version;
-        this.previousJobs =  previousJobs;
-        this.academicBackground = academicBackground;
-        this.projects = projects;
-        this.experiences = experiences;
+        curriculumId = 0;
     }
 
     public Curriculum(long accountId, long curriculumId, String title) {
@@ -65,6 +61,24 @@ public class Curriculum implements DomainObject<Long> {
         this.academicBackground = null;
         this.projects = null;
         this.experiences = null;
+        this.version = -1;
+    }
+
+    public Curriculum(long accountId,
+                      long curriculumId,
+                      String title,
+                      List<PreviousJob> previousJobsList,
+                      List<AcademicBackground> academicBackgroundList ,
+                      List<CurriculumExperience> experiencesList,
+                      List<Project> projectsList)
+    {
+        this.accountId = accountId;
+        this.curriculumId = curriculumId;
+        this.title = title;
+        this.previousJobs =  CompletableFuture.completedFuture(previousJobsList);
+        this.academicBackground = CompletableFuture.completedFuture( academicBackgroundList);
+        this.experiences = CompletableFuture.completedFuture(experiencesList);
+        this.projects = CompletableFuture.completedFuture(projectsList);
         this.version = -1;
     }
 
@@ -85,7 +99,7 @@ public class Curriculum implements DomainObject<Long> {
         return title;
     }
 
-    public CompletableFuture<List<PreviousJobs>> getPreviousJobs() {
+    public CompletableFuture<List<PreviousJob>> getPreviousJobs() {
         return previousJobs;
     }
 
@@ -100,4 +114,6 @@ public class Curriculum implements DomainObject<Long> {
     public CompletableFuture<List<CurriculumExperience>> getExperiences() {
         return experiences;
     }
+
+
 }

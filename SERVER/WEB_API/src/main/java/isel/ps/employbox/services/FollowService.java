@@ -37,7 +37,9 @@ public class FollowService {
         return followsRepo.findWhere(new Pair<>("accountIdFollower", followerAccountId))
                 .thenAccept(accounts -> accounts
                         .forEach(elem -> arr.add(accountService.getAccount(elem.getAccountIdFollowed()))))
-                .thenCompose(__ -> CompletableFuture.allOf(arr.toArray(new CompletableFuture[arr.size()])))
+                .thenCompose(
+                        __ -> CompletableFuture.allOf(arr.toArray(new CompletableFuture[arr.size()]))
+                )
                 .thenApply(__ -> arr.stream().map(CompletableFuture::join));
     }
 

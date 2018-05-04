@@ -1,15 +1,18 @@
 package isel.ps.employbox.model.entities;
 
 import com.github.jayield.rapper.ColumnName;
+import com.github.jayield.rapper.DataRepository;
 import com.github.jayield.rapper.DomainObject;
 import com.github.jayield.rapper.Id;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.sql.Date;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
-import java.util.stream.Collectors;
 
 public class Job implements DomainObject<Long> {
+    @Autowired
+    private DataRepository<JobExperience, Long> jobExperienceRepo;
 
     @Id(isIdentity =  true)
     private long jobId;
@@ -101,7 +104,7 @@ public class Job implements DomainObject<Long> {
         this.offerBeginDate = offerBeginDate;
         this.offerEndDate = offerEndDate;
         this.offerType = offerType;
-        this.applications = null;
+        this.applications = CompletableFuture.completedFuture(null);
         this.experiences = CompletableFuture.completedFuture(experiences);
         this.version = version;
     }
@@ -157,12 +160,6 @@ public class Job implements DomainObject<Long> {
     }
 
     public CompletableFuture<List<JobExperience>> getExperiences() {
-        return experiences.thenApply(
-                experiences -> experiences
-                        .stream()
-                        .peek(experience -> {
-                            experience.getIdentityKey().setJobId(jobId);
-                        }).collect(Collectors.toList())
-        );
+        return experiences;
     }
 }

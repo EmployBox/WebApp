@@ -5,6 +5,7 @@ import isel.ps.employbox.ErrorMessages;
 import isel.ps.employbox.exceptions.BadRequestException;
 import isel.ps.employbox.exceptions.ResourceNotFoundException;
 import isel.ps.employbox.model.entities.Rating;
+import javafx.util.Pair;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
@@ -22,7 +23,7 @@ public class RatingService {
     }
 
     public CompletableFuture<Stream<Rating>> getRatings(long accountId, String type) {
-        return ratingRepo.findAll()
+        return ratingRepo.findWhere(new Pair<>("accountId", accountId))
                 .thenApply(list ->
                         list.stream()
                                 .filter(curr-> type.equals("done") && curr.getAccountIdFrom() == accountId || type.equals("received")&& curr.getAccountIdTo()== accountId)

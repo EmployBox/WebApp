@@ -6,7 +6,6 @@ import isel.ps.employbox.controllers.UserController;
 import org.springframework.hateoas.ResourceSupport;
 
 import java.sql.Date;
-import java.util.List;
 
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
@@ -14,16 +13,13 @@ import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 public class OutJob extends ResourceSupport {
 
     @JsonProperty
-    private final long accountID;
+    private final long accountId;
 
     @JsonProperty
     private final long jobId;
 
     @JsonProperty
     private final String title;
-
-    @JsonProperty
-    private final List<OutExperience> experiences;
 
     @JsonProperty
     private final String address;
@@ -51,7 +47,6 @@ public class OutJob extends ResourceSupport {
             long accountID,
             long jobId,
             String title,
-            List<OutExperience> experiences,
             String address,
             double wage,
             String description,
@@ -60,10 +55,9 @@ public class OutJob extends ResourceSupport {
             Date offerEndDate,
             String offerType)
     {
-        this.accountID = accountID;
+        this.accountId = accountID;
         this.jobId = jobId;
         this.title = title;
-        this.experiences = experiences;
         this.address = address;
         this.wage = wage;
         this.description = description;
@@ -71,20 +65,8 @@ public class OutJob extends ResourceSupport {
         this.offerBeginDate = offerBeginDate;
         this.offerEndDate = offerEndDate;
         this.offerType = offerType;
+        this.add( linkTo ( methodOn(JobController.class).getJobExperiences(jobId)).withRel("experiences"));
         this.add( linkTo ( JobController.class).slash(jobId).withSelfRel());
         this.add( linkTo ( methodOn(UserController.class).getAllApplications(accountID)).withRel("applications"));
-    }
-
-    public static class OutExperience extends ResourceSupport{
-        @JsonProperty
-        private final String competence;
-
-        @JsonProperty
-        private final int years;
-
-        public OutExperience(String competence, int years) {
-            this.competence = competence;
-            this.years = years;
-        }
     }
 }

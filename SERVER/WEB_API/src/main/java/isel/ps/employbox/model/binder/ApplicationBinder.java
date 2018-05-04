@@ -26,7 +26,7 @@ public class ApplicationBinder implements ModelBinder<Application,OutApplication
     }
 
     @Override
-    public Application bindInput(InApplication obj) {
-        return new Application (obj.getAccountId(), obj.getJobId(), obj.getCurriculumId(), obj.getDate());
+    public Application bindInput(InApplication inApplication) {
+        return new Application ( inApplication.getAccountId(), inApplication.getJobId(), inApplication.getCurriculumId(), inApplication.getDate());
     }
 }

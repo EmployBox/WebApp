@@ -1,17 +1,21 @@
 package isel.ps.employbox.model.input;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+import isel.ps.employbox.model.entities.CurriculumChilds.AcademicBackground;
+import isel.ps.employbox.model.entities.CurriculumChilds.CurriculumExperience;
+import isel.ps.employbox.model.entities.CurriculumChilds.PreviousJob;
+import isel.ps.employbox.model.entities.CurriculumChilds.Project;
 
+import java.util.Collections;
 import java.util.List;
 
 public class InCurriculum {
     private long accountId;
     private long curriculumId;
     private String title;
-    private List<Experience> experiences;
-    private List<PreviousJobs> previousJobs;
-    private List<Project> projects;
-    private List<AcademicBackground> academicBackground;
+    private List<CurriculumExperience> experiences = Collections.emptyList();
+    private List<PreviousJob> previousJobs = Collections.emptyList();
+    private List<Project> projects = Collections.emptyList();
+    private List<AcademicBackground> academicBackground = Collections.emptyList();
 
     public long getAccountId() {
         return accountId;
@@ -25,11 +29,11 @@ public class InCurriculum {
         return title;
     }
 
-    public List<Experience> getExperiences() {
+    public List<CurriculumExperience> getExperiences() {
         return experiences;
     }
 
-    public List<PreviousJobs> getPreviousJobs() {
+    public List<PreviousJob> getPreviousJobs() {
         return previousJobs;
     }
 
@@ -53,11 +57,11 @@ public class InCurriculum {
         this.title = title;
     }
 
-    public void setExperiences(List<Experience> experiences) {
+    public void setExperiences(List<CurriculumExperience> experiences) {
         this.experiences = experiences;
     }
 
-    public void setPreviousJobs(List<PreviousJobs> previousJobs) {
+    public void setPreviousJobs(List<PreviousJob> previousJobs) {
         this.previousJobs = previousJobs;
     }
 
@@ -69,118 +73,4 @@ public class InCurriculum {
         this.academicBackground = academicBackground;
     }
 
-    private class Experience {
-        private final String competence;
-        private final int year;
-
-        public Experience(String competence, int year){
-
-            this.competence = competence;
-            this.year = year;
-        }
-
-        public String getCompetence() {
-            return competence;
-        }
-
-        public int getYear() {
-            return year;
-        }
-    }
-
-    private class PreviousJobs {
-        private final String companyName;
-        private final String beginDate;
-        private final String endDate;
-        private final String workload;
-        private final String role;
-
-        public PreviousJobs(String companyName, String beginDate, String endDate, String workload, String role){
-            this.companyName = companyName;
-            this.beginDate = beginDate;
-            this.endDate = endDate;
-            this.workload = workload;
-            this.role = role;
-        }
-
-        @JsonProperty("company-name")
-        public String getCompanyName() {
-            return companyName;
-        }
-
-        @JsonProperty("begin-date")
-        public String getBeginDate() {
-            return beginDate;
-        }
-
-        @JsonProperty("end-date")
-        public String getEndDate() {
-            return endDate;
-        }
-
-        public String getWorkload() {
-            return workload;
-        }
-
-        public String getRole() {
-            return role;
-        }
-    }
-
-    private class Project {
-        private final String name;
-        private final String description;
-
-        public Project(String name, String description){
-            this.name = name;
-            this.description = description;
-        }
-
-        public String getName() {
-            return name;
-        }
-
-        public String getDescription() {
-            return description;
-        }
-    }
-
-    private class AcademicBackground {
-        private final String institution;
-        private final String degree;
-        private final String studyArea;
-        private final String beginDate;
-        private final String endDate;
-
-        public AcademicBackground(String institution, String degree, String studyArea, String beginDate, String endDate){
-
-            this.institution = institution;
-            this.degree = degree;
-            this.studyArea = studyArea;
-            this.beginDate = beginDate;
-            this.endDate = endDate;
-        }
-
-        public String getInstitution() {
-            return institution;
-        }
-
-        public String getDegree() {
-            return degree;
-        }
-
-        public String getStudyArea() {
-            return studyArea;
-        }
-
-        @JsonProperty("begin-date")
-        public String getBeginDate() {
-            return beginDate;
-        }
-
-        @JsonProperty("end-date")
-        public String getEndDate() {
-            return endDate;
-        }
-    }
 }

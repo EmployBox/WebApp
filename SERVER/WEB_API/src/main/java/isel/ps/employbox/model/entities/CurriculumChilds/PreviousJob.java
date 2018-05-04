@@ -1,16 +1,18 @@
-package isel.ps.employbox.model.entities;
+package isel.ps.employbox.model.entities.CurriculumChilds;
 
 import com.github.jayield.rapper.DomainObject;
-import com.github.jayield.rapper.EmbeddedId;
+import com.github.jayield.rapper.Id;
+import org.springframework.hateoas.ResourceSupport;
 
 import java.sql.Date;
 
-public class PreviousJobs implements DomainObject<PreviousJobs.PreviousJobsKey> {
-    @EmbeddedId
-    private final PreviousJobsKey previousJobsKey;
+public class PreviousJob extends ResourceSupport implements DomainObject<Long>,CurriculumChild {
+
+    @Id(isIdentity = true)
+    private final long previousJobId;
 
     private final long accountId;
-    private final long curriculumId;
+    private long curriculumId;
     private final Date beginDate;
     private final Date endDate;
     private final long version;
@@ -19,7 +21,7 @@ public class PreviousJobs implements DomainObject<PreviousJobs.PreviousJobsKey> 
     private final String role;
 
 
-    public PreviousJobs(){
+    public PreviousJob(){
         accountId = 0;
         curriculumId = 0;
         beginDate = null;
@@ -28,10 +30,21 @@ public class PreviousJobs implements DomainObject<PreviousJobs.PreviousJobsKey> 
         companyName = null;
         workLoad = null;
         role = null;
-        previousJobsKey = null;
+        previousJobId = 0;
     }
 
-    public PreviousJobs(long userId, long curriculumId, Date beginDate, Date endDate, String companyName, String workLoad, String role, long version) {
+    public PreviousJob(
+            long previousJobId,
+            long userId,
+            long curriculumId,
+            Date beginDate,
+            Date endDate,
+            String companyName,
+            String workLoad,
+            String role,
+            long version)
+    {
+        this.previousJobId = previousJobId;
         this.accountId = userId;
         this.curriculumId = curriculumId;
         this.beginDate = beginDate;
@@ -40,12 +53,11 @@ public class PreviousJobs implements DomainObject<PreviousJobs.PreviousJobsKey> 
         this.role = role;
         this.endDate = endDate;
         this.version = version;
-        previousJobsKey = new PreviousJobsKey(userId, curriculumId);
     }
 
     @Override
-    public PreviousJobsKey getIdentityKey() {
-        return previousJobsKey;
+    public Long getIdentityKey() {
+        return previousJobId;
     }
 
     public long getVersion() {
@@ -80,26 +92,7 @@ public class PreviousJobs implements DomainObject<PreviousJobs.PreviousJobsKey> 
         return endDate;
     }
 
-    public static class PreviousJobsKey {
-        private final long accountId;
-        private final long curriculumId;
-
-        public PreviousJobsKey(){
-            accountId = 0;
-            curriculumId = 0;
-        }
-
-        public PreviousJobsKey(long userId, long curriculumId) {
-            this.accountId = userId;
-            this.curriculumId = curriculumId;
-        }
-
-        public long getAccountId() {
-            return accountId;
-        }
-
-        public long getCurriculumId() {
-            return curriculumId;
-        }
+    public void setCurriculumId(long curriculumId){
+        this.curriculumId = curriculumId;
     }
 }

@@ -21,7 +21,7 @@ public interface ModelBinder<T, O extends ResourceSupport, I> {
         return list.map(this::bindInput);
     }
 
-
+    /*
     default Mono<HalCollection> bindOutput(CompletableFuture<Stream<T>> listCompletableFuture, Class selfController, Object ... parameters) {
         return Mono.fromFuture(
                 listCompletableFuture
@@ -40,24 +40,24 @@ public interface ModelBinder<T, O extends ResourceSupport, I> {
                                 }
                         )
         );
-    }
+    }*/
 
-    /*
-    default Mono<HalCollection> bindOutput(CompletableFuture<Stream<T>> listCompletableFuture, Class selfController) {
+    default Mono<HalCollection> bindOutput(CompletableFuture<Stream<T>> listCompletableFuture, Class selfController, Object ... parameters) {
         EmbeddedWrappers wrappers = new EmbeddedWrappers(true);
         ArrayList<EmbeddedWrapper> embeddedChecklists = new ArrayList<>();
         Stream<T> list = listCompletableFuture.join();
 
         list.map(curr-> bindOutput( CompletableFuture.completedFuture(curr)).block())
-                .forEach(curr -> embeddedChecklists.add( wrappers.wrap(curr.getCurriculumId())));
+                .forEach(curr -> embeddedChecklists.add( wrappers.wrap(new CollectionItem(curr.getId()))));
 
         HalCollection ret = new HalCollection(
                 embeddedChecklists.size(),
                 new Resources<>(embeddedChecklists),
-                selfController
+                selfController,
+                parameters
         );
         return Mono.fromFuture( CompletableFuture.completedFuture(ret));
-    }*/
+    }
 
     @Relation(value= "item", collectionRelation = "items")
     class CollectionItem extends ResourceSupport {

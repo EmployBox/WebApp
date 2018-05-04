@@ -2,13 +2,14 @@ package isel.ps.employbox.model.entities;
 
 
 import com.github.jayield.rapper.DomainObject;
-import com.github.jayield.rapper.EmbeddedId;
+import com.github.jayield.rapper.Id;
 
 import java.sql.Date;
 
-public class Application implements DomainObject<Application.ApplicationKeys> {
-    @EmbeddedId
-    private final ApplicationKeys applicationKey;
+public class Application implements DomainObject<Long> {
+
+    @Id(isIdentity = true)
+    private final long applicationId;
     private final long accountId;
     private final long jobId;
     private final long curriculumId;
@@ -16,35 +17,36 @@ public class Application implements DomainObject<Application.ApplicationKeys> {
     private final long version;
 
     public Application(){
-        applicationKey = null;
         accountId = 0;
         jobId = 0;
         curriculumId = 0;
         date = null;
         version = 0;
+        applicationId = 0;
     }
 
-    public Application(long userId, long jobId, long curriculumId, Date date, long version) {
+    public Application(long applicationId, long userId, long jobId, long curriculumId, Date date, long version) {
+        this.applicationId = applicationId;
         this.accountId = userId;
         this.jobId = jobId;
         this.curriculumId = curriculumId;
         this.date = date;
         this.version = version;
-        applicationKey = new ApplicationKeys(userId, jobId);
     }
 
-    public Application(long userId, long jobId, long curriculumId, Date date) {
+    public Application( long userId, long jobId, long curriculumId, Date date) {
+        this.applicationId = -1;
         this.accountId = userId;
         this.jobId = jobId;
         this.curriculumId = curriculumId;
         this.date = date;
         this.version = -1;
-        applicationKey = new ApplicationKeys(userId, jobId);
     }
 
+
     @Override
-    public ApplicationKeys getIdentityKey() {
-        return applicationKey;
+    public Long getIdentityKey() {
+        return applicationId;
     }
 
     public long getVersion() {
@@ -67,23 +69,4 @@ public class Application implements DomainObject<Application.ApplicationKeys> {
         return accountId;
     }
 
-    public static class ApplicationKeys {
-        private long accountId;
-        private long jobId;
-
-        public ApplicationKeys(){ }
-
-        public ApplicationKeys(long userId, long jobId) {
-            this.accountId = userId;
-            this.jobId = jobId;
-        }
-
-        public long getAccountId() {
-            return accountId;
-        }
-
-        public long getJobId() {
-            return jobId;
-        }
-    }
 }

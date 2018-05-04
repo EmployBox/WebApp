@@ -25,12 +25,12 @@ public class UserService {
 
     private final DataRepository<User, Long> userRepo;
     private final DataRepository<Curriculum, Long> curriculumRepo;
-    private final DataRepository<Application, Application.ApplicationKeys> applicationRepo;
+    private final DataRepository<Application, Long> applicationRepo;
 
     public UserService(
             DataRepository<User, Long> userRepo,
             DataRepository<Curriculum, Long> curriculumRepo,
-            DataRepository<Application, Application.ApplicationKeys> applicationRepo) {
+            DataRepository<Application, Long> applicationRepo) {
         this.userRepo = userRepo;
         this.curriculumRepo = curriculumRepo;
         this.applicationRepo = applicationRepo;
@@ -79,27 +79,6 @@ public class UserService {
     }
 
 
-    public CompletableFuture<Stream<Curriculum>> getCurricula(long userId, String email)
-    {
-        return getUser(userId, email).thenApply(
-                user -> user.getCurricula()
-                        .join()
-                        .stream()
-                        .filter(curr -> curr.getAccountId() == userId)
-        );
-    }
-
-    public CompletableFuture<Curriculum> getCurriculum(long userId, long cid, String email) {
-        return getUser(userId, email)
-                .thenCompose(User::getCurricula)
-                .thenApply(curricula -> {
-                    Optional<Curriculum> oret;
-                    if (curricula.isEmpty() || !(oret = curricula.stream().filter(curr -> curr.getIdentityKey() == cid).findFirst()).isPresent())
-                        throw new ResourceNotFoundException(ErrorMessages.resourceNotfound_curriculum);
-                    return oret.get();
-                });
-    }
-
     public Mono<Void> updateUser(User user, String email) {
         return Mono.fromFuture(
                 getUser(user.getIdentityKey(), email)
@@ -120,18 +99,6 @@ public class UserService {
                         })
         );
     }
-
-    public Mono<Void> updateCurriculum(Curriculum curriculum, String email) {
-        return Mono.fromFuture(
-                getUser(curriculum.getAccountId(), email)
-                        .thenCompose(__ -> getCurriculum(curriculum.getAccountId(), curriculum.getIdentityKey(), email))
-                        .thenCompose(___ -> curriculumRepo.update(curriculum))
-                        .thenAccept(res -> {
-                            if (!res) throw new BadRequestException(ErrorMessages.badRequest_ItemCreation);
-                        })
-        );
-    }
-
 
     public CompletableFuture<User> createUser(User user) {
         return userRepo.create(user).thenApply(
@@ -156,18 +123,6 @@ public class UserService {
                 });
     }
 
-    public CompletableFuture<Curriculum> createCurriculum(long userId, Curriculum curriculum, String email) {
-        if (curriculum.getAccountId() != userId)
-            throw new BadRequestException(ErrorMessages.badRequest_IdsMismatch);
-
-        return getUser(userId, email)
-                .thenCompose(__ -> curriculumRepo.create(curriculum))
-                .thenApply(res -> {
-                    if (!res) throw new BadRequestException(ErrorMessages.badRequest_ItemCreation);
-                    return curriculum;
-                });
-    }
-
     public Mono<Void> deleteUser(long id, String email) {
         return Mono.fromFuture(
                 getUser(id, email)
@@ -183,16 +138,6 @@ public class UserService {
                 getUser(userId, email)
                         .thenCompose(__ -> getApplication(userId, jobId))
                         .thenCompose(applicationRepo::delete)
-                        .thenAccept(res -> {
-                            if (!res) throw new BadRequestException(ErrorMessages.badRequest_ItemDeletion);
-                        })
-        );
-    }
-
-    public Mono<Void> deleteCurriculum(long userId, long cid, String name) {
-        return Mono.fromFuture(
-                getCurriculum(userId, cid, name)
-                        .thenCompose(curriculumRepo::delete)
                         .thenAccept(res -> {
                             if (!res) throw new BadRequestException(ErrorMessages.badRequest_ItemDeletion);
                         })

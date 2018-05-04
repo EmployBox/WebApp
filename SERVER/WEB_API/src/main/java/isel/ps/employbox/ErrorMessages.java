@@ -4,6 +4,7 @@ public class ErrorMessages {
     public static final String badRequest_IdsMismatch = "Given ids do not match with the ones passed in the body";
     public static final String unAuthorized_IdAndEmailMismatch = "Account authenticated is not allowed to user this resource";
     public static final String unAuthorized_t = "";
+    public static final String resourceNotfound = "Resource item wasn´t found";
     public static final String resourceNotfound_user = "User wasn't found";
     public static final String resourceNotfound_account = "Account wasn't found";
     public static final String conflit_UsernameTaken = "The username provided is already taken";
@@ -23,4 +24,7 @@ public class ErrorMessages {
     public static final String badRequest_ItemUpdate = "Item could not be updated, check if the object your are trying to update exists or you can update it";
     public static final String resourceNotfound_company = "Company could not be found";
     public static final String jobExperience_ItemCreation = "The job experience list you tried to create with a job couldn't be added to the database";
+    public static final String resourceNotfound_previousJob = "Previous job wasnt found for this curriculum";
+    public static String resourceNotfound_jobExperience;
+    public static String childsCreation = "The item was created with success but some lists belonging to this object could not be added to the DB";
 }

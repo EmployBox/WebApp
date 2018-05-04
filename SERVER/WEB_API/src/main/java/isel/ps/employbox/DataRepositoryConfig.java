@@ -3,7 +3,10 @@ package isel.ps.employbox;
 import com.github.jayield.rapper.DataRepository;
 import com.github.jayield.rapper.utils.MapperRegistry;
 import isel.ps.employbox.model.entities.*;
-import isel.ps.employbox.model.entities.Application.ApplicationKeys;
+import isel.ps.employbox.model.entities.CurriculumChilds.AcademicBackground;
+import isel.ps.employbox.model.entities.CurriculumChilds.CurriculumExperience;
+import isel.ps.employbox.model.entities.CurriculumChilds.PreviousJob;
+import isel.ps.employbox.model.entities.CurriculumChilds.Project;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -13,7 +16,22 @@ import static isel.ps.employbox.model.entities.Follow.FollowKey;
 public class DataRepositoryConfig {
 
     @Bean
-    public DataRepository<CurriculumExperience, CurriculumExperience.CurriculumExperienceKey> curriculumExperienceRepoBean(){
+    public DataRepository<Project, Long> projectBean(){
+        return new DataRepository(MapperRegistry.getRepository(Project.class));
+    }
+
+    @Bean
+    public DataRepository<PreviousJob, Long> previousJobsBean(){
+        return new DataRepository(MapperRegistry.getRepository(PreviousJob.class));
+    }
+
+    @Bean
+    public DataRepository<AcademicBackground, Long> academicBackgroundAcademicBean(){
+        return new DataRepository(MapperRegistry.getRepository(AcademicBackground.class));
+    }
+
+    @Bean
+    public DataRepository<CurriculumExperience, Long> curriculumExperienceRepoBean(){
         return new DataRepository(MapperRegistry.getRepository(CurriculumExperience.class));
     }
 
@@ -28,7 +46,7 @@ public class DataRepositoryConfig {
     }
 
     @Bean
-    public DataRepository<Application, ApplicationKeys> applicationRepoBean(){
+    public DataRepository<Application, Long> applicationRepoBean(){
         return new DataRepository(MapperRegistry.getRepository(Application.class));
     }
 
@@ -73,7 +91,7 @@ public class DataRepositoryConfig {
     }
 
     @Bean
-    public DataRepository<JobExperience, JobExperience.JobExperienceKey> jobExperienceRepoBean(){
+    public DataRepository<JobExperience, Long> jobExperienceRepoBean(){
         return new DataRepository(MapperRegistry.getRepository(JobExperience.class));
     }
 

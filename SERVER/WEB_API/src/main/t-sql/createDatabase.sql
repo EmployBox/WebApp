@@ -61,19 +61,21 @@ CREATE TABLE [Curriculum](
 )
 
 CREATE TABLE [Project] (
-	accountId BIGINT,
-	curriculumId BIGINT,
+	projectId BIGINT IDENTITY PRIMARY KEY,
+	accountId BIGINT NOT NULL,
+	curriculumId BIGINT NOT NULL,
 	name NVARCHAR(15),
 	[description] NVARCHAR(50),
 	[version] rowversion
 
-	PRIMARY KEY (accountId, curriculumID),
-	FOREIGN KEY (curriculumId) REFERENCES curriculum(curriculumId)
+	FOREIGN KEY (curriculumId) REFERENCES curriculum,
+	FOREIGN KEY (accountId) REFERENCES Account
 )
 
 CREATE TABLE [AcademicBackground](
-	accountId BIGINT,
-	curriculumId BIGINT,
+	academicBackgroundKey BIGINT IDENTITY PRIMARY KEY,
+	accountId BIGINT NOT NULL,
+	curriculumId BIGINT NOT NULL,
 	beginDate DATETIME DEFAULT(GETDATE()),
 	endDate DATETIME,
 	studyArea NVARCHAR(40),
@@ -81,8 +83,8 @@ CREATE TABLE [AcademicBackground](
 	degreeObtained NVARCHAR(10),
 	[version] rowversion,
 
+	FOREIGN KEY (accountId) REFERENCES Account,
 	FOREIGN KEY (curriculumId) REFERENCES curriculum(curriculumId),
-	PRIMARY KEY(accountId, curriculumId),
 	check (endDate < beginDate),
 	check (degreeObtained = 'basic level 1' 
 			OR degreeObtained = 'basic level 2' 
@@ -94,8 +96,9 @@ CREATE TABLE [AcademicBackground](
 )
 
 CREATE TABLE [PreviousJobs](
-	accountId BIGINT,
-	curriculumId BIGINT,
+	previousJobId BIGINT IDENTITY PRIMARY KEY,
+	accountId BIGINT NOT NULL,
+	curriculumId BIGINT NOT NULL,
 	beginDate DATETIME DEFAULT(GETDATE()),
 	endDate DATETIME,
 	companyName NVARCHAR(20),
@@ -103,9 +106,7 @@ CREATE TABLE [PreviousJobs](
 	[role] NVARCHAR(20),
 	[version] rowversion,
 
-	PRIMARY KEY(accountId, curriculumId),
-	
-	FOREIGN KEY (curriculumId) REFERENCES Curriculum(curriculumId),
+	FOREIGN KEY (curriculumId) REFERENCES Curriculum,
 	CHECK([workLoad] = 'partial' OR [workLoad] = 'total')
 )
 
@@ -123,7 +124,7 @@ CREATE TABLE [Local] (
 CREATE TABLE [Job](
 	jobId BIGINT identity primary key,
     title nvarchar(50) not null,
-	accountId BIGINT,
+	accountId BIGINT ,
 	schedule NVARCHAR(20),
 	wage INT check(wage > 0),
 	[description] NVARCHAR(50),
@@ -133,43 +134,43 @@ CREATE TABLE [Job](
 	[Address] NVARCHAR(50),
 	[version] rowversion,
 
-	FOREIGN KEY (accountID) REFERENCES Account(accountId),
+	FOREIGN KEY (accountID) REFERENCES Account,
 	check(offerType = 'Looking for work' OR offerType = 'Looking for Worker')
 )
 
 CREATE TABLE [CurriculumExperience](
-	accountId BIGINT,
-	curriculumId BIGINT,
+	curriculumExperienceId BIGINT IDENTITY PRIMARY KEY,
+	accountId BIGINT NOT NULL,
+	curriculumId BIGINT NOT NULL,
 	competences NVARCHAR(50),
 	years SMALLINT,
 	[version] rowversion
 
 	FOREIGN KEY (curriculumId) REFERENCES Curriculum,
-
-	primary key(accountId, curriculumId)
+	FOREIGN KEY (accountId) REFERENCES Account
 )
 
 CREATE TABLE [JobExperience](
-	jobId BIGINT,
+	jobExperienceId BIGINT IDENTITY PRIMARY KEY,
+	jobId BIGINT NOT NULL,
 	competences NVARCHAR(50),
 	years SMALLINT,
 	[version] rowversion
 
-	FOREIGN KEY (jobId) REFERENCES Job,
-
-	primary key(jobId,competences)
+	FOREIGN KEY (jobId) REFERENCES Job
 )
 
 CREATE TABLE [Application](
+	applicationId BIGINT IDENTITY PRIMARY KEY,
 	accountId BIGINT,
 	curriculumId BIGINT,
 	jobId BIGINT,
 	[date] datetime default(GETDATE()),
 	[version] rowversion,
 
-	FOREIGN KEY (curriculumId) REFERENCES curriculum(curriculumId),
+	FOREIGN KEY (accountId) REFERENCES Account,
+	FOREIGN KEY (curriculumId) REFERENCES curriculum,
 	FOREIGN KEY (jobId) REFERENCES Job,
-	primary key (accountId, jobId)
 )
 CREATE TABLE [Rating](
 	accountIdFrom BIGINT,
