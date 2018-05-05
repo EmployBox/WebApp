@@ -1,18 +1,14 @@
 package isel.ps.employbox.model.entities;
 
 import com.github.jayield.rapper.ColumnName;
-import com.github.jayield.rapper.DataRepository;
 import com.github.jayield.rapper.DomainObject;
 import com.github.jayield.rapper.Id;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.sql.Date;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 public class Job implements DomainObject<Long> {
-    @Autowired
-    private DataRepository<JobExperience, Long> jobExperienceRepo;
 
     @Id(isIdentity =  true)
     private long jobId;

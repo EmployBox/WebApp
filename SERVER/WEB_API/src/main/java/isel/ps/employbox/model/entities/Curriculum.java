@@ -1,28 +1,17 @@
 package isel.ps.employbox.model.entities;
 
 import com.github.jayield.rapper.ColumnName;
-import com.github.jayield.rapper.DataRepository;
 import com.github.jayield.rapper.DomainObject;
 import com.github.jayield.rapper.Id;
 import isel.ps.employbox.model.entities.CurriculumChilds.AcademicBackground;
 import isel.ps.employbox.model.entities.CurriculumChilds.CurriculumExperience;
 import isel.ps.employbox.model.entities.CurriculumChilds.PreviousJobs;
 import isel.ps.employbox.model.entities.CurriculumChilds.Project;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 public class Curriculum implements DomainObject<Long> {
-    @Autowired
-    private DataRepository<PreviousJobs, Long> previousJobsRepo;
-    @Autowired
-    private DataRepository<AcademicBackground, Long> academicBackgroundRepo;
-    @Autowired
-    private DataRepository<Project, Long> projectRepo;
-    @Autowired
-    private DataRepository<CurriculumExperience, Long> curriculumExperienceRepo;
-
     @Id(isIdentity = true)
     private final long curriculumId;
 

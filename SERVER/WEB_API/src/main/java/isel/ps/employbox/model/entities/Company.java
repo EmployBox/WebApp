@@ -57,7 +57,12 @@ public class Company extends Account {
             float rating,
             String name,
             String Specialization,
-            short yearFounded, String logoUrl, String webPageUrl, String description, long version, long accountVersion) {
+            short yearFounded,
+            String logoUrl,
+            String webPageUrl,
+            String description,
+            long version,
+            long accountVersion) {
         super(accountID, email, password, rating, accountVersion);
         this.name = name;
         this.Specialization = Specialization;
