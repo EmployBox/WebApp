@@ -9,8 +9,6 @@ import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 
 public class OutJobExperience extends ResourceSupport {
 
-    @JsonProperty
-    private final long experienceId;
 
     @JsonProperty
     private final long jobId;
@@ -24,12 +22,11 @@ public class OutJobExperience extends ResourceSupport {
     @JsonProperty
     private final int years;
 
-    public OutJobExperience(long experienceId, long jobId, long jobExperienceId, String competence, int years) {
-        this.experienceId = experienceId;
+    public OutJobExperience(long jobExperienceId, long jobId, String competence, int years) {
         this.jobId = jobId;
         this.jobExperienceId = jobExperienceId;
         this.competence = competence;
         this.years = years;
-        this.add( linkTo( methodOn(JobController.class).getJobExperiences(this.jobId)).slash(experienceId).withSelfRel());
+        this.add( linkTo( methodOn(JobController.class).getJobExperiences(this.jobId)).slash(jobExperienceId).withSelfRel());
     }
 }

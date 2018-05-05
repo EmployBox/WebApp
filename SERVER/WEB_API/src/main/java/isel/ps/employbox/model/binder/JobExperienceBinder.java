@@ -20,7 +20,6 @@ public class JobExperienceBinder implements ModelBinder<JobExperience,OutJobExpe
                                 new OutJobExperience(
                                         jobExperience.getIdentityKey(),
                                         jobExperience.getJobId(),
-                                        jobExperience.getIdentityKey(),
                                         jobExperience.getCompetences(),
                                         jobExperience.getYears())
                 )

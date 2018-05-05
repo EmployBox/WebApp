@@ -72,6 +72,8 @@ public class JobService {
                 })
                 .thenCompose(
                         experienceList -> {
+                            if(experienceList.size() == 0)
+                                return CompletableFuture.completedFuture(true);
                             experienceList.forEach((curr) -> curr.setJobId(job.getIdentityKey()));
                             return jobExperienceRepo.createAll(experienceList);
                         }
