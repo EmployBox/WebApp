@@ -6,12 +6,12 @@ import org.springframework.hateoas.ResourceSupport;
 
 import java.sql.Date;
 
-public class PreviousJob extends ResourceSupport implements DomainObject<Long>,CurriculumChild {
+public class PreviousJobs extends ResourceSupport implements DomainObject<Long>,CurriculumChild {
 
     @Id(isIdentity = true)
     private final long previousJobId;
 
-    private final long accountId;
+    private long accountId;
     private long curriculumId;
     private final Date beginDate;
     private final Date endDate;
@@ -21,7 +21,7 @@ public class PreviousJob extends ResourceSupport implements DomainObject<Long>,C
     private final String role;
 
 
-    public PreviousJob(){
+    public PreviousJobs(){
         accountId = 0;
         curriculumId = 0;
         beginDate = null;
@@ -33,7 +33,7 @@ public class PreviousJob extends ResourceSupport implements DomainObject<Long>,C
         previousJobId = 0;
     }
 
-    public PreviousJob(
+    public PreviousJobs(
             long previousJobId,
             long userId,
             long curriculumId,
@@ -94,5 +94,9 @@ public class PreviousJob extends ResourceSupport implements DomainObject<Long>,C
 
     public void setCurriculumId(long curriculumId){
         this.curriculumId = curriculumId;
+    }
+
+    public void setAccountId(long accountId) {
+        this.accountId = accountId;
     }
 }

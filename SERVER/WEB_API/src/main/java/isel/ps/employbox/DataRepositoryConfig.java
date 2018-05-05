@@ -5,7 +5,7 @@ import com.github.jayield.rapper.utils.MapperRegistry;
 import isel.ps.employbox.model.entities.*;
 import isel.ps.employbox.model.entities.CurriculumChilds.AcademicBackground;
 import isel.ps.employbox.model.entities.CurriculumChilds.CurriculumExperience;
-import isel.ps.employbox.model.entities.CurriculumChilds.PreviousJob;
+import isel.ps.employbox.model.entities.CurriculumChilds.PreviousJobs;
 import isel.ps.employbox.model.entities.CurriculumChilds.Project;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -21,8 +21,8 @@ public class DataRepositoryConfig {
     }
 
     @Bean
-    public DataRepository<PreviousJob, Long> previousJobsBean(){
-        return new DataRepository(MapperRegistry.getRepository(PreviousJob.class));
+    public DataRepository<PreviousJobs, Long> previousJobsBean(){
+        return new DataRepository(MapperRegistry.getRepository(PreviousJobs.class));
     }
 
     @Bean

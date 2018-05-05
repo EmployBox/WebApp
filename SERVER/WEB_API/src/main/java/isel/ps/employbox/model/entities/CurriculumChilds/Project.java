@@ -7,7 +7,7 @@ public class Project implements DomainObject<Long>,CurriculumChild {
 
     @Id(isIdentity = true)
     private final long projectId;
-    private final long accountId;
+    private long accountId;
     private long curriculumId;
     private final String name;
     private final String description;
@@ -59,6 +59,10 @@ public class Project implements DomainObject<Long>,CurriculumChild {
 
     public void setCurriculumId(long curriculumId){
         this.curriculumId = curriculumId;
+    }
+
+    public void setAccountId(long accountId) {
+        this.accountId = accountId;
     }
 
 }

@@ -6,7 +6,7 @@ import isel.ps.employbox.model.binder.CurriclumBinders.*;
 import isel.ps.employbox.model.entities.*;
 import isel.ps.employbox.model.entities.CurriculumChilds.AcademicBackground;
 import isel.ps.employbox.model.entities.CurriculumChilds.CurriculumExperience;
-import isel.ps.employbox.model.entities.CurriculumChilds.PreviousJob;
+import isel.ps.employbox.model.entities.CurriculumChilds.PreviousJobs;
 import isel.ps.employbox.model.entities.CurriculumChilds.Project;
 import isel.ps.employbox.model.input.InCurriculum;
 import isel.ps.employbox.model.output.*;
@@ -23,7 +23,7 @@ public class CurriculumController {
 
     private final DataRepository <Project, Long> projectRepo;
     private final DataRepository <AcademicBackground, Long> backgroundRepo;
-    private final DataRepository <PreviousJob, Long> prevJobRepo;
+    private final DataRepository <PreviousJobs, Long> prevJobRepo;
     private final DataRepository <CurriculumExperience, Long> currExpRepo;
 
 
@@ -37,7 +37,7 @@ public class CurriculumController {
     public CurriculumController(
             DataRepository<Project, Long> projectRepository,
             DataRepository<AcademicBackground, Long> academicBackgroundLongDataRepository,
-            DataRepository<PreviousJob, Long> previousJobLongDataRepository,
+            DataRepository<PreviousJobs, Long> previousJobLongDataRepository,
             DataRepository<CurriculumExperience, Long> curriculumExperienceLongDataRepository,
             CurriculumService userService,
             CurriculumBinder curriculumBinder,
@@ -72,12 +72,12 @@ public class CurriculumController {
                 curriculumService.getCurriculum(id, cid, authentication.getName()));
     }
 
-    @GetMapping("/{cid}/academic/{projectId}")
+    @GetMapping("/{cid}/academic/{academicId}")
     public Mono<OutAcademicBackground> getAcademicBackground(
             @PathVariable long id,
             @PathVariable long cid,
-            @PathVariable long prvJbId){
-        return academicBackgroundBinder.bindOutput(curriculumService.getCurriculumChild(backgroundRepo, id, cid, prvJbId));
+            @PathVariable long academicId){
+        return academicBackgroundBinder.bindOutput(curriculumService.getCurriculumChild(backgroundRepo, id, cid, academicId));
     }
 
     @GetMapping("/{cid}/academic")
@@ -94,8 +94,8 @@ public class CurriculumController {
     public Mono<OutProject> getProjects (
             @PathVariable long id,
             @PathVariable long cid,
-            @PathVariable long prvJbId){
-        return projectBinder.bindOutput(curriculumService.getCurriculumChild(projectRepo, id, cid, prvJbId));
+            @PathVariable long projectId){
+        return projectBinder.bindOutput(curriculumService.getCurriculumChild(projectRepo, id, cid, projectId));
     }
 
     @GetMapping("/{cid}/projects")
@@ -242,7 +242,7 @@ public class CurriculumController {
 
     @PutMapping("/{cid}/project/{ceId}")
     public Mono<Void> updateProject(
-            @PathVariable long pjId,
+            @PathVariable long ceId,
             @PathVariable long id,
             @PathVariable long cid,
             @RequestBody Project project,
@@ -250,7 +250,7 @@ public class CurriculumController {
     ){
         if(project.getAccountId() != id || project.getCurriculumId() != cid)
             throw new BadRequestException(badRequest_IdsMismatch);
-        return curriculumService.updateProject(pjId, id, cid, project,authentication.getName() );
+        return curriculumService.updateProject(ceId, id, cid, project,authentication.getName() );
     }
 
     @DeleteMapping("/{cid}/project/{pjId}")
@@ -264,10 +264,10 @@ public class CurriculumController {
     }
 
     @PostMapping("/{cid}/previousJob")
-    public Mono<PreviousJob> addPreviousJob (
+    public Mono<PreviousJobs> addPreviousJob (
             @PathVariable long id,
             @PathVariable long cid,
-            @RequestBody PreviousJob previousJobs,
+            @RequestBody PreviousJobs previousJobs,
             Authentication authentication)
     {
         return Mono.fromFuture( curriculumService.addPreviousJobToCurriculum(id,cid, previousJobs,authentication.getName()));
@@ -278,7 +278,7 @@ public class CurriculumController {
             @PathVariable long pvjId,
             @PathVariable long id,
             @PathVariable long cid,
-            @RequestBody PreviousJob previousJobs,
+            @RequestBody PreviousJobs previousJobs,
             Authentication authentication)
     {
         if(previousJobs.getAccountId() != id || previousJobs.getCurriculumId() != cid)

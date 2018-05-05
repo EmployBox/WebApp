@@ -6,7 +6,7 @@ import com.github.jayield.rapper.DomainObject;
 import com.github.jayield.rapper.Id;
 import isel.ps.employbox.model.entities.CurriculumChilds.AcademicBackground;
 import isel.ps.employbox.model.entities.CurriculumChilds.CurriculumExperience;
-import isel.ps.employbox.model.entities.CurriculumChilds.PreviousJob;
+import isel.ps.employbox.model.entities.CurriculumChilds.PreviousJobs;
 import isel.ps.employbox.model.entities.CurriculumChilds.Project;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -15,7 +15,7 @@ import java.util.concurrent.CompletableFuture;
 
 public class Curriculum implements DomainObject<Long> {
     @Autowired
-    private DataRepository<PreviousJob, Long> previousJobsRepo;
+    private DataRepository<PreviousJobs, Long> previousJobsRepo;
     @Autowired
     private DataRepository<AcademicBackground, Long> academicBackgroundRepo;
     @Autowired
@@ -31,7 +31,7 @@ public class Curriculum implements DomainObject<Long> {
     private final long version;
 
     @ColumnName(foreignName = "curriculumId" )
-    private final CompletableFuture<List<PreviousJob>> previousJobs;
+    private final CompletableFuture<List<PreviousJobs>> previousJobs;
 
     @ColumnName(foreignName = "curriculumId" )
     private final CompletableFuture<List<AcademicBackground>> academicBackground;
@@ -67,7 +67,7 @@ public class Curriculum implements DomainObject<Long> {
     public Curriculum(long accountId,
                       long curriculumId,
                       String title,
-                      List<PreviousJob> previousJobsList,
+                      List<PreviousJobs> previousJobsList,
                       List<AcademicBackground> academicBackgroundList ,
                       List<CurriculumExperience> experiencesList,
                       List<Project> projectsList)
@@ -99,7 +99,7 @@ public class Curriculum implements DomainObject<Long> {
         return title;
     }
 
-    public CompletableFuture<List<PreviousJob>> getPreviousJobs() {
+    public CompletableFuture<List<PreviousJobs>> getPreviousJobs() {
         return previousJobs;
     }
 

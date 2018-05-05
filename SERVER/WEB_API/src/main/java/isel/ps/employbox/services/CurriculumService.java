@@ -23,14 +23,14 @@ public class CurriculumService {
     private final UserService userService;
 
     private final DataRepository<Curriculum, Long> curriculumRepo;
-    private final DataRepository<PreviousJob, Long> previousJobsRepo;
+    private final DataRepository<PreviousJobs, Long> previousJobsRepo;
     private final DataRepository<AcademicBackground, Long> academicBackgroundRepo;
     private final DataRepository<Project, Long> projectRepo;
     private final DataRepository<CurriculumExperience, Long> curriculumExperienceRepo;
 
     public CurriculumService(UserService userService,
                              DataRepository<Curriculum, Long> curriculumRepo,
-                             DataRepository<PreviousJob, Long> previousJobsRepo,
+                             DataRepository<PreviousJobs, Long> previousJobsRepo,
                              DataRepository<AcademicBackground, Long> academicBackgroundRepo,
                              DataRepository<Project, Long> projectRepo,
                              DataRepository<CurriculumExperience, Long> curriculumExperienceRepo)
@@ -47,7 +47,6 @@ public class CurriculumService {
         if (curriculum.getAccountId() != userId)
             throw new BadRequestException(ErrorMessages.badRequest_IdsMismatch);
 
-
         return userService.getUser(userId, email)
                 .thenCompose(__ -> curriculumRepo.create(curriculum))
                 .thenApply(res -> {
@@ -55,44 +54,81 @@ public class CurriculumService {
                     return curriculum;
                 }).thenCompose(
                         (__) -> {
-                            List<CompletableFuture<Boolean>> creates = new ArrayList<>();
-
-                            creates.add(curriculum.getPreviousJobs()
-                                    .thenApply(previousJobsList -> {
-                                        previousJobsList.forEach( curr -> curr.setCurriculumId(curriculum.getIdentityKey()));
-                                        return previousJobsList;
-                                    })
-                                    .thenCompose(previousJobsRepo::createAll)
-                            );
-
-                            creates.add(curriculum.getAcademicBackground()
-                                    .thenApply(academicBackgroundList -> {
-                                        academicBackgroundList.forEach(curr -> curr.setCurriculumId (curriculum.getIdentityKey()));
-                                        return academicBackgroundList;
-                                    }).thenCompose(academicBackgroundRepo::createAll));
-
-                            creates.add(curriculum.getExperiences().thenApply(experienceList -> {
-                                experienceList.forEach( curr -> curr.setCurriculumId(curriculum.getIdentityKey()));
-                                return experienceList;
-                            }).thenCompose(curriculumExperienceRepo::createAll));
-
-                            creates.add(curriculum.getProjects()
-                                    .thenApply(projectList -> {
-                                        projectList.forEach(curr -> curr.setCurriculumId(curriculum.getIdentityKey()));
-                                        return projectList;
-                                    })
-                                    .thenCompose(projectRepo::createAll));
-
-                            return creates
+                            List<CompletableFuture<Boolean>> list = new ArrayList<>();
+                            populateChildList(list, curriculum, userId);
+                            return list
                                     .stream()
                                     .reduce(CompletableFuture.completedFuture(true), (a, b) -> a.thenCombine(b, (a2, b2) -> a2 && b2));
                         }
                 ).thenApply(
                         res -> {
-                             if(!res) throw new BadRequestException(ErrorMessages.childsCreation);
-                             return curriculum;
+                            if (!res) throw new BadRequestException(ErrorMessages.childsCreation);
+                            return curriculum;
                         }
                 );
+    }
+
+    private void populateChildList(List<CompletableFuture<Boolean>> creationList, Curriculum curriculum, long userId){
+        creationList.add(curriculum.getPreviousJobs()
+                .thenApply(previousJobsList -> {
+                    previousJobsList.forEach(curr -> {
+                        curr.setAccountId(userId);
+                        curr.setCurriculumId(curriculum.getIdentityKey());
+                    });
+                    return previousJobsList;
+                })
+                .thenCompose( list -> {
+                    if(list.size() == 0)
+                        return CompletableFuture.completedFuture(true);
+                    return previousJobsRepo.createAll(list);
+                })
+        );
+
+        creationList.add(curriculum.getAcademicBackground()
+                .thenApply(academicBackgroundList -> {
+                    academicBackgroundList.forEach(curr -> {
+                                curr.setAccountId(userId);
+                                curr.setCurriculumId(curriculum.getIdentityKey());
+                            }
+                    );
+                    return academicBackgroundList;
+                }).thenCompose(
+                        list -> {
+                            if(list.size() == 0)
+                                return CompletableFuture.completedFuture(true);
+                            return academicBackgroundRepo.createAll(list);
+                        })
+        );
+
+        creationList.add(curriculum.getExperiences().thenApply(experienceList -> {
+            experienceList.forEach(curr -> {
+                curr.setAccountId(userId);
+                curr.setCurriculumId(curriculum.getIdentityKey());
+            });
+            return experienceList;
+        }).thenCompose(
+                list -> {
+                    if(list.size() == 0)
+                        return CompletableFuture.completedFuture(true);
+                    return curriculumExperienceRepo.createAll(list);
+                }
+        ));
+
+        creationList.add(curriculum.getProjects()
+                .thenApply(projectList -> {
+                    projectList.forEach(curr -> {
+                        curr.setAccountId(userId);
+                        curr.setCurriculumId(curriculum.getIdentityKey());
+                    });
+                    return projectList;
+                })
+                .thenCompose(
+                        list -> {
+                            if(list.size() == 0)
+                                return  CompletableFuture.completedFuture(true);
+                            return projectRepo.createAll(list);
+                        })
+        );
     }
 
     public CompletableFuture<Stream<Curriculum>> getCurricula(long userId, String email)
@@ -153,7 +189,7 @@ public class CurriculumService {
                 });
     }
 
-    public CompletableFuture<Stream<PreviousJob>> getCurriculumPreviousJobs(long curriculumId){
+    public CompletableFuture<Stream<PreviousJobs>> getCurriculumPreviousJobs(long curriculumId){
         return previousJobsRepo.findWhere(new Pair<>("curriculumId",curriculumId))
                 .thenApply( opreviousJobs -> opreviousJobs.stream());
     }
@@ -174,10 +210,10 @@ public class CurriculumService {
     }
 
 
-    public CompletableFuture<PreviousJob> addPreviousJobToCurriculum (
+    public CompletableFuture<PreviousJobs> addPreviousJobToCurriculum (
             long accountId,
             long curriculumId,
-            PreviousJob previousJobs,
+            PreviousJobs previousJobs,
             String email
     ) {
         if(previousJobs.getAccountId() != accountId || previousJobs.getCurriculumId() != curriculumId)
@@ -244,7 +280,7 @@ public class CurriculumService {
             long pvjId,
             long accountId,
             long curriculumId,
-            PreviousJob previousJobs,
+            PreviousJobs previousJobs,
             String email
     ) {
         if(previousJobs.getAccountId() != pvjId)

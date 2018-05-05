@@ -1,7 +1,7 @@
 package isel.ps.employbox.model.binder.CurriclumBinders;
 
 import isel.ps.employbox.model.binder.ModelBinder;
-import isel.ps.employbox.model.entities.CurriculumChilds.PreviousJob;
+import isel.ps.employbox.model.entities.CurriculumChilds.PreviousJobs;
 import isel.ps.employbox.model.output.OutPreviousJobs;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
@@ -10,9 +10,9 @@ import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 import java.util.concurrent.CompletableFuture;
 
 @Component
-public class PreviousJobsBinder implements ModelBinder<PreviousJob, OutPreviousJobs, Void> {
+public class PreviousJobsBinder implements ModelBinder<PreviousJobs, OutPreviousJobs, Void> {
     @Override
-    public Mono<OutPreviousJobs> bindOutput(CompletableFuture<PreviousJob> outPreviousJobsCompletableFuture) {
+    public Mono<OutPreviousJobs> bindOutput(CompletableFuture<PreviousJobs> outPreviousJobsCompletableFuture) {
         return Mono.fromFuture(
                 outPreviousJobsCompletableFuture.thenApply(
                         previousJob -> new OutPreviousJobs(
@@ -29,7 +29,7 @@ public class PreviousJobsBinder implements ModelBinder<PreviousJob, OutPreviousJ
     }
 
     @Override
-    public PreviousJob bindInput(Void object) {
+    public PreviousJobs bindInput(Void object) {
         throw new NotImplementedException();
     }
 }

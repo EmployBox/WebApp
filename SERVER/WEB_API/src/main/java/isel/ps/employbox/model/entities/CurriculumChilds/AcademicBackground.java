@@ -8,10 +8,10 @@ import java.sql.Date;
 public class AcademicBackground implements DomainObject<Long>,CurriculumChild {
 
     @Id(isIdentity = true)
-    private Long academicBackgroundKey;
+    private final long academicBackgroundKey;
 
-    private final long accountId;
-    private final long curriculumId;
+    private long accountId;
+    private long curriculumId;
     private final Date beginDate;
     private final Date endDate;
     private final String studyArea;
@@ -28,7 +28,7 @@ public class AcademicBackground implements DomainObject<Long>,CurriculumChild {
         institution = null;
         degreeObtained = null;
         version = 0;
-        academicBackgroundKey = null;
+        academicBackgroundKey = 0;
     }
 
     public AcademicBackground(long userId, long curriculumId, Date beginDate, Date endDate, String studyArea, String institution, String degreeObtained, long version, Long academicBackgroundKey) {
@@ -80,7 +80,11 @@ public class AcademicBackground implements DomainObject<Long>,CurriculumChild {
         return institution;
     }
 
-    public void setCurriculumId(long academicBackgroundKey){
-        this.academicBackgroundKey = academicBackgroundKey;
+    public void setCurriculumId(long curriculumId){
+        this.curriculumId = curriculumId;
+    }
+
+    public void setAccountId(long accountId) {
+        this.accountId = accountId;
     }
 }

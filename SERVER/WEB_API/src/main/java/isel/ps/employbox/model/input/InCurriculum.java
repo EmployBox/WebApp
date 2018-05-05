@@ -2,7 +2,7 @@ package isel.ps.employbox.model.input;
 
 import isel.ps.employbox.model.entities.CurriculumChilds.AcademicBackground;
 import isel.ps.employbox.model.entities.CurriculumChilds.CurriculumExperience;
-import isel.ps.employbox.model.entities.CurriculumChilds.PreviousJob;
+import isel.ps.employbox.model.entities.CurriculumChilds.PreviousJobs;
 import isel.ps.employbox.model.entities.CurriculumChilds.Project;
 
 import java.util.Collections;
@@ -13,7 +13,7 @@ public class InCurriculum {
     private long curriculumId;
     private String title;
     private List<CurriculumExperience> experiences = Collections.emptyList();
-    private List<PreviousJob> previousJobs = Collections.emptyList();
+    private List<PreviousJobs> previousJobs = Collections.emptyList();
     private List<Project> projects = Collections.emptyList();
     private List<AcademicBackground> academicBackground = Collections.emptyList();
 
@@ -33,7 +33,7 @@ public class InCurriculum {
         return experiences;
     }
 
-    public List<PreviousJob> getPreviousJobs() {
+    public List<PreviousJobs> getPreviousJobs() {
         return previousJobs;
     }
 
@@ -61,7 +61,7 @@ public class InCurriculum {
         this.experiences = experiences;
     }
 
-    public void setPreviousJobs(List<PreviousJob> previousJobs) {
+    public void setPreviousJobs(List<PreviousJobs> previousJobs) {
         this.previousJobs = previousJobs;
     }
 
