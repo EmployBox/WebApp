@@ -13,7 +13,7 @@ public class Application implements DomainObject<Long> {
     private final long applicationId;
     private final long accountId;
     private final long jobId;
-    private final long curriculumId;
+    private final Long curriculumId;
     private final Timestamp date;
     @Version
     private final long version;
@@ -21,13 +21,13 @@ public class Application implements DomainObject<Long> {
     public Application(){
         accountId = 0;
         jobId = 0;
-        curriculumId = 0;
+        curriculumId = null;
         date = null;
         version = 0;
         applicationId = 0;
     }
 
-    public Application(long applicationId, long userId, long jobId, long curriculumId, Timestamp date, long version) {
+    public Application(long applicationId, long userId, long jobId, Long curriculumId, Timestamp date, long version) {
         this.applicationId = applicationId;
         this.accountId = userId;
         this.jobId = jobId;
@@ -36,7 +36,7 @@ public class Application implements DomainObject<Long> {
         this.version = version;
     }
 
-    public Application(long userId, long jobId, long curriculumId, Timestamp date) {
+    public Application(long userId, long jobId, Long curriculumId, Timestamp date) {
         this.applicationId = -1;
         this.accountId = userId;
         this.jobId = jobId;
@@ -59,7 +59,7 @@ public class Application implements DomainObject<Long> {
         return date;
     }
 
-    public long getCurriculumId() {
+    public Long getCurriculumId() {
         return curriculumId;
     }
 

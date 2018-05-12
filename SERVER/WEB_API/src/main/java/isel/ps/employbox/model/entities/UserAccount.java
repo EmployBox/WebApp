@@ -23,8 +23,8 @@ public class UserAccount extends Account {
         name = null;
         summary = null;
         photoUrl = null;
-        curricula = null;
-        applications = null;
+        curricula = CompletableFuture.completedFuture(Collections.emptyList());
+        applications = CompletableFuture.completedFuture(Collections.emptyList());
         version = 0;
     }
 
@@ -42,8 +42,9 @@ public class UserAccount extends Account {
                        CompletableFuture<List<Chat>> chats,
                        CompletableFuture<List<Comment>> comments,
                        CompletableFuture<List<Rating>> ratings,
-                       CompletableFuture<List<UserAccount>> followers, long version1)
-    {
+                       CompletableFuture<List<UserAccount>> followers,
+                       long version1
+    ) {
         super(accountID, email, password, rating, version, offeredJobs, comments, chats, ratings, followers);
         this.name = name;
         this.summary = summary;

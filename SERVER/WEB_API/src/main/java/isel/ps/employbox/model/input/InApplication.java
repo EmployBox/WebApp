@@ -5,7 +5,7 @@ import java.sql.Timestamp;
 public class InApplication {
     private long accountId;
     private long jobId;
-    private long curriculumId;
+    private Long curriculumId;
     private Timestamp date;
 
     public long getAccountId() {
@@ -24,11 +24,11 @@ public class InApplication {
         this.jobId = jobId;
     }
 
-    public long getCurriculumId() {
+    public Long getCurriculumId() {
         return curriculumId;
     }
 
-    public void setCurriculumId(long curriculumId) {
+    public void setCurriculumId(Long curriculumId) {
         this.curriculumId = curriculumId;
     }
 

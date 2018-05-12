@@ -18,16 +18,17 @@ public class OutApplication extends ResourceSupport {
     private long jobId;
 
     @JsonProperty
-    private long curriculumId;
+    private Long curriculumId;
 
     @JsonProperty
     private Timestamp date;
 
-    public OutApplication(long userId, long jobId, long curriculumId, Timestamp date){
+    public OutApplication(long userId, long jobId, Long curriculumId, Timestamp date){
         this.accountId = userId;
         this.jobId = jobId;
         this.curriculumId = curriculumId;
         this.date = date;
-        this.add( linkTo( methodOn(UserController.class,userId)).slash(userId).withSelfRel());
+        //TODO link not well done
+        this.add( linkTo( methodOn(UserController.class).getApplication(userId, jobId)).withSelfRel());
     }
 }
