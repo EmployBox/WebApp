@@ -35,8 +35,8 @@ IF DB_ID ('PS_API_DATABASE') IS NOT NULL
 			DROP TABLE [Curriculum];
 		IF OBJECT_ID(N'[Moderator]') IS NOT NULL
 			DROP TABLE [Moderator];
-		IF OBJECT_ID(N'[User]') IS NOT NULL
-			DROP TABLE [User];
+		IF OBJECT_ID(N'[UserAccount]') IS NOT NULL
+			DROP TABLE [UserAccount];
 		IF OBJECT_ID(N'[Company]') IS NOT NULL
 			DROP TABLE [Company];
 		IF OBJECT_ID(N'[Account]') IS NOT NULL

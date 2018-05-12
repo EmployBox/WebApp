@@ -3,8 +3,9 @@ package isel.ps.employbox.model.entities;
 import com.github.jayield.rapper.ColumnName;
 import com.github.jayield.rapper.DomainObject;
 import com.github.jayield.rapper.Id;
+import com.github.jayield.rapper.Version;
 
-import java.sql.Date;
+import java.sql.Timestamp;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
@@ -19,9 +20,10 @@ public class Job implements DomainObject<Long> {
     private final int wage;
     private final String description;
     private final String schedule;
-    private final Date offerBeginDate;
-    private final Date offerEndDate;
+    private final Timestamp offerBeginDate;
+    private final Timestamp offerEndDate;
     private final String offerType;
+    @Version
     private final long version;
 
     @ColumnName(foreignName = "jobId")
@@ -53,8 +55,8 @@ public class Job implements DomainObject<Long> {
             int wage,
             String description,
             String schedule,
-            Date offerBeginDate,
-            Date offerEndDate,
+            Timestamp offerBeginDate,
+            Timestamp offerEndDate,
             String offerType,
             long version,
             CompletableFuture<List<Application>> applications,
@@ -83,8 +85,8 @@ public class Job implements DomainObject<Long> {
             int wage,
             String description,
             String schedule,
-            Date offerBeginDate,
-            Date offerEndDate,
+            Timestamp offerBeginDate,
+            Timestamp offerEndDate,
             String offerType,
             List<JobExperience> experiences,
             long version
@@ -130,11 +132,11 @@ public class Job implements DomainObject<Long> {
         return schedule;
     }
 
-    public Date getOfferBeginDate() {
+    public Timestamp getOfferBeginDate() {
         return offerBeginDate;
     }
 
-    public Date getOfferEndDate() {
+    public Timestamp getOfferEndDate() {
         return offerEndDate;
     }
 

@@ -17,82 +17,81 @@ public class DataRepositoryConfig {
 
     @Bean
     public DataRepository<Project, Long> projectBean(){
-        return new DataRepository(MapperRegistry.getRepository(Project.class));
+        return MapperRegistry.getRepository(Project.class);
     }
 
     @Bean
     public DataRepository<PreviousJobs, Long> previousJobsBean(){
-        return new DataRepository(MapperRegistry.getRepository(PreviousJobs.class));
+        return MapperRegistry.getRepository(PreviousJobs.class);
     }
 
     @Bean
     public DataRepository<AcademicBackground, Long> academicBackgroundAcademicBean(){
-        return new DataRepository(MapperRegistry.getRepository(AcademicBackground.class));
+        return MapperRegistry.getRepository(AcademicBackground.class);
     }
 
     @Bean
     public DataRepository<CurriculumExperience, Long> curriculumExperienceRepoBean(){
-        return new DataRepository(MapperRegistry.getRepository(CurriculumExperience.class));
+        return MapperRegistry.getRepository(CurriculumExperience.class);
     }
 
     @Bean
     public DataRepository<Curriculum, Long> curriculumRepoBean(){
-        return new DataRepository(MapperRegistry.getRepository(Curriculum.class));
+        return MapperRegistry.getRepository(Curriculum.class);
     }
 
     @Bean
     public DataRepository<Follow, FollowKey> followRepoBean(){
-        return new DataRepository(MapperRegistry.getRepository(Follow.class));
+        return MapperRegistry.getRepository(Follow.class);
     }
 
     @Bean
     public DataRepository<Application, Long> applicationRepoBean(){
-        return new DataRepository(MapperRegistry.getRepository(Application.class));
+        return MapperRegistry.getRepository(Application.class);
     }
 
     @Bean
     public DataRepository<Job, Long> jobRepoBean(){
-        return new DataRepository(MapperRegistry.getRepository(Job.class));
+        return MapperRegistry.getRepository(Job.class);
     }
 
     @Bean
     public DataRepository<Rating,Rating.RatingKey> ratingRepoBean(){
-        return new DataRepository(MapperRegistry.getRepository(Rating.class));
+        return MapperRegistry.getRepository(Rating.class);
     }
 
     @Bean
     public DataRepository<Comment,Long > commentRepoBean(){
-        return new DataRepository(MapperRegistry.getRepository(Comment.class));
+        return MapperRegistry.getRepository(Comment.class);
     }
 
     @Bean
     public DataRepository<Chat, Long>  chatRepoBean(){
-        return new DataRepository(MapperRegistry.getRepository(Chat.class));
+        return MapperRegistry.getRepository(Chat.class);
     }
 
     @Bean
     public DataRepository<Message, Long>  messageRepoBean(){
-        return new DataRepository(MapperRegistry.getRepository(Message.class));
+        return MapperRegistry.getRepository(Message.class);
     }
 
     @Bean
     public DataRepository<Account, Long>  accountRepoBean(){
-        return new DataRepository(MapperRegistry.getRepository(Account.class));
+        return MapperRegistry.getRepository(Account.class);
     }
 
     @Bean
-    public DataRepository<User, Long>  userRepoBean(){
-        return new DataRepository(MapperRegistry.getRepository(User.class));
+    public DataRepository<UserAccount, Long>  userRepoBean(){
+        return MapperRegistry.getRepository(UserAccount.class);
     }
 
     @Bean
     public DataRepository<Company, Long>  companyRepoBean(){
-        return new DataRepository(MapperRegistry.getRepository(Company.class));
+        return MapperRegistry.getRepository(Company.class);
     }
 
     @Bean
     public DataRepository<JobExperience, Long> jobExperienceRepoBean(){
-        return new DataRepository(MapperRegistry.getRepository(JobExperience.class));
+        return MapperRegistry.getRepository(JobExperience.class);
     }
-
 }

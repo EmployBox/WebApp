@@ -1,9 +1,12 @@
 package isel.ps.employbox.model.entities;
 
+import com.github.jayield.rapper.ColumnName;
+
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 public class Moderator extends Account {
+    @ColumnName(foreignName = "moderatorId")
     private final CompletableFuture<List<Rating>> ratingsModerated;
 
     public Moderator(){
@@ -19,7 +22,8 @@ public class Moderator extends Account {
             CompletableFuture<List<Comment>> comments,
             CompletableFuture<List<Chat>> chats,
             CompletableFuture<List<Rating>> ratings,
-            CompletableFuture<List<Rating>> ratingsModerated) {
+            CompletableFuture<List<Rating>> ratingsModerated
+    ) {
         super(accountID, email, password, rating, version, null, comments, chats, ratings, null);
         this.ratingsModerated = ratingsModerated;
     }

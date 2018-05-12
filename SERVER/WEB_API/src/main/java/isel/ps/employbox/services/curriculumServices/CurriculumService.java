@@ -8,7 +8,7 @@ import isel.ps.employbox.exceptions.ConflictException;
 import isel.ps.employbox.exceptions.ResourceNotFoundException;
 import isel.ps.employbox.model.entities.Curriculum;
 import isel.ps.employbox.model.entities.CurriculumChilds.*;
-import isel.ps.employbox.model.entities.User;
+import isel.ps.employbox.model.entities.UserAccount;
 import isel.ps.employbox.services.UserService;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
@@ -145,7 +145,7 @@ public class CurriculumService {
 
     public CompletableFuture<Curriculum> getCurriculum(long userId, long cid, String email) {
         return userService.getUser(userId, email)
-                .thenCompose(User::getCurricula)
+                .thenCompose(UserAccount::getCurricula)
                 .thenApply(curricula -> {
                     Optional<Curriculum> oret;
                     if (curricula.isEmpty() || !(oret = curricula.stream().filter(curr -> curr.getIdentityKey() == cid).findFirst()).isPresent())

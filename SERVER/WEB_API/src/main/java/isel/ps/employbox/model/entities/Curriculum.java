@@ -3,6 +3,7 @@ package isel.ps.employbox.model.entities;
 import com.github.jayield.rapper.ColumnName;
 import com.github.jayield.rapper.DomainObject;
 import com.github.jayield.rapper.Id;
+import com.github.jayield.rapper.Version;
 import isel.ps.employbox.model.entities.CurriculumChilds.AcademicBackground;
 import isel.ps.employbox.model.entities.CurriculumChilds.CurriculumExperience;
 import isel.ps.employbox.model.entities.CurriculumChilds.PreviousJobs;
@@ -17,6 +18,7 @@ public class Curriculum implements DomainObject<Long> {
 
     private final long accountId;
     private final String title;
+    @Version
     private final long version;
 
     @ColumnName(foreignName = "curriculumId" )

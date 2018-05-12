@@ -1,5 +1,7 @@
 package isel.ps.employbox.model.entities;
 
+import com.github.jayield.rapper.Version;
+
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
@@ -10,6 +12,7 @@ public class Company extends Account {
     private final String logoUrl;
     private final String webPageUrl;
     private final String description;
+    @Version
     private final long version;
 
     public Company(){
@@ -38,7 +41,7 @@ public class Company extends Account {
             CompletableFuture<List<Chat>> chats,
             CompletableFuture<List<Comment>> comments,
             CompletableFuture<List<Rating>> ratings,
-            CompletableFuture<List<User>> following)
+            CompletableFuture<List<UserAccount>> following)
     {
         super(accountID, email, password, rating, version, offeredJobs,comments, chats, ratings, following);
         this.name = name;

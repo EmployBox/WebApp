@@ -2,33 +2,27 @@ package isel.ps.employbox.model.entities;
 
 import com.github.jayield.rapper.DomainObject;
 import com.github.jayield.rapper.EmbeddedId;
+import com.github.jayield.rapper.Version;
+import com.github.jayield.rapper.utils.EmbeddedIdClass;
 
 public class Follow implements DomainObject<Follow.FollowKey> {
 
     @EmbeddedId
     private final FollowKey followKey;
-
-    private final long accountIdFollower;
-    private final long accountIdFollowed;
+    @Version
     private final long version;
 
     public Follow(){
-        followKey = null;
-        accountIdFollower = 0;
-        accountIdFollowed = 0;
+        followKey = new FollowKey();
         version = 0;
     }
 
     public Follow(long accountIdFollower, long accountIdFollowed, long version) {
-        this.accountIdFollower = accountIdFollower;
-        this.accountIdFollowed = accountIdFollowed;
         this.version = version;
         followKey = new FollowKey(accountIdFollowed, accountIdFollower);
     }
 
     public Follow(long accountIdFollower, long accountIdFollowed) {
-        this.accountIdFollower = accountIdFollower;
-        this.accountIdFollowed = accountIdFollowed;
         this.version = -1;
         followKey = new FollowKey(accountIdFollowed, accountIdFollower);
     }
@@ -43,20 +37,25 @@ public class Follow implements DomainObject<Follow.FollowKey> {
     }
 
     public long getAccountIdFollower() {
-        return accountIdFollower;
+        return followKey.getAccountIdFollower();
     }
 
     public long getAccountIdFollowed() {
-        return accountIdFollowed;
+        return followKey.getAccountIdFollowed();
     }
 
-    public static class FollowKey {
-        private long accountIdFollower;
-        private long accountIdFollowed;
+    public static class FollowKey extends EmbeddedIdClass {
+        private final long accountIdFollower;
+        private final long accountIdFollowed;
 
-        public FollowKey(){}
+        public FollowKey(){
+            super();
+            accountIdFollowed = 0;
+            accountIdFollower = 0;
+        }
 
         public FollowKey(long accountIdFollowed, long accountIdFollower) {
+            super(accountIdFollowed, accountIdFollower);
             this.accountIdFollower = accountIdFollowed;
             this.accountIdFollowed = accountIdFollower;
         }

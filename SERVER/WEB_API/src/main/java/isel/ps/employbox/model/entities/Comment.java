@@ -3,6 +3,7 @@ package isel.ps.employbox.model.entities;
 import com.github.jayield.rapper.ColumnName;
 import com.github.jayield.rapper.DomainObject;
 import com.github.jayield.rapper.Id;
+import com.github.jayield.rapper.Version;
 
 import java.sql.Date;
 import java.util.List;
@@ -18,6 +19,7 @@ public class Comment implements DomainObject<Long> {
     private final Date date;
     private final String text;
     private final boolean status; //moderated or not
+    @Version
     private final long version;
 
     @ColumnName(foreignName = "mainCommentId")

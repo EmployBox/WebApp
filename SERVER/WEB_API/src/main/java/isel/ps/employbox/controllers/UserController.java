@@ -4,7 +4,7 @@ import isel.ps.employbox.exceptions.BadRequestException;
 import isel.ps.employbox.model.binder.ApplicationBinder;
 import isel.ps.employbox.model.binder.UserBinder;
 import isel.ps.employbox.model.entities.Application;
-import isel.ps.employbox.model.entities.User;
+import isel.ps.employbox.model.entities.UserAccount;
 import isel.ps.employbox.model.input.InApplication;
 import isel.ps.employbox.model.input.InUser;
 import isel.ps.employbox.model.output.HalCollection;
@@ -65,8 +65,8 @@ public class UserController {
             Authentication authentication)
     {
         if(inUser.getId() != id) throw new BadRequestException(BAD_REQUEST_IDS_MISMATCH);
-        User user = userBinder.bindInput(inUser);
-        return userService.updateUser(user, authentication.getName());
+        UserAccount userAccount = userBinder.bindInput(inUser);
+        return userService.updateUser(userAccount, authentication.getName());
     }
 
     @PutMapping("/{id}/applications/{jid}")
@@ -84,8 +84,8 @@ public class UserController {
 
     @PostMapping
     public Mono<OutUser> createUser( @RequestBody InUser inUser ){
-        User user = userBinder.bindInput(inUser);
-        return userBinder.bindOutput( userService.createUser(user) );
+        UserAccount userAccount = userBinder.bindInput(inUser);
+        return userBinder.bindOutput( userService.createUser(userAccount) );
     }
 
     @PostMapping("/{id}/applications/{jid}")

@@ -3,6 +3,8 @@ package isel.ps.employbox.model.entities;
 
 import com.github.jayield.rapper.DomainObject;
 import com.github.jayield.rapper.EmbeddedId;
+import com.github.jayield.rapper.Version;
+import com.github.jayield.rapper.utils.EmbeddedIdClass;
 
 public class Rating implements DomainObject<Rating.RatingKey> {
     @EmbeddedId
@@ -17,6 +19,7 @@ public class Rating implements DomainObject<Rating.RatingKey> {
     private final float ponctuality;
     private final float assiduity;
     private final float demeanor;
+    @Version
     private final long version;
 
     public Rating(){
@@ -103,17 +106,18 @@ public class Rating implements DomainObject<Rating.RatingKey> {
         return version;
     }
 
-    public static class RatingKey {
+    public static class RatingKey extends EmbeddedIdClass {
         private final long accountIdFrom;
         private final long accountIdTo;
 
         public RatingKey(){
+            super();
             accountIdFrom = 0;
             accountIdTo = 0;
         }
 
         public RatingKey(long accountIdFollowed, long accountIdFollower) {
-
+            super(accountIdFollowed, accountIdFollower);
             this.accountIdFrom = accountIdFollowed;
             this.accountIdTo = accountIdFollower;
         }

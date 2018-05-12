@@ -41,7 +41,7 @@ CREATE TABLE [Moderator] (
 	FOREIGN KEY (accountID) REFERENCES Account(accountID)
 )
 
-CREATE TABLE [User] (
+CREATE TABLE [UserAccount] (
 	accountId BIGINT primary key references Account,
 	name NVARCHAR(40),
 	summary NVARCHAR(1500),
@@ -52,12 +52,12 @@ CREATE TABLE [User] (
 )
 
 CREATE TABLE [Curriculum](
-	accountId BIGINT references [User],
+	accountId BIGINT references [UserAccount],
 	curriculumId BIGINT identity primary key,
 	title nvarchar(50),
     [version] rowversion
 
-	FOREIGN KEY (accountId) REFERENCES [User] (accountId)
+	FOREIGN KEY (accountId) REFERENCES [UserAccount] (accountId)
 )
 
 CREATE TABLE [Project] (

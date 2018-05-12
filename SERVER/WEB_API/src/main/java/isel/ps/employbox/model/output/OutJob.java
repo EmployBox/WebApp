@@ -5,7 +5,7 @@ import isel.ps.employbox.controllers.JobController;
 import isel.ps.employbox.controllers.UserController;
 import org.springframework.hateoas.ResourceSupport;
 
-import java.sql.Date;
+import java.sql.Timestamp;
 
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
@@ -34,10 +34,10 @@ public class OutJob extends ResourceSupport {
     private final String schedule;
 
     @JsonProperty
-    private final Date offerBeginDate;
+    private final Timestamp offerBeginDate;
 
     @JsonProperty
-    private final Date offerEndDate;
+    private final Timestamp offerEndDate;
 
     @JsonProperty
     private final String offerType;
@@ -51,8 +51,8 @@ public class OutJob extends ResourceSupport {
             double wage,
             String description,
             String schedule,
-            Date offerBeginDate,
-            Date offerEndDate,
+            Timestamp offerBeginDate,
+            Timestamp offerEndDate,
             String offerType)
     {
         this.accountId = accountID;

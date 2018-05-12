@@ -3,6 +3,7 @@ package isel.ps.employbox.model.entities;
 import com.github.jayield.rapper.ColumnName;
 import com.github.jayield.rapper.DomainObject;
 import com.github.jayield.rapper.Id;
+import com.github.jayield.rapper.Version;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -27,7 +28,7 @@ public class Account implements DomainObject<Long>, UserDetails, Serializable {
     protected final String password;
     protected final double rating;
     private static final Role role = DEFAULT;
-
+    @Version
     private final long version;
 
     @ColumnName(foreignName = "accountId")
@@ -37,7 +38,7 @@ public class Account implements DomainObject<Long>, UserDetails, Serializable {
     protected final CompletableFuture<List<Comment>> comments;
 
     @ColumnName(table = "Follows", foreignName = "accountIdFollowed", externalName = "accountIdFollower")
-    protected final CompletableFuture<List<User>> following;
+    protected final CompletableFuture<List<UserAccount>> following;
 
     @ColumnName( foreignName = "accountIdFirst")
     protected final CompletableFuture<List<Chat>> chats;
@@ -52,11 +53,11 @@ public class Account implements DomainObject<Long>, UserDetails, Serializable {
         password = null;
         rating = 0;
         version = 0;
-        offeredJobs = null;
-        comments = null;
-        following = null;
-        chats = null;
-        ratings = null;
+        offeredJobs = CompletableFuture.completedFuture(Collections.emptyList());
+        comments = CompletableFuture.completedFuture(Collections.emptyList());
+        following = CompletableFuture.completedFuture(Collections.emptyList());
+        chats = CompletableFuture.completedFuture(Collections.emptyList());
+        ratings = CompletableFuture.completedFuture(Collections.emptyList());
     }
 
     protected Account(
@@ -69,7 +70,7 @@ public class Account implements DomainObject<Long>, UserDetails, Serializable {
             CompletableFuture<List<Comment>> comments,
             CompletableFuture<List<Chat>> chats,
             CompletableFuture<List<Rating>> ratings,
-            CompletableFuture<List<User>> following
+            CompletableFuture<List<UserAccount>> following
     ) {
         this.accountId = accountID;
         this.email = email;
@@ -89,11 +90,11 @@ public class Account implements DomainObject<Long>, UserDetails, Serializable {
         this.email = email;
         this.password =  passwordEncoder.encode(password);
         this.rating = rating;
-        this.offeredJobs = null;
-        this.chats = null;
-        this.ratings = null;
-        this.comments = null;
-        this.following = null;
+        this.offeredJobs = CompletableFuture.completedFuture(Collections.emptyList());
+        this.chats = CompletableFuture.completedFuture(Collections.emptyList());
+        this.ratings = CompletableFuture.completedFuture(Collections.emptyList());
+        this.comments = CompletableFuture.completedFuture(Collections.emptyList());
+        this.following = CompletableFuture.completedFuture(Collections.emptyList());
     }
 
     @Override
@@ -115,7 +116,7 @@ public class Account implements DomainObject<Long>, UserDetails, Serializable {
         return offeredJobs;
     }
 
-    public CompletableFuture<List<User>> getFollowing() {
+    public CompletableFuture<List<UserAccount>> getFollowing() {
         return following;
     }
 

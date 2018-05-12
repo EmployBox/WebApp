@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import isel.ps.employbox.controllers.UserController;
 import org.springframework.hateoas.ResourceSupport;
 
-import java.sql.Date;
+import java.sql.Timestamp;
 
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
@@ -21,9 +21,9 @@ public class OutApplication extends ResourceSupport {
     private long curriculumId;
 
     @JsonProperty
-    private Date date;
+    private Timestamp date;
 
-    public OutApplication(long userId, long jobId, long curriculumId, Date date){
+    public OutApplication(long userId, long jobId, long curriculumId, Timestamp date){
         this.accountId = userId;
         this.jobId = jobId;
         this.curriculumId = curriculumId;

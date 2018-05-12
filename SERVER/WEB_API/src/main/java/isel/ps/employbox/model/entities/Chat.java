@@ -3,6 +3,7 @@ package isel.ps.employbox.model.entities;
 import com.github.jayield.rapper.ColumnName;
 import com.github.jayield.rapper.DomainObject;
 import com.github.jayield.rapper.Id;
+import com.github.jayield.rapper.Version;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -12,6 +13,7 @@ public class Chat implements DomainObject<Long> {
     private long chatId;
     private final long accountIdFirst;
     private final long accountIdSecond;
+    @Version
     private long version;
 
     @ColumnName(foreignName = "chatId")

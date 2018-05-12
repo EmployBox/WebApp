@@ -3,8 +3,9 @@ package isel.ps.employbox.model.entities;
 
 import com.github.jayield.rapper.DomainObject;
 import com.github.jayield.rapper.Id;
+import com.github.jayield.rapper.Version;
 
-import java.sql.Date;
+import java.sql.Timestamp;
 
 public class Application implements DomainObject<Long> {
 
@@ -13,7 +14,8 @@ public class Application implements DomainObject<Long> {
     private final long accountId;
     private final long jobId;
     private final long curriculumId;
-    private final Date date;
+    private final Timestamp date;
+    @Version
     private final long version;
 
     public Application(){
@@ -25,7 +27,7 @@ public class Application implements DomainObject<Long> {
         applicationId = 0;
     }
 
-    public Application(long applicationId, long userId, long jobId, long curriculumId, Date date, long version) {
+    public Application(long applicationId, long userId, long jobId, long curriculumId, Timestamp date, long version) {
         this.applicationId = applicationId;
         this.accountId = userId;
         this.jobId = jobId;
@@ -34,7 +36,7 @@ public class Application implements DomainObject<Long> {
         this.version = version;
     }
 
-    public Application( long userId, long jobId, long curriculumId, Date date) {
+    public Application(long userId, long jobId, long curriculumId, Timestamp date) {
         this.applicationId = -1;
         this.accountId = userId;
         this.jobId = jobId;
@@ -53,7 +55,7 @@ public class Application implements DomainObject<Long> {
         return version;
     }
 
-    public Date getDate() {
+    public Timestamp getDate() {
         return date;
     }
 

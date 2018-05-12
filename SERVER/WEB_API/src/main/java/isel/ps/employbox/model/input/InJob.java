@@ -2,7 +2,7 @@ package isel.ps.employbox.model.input;
 
 import isel.ps.employbox.model.entities.JobExperience;
 
-import java.sql.Date;
+import java.sql.Timestamp;
 import java.util.Collections;
 import java.util.List;
 
@@ -15,8 +15,8 @@ public class InJob {
     private int wage;
     private String description;
     private String schedule;
-    private Date offerBeginDate;
-    private Date offerEndDate;
+    private Timestamp offerBeginDate;
+    private Timestamp offerEndDate;
     private String offerType;
     private long version;
 
@@ -84,17 +84,17 @@ public class InJob {
         this.schedule = schedule;
     }
 
-    public Date getOfferBeginDate() {
+    public Timestamp getOfferBeginDate() {
         return offerBeginDate;
     }
 
-    public void setOfferBeginDate(Date offerBeginDate) {
+    public void setOfferBeginDate(Timestamp offerBeginDate) {
         this.offerBeginDate = offerBeginDate;
     }
 
-    public Date getOfferEndDate() {return offerEndDate;}
+    public Timestamp getOfferEndDate() {return offerEndDate;}
 
-    public void setOfferEndDate(Date offerEndDate) {
+    public void setOfferEndDate(Timestamp offerEndDate) {
         this.offerEndDate = offerEndDate;
     }
 

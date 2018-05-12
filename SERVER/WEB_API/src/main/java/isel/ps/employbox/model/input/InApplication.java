@@ -1,12 +1,12 @@
 package isel.ps.employbox.model.input;
 
-import java.sql.Date;
+import java.sql.Timestamp;
 
 public class InApplication {
     private long accountId;
     private long jobId;
     private long curriculumId;
-    private Date date;
+    private Timestamp date;
 
     public long getAccountId() {
         return accountId;
@@ -32,11 +32,11 @@ public class InApplication {
         this.curriculumId = curriculumId;
     }
 
-    public Date getDate() {
+    public Timestamp getDate() {
         return date;
     }
 
-    public void setDate(Date date) {
+    public void setDate(Timestamp date) {
         this.date = date;
     }
 }
