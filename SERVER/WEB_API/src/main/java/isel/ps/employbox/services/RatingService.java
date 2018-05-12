@@ -35,7 +35,7 @@ public class RatingService {
         return ratingRepo.findById( new Rating.RatingKey(accountFrom, accountTo))
                 .thenApply( orating -> {
                     if(!orating.isPresent())
-                        throw new ResourceNotFoundException(ErrorMessages.resourceNotfound_Rating);
+                        throw new ResourceNotFoundException(ErrorMessages.RESOURCE_NOTFOUND_RATING);
                     return orating.get();
                 });
     }
@@ -48,7 +48,7 @@ public class RatingService {
                 )
                 .thenCompose (__-> ratingRepo.update(rating))
                 .thenAccept(res -> {
-                    if(!res) throw new BadRequestException(ErrorMessages.badRequest_ItemCreation);
+                    if(!res) throw new BadRequestException(ErrorMessages.BAD_REQUEST_ITEM_CREATION);
                 })
         );
     }
@@ -61,7 +61,7 @@ public class RatingService {
                 )
                 .thenCompose ( __-> ratingRepo.create( rating ))
                 .thenApply(res -> {
-                    if(!res) throw new BadRequestException(ErrorMessages.badRequest_ItemCreation);
+                    if(!res) throw new BadRequestException(ErrorMessages.BAD_REQUEST_ITEM_CREATION);
                     return rating;
                 })
         );

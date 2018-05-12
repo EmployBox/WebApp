@@ -46,12 +46,12 @@ public class CurriculumService {
 
     public CompletableFuture<Curriculum> createCurriculum(long userId, Curriculum curriculum, String email) {
         if (curriculum.getAccountId() != userId)
-            throw new BadRequestException(ErrorMessages.badRequest_IdsMismatch);
+            throw new BadRequestException(ErrorMessages.BAD_REQUEST_IDS_MISMATCH);
 
         return userService.getUser(userId, email)
                 .thenCompose(__ -> curriculumRepo.create(curriculum))
                 .thenApply(res -> {
-                    if (!res) throw new BadRequestException(ErrorMessages.badRequest_ItemCreation);
+                    if (!res) throw new BadRequestException(ErrorMessages.BAD_REQUEST_ITEM_CREATION);
                     return curriculum;
                 }).thenCompose(
                         (__) -> {
@@ -63,7 +63,7 @@ public class CurriculumService {
                         }
                 ).thenApply(
                         res -> {
-                            if (!res) throw new BadRequestException(ErrorMessages.childsCreation);
+                            if (!res) throw new BadRequestException(ErrorMessages.CHILDS_CREATION);
                             return curriculum;
                         }
                 );
@@ -149,7 +149,7 @@ public class CurriculumService {
                 .thenApply(curricula -> {
                     Optional<Curriculum> oret;
                     if (curricula.isEmpty() || !(oret = curricula.stream().filter(curr -> curr.getIdentityKey() == cid).findFirst()).isPresent())
-                        throw new ResourceNotFoundException(ErrorMessages.resourceNotfound_curriculum);
+                        throw new ResourceNotFoundException(ErrorMessages.RESOURCE_NOTFOUND_CURRICULUM);
                     return oret.get();
                 });
     }
@@ -160,7 +160,7 @@ public class CurriculumService {
                         .thenCompose(__ -> getCurriculum(curriculum.getAccountId(), curriculum.getIdentityKey(), email))
                         .thenCompose(___ -> curriculumRepo.update(curriculum))
                         .thenAccept(res -> {
-                            if (!res) throw new BadRequestException(ErrorMessages.badRequest_ItemCreation);
+                            if (!res) throw new BadRequestException(ErrorMessages.BAD_REQUEST_ITEM_CREATION);
                         })
         );
     }
@@ -170,7 +170,7 @@ public class CurriculumService {
                 getCurriculum(userId, cid, name)
                         .thenCompose(curriculumRepo::delete)
                         .thenAccept(res -> {
-                            if (!res) throw new BadRequestException(ErrorMessages.badRequest_ItemDeletion);
+                            if (!res) throw new BadRequestException(ErrorMessages.BAD_REQUEST_ITEM_DELETION);
                         })
         );
     }
@@ -182,10 +182,10 @@ public class CurriculumService {
             long jexpId)
     {
         return repo.findById(jexpId)
-                .thenApply( oChild -> oChild.orElseThrow( ()-> new ResourceNotFoundException(ErrorMessages.resourceNotfound)))
+                .thenApply( oChild -> oChild.orElseThrow( ()-> new ResourceNotFoundException(ErrorMessages.RESOURCE_NOTFOUND)))
                 .thenApply( child -> {
                     if(child.getCurriculumId() != curriculumId || child.getAccountId() != accountId)
-                        throw new ConflictException(ErrorMessages.badRequest_IdsMismatch);
+                        throw new ConflictException(ErrorMessages.BAD_REQUEST_IDS_MISMATCH);
                     return child;
                 });
     }

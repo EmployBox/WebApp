@@ -11,7 +11,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
-import static isel.ps.employbox.ErrorMessages.badRequest_IdsMismatch;
+import static isel.ps.employbox.ErrorMessages.BAD_REQUEST_IDS_MISMATCH;
 
 @RestController
 @RequestMapping("/accounts/{id}/ratings")
@@ -49,7 +49,7 @@ public class RatingController {
             @RequestBody InRating rating,
             Authentication authentication
     ){
-        if(id != rating.getAccountIDFrom() || accountTo != rating.getAccountIDTo()) throw new BadRequestException(badRequest_IdsMismatch);
+        if(id != rating.getAccountIDFrom() || accountTo != rating.getAccountIDTo()) throw new BadRequestException(BAD_REQUEST_IDS_MISMATCH);
         return ratingService.updateRating(ratingBinder.bindInput(rating), authentication.getName());
     }
 
@@ -60,7 +60,7 @@ public class RatingController {
             @RequestBody InRating rating,
             Authentication authentication)
     {
-        if(id != rating.getAccountIDFrom() || accountTo != rating.getAccountIDTo()) throw new BadRequestException(badRequest_IdsMismatch);
+        if(id != rating.getAccountIDFrom() || accountTo != rating.getAccountIDTo()) throw new BadRequestException(BAD_REQUEST_IDS_MISMATCH);
         return ratingService.createRating( ratingBinder.bindInput(rating), authentication.getName());
     }
 

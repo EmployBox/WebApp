@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 @ControllerAdvice
 public class GlobalControllerExceptionHandler {
 
+    private static final String BLANK = "about:BLANK";
+
     @ExceptionHandler(BadRequestException.class)
     public ResponseEntity<ErrorModel> handleBadRequest(BadRequestException exception){
         ErrorModel error = new ErrorModel();
@@ -28,7 +30,7 @@ public class GlobalControllerExceptionHandler {
         ErrorModel error = new ErrorModel();
         error.detail = exception.getMessage();
         error.status = HttpStatus.UNAUTHORIZED.value();
-        error.type = "about:blank";
+        error.type = BLANK;
         error.title = HttpStatus.UNAUTHORIZED.getReasonPhrase();
         return new ResponseEntity<>(error, headers, HttpStatus.UNAUTHORIZED);
     }
@@ -38,7 +40,7 @@ public class GlobalControllerExceptionHandler {
         ErrorModel error = new ErrorModel();
         error.detail = exception.getMessage();
         error.status = HttpStatus.FORBIDDEN.value();
-        error.type = "about:blank";
+        error.type = BLANK;
         error.title = HttpStatus.FORBIDDEN.getReasonPhrase();
         return new ResponseEntity<>(error, HttpStatus.FORBIDDEN);
     }
@@ -48,7 +50,7 @@ public class GlobalControllerExceptionHandler {
         ErrorModel error = new ErrorModel();
         error.detail = exception.getMessage();
         error.status = HttpStatus.NOT_FOUND.value();
-        error.type = "about:blank";
+        error.type = BLANK;
         error.title = HttpStatus.NOT_FOUND.getReasonPhrase();
         return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
     }
@@ -58,15 +60,15 @@ public class GlobalControllerExceptionHandler {
         ErrorModel error = new ErrorModel();
         error.detail = exception.getMessage();
         error.status = HttpStatus.CONFLICT.value();
-        error.type = "about:blank";
+        error.type = BLANK;
         error.title = HttpStatus.CONFLICT.getReasonPhrase();
         return new ResponseEntity<>(error, HttpStatus.CONFLICT);
     }
 
     public static class ErrorModel {
-        public String type;
-        public int status;
-        public String detail;
-        public String title;
+        String type;
+        int status;
+        String detail;
+        String title;
     }
 }

@@ -36,12 +36,12 @@ public class AcademicBackgroundService {
             String email
     ) {
         if(academicBackground.getAccountId() != accountId || academicBackground.getCurriculumId() != curriculumId || academicBackgroundId != academicBackground.getAccountId())
-            throw new ConflictException(ErrorMessages.badRequest_IdsMismatch);
+            throw new ConflictException(ErrorMessages.BAD_REQUEST_IDS_MISMATCH);
 
         return curriculumService.getCurriculum(accountId, curriculumId, email)
                 .thenCompose( __ -> academicBackgroundRepo.create( academicBackground))
                 .thenApply( res -> {
-                    if (!res) throw new BadRequestException(ErrorMessages.badRequest_ItemDeletion);
+                    if (!res) throw new BadRequestException(ErrorMessages.BAD_REQUEST_ITEM_DELETION);
                     return academicBackground;
                 });
     }
@@ -56,7 +56,7 @@ public class AcademicBackgroundService {
                 .thenCompose(__ -> academicBackgroundRepo.update(academicBackground)
                         .thenAccept(
                                 res -> {
-                                    if (!res) throw new BadRequestException(ErrorMessages.badRequest_ItemDeletion);
+                                    if (!res) throw new BadRequestException(ErrorMessages.BAD_REQUEST_ITEM_DELETION);
                                 }
                         ))
         );
@@ -72,7 +72,7 @@ public class AcademicBackgroundService {
                 .thenCompose(__ -> academicBackgroundRepo.deleteById(academicBackgroundId))
                 .thenAccept(
                         res -> {
-                            if (!res) throw new BadRequestException(ErrorMessages.badRequest_ItemDeletion);
+                            if (!res) throw new BadRequestException(ErrorMessages.BAD_REQUEST_ITEM_DELETION);
                         }
                 )
         );

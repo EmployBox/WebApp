@@ -14,7 +14,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
-import static isel.ps.employbox.ErrorMessages.badRequest_IdsMismatch;
+import static isel.ps.employbox.ErrorMessages.BAD_REQUEST_IDS_MISMATCH;
 
 @RestController
 @RequestMapping("/accounts/{id}/chats")
@@ -42,7 +42,7 @@ public class ChatController {
 
     @PostMapping
     public Mono<Chat> createChat(@PathVariable long id, @RequestBody InChat inChat, Authentication authentication) {
-        if(id != inChat.getAccountIdFirst()) throw new BadRequestException(badRequest_IdsMismatch);
+        if(id != inChat.getAccountIdFirst()) throw new BadRequestException(BAD_REQUEST_IDS_MISMATCH);
         return chatService.createNewChat(
                 id,
                 chatBinder.bindInput(inChat),
@@ -53,7 +53,7 @@ public class ChatController {
     @PostMapping("/{cid}/messages")
     public Mono<OutMessage> createMessage(@PathVariable long id, @PathVariable long cid, @RequestBody InMessage msg, Authentication authentication) {
         if (cid != msg.getChatId())
-            throw new BadRequestException(ErrorMessages.badRequest_IdsMismatch);
+            throw new BadRequestException(ErrorMessages.BAD_REQUEST_IDS_MISMATCH);
         return messageBinder.bindOutput(chatService.createNewChatMessage(id, cid, messageBinder.bindInput(msg), authentication.getName()));
     }
 

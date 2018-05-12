@@ -15,7 +15,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
-import static isel.ps.employbox.ErrorMessages.badRequest_IdsMismatch;
+import static isel.ps.employbox.ErrorMessages.BAD_REQUEST_IDS_MISMATCH;
 
 @RestController
 @RequestMapping("/accounts/users/{id}/curricula")
@@ -166,7 +166,7 @@ public class CurriculumController {
             @RequestBody InCurriculum inCurriculum,
             Authentication authentication
     ){
-        if(inCurriculum.getAccountId() != id || inCurriculum.getCurriculumId() != cid) throw new BadRequestException(badRequest_IdsMismatch);
+        if(inCurriculum.getAccountId() != id || inCurriculum.getCurriculumId() != cid) throw new BadRequestException(BAD_REQUEST_IDS_MISMATCH);
         Curriculum curriculum = curriculumBinder.bindInput(inCurriculum);
         return curriculumService.updateCurriculum(curriculum,authentication.getName() );
     }
@@ -195,7 +195,7 @@ public class CurriculumController {
             Authentication authentication
     ){
         if(curriculumExperience.getAccountId() != id || curriculumExperience.getCurriculumId() != cid || curriculumExperience.getIdentityKey() != jeId)
-            throw new BadRequestException(badRequest_IdsMismatch);
+            throw new BadRequestException(BAD_REQUEST_IDS_MISMATCH);
         return curriculumExperienceService.updateCurriculumExperience(id, cid, curriculumExperience,authentication.getName() );
     }
 
@@ -228,7 +228,7 @@ public class CurriculumController {
             Authentication authentication)
     {
         if(academicBackground.getAccountId() != id || academicBackground.getCurriculumId() != cid)
-            throw new BadRequestException(badRequest_IdsMismatch);
+            throw new BadRequestException(BAD_REQUEST_IDS_MISMATCH);
         return academicBackgroundService.updateAcademicBackground(id, cid, academicBackground, authentication.getName() );
     }
 
@@ -261,7 +261,7 @@ public class CurriculumController {
             Authentication authentication
     ){
         if(project.getAccountId() != id || project.getCurriculumId() != cid)
-            throw new BadRequestException(badRequest_IdsMismatch);
+            throw new BadRequestException(BAD_REQUEST_IDS_MISMATCH);
         return projectService.updateProject(ceId, id, cid, project,authentication.getName() );
     }
 
@@ -294,7 +294,7 @@ public class CurriculumController {
             Authentication authentication)
     {
         if(previousJobs.getAccountId() != id || previousJobs.getCurriculumId() != cid)
-            throw new BadRequestException(badRequest_IdsMismatch);
+            throw new BadRequestException(BAD_REQUEST_IDS_MISMATCH);
         return previousJobService.updatePreviousJob(pvjId, id, cid, previousJobs,authentication.getName() );
     }
 

@@ -35,11 +35,11 @@ public class PreviousJobService {
             String email
     ) {
         if(previousJobs.getAccountId() != accountId || previousJobs.getCurriculumId() != curriculumId)
-            throw new ConflictException(ErrorMessages.badRequest_IdsMismatch);
+            throw new ConflictException(ErrorMessages.BAD_REQUEST_IDS_MISMATCH);
         return curriculumService.getCurriculum(accountId, curriculumId,email)
                 .thenCompose( __ ->previousJobsRepo.create( previousJobs))
                 .thenApply( res -> {
-                    if (!res) throw new BadRequestException(ErrorMessages.badRequest_ItemDeletion);
+                    if (!res) throw new BadRequestException(ErrorMessages.BAD_REQUEST_ITEM_DELETION);
                     return previousJobs;
                 });
     }
@@ -53,12 +53,12 @@ public class PreviousJobService {
             String email
     ) {
         if(previousJobs.getAccountId() != pvjId)
-            throw new BadRequestException(ErrorMessages.badRequest_IdsMismatch);
+            throw new BadRequestException(ErrorMessages.BAD_REQUEST_IDS_MISMATCH);
         return Mono.fromFuture(curriculumService.getCurriculum(accountId, curriculumId, email)
                 .thenCompose(__ -> previousJobsRepo.update(previousJobs))
                 .thenAccept(
                         res -> {
-                            if (!res) throw new BadRequestException(ErrorMessages.badRequest_ItemDeletion);
+                            if (!res) throw new BadRequestException(ErrorMessages.BAD_REQUEST_ITEM_DELETION);
                         }
                 )
         );
@@ -75,7 +75,7 @@ public class PreviousJobService {
                         .thenCompose(__ -> previousJobsRepo.deleteById(previousJobId))
                         .thenAccept(
                                 res -> {
-                                    if (!res) throw new BadRequestException(ErrorMessages.badRequest_ItemDeletion);
+                                    if (!res) throw new BadRequestException(ErrorMessages.BAD_REQUEST_ITEM_DELETION);
                                 }
                         )
         );

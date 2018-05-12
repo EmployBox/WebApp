@@ -10,7 +10,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
-import static isel.ps.employbox.ErrorMessages.badRequest_IdsMismatch;
+import static isel.ps.employbox.ErrorMessages.BAD_REQUEST_IDS_MISMATCH;
 
 @RestController
 @RequestMapping("/accounts/{id}/comments")
@@ -49,7 +49,7 @@ public class CommentController {
             @RequestBody InComment comment,
             Authentication authentication
     ){
-        if(id != comment.getAccountIdFrom() || accountTo != comment.getAccountIdTo()) throw new BadRequestException(badRequest_IdsMismatch);
+        if(id != comment.getAccountIdFrom() || accountTo != comment.getAccountIdTo()) throw new BadRequestException(BAD_REQUEST_IDS_MISMATCH);
         return commentService.updateComment(commentBinder.bindInput(comment), authentication.getName());
     }
 
@@ -60,7 +60,7 @@ public class CommentController {
             @RequestBody InComment comment,
             Authentication authentication
     ){
-        if(accountFromId != comment.getAccountIdFrom() || accountTo != comment.getAccountIdTo()) throw new BadRequestException(badRequest_IdsMismatch);
+        if(accountFromId != comment.getAccountIdFrom() || accountTo != comment.getAccountIdTo()) throw new BadRequestException(BAD_REQUEST_IDS_MISMATCH);
         return commentBinder.bindOutput( commentService.createComment(commentBinder.bindInput(comment), authentication.getName()));
     }
 

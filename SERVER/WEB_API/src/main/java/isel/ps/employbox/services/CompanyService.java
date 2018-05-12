@@ -32,18 +32,18 @@ public class CompanyService {
     public CompletableFuture<Company> getCompany(long cid) {
         return companyRepo.findById(cid)
                 .thenApply(
-                        optionalCompany -> optionalCompany.orElseThrow(() -> new ResourceNotFoundException(ErrorMessages.resourceNotfound_company)));
+                        optionalCompany -> optionalCompany.orElseThrow(() -> new ResourceNotFoundException(ErrorMessages.RESOURCE_NOTFOUND_COMPANY)));
     }
 
     public CompletableFuture<Company> createCompany(Company company, String email) {
         return accountRepo.findWhere(new Pair<>("email", email))
                 .thenCompose(list -> {
                             if (list.get(0).getRole() != Role.ADMINISTRATOR)
-                                throw new UnauthorizedException(ErrorMessages.unAuthorized);
+                                throw new UnauthorizedException(ErrorMessages.UN_AUTHORIZED);
                             return companyRepo.create(company);
                         }
                 ).thenApply(res -> {
-                    if (!res) throw new BadRequestException(ErrorMessages.badRequest_ItemCreation);
+                    if (!res) throw new BadRequestException(ErrorMessages.BAD_REQUEST_ITEM_CREATION);
                     return company;
                 });
     }
@@ -53,11 +53,11 @@ public class CompanyService {
                 accountRepo.findWhere(new Pair<>("email", email))
                         .thenCompose(list -> {
                                     if (list.get(0).getRole() != Role.ADMINISTRATOR)
-                                        throw new UnauthorizedException(ErrorMessages.unAuthorized);
+                                        throw new UnauthorizedException(ErrorMessages.UN_AUTHORIZED);
                                     return companyRepo.deleteById(cid);
                                 }
                         ).thenAccept(res -> {
-                    if (!res) throw new BadRequestException(ErrorMessages.badRequest_ItemDeletion);
+                    if (!res) throw new BadRequestException(ErrorMessages.BAD_REQUEST_ITEM_DELETION);
                 })
         );
     }
@@ -67,11 +67,11 @@ public class CompanyService {
                 accountRepo.findWhere(new Pair<>("email", email))
                         .thenCompose(list -> {
                                     if (list.get(0).getRole() != Role.ADMINISTRATOR)
-                                        throw new UnauthorizedException(ErrorMessages.unAuthorized);
+                                        throw new UnauthorizedException(ErrorMessages.UN_AUTHORIZED);
                                     return companyRepo.update(company);
                                 }
                         ).thenAccept(res -> {
-                    if (!res) throw new BadRequestException(ErrorMessages.badRequest_ItemUpdate);
+                    if (!res) throw new BadRequestException(ErrorMessages.BAD_REQUEST_ITEM_UPDATE);
                 })
         );
     }

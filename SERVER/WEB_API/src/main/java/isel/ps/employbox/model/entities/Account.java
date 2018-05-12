@@ -10,12 +10,13 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.io.Serializable;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 import static isel.ps.employbox.model.entities.Role.DEFAULT;
 
-public class Account implements DomainObject<Long>,UserDetails, Serializable {
+public class Account implements DomainObject<Long>, UserDetails, Serializable {
 
     private final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
@@ -25,7 +26,7 @@ public class Account implements DomainObject<Long>,UserDetails, Serializable {
     protected final String email;
     protected final String password;
     protected final double rating;
-    private final Role role = DEFAULT;
+    private static final Role role = DEFAULT;
 
     private final long version;
 
@@ -132,7 +133,7 @@ public class Account implements DomainObject<Long>,UserDetails, Serializable {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return null;
+        return Collections.emptyList();
     }
 
     @Override

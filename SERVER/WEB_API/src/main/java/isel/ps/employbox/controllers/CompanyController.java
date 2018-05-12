@@ -10,7 +10,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
-import static isel.ps.employbox.ErrorMessages.badRequest_IdsMismatch;
+import static isel.ps.employbox.ErrorMessages.BAD_REQUEST_IDS_MISMATCH;
 
 @RestController
 @RequestMapping("/accounts/companies")
@@ -53,7 +53,7 @@ public class CompanyController {
             @RequestBody InCompany inCompany,
             Authentication authentication
     ){
-        if(id != inCompany.getAccountId()) throw new BadRequestException(badRequest_IdsMismatch);
+        if(id != inCompany.getAccountId()) throw new BadRequestException(BAD_REQUEST_IDS_MISMATCH);
         return companyService.updateCompany(
                 companyBinder.bindInput(inCompany),
                 authentication.getName()

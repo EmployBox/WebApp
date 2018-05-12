@@ -15,7 +15,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
-import static isel.ps.employbox.ErrorMessages.badRequest_IdsMismatch;
+import static isel.ps.employbox.ErrorMessages.BAD_REQUEST_IDS_MISMATCH;
 
 @RestController
 @RequestMapping("/accounts/users")
@@ -64,7 +64,7 @@ public class UserController {
             @RequestBody InUser inUser,
             Authentication authentication)
     {
-        if(inUser.getId() != id) throw new BadRequestException(badRequest_IdsMismatch);
+        if(inUser.getId() != id) throw new BadRequestException(BAD_REQUEST_IDS_MISMATCH);
         User user = userBinder.bindInput(inUser);
         return userService.updateUser(user, authentication.getName());
     }
@@ -77,7 +77,7 @@ public class UserController {
             Authentication authentication)
     {
         if(inApplication.getAccountId() != id || inApplication.getJobId() != jid)
-            throw new BadRequestException(badRequest_IdsMismatch);
+            throw new BadRequestException(BAD_REQUEST_IDS_MISMATCH);
         Application application = applicationBinder.bindInput(inApplication);
         return userService.updateApplication(application, authentication.getName());
     }
@@ -91,7 +91,7 @@ public class UserController {
     @PostMapping("/{id}/applications/{jid}")
     public Mono<OutApplication> createApplication(@PathVariable long id, @PathVariable long jid,  @RequestBody InApplication inApplication, Authentication authentication){
         if(id != inApplication.getAccountId() || jid != inApplication.getJobId())
-            throw new BadRequestException(badRequest_IdsMismatch);
+            throw new BadRequestException(BAD_REQUEST_IDS_MISMATCH);
         Application application = applicationBinder.bindInput(inApplication);
         return applicationBinder.bindOutput( userService.createApplication(id, application, authentication.getName()));
     }

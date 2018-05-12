@@ -18,7 +18,7 @@ import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Stream;
 
-import static isel.ps.employbox.ErrorMessages.resourceNotfound_user;
+import static isel.ps.employbox.ErrorMessages.RESOURCE_NOTFOUND_USER;
 
 @Service
 public class UserService {
@@ -48,9 +48,9 @@ public class UserService {
         return userRepo.findById(id)
                 .thenApply(res -> {
                             if (!res.isPresent())
-                                throw new ResourceNotFoundException(resourceNotfound_user);
+                                throw new ResourceNotFoundException(RESOURCE_NOTFOUND_USER);
                             if (email.length == 1 && !res.get().getEmail().equals(email[0]))
-                                throw new UnauthorizedException(ErrorMessages.unAuthorized_IdAndEmailMismatch);
+                                throw new UnauthorizedException(ErrorMessages.UN_AUTHORIZED_ID_AND_EMAIL_MISMATCH);
                             return res.get();
                         }
                 );
@@ -62,7 +62,7 @@ public class UserService {
                 .thenApply(applications -> {
                     Optional<Application> application = applications.stream().filter(curr -> curr.getAccountId() == userId && curr.getJobId() == jobId).findFirst();
                     if (applications.isEmpty() || !application.isPresent())
-                        throw new ResourceNotFoundException(ErrorMessages.resourceNotfound_application);
+                        throw new ResourceNotFoundException(ErrorMessages.RESOURCE_NOTFOUND_APPLICATION);
                     return application.get();
                 });
     }
@@ -71,10 +71,10 @@ public class UserService {
     public CompletableFuture<Stream<Application>> getAllApplications(long accountId)
     {
         return userRepo.findById(accountId)
-                .thenApply( ouser -> ouser.orElseThrow( ()-> new ResourceNotFoundException(ErrorMessages.resourceNotfound_user)))
+                .thenApply( ouser -> ouser.orElseThrow( ()-> new ResourceNotFoundException(ErrorMessages.RESOURCE_NOTFOUND_USER)))
                 .thenApply(user -> user.getApplications().join().stream())
                 .exceptionally(__ -> {
-                    throw new ResourceNotFoundException(ErrorMessages.resourceNotfound_user);
+                    throw new ResourceNotFoundException(ErrorMessages.RESOURCE_NOTFOUND_USER);
                 });
     }
 
@@ -84,7 +84,7 @@ public class UserService {
                 getUser(user.getIdentityKey(), email)
                         .thenCompose(__ -> userRepo.update(user))
                         .thenAccept(res -> {
-                            if (!res) throw new BadRequestException(ErrorMessages.badRequest_ItemCreation);
+                            if (!res) throw new BadRequestException(ErrorMessages.BAD_REQUEST_ITEM_CREATION);
                         })
         );
     }
@@ -95,7 +95,7 @@ public class UserService {
                         .thenCompose(__ -> getApplication(application.getAccountId(), application.getJobId()))
                         .thenCompose(___ -> applicationRepo.update(application))
                         .thenAccept(res -> {
-                            if (!res) throw new BadRequestException(ErrorMessages.badRequest_ItemCreation);
+                            if (!res) throw new BadRequestException(ErrorMessages.BAD_REQUEST_ITEM_CREATION);
                         })
         );
     }
@@ -103,22 +103,22 @@ public class UserService {
     public CompletableFuture<User> createUser(User user) {
         return userRepo.create(user).thenApply(
                 res -> {
-                    if (!res) throw new BadRequestException(ErrorMessages.badRequest_ItemCreation);
+                    if (!res) throw new BadRequestException(ErrorMessages.BAD_REQUEST_ITEM_CREATION);
                     return user;
                 }).exceptionally(e -> {
-                    throw new ConflictException(ErrorMessages.conflit_UsernameTaken);
+                    throw new ConflictException(ErrorMessages.CONFLIT_USERNAME_TAKEN);
                 }
         );
     }
 
     public CompletableFuture<Application> createApplication(long userId, Application application, String email) {
         if (application.getAccountId() != userId)
-            throw new BadRequestException(ErrorMessages.badRequest_IdsMismatch);
+            throw new BadRequestException(ErrorMessages.BAD_REQUEST_IDS_MISMATCH);
 
         return getUser(userId, email)
                 .thenCompose(__ -> applicationRepo.create(application))
                 .thenApply(res -> {
-                    if (!res) throw new BadRequestException(ErrorMessages.badRequest_ItemCreation);
+                    if (!res) throw new BadRequestException(ErrorMessages.BAD_REQUEST_ITEM_CREATION);
                     return application;
                 });
     }
@@ -128,7 +128,7 @@ public class UserService {
                 getUser(id, email)
                         .thenCompose(userRepo::delete)
                         .thenAccept(res -> {
-                            if (!res) throw new BadRequestException(ErrorMessages.badRequest_ItemDeletion);
+                            if (!res) throw new BadRequestException(ErrorMessages.BAD_REQUEST_ITEM_DELETION);
                         })
         );
     }
@@ -139,7 +139,7 @@ public class UserService {
                         .thenCompose(__ -> getApplication(userId, jobId))
                         .thenCompose(applicationRepo::delete)
                         .thenAccept(res -> {
-                            if (!res) throw new BadRequestException(ErrorMessages.badRequest_ItemDeletion);
+                            if (!res) throw new BadRequestException(ErrorMessages.BAD_REQUEST_ITEM_DELETION);
                         })
         );
     }

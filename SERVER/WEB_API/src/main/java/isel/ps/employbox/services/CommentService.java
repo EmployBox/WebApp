@@ -39,9 +39,9 @@ public class CommentService {
                 .thenCompose(
                         __ -> commentRepo.findById(commentId)
                                 .thenApply(ocomment -> {
-                                            Comment comment = ocomment.orElseThrow(() -> new ResourceNotFoundException(ErrorMessages.resourceNotfound_comment));
+                                            Comment comment = ocomment.orElseThrow(() -> new ResourceNotFoundException(ErrorMessages.RESOURCE_NOTFOUND_COMMENT));
                                             if (comment.getAccountIdFrom() != accountFromId && comment.getAccountIdDest() != accountToId)
-                                                throw new BadRequestException(ErrorMessages.badRequest_IdsMismatch);
+                                                throw new BadRequestException(ErrorMessages.BAD_REQUEST_IDS_MISMATCH);
                                             return comment;
                                         }
                                 ));
@@ -52,7 +52,7 @@ public class CommentService {
                 getComment(comment.getAccountIdFrom(), comment.getAccountIdDest(), comment.getIdentityKey(), username)
                         .thenCompose(__ -> commentRepo.update(comment))
                         .thenAccept(res -> {
-                            if (!res) throw new BadRequestException(ErrorMessages.badRequest_ItemCreation);
+                            if (!res) throw new BadRequestException(ErrorMessages.BAD_REQUEST_ITEM_CREATION);
                         })
         );
     }
@@ -63,7 +63,7 @@ public class CommentService {
                 accountService.getAccount(comment.getAccountIdDest())
         ).thenCompose(__ -> commentRepo.create(comment)
         ).thenApply(res -> {
-            if (!res) throw new BadRequestException(ErrorMessages.badRequest_ItemCreation);
+            if (!res) throw new BadRequestException(ErrorMessages.BAD_REQUEST_ITEM_CREATION);
             return comment;
         });
     }
@@ -72,14 +72,14 @@ public class CommentService {
         return Mono.fromFuture(
                 commentRepo.findById(commentId)
                         .thenAccept(ocomment -> {
-                            Comment comment = ocomment.orElseThrow(() -> new ResourceNotFoundException(ErrorMessages.resourceNotfound_comment));
+                            Comment comment = ocomment.orElseThrow(() -> new ResourceNotFoundException(ErrorMessages.RESOURCE_NOTFOUND_COMMENT));
                             accountRepo.findWhere(new Pair<>("email", email))
                                     .thenCompose(list -> {
                                         if (comment.getAccountIdFrom() != list.get(0).getIdentityKey())
-                                            throw new UnauthorizedException(ErrorMessages.unAuthorized);
+                                            throw new UnauthorizedException(ErrorMessages.UN_AUTHORIZED);
                                         return commentRepo.deleteById(commentId);
                                     }).thenAccept(res -> {
-                                if (!res) throw new BadRequestException(ErrorMessages.badRequest_ItemCreation);
+                                if (!res) throw new BadRequestException(ErrorMessages.BAD_REQUEST_ITEM_CREATION);
                             });
                         })
         );

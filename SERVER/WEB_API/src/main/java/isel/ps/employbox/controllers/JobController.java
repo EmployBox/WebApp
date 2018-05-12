@@ -16,7 +16,7 @@ import reactor.core.publisher.Mono;
 
 import java.util.List;
 
-import static isel.ps.employbox.ErrorMessages.badRequest_IdsMismatch;
+import static isel.ps.employbox.ErrorMessages.BAD_REQUEST_IDS_MISMATCH;
 
 @RestController
 @RequestMapping("/jobs")
@@ -65,7 +65,7 @@ public class JobController {
 
     @PutMapping("/{jid}")
     public Mono<Void> updateJob(@PathVariable long jid, @RequestBody InJob job, Authentication authentication){
-        if(job.getJobID() != jid) throw new BadRequestException(badRequest_IdsMismatch);
+        if(job.getJobID() != jid) throw new BadRequestException(BAD_REQUEST_IDS_MISMATCH);
         Job updateJob = jobBinder.bindInput(job);
 
         return jobService.updateJob(updateJob, authentication.getName());

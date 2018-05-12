@@ -36,11 +36,11 @@ public class ProjectService {
             String email
     ) {
         if(project.getAccountId() != accountId || project.getCurriculumId() != curriculumId)
-            throw new ConflictException(ErrorMessages.badRequest_IdsMismatch);
+            throw new ConflictException(ErrorMessages.BAD_REQUEST_IDS_MISMATCH);
         return curriculumService.getCurriculum(accountId, curriculumId,email)
                 .thenCompose( __ -> projectRepo.create( project))
                 .thenApply( res -> {
-                    if (!res) throw new BadRequestException(ErrorMessages.badRequest_ItemDeletion);
+                    if (!res) throw new BadRequestException(ErrorMessages.BAD_REQUEST_ITEM_DELETION);
                     return project;
                 });
     }
@@ -53,12 +53,12 @@ public class ProjectService {
             String email
     ) {
         if(project.getIdentityKey() != projectId)
-            throw new BadRequestException(ErrorMessages.badRequest_IdsMismatch);
+            throw new BadRequestException(ErrorMessages.BAD_REQUEST_IDS_MISMATCH);
         return Mono.fromFuture(curriculumService.getCurriculum(accountId, curriculumId, email)
                 .thenCompose(__ -> projectRepo.update(project)
                         .thenAccept(
                                 res -> {
-                                    if (!res) throw new BadRequestException(ErrorMessages.badRequest_ItemDeletion);
+                                    if (!res) throw new BadRequestException(ErrorMessages.BAD_REQUEST_ITEM_DELETION);
                                 }
                         ))
         );
@@ -75,7 +75,7 @@ public class ProjectService {
                         .thenCompose(__ -> projectRepo.deleteById(projectId))
                         .thenAccept(
                                 res -> {
-                                    if (!res) throw new BadRequestException(ErrorMessages.badRequest_ItemDeletion);
+                                    if (!res) throw new BadRequestException(ErrorMessages.BAD_REQUEST_ITEM_DELETION);
                                 }
                         )
         );

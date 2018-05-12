@@ -17,8 +17,8 @@ import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Stream;
 
-import static isel.ps.employbox.ErrorMessages.resourceNotfound_account;
-import static isel.ps.employbox.ErrorMessages.resourceNotfound_user;
+import static isel.ps.employbox.ErrorMessages.RESOURCE_NOTFOUND_ACCOUNT;
+import static isel.ps.employbox.ErrorMessages.RESOURCE_NOTFOUND_USER;
 
 @Service
 public final class AccountService implements UserDetailsService {
@@ -38,16 +38,16 @@ public final class AccountService implements UserDetailsService {
             throw new InvalidParameterException("Only 1 or 2 parameters are allowed for this method");
 
         return accountRepo.findById(id)
-                .thenApply(oacc -> oacc.orElseThrow(() -> new ResourceNotFoundException(resourceNotfound_account)))
+                .thenApply(oacc -> oacc.orElseThrow(() -> new ResourceNotFoundException(RESOURCE_NOTFOUND_ACCOUNT)))
                 .thenApply(account -> {
                     if (email.length == 1 && !account.getEmail().equals(email[0]))
-                        throw new UnauthorizedException(ErrorMessages.unAuthorized_IdAndEmailMismatch);
+                        throw new UnauthorizedException(ErrorMessages.UN_AUTHORIZED_ID_AND_EMAIL_MISMATCH);
                     return account;
                 });
     }
 
     @Override
-    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+    public UserDetails loadUserByUsername(String email) {
         Optional<Account> oacc=
                 accountRepo.findWhere(new Pair<>("email", email)).join()
                         .stream()
@@ -55,7 +55,7 @@ public final class AccountService implements UserDetailsService {
                         .findFirst();
 
         if( !oacc.isPresent())
-            throw new UsernameNotFoundException( resourceNotfound_user );
+            throw new UsernameNotFoundException(RESOURCE_NOTFOUND_USER);
 
         return oacc.get();
     }
