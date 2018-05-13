@@ -72,7 +72,8 @@ public class UserService {
     {
         return userRepo.findById(accountId)
                 .thenApply( ouser -> ouser.orElseThrow(()-> new ResourceNotFoundException(ErrorMessages.RESOURCE_NOTFOUND_USER)))
-                .thenApply(user -> user.getApplications().join().stream())
+                .thenCompose(user -> user.getApplications())
+                .thenApply( applications -> applications.stream())
                 .exceptionally(throwable -> {
                     throw new ResourceNotFoundException(ErrorMessages.RESOURCE_NOTFOUND_USER);
                 });

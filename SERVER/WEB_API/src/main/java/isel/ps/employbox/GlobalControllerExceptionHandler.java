@@ -66,9 +66,9 @@ public class GlobalControllerExceptionHandler {
     }
 
     public static class ErrorModel {
-        String type;
-        int status;
-        String detail;
-        String title;
+        public String type;
+        public int status;
+        public String detail;
+        public String title;
     }
 }
