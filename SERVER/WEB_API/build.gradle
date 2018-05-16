@@ -13,6 +13,7 @@ buildscript {
 
 plugins {
     id "org.sonarqube" version "2.6.1"
+    id "org.asciidoctor.convert" version "1.5.7"
 }
 
 apply plugin: 'java'
@@ -29,6 +30,8 @@ repositories {
 }
 
 dependencies {
+    asciidoctor 'org.springframework.restdocs:spring-restdocs-asciidoctor:2.0.1.RELEASE'
+
     compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
     compile ("org.springframework.boot:spring-boot-starter-security")
     compile group: 'org.springframework.boot', name: 'spring-boot-starter-web', version: '2.0.0.RELEASE'
@@ -39,14 +42,32 @@ dependencies {
     //compile group: 'com.github.jayield', name: 'rapper', version: '1.0.3'
 
     testCompile('org.springframework.boot:spring-boot-starter-test')
+    testCompile 'org.springframework.restdocs:spring-restdocs-mockmvc:2.0.1.RELEASE'
+    testCompile group: 'org.springframework.security', name: 'spring-security-test', version: '4.0.0.RELEASE'
 }
+
 compileKotlin {
     kotlinOptions {
         jvmTarget = "1.8"
     }
 }
+
 compileTestKotlin {
     kotlinOptions {
         jvmTarget = "1.8"
     }
+}
+
+ext {
+    snippetsDir = file('build/generated-snippets')
+}
+
+test {
+    outputs.dir snippetsDir
+}
+
+asciidoctor {
+    sourceDir 'src/main/asciidoc'
+    inputs.dir snippetsDir
+    dependsOn test
 }

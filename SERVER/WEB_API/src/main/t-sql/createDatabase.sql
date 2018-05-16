@@ -30,15 +30,11 @@ CREATE TABLE [Company] (
 	webPageUrl NVARCHAR(50),
 	LogoUrl NVARCHAR(100),
 	[description] NVARCHAR(50),
-	[version] rowversion,
-
-	FOREIGN KEY (accountID) REFERENCES Account(accountID)
+	[version] rowversion
 )
 
 CREATE TABLE [Moderator] (
-	accountID BIGINT primary key references Account,
-
-	FOREIGN KEY (accountID) REFERENCES Account(accountID)
+	accountID BIGINT primary key references Account
 )
 
 CREATE TABLE [UserAccount] (
@@ -47,8 +43,6 @@ CREATE TABLE [UserAccount] (
 	summary NVARCHAR(1500),
 	PhotoUrl NVARCHAR(100),
 	[version] rowversion
-
-	FOREIGN KEY (accountID) REFERENCES Account(accountID)		
 )
 
 CREATE TABLE [Curriculum](
@@ -56,8 +50,6 @@ CREATE TABLE [Curriculum](
 	curriculumId BIGINT identity primary key,
 	title nvarchar(50),
     [version] rowversion
-
-	FOREIGN KEY (accountId) REFERENCES [UserAccount] (accountId)
 )
 
 CREATE TABLE [Project] (
@@ -123,7 +115,7 @@ CREATE TABLE [Local] (
 
 CREATE TABLE [Job](
 	jobId BIGINT identity primary key,
-    title nvarchar(50) not null,
+  title nvarchar(50) not null,
 	accountId BIGINT ,
 	schedule NVARCHAR(20),
 	wage INT check(wage > 0),
@@ -206,7 +198,7 @@ CREATE TABLE [Chat](
 CREATE TABLE [Message](
 	accountId BIGINT,
 	messageId BIGINT IDENTITY primary key,
-	chatId BIGINT REFERENCES Chat,
+	chatId BIGINT,
 	[text] NVARCHAR(200),
 	[date] datetime default(getdate()),
 	[version] rowversion,
@@ -233,10 +225,8 @@ CREATE TABLE [Comment] (
 CREATE TABLE [Follows] (
 	accountIdFollowed BIGINT references Account,
 	accountIdFollower BIGINT references Account,
-	[version] rowversion
+	[version] rowversion,
 
-	FOREIGN KEY (accountIdFollowed) REFERENCES Account(accountId),
-	FOREIGN KEY (accountIdFollower) REFERENCES Account(accountId),
 	primary key (accountIdFollowed, accountIdFollower)
 )
 GO

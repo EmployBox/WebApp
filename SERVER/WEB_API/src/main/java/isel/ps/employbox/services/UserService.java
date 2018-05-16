@@ -94,7 +94,7 @@ public class UserService {
         return Mono.fromFuture(
                 getUser(application.getAccountId(), email)
                         .thenCompose(__ -> getApplication(application.getAccountId(), application.getJobId()))
-                        .thenCompose(___ -> applicationRepo.update(application))
+                        .thenCompose(__ -> applicationRepo.update(application))
                         .thenAccept(res -> {
                             if (!res) throw new BadRequestException(ErrorMessages.BAD_REQUEST_ITEM_CREATION);
                         })

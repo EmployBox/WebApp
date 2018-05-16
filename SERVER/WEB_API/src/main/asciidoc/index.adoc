@@ -1,0 +1,9 @@
+= Employbox API documentation
+
+== Create a user
+
+.HTTP request
+include::{snippets}/createUser/http-request.adoc[]
+
+.HTTP response
+include::{snippets}/createUser/http-response.adoc[]
