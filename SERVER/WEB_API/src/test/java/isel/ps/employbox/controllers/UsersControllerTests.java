@@ -8,6 +8,7 @@ import isel.ps.employbox.model.binder.UserBinder;
 import isel.ps.employbox.model.entities.UserAccount;
 import isel.ps.employbox.model.input.InUser;
 import isel.ps.employbox.security.AuthFilter;
+import javafx.util.Pair;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -17,7 +18,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.JUnitRestDocumentation;
+import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
 import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
@@ -29,9 +32,9 @@ import java.sql.SQLException;
 import static junit.framework.TestCase.assertTrue;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.httpBasic;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -52,7 +55,9 @@ public class UsersControllerTests {
     private DataRepository<UserAccount, Long> userRepo;
 
     private MockMvc mockMvc;
+    //private WebTestClient webTestClient;
     private Connection con;
+    private long userAccountId;
 
     @Before
     public void setUp() throws SQLException {
@@ -73,6 +78,11 @@ public class UsersControllerTests {
                 //.alwaysDo(document("{method-name}", preprocessRequest(prettyPrint()), preprocessResponse(prettyPrint())))
                 .build();
 
+        /*webTestClient = WebTestClient.bindToController(UserController.class)
+                .configureClient()
+                .filter(documentationConfiguration(restDocumentation))
+                .build();*/
+
         InUser user = new InUser();
         user.setEmail("teste@gmail.com");
         user.setPassword("password");
@@ -87,13 +97,13 @@ public class UsersControllerTests {
         userAccount = userBinder.bindInput(user);
 
         assertTrue(userRepo.create(userAccount).join());
+        userAccountId = userAccount.getIdentityKey();
+
+        con.commit();
     }
 
     @After
     public void after() throws SQLException {
-        //TODO implement deleteAll on Rapper
-        //userRepo.deleteAll();
-        con.rollback();
         con.close();
     }
 
@@ -115,15 +125,35 @@ public class UsersControllerTests {
         )
                 .andExpect(status().isOk())
                 .andDo(document("createUser"));
+
+        /*webTestClient
+                .post()
+                .uri("/accounts/users")
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody()
+                .consumeWith(document("createUser"));*/
+
+        assertTrue(userRepo.findWhere(new Pair<>("email", "someEmail@hotmail.com")).join().size() != 0);
     }
 
     @Test
-    public void testgetAllUsers() throws Exception {
+    public void testGetAllUsers() throws Exception {
         mockMvc.perform(
                 get("/accounts/users")
                         .with(httpBasic("teste@gmail.com", "password"))
         )
                 .andExpect(status().isOk())
                 .andDo(document("getAllUsers"));
+    }
+
+    @Test
+    public void testGetUser() throws Exception {
+        mockMvc.perform(
+                get("/accounts/users/" + userAccountId)
+                        .with(httpBasic("teste@gmail.com", "password"))
+        )
+                .andExpect(status().isOk())
+                .andDo(document("getUser"));
     }
 }

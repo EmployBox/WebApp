@@ -7,3 +7,11 @@ include::{snippets}/createUser/http-request.adoc[]
 
 .HTTP response
 include::{snippets}/createUser/http-response.adoc[]
+
+== Get all users
+
+.HTTP request
+include::{snippets}/getAllUsers/http-request.adoc[]
+
+.HTTP response
+include::{snippets}/getAllUsers/http-response.adoc[]
