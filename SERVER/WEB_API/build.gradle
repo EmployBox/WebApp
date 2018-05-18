@@ -33,6 +33,8 @@ repositories {
 dependencies {
     asciidoctor 'org.springframework.restdocs:spring-restdocs-asciidoctor:2.0.1.RELEASE'
 
+    runtime group: 'com.microsoft.sqlserver', name: 'mssql-jdbc', version: '6.5.2.jre8-preview'
+
     compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
     compile ("org.springframework.boot:spring-boot-starter-security")
     compile group: 'org.springframework.boot', name: 'spring-boot-starter-web', version: '2.0.0.RELEASE'
@@ -44,8 +46,9 @@ dependencies {
 
     testCompile('org.springframework.boot:spring-boot-starter-test')
     testCompile("org.springframework.restdocs:spring-restdocs-mockmvc")
+    //testCompile('org.springframework.restdocs:spring-restdocs-webtestclient')
     testCompile group: 'org.springframework.security', name: 'spring-security-test', version: '5.0.5.RELEASE'
-    testCompile group: 'org.hsqldb', name: 'hsqldb', version: '2.4.0'
+    testRuntime group: 'org.hsqldb', name: 'hsqldb', version: '2.4.0'
 
     compile fileTree(dir: 'vendor/main', include: '*.jar')
     testCompile fileTree(dir: 'vendor/main', include: '*.jar')
