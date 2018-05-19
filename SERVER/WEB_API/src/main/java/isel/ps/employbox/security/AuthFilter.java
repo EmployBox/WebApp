@@ -1,6 +1,5 @@
 package isel.ps.employbox.security;
 
-import isel.ps.employbox.services.AccountService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -16,10 +15,10 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 @Configuration
 @EnableWebSecurity
 public class AuthFilter extends WebSecurityConfigurerAdapter {
-    private AccountService accountService;
+    private UserDetailsServiceImpl userDetailsService;
 
-    public AuthFilter(AccountService accountService) {
-        this.accountService = accountService;
+    public AuthFilter(UserDetailsServiceImpl userDetailsService) {
+        this.userDetailsService = userDetailsService;
     }
 
     @Override
@@ -30,7 +29,7 @@ public class AuthFilter extends WebSecurityConfigurerAdapter {
     @Bean
     public DaoAuthenticationProvider authenticationProvider() {
         DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
-        authProvider.setUserDetailsService(accountService);
+        authProvider.setUserDetailsService(userDetailsService);
         authProvider.setPasswordEncoder(passwordEncoder());
         return authProvider;
     }

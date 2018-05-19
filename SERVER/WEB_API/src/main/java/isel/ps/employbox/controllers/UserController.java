@@ -62,8 +62,8 @@ public class UserController {
     public Mono<Void> updateUser(
             @PathVariable long id,
             @RequestBody InUser inUser,
-            Authentication authentication)
-    {
+            Authentication authentication
+    ) {
         if(inUser.getId() != id) throw new BadRequestException(BAD_REQUEST_IDS_MISMATCH);
         UserAccount userAccount = userBinder.bindInput(inUser);
         return userService.updateUser(userAccount, authentication.getName());
@@ -74,8 +74,8 @@ public class UserController {
             @PathVariable long id,
             @PathVariable long jid,
             @RequestBody InApplication inApplication,
-            Authentication authentication)
-    {
+            Authentication authentication
+    ) {
         if(inApplication.getAccountId() != id || inApplication.getJobId() != jid)
             throw new BadRequestException(BAD_REQUEST_IDS_MISMATCH);
         Application application = applicationBinder.bindInput(inApplication);

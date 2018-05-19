@@ -42,7 +42,7 @@ public class UserAccount extends Account {
                        CompletableFuture<List<Chat>> chats,
                        CompletableFuture<List<Comment>> comments,
                        CompletableFuture<List<Rating>> ratings,
-                       CompletableFuture<List<UserAccount>> followers,
+                       CompletableFuture<List<Account>> followers,
                        long version1
     ) {
         super(accountID, email, password, rating, version, offeredJobs, comments, chats, ratings, followers);

@@ -32,7 +32,7 @@ public class Company extends Account {
             float rating,
             long version,
             String name,
-            String Specialization,
+            String specialization,
             short yearFounded,
             String logoUrl,
             String webPageUrl,
@@ -41,11 +41,11 @@ public class Company extends Account {
             CompletableFuture<List<Chat>> chats,
             CompletableFuture<List<Comment>> comments,
             CompletableFuture<List<Rating>> ratings,
-            CompletableFuture<List<UserAccount>> following)
+            CompletableFuture<List<Account>> following)
     {
         super(accountID, email, password, rating, version, offeredJobs,comments, chats, ratings, following);
         this.name = name;
-        this.Specialization = Specialization;
+        this.Specialization = specialization;
         this.logoUrl = logoUrl;
         this.webPageUrl = webPageUrl;
         this.description = description;
@@ -59,7 +59,7 @@ public class Company extends Account {
             String password,
             float rating,
             String name,
-            String Specialization,
+            String specialization,
             short yearFounded,
             String logoUrl,
             String webPageUrl,
@@ -68,7 +68,7 @@ public class Company extends Account {
             long accountVersion) {
         super(accountID, email, password, rating, accountVersion);
         this.name = name;
-        this.Specialization = Specialization;
+        this.Specialization = specialization;
         this.logoUrl = logoUrl;
         this.webPageUrl = webPageUrl;
         this.description = description;

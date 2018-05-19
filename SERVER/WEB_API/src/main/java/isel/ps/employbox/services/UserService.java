@@ -30,7 +30,8 @@ public class UserService {
     public UserService(
             DataRepository<UserAccount, Long> userRepo,
             DataRepository<Curriculum, Long> curriculumRepo,
-            DataRepository<Application, Long> applicationRepo) {
+            DataRepository<Application, Long> applicationRepo
+    ) {
         this.userRepo = userRepo;
         this.curriculumRepo = curriculumRepo;
         this.applicationRepo = applicationRepo;

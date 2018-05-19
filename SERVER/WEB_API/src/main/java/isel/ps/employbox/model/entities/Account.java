@@ -38,7 +38,7 @@ public class Account implements DomainObject<Long>, UserDetails, Serializable {
     protected final CompletableFuture<List<Comment>> comments;
 
     @ColumnName(table = "Follows", foreignName = "accountIdFollowed", externalName = "accountIdFollower")
-    protected final CompletableFuture<List<UserAccount>> following;
+    protected final CompletableFuture<List<Account>> following;
 
     @ColumnName( foreignName = "accountIdFirst")
     protected final CompletableFuture<List<Chat>> chats;
@@ -70,7 +70,7 @@ public class Account implements DomainObject<Long>, UserDetails, Serializable {
             CompletableFuture<List<Comment>> comments,
             CompletableFuture<List<Chat>> chats,
             CompletableFuture<List<Rating>> ratings,
-            CompletableFuture<List<UserAccount>> following
+            CompletableFuture<List<Account>> following
     ) {
         this.accountId = accountID;
         this.email = email;
@@ -116,7 +116,7 @@ public class Account implements DomainObject<Long>, UserDetails, Serializable {
         return offeredJobs;
     }
 
-    public CompletableFuture<List<UserAccount>> getFollowing() {
+    public CompletableFuture<List<Account>> getFollowing() {
         return following;
     }
 
