@@ -3,6 +3,7 @@ package isel.ps.employbox.model.binder;
 import isel.ps.employbox.model.entities.Company;
 import isel.ps.employbox.model.input.InCompany;
 import isel.ps.employbox.model.output.OutCompany;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 
@@ -10,6 +11,12 @@ import java.util.concurrent.CompletableFuture;
 
 @Component
 public class CompanyBinder implements ModelBinder<Company,OutCompany,InCompany> {
+
+    private final PasswordEncoder passwordEncoder;
+
+    public CompanyBinder(PasswordEncoder passwordEncoder) {
+        this.passwordEncoder = passwordEncoder;
+    }
 
     @Override
     public Mono<OutCompany> bindOutput(CompletableFuture<Company> companyCompletableFuture) {
@@ -35,7 +42,7 @@ public class CompanyBinder implements ModelBinder<Company,OutCompany,InCompany> 
         return new Company(
                 obj.getAccountId(),
                 obj.getEmail(),
-                obj.getPassword(),
+                obj.getPassword() != null ? passwordEncoder.encode(obj.getPassword()) : null,
                 obj.getRating(),
                 obj.getName(),
                 obj.getSpecialization(),

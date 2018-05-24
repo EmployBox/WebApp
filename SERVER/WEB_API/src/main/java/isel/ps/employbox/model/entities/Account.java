@@ -4,26 +4,20 @@ import com.github.jayield.rapper.ColumnName;
 import com.github.jayield.rapper.DomainObject;
 import com.github.jayield.rapper.Id;
 import com.github.jayield.rapper.Version;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-import java.io.Serializable;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 import static isel.ps.employbox.model.entities.Role.DEFAULT;
 
-public class Account implements DomainObject<Long>, UserDetails, Serializable {
-
-    private final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+public class Account implements DomainObject<Long> {
 
     @Id (isIdentity =  true)
     protected long accountId;
-
     protected final String email;
     protected final String password;
     protected final double rating;
@@ -64,7 +58,7 @@ public class Account implements DomainObject<Long>, UserDetails, Serializable {
             long accountID,
             String email,
             String password,
-            float rating,
+            double rating,
             long version,
             CompletableFuture<List<Job>> offeredJobs,
             CompletableFuture<List<Comment>> comments,
@@ -74,7 +68,7 @@ public class Account implements DomainObject<Long>, UserDetails, Serializable {
     ) {
         this.accountId = accountID;
         this.email = email;
-        this.password = passwordEncoder.encode(password);
+        this.password = password;
         this.rating = rating;
         this.version = version;
         this.offeredJobs = offeredJobs;
@@ -84,11 +78,11 @@ public class Account implements DomainObject<Long>, UserDetails, Serializable {
         this.following = following;
     }
 
-    protected Account(long accountId, String email, String password, float rating, long version){
+    protected Account(long accountId, String email, String password, double rating, long version){
         this.accountId = accountId;
         this.version = version;
         this.email = email;
-        this.password =  passwordEncoder.encode(password);
+        this.password = password;
         this.rating = rating;
         this.offeredJobs = CompletableFuture.completedFuture(Collections.emptyList());
         this.chats = CompletableFuture.completedFuture(Collections.emptyList());
@@ -102,11 +96,13 @@ public class Account implements DomainObject<Long>, UserDetails, Serializable {
         return accountId;
     }
 
-
     public String getEmail() {
         return email;
     }
 
+    public String getPassword() {
+        return password;
+    }
 
     public double getRating() {
         return rating;
@@ -130,41 +126,6 @@ public class Account implements DomainObject<Long>, UserDetails, Serializable {
 
     public CompletableFuture<List<Rating>> getRatings() {
         return ratings;
-    }
-
-    @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        return Collections.emptyList();
-    }
-
-    @Override
-    public String getPassword() {
-        return password;
-    }
-
-    @Override
-    public String getUsername() {
-        return email;
-    }
-
-    @Override
-    public boolean isAccountNonExpired() {
-        return true;
-    }
-
-    @Override
-    public boolean isAccountNonLocked() {
-        return true;
-    }
-
-    @Override
-    public boolean isCredentialsNonExpired() {
-        return true;
-    }
-
-    @Override
-    public boolean isEnabled() {
-        return true;
     }
 
     @Override
