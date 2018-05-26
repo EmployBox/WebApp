@@ -66,7 +66,7 @@ public class ChatService {
                     return msgRepo.create(msg);
                 })
                 .thenApply(res -> {
-                    if (!res) throw new BadRequestException(ErrorMessages.BAD_REQUEST_ITEM_CREATION);
+                    if (res.isPresent()) throw new BadRequestException(ErrorMessages.BAD_REQUEST_ITEM_CREATION);
                     return msg;
                 });
     }
@@ -83,7 +83,7 @@ public class ChatService {
                         accountService.getAccount(inChat.getAccountIdSecond())
                 ).thenCompose(__ -> chatRepo.create(inChat)
                 ).thenApply(res -> {
-                    if (!res) throw new BadRequestException(ErrorMessages.BAD_REQUEST_ITEM_CREATION);
+                    if (res.isPresent()) throw new BadRequestException(ErrorMessages.BAD_REQUEST_ITEM_CREATION);
                     return inChat;
                 })
         );

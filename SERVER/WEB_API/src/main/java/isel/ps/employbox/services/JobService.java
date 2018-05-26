@@ -11,7 +11,9 @@ import javafx.util.Pair;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
+import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Stream;
 
@@ -28,7 +30,7 @@ public class JobService {
     }
 
     public CompletableFuture<Stream<Job> > getAllJobs() {
-        return  jobRepo.findAll().thenApply( list -> list.stream());
+        return  jobRepo.findAll().thenApply(Collection::stream);
     }
 
     public CompletableFuture<Job> getJob(long jid) {
@@ -38,7 +40,7 @@ public class JobService {
 
     public CompletableFuture<Stream<JobExperience>> getJobExperiences(long jid) {
         return jobExperienceRepo.findWhere(new Pair<>("jobId", jid))
-                .thenApply( list -> list.stream());
+                .thenApply(Collection::stream);
     }
 
     public CompletableFuture<JobExperience> getJobExperience(long id, long cid) {
@@ -58,7 +60,7 @@ public class JobService {
                         accountService.getAccount(job.getAccountId(), email)
                 ).thenCompose( __-> jobRepo.update(job))
                  .thenAccept( res -> {
-                    if(!res) throw new BadRequestException(ErrorMessages.BAD_REQUEST_ITEM_CREATION);
+                    if(res.isPresent()) throw new BadRequestException(ErrorMessages.BAD_REQUEST_ITEM_CREATION);
                 })
         );
     }
@@ -67,18 +69,18 @@ public class JobService {
         return accountService.getAccount(job.getAccountId(), email)
                 .thenCompose(__ -> jobRepo.create(job))
                 .thenCompose(res -> {
-                    if (!res) throw new BadRequestException(ErrorMessages.BAD_REQUEST_ITEM_CREATION);
+                    if (res.isPresent()) throw new BadRequestException(ErrorMessages.BAD_REQUEST_ITEM_CREATION);
                     return job.getExperiences();
                 })
                 .thenCompose(
                         experienceList -> {
-                            if(experienceList.size() == 0)
-                                return CompletableFuture.completedFuture(true);
-                            experienceList.forEach((curr) -> curr.setJobId(job.getIdentityKey()));
+                            if(experienceList.isEmpty())
+                                return CompletableFuture.completedFuture(Optional.empty());
+                            experienceList.forEach(curr -> curr.setJobId(job.getIdentityKey()));
                             return jobExperienceRepo.createAll(experienceList);
                         }
                 ).thenApply(res -> {
-                            if (!res) throw new BadRequestException(ErrorMessages.CHILDS_CREATION);
+                            if (res.isPresent()) throw new BadRequestException(ErrorMessages.CHILDS_CREATION);
                             return job;
                         }
 
@@ -93,7 +95,7 @@ public class JobService {
                                throw new BadRequestException(ErrorMessages.UN_AUTHORIZED_ID_AND_EMAIL_MISMATCH);
                             return jobRepo.delete(job);
                        }).thenAccept( res -> {
-                           if(!res) throw new BadRequestException(ErrorMessages.BAD_REQUEST_ITEM_DELETION);
+                           if(res.isPresent()) throw new BadRequestException(ErrorMessages.BAD_REQUEST_ITEM_DELETION);
                        })
                    )
        );
@@ -104,7 +106,7 @@ public class JobService {
                 .thenCompose(job -> accountService.getAccount(job.getAccountId(), username))
                 .thenCompose( __ -> jobExperienceRepo.createAll(jobExperience))
                 .thenAccept( res -> {
-                   if(!res) throw new BadRequestException(ErrorMessages.BAD_REQUEST_ITEM_CREATION);
+                   if(res.isPresent()) throw new BadRequestException(ErrorMessages.BAD_REQUEST_ITEM_CREATION);
                 });
     }
 
@@ -118,7 +120,7 @@ public class JobService {
                         .thenCompose(account ->
                                 jobExperienceRepo.update(jobExperience))
                         .thenAccept(res -> {
-                                    if (!res) throw new BadRequestException(ErrorMessages.BAD_REQUEST_ITEM_DELETION);
+                                    if (res.isPresent()) throw new BadRequestException(ErrorMessages.BAD_REQUEST_ITEM_DELETION);
                                 }
                         )
         );
@@ -128,8 +130,8 @@ public class JobService {
         return Mono.fromFuture(
                 getJob(jobId)
                         .thenCompose( job-> accountService.getAccount(job.getAccountId(), email))
-                        .thenCompose( (___) -> jobExperienceRepo.deleteById(jxpId))
-                        .thenAccept(res -> { if (!res) throw new BadRequestException(ErrorMessages.BAD_REQUEST_ITEM_DELETION); })
+                        .thenCompose( __ -> jobExperienceRepo.deleteById(jxpId))
+                        .thenAccept(res -> { if (res.isPresent()) throw new BadRequestException(ErrorMessages.BAD_REQUEST_ITEM_DELETION); })
         );
     }
 }

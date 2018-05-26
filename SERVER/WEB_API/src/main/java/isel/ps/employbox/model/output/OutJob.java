@@ -2,7 +2,7 @@ package isel.ps.employbox.model.output;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import isel.ps.employbox.controllers.JobController;
-import isel.ps.employbox.controllers.UserController;
+import isel.ps.employbox.controllers.UserAccountController;
 import org.springframework.hateoas.ResourceSupport;
 
 import java.sql.Timestamp;
@@ -67,6 +67,6 @@ public class OutJob extends ResourceSupport {
         this.offerType = offerType;
         this.add( linkTo ( methodOn(JobController.class).getJobExperiences(jobId)).withRel("experiences"));
         this.add( linkTo ( JobController.class).slash(jobId).withSelfRel());
-        this.add( linkTo ( methodOn(UserController.class).getAllApplications(accountID)).withRel("applications"));
+        this.add( linkTo ( methodOn(UserAccountController.class).getAllApplications(accountID)).withRel("applications"));
     }
 }

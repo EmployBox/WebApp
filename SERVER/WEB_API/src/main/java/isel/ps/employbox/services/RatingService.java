@@ -48,7 +48,7 @@ public class RatingService {
                 )
                 .thenCompose (__-> ratingRepo.update(rating))
                 .thenAccept(res -> {
-                    if(!res) throw new BadRequestException(ErrorMessages.BAD_REQUEST_ITEM_CREATION);
+                    if(res.isPresent()) throw new BadRequestException(ErrorMessages.BAD_REQUEST_ITEM_CREATION);
                 })
         );
     }
@@ -61,7 +61,7 @@ public class RatingService {
                 )
                 .thenCompose ( __-> ratingRepo.create( rating ))
                 .thenApply(res -> {
-                    if(!res) throw new BadRequestException(ErrorMessages.BAD_REQUEST_ITEM_CREATION);
+                    if(res.isPresent()) throw new BadRequestException(ErrorMessages.BAD_REQUEST_ITEM_CREATION);
                     return rating;
                 })
         );

@@ -86,7 +86,7 @@ public class UserService {
                 getUser(userAccount.getIdentityKey(), email)
                         .thenCompose(__ -> userRepo.update(userAccount))
                         .thenAccept(res -> {
-                            if (!res) throw new BadRequestException(ErrorMessages.BAD_REQUEST_ITEM_CREATION);
+                            if (res.isPresent()) throw new BadRequestException(ErrorMessages.BAD_REQUEST_ITEM_CREATION);
                         })
         );
     }
@@ -97,7 +97,7 @@ public class UserService {
                         .thenCompose(__ -> getApplication(application.getAccountId(), application.getJobId()))
                         .thenCompose(__ -> applicationRepo.update(application))
                         .thenAccept(res -> {
-                            if (!res) throw new BadRequestException(ErrorMessages.BAD_REQUEST_ITEM_CREATION);
+                            if (res.isPresent()) throw new BadRequestException(ErrorMessages.BAD_REQUEST_ITEM_CREATION);
                         })
         );
     }
@@ -105,7 +105,7 @@ public class UserService {
     public CompletableFuture<UserAccount> createUser(UserAccount userAccount) {
         return userRepo.create(userAccount)
                 .thenApply(res -> {
-                    if (!res) throw new BadRequestException(ErrorMessages.BAD_REQUEST_ITEM_CREATION);
+                    if (res.isPresent()) throw new BadRequestException(ErrorMessages.BAD_REQUEST_ITEM_CREATION);
                     return userAccount;
                 })
                 .exceptionally(e -> {
@@ -120,7 +120,7 @@ public class UserService {
         return getUser(userId, email)
                 .thenCompose(__ -> applicationRepo.create(application))
                 .thenApply(res -> {
-                    if (!res) throw new BadRequestException(ErrorMessages.BAD_REQUEST_ITEM_CREATION);
+                    if (res.isPresent()) throw new BadRequestException(ErrorMessages.BAD_REQUEST_ITEM_CREATION);
                     return application;
                 });
     }
@@ -130,7 +130,7 @@ public class UserService {
                 getUser(id, email)
                         .thenCompose(userRepo::delete)
                         .thenAccept(res -> {
-                            if (!res) throw new BadRequestException(ErrorMessages.BAD_REQUEST_ITEM_DELETION);
+                            if (res.isPresent()) throw new BadRequestException(ErrorMessages.BAD_REQUEST_ITEM_DELETION);
                         })
         );
     }
@@ -141,7 +141,7 @@ public class UserService {
                         .thenCompose(__ -> getApplication(userId, jobId))
                         .thenCompose(applicationRepo::delete)
                         .thenAccept(res -> {
-                            if (!res) throw new BadRequestException(ErrorMessages.BAD_REQUEST_ITEM_DELETION);
+                            if (res.isPresent()) throw new BadRequestException(ErrorMessages.BAD_REQUEST_ITEM_DELETION);
                         })
         );
     }

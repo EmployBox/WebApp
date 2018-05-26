@@ -49,7 +49,7 @@ public class FollowService {
                         .thenCompose(
                                 __ -> followsRepo.create(new Follow(accountToBeFollowedId, accountToFollowId))
                                         .thenAccept(res -> {
-                                            if (!res)
+                                            if (res.isPresent())
                                                 throw new BadRequestException(ErrorMessages.BAD_REQUEST_ITEM_DELETION);
                                         }))
         );
@@ -60,7 +60,7 @@ public class FollowService {
                 accountService.getAccount(id, username)
                         .thenCompose(__ -> followsRepo.deleteById(new Follow.FollowKey(id, fid)))
                         .thenAccept(res -> {
-                            if (!res)
+                            if (res.isPresent())
                                 throw new BadRequestException(ErrorMessages.BAD_REQUEST_ITEM_DELETION);
                         })
         );

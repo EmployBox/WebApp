@@ -34,10 +34,10 @@ public class OutUser extends ResourceSupport {
         this.photo_url = photo_url;
         this.summary = summary;
         this.rating = rating;
-        this.add( linkTo ( UserController.class).slash(id).withSelfRel());
+        this.add( linkTo ( UserAccountController.class).slash(id).withSelfRel());
         this.add( linkTo ( JobController.class,id).withRel("offered_jobs"));
         this.add( linkTo ( CurriculumController.class,id).withRel("curricula"));
-        this.add( linkTo ( methodOn(UserController.class).getAllApplications(id)).withRel("applications"));
+        this.add( linkTo ( methodOn(UserAccountController.class).getAllApplications(id)).withRel("applications"));
         this.add( linkTo ( ChatController.class,id).withRel("chats"));
         this.add( linkTo ( CommentController.class,id).withRel("comments"));
         this.add( linkTo ( RatingController.class,id).withRel("ratings"));

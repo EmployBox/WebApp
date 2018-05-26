@@ -7,12 +7,11 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.net.URLDecoder;
 import java.util.List;
 
-public class SomeTests {
+public class RapperTests {
 
-    private final Logger logger = LoggerFactory.getLogger(SomeTests.class);
+    private final Logger logger = LoggerFactory.getLogger(RapperTests.class);
 
     @Test
     public void test() {
@@ -24,10 +23,9 @@ public class SomeTests {
         MapperRegistry.getRepository(Comment.class);
         MapperRegistry.getRepository(Chat.class);
         MapperRegistry.getRepository(Message.class);
-        DataRepository<Account, Long> accountRepo = MapperRegistry.getRepository(Account.class);
+        MapperRegistry.getRepository(Account.class);
         MapperRegistry.getRepository(UserAccount.class);
         MapperRegistry.getRepository(Company.class);
         MapperRegistry.getRepository(JobExperience.class);
-        List<Account> accounts = accountRepo.findAll().join();
     }
 }

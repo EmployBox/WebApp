@@ -7,7 +7,7 @@ import java.util.concurrent.CompletableFuture;
 
 public class Company extends Account {
     private final String name;
-    private final String Specialization;
+    private final String specialization;
     private final short yearFounded;
     private final String logoUrl;
     private final String webPageUrl;
@@ -17,7 +17,7 @@ public class Company extends Account {
 
     public Company(){
         name = null;
-        Specialization = null;
+        specialization = null;
         yearFounded = 0;
         logoUrl = null;
         webPageUrl = null;
@@ -45,7 +45,7 @@ public class Company extends Account {
     {
         super(accountID, email, password, rating, version, offeredJobs,comments, chats, ratings, following);
         this.name = name;
-        this.Specialization = specialization;
+        this.specialization = specialization;
         this.logoUrl = logoUrl;
         this.webPageUrl = webPageUrl;
         this.description = description;
@@ -68,7 +68,7 @@ public class Company extends Account {
             long accountVersion) {
         super(accountID, email, password, rating, accountVersion);
         this.name = name;
-        this.Specialization = specialization;
+        this.specialization = specialization;
         this.logoUrl = logoUrl;
         this.webPageUrl = webPageUrl;
         this.description = description;
@@ -81,7 +81,7 @@ public class Company extends Account {
     }
 
     public String getSpecialization() {
-        return Specialization;
+        return specialization;
     }
 
     public short getYearFounded() {

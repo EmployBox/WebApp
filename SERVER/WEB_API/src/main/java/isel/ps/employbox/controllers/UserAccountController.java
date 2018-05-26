@@ -19,13 +19,13 @@ import static isel.ps.employbox.ErrorMessages.BAD_REQUEST_IDS_MISMATCH;
 
 @RestController
 @RequestMapping("/accounts/users")
-public class UserController {
+public class UserAccountController {
 
     private final UserService userService;
     private final UserBinder userBinder;
     private final ApplicationBinder applicationBinder;
 
-    public UserController(UserService userService, UserBinder userBinder, ApplicationBinder applicationBinder) {
+    public UserAccountController(UserService userService, UserBinder userBinder, ApplicationBinder applicationBinder) {
         this.userService = userService;
         this.userBinder = userBinder;
         this.applicationBinder = applicationBinder;

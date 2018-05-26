@@ -52,7 +52,7 @@ public class CommentService {
                 getComment(comment.getAccountIdFrom(), comment.getAccountIdDest(), comment.getIdentityKey(), username)
                         .thenCompose(__ -> commentRepo.update(comment))
                         .thenAccept(res -> {
-                            if (!res) throw new BadRequestException(ErrorMessages.BAD_REQUEST_ITEM_CREATION);
+                            if (res.isPresent()) throw new BadRequestException(ErrorMessages.BAD_REQUEST_ITEM_CREATION);
                         })
         );
     }
@@ -63,7 +63,7 @@ public class CommentService {
                 accountService.getAccount(comment.getAccountIdDest())
         ).thenCompose(__ -> commentRepo.create(comment)
         ).thenApply(res -> {
-            if (!res) throw new BadRequestException(ErrorMessages.BAD_REQUEST_ITEM_CREATION);
+            if (res.isPresent()) throw new BadRequestException(ErrorMessages.BAD_REQUEST_ITEM_CREATION);
             return comment;
         });
     }
@@ -79,7 +79,7 @@ public class CommentService {
                                             throw new UnauthorizedException(ErrorMessages.UN_AUTHORIZED);
                                         return commentRepo.deleteById(commentId);
                                     }).thenAccept(res -> {
-                                if (!res) throw new BadRequestException(ErrorMessages.BAD_REQUEST_ITEM_CREATION);
+                                if (res.isPresent()) throw new BadRequestException(ErrorMessages.BAD_REQUEST_ITEM_CREATION);
                             });
                         })
         );

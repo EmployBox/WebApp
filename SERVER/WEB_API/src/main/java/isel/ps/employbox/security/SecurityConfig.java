@@ -37,6 +37,7 @@ public class SecurityConfig {
         http.authorizeExchange().pathMatchers(HttpMethod.GET, "/accounts/**/comments").permitAll();
         http.authorizeExchange().pathMatchers(HttpMethod.GET, "/jobs").permitAll();
         http.authorizeExchange().pathMatchers(HttpMethod.GET, "/jobs/**").permitAll();
+        http.authorizeExchange().pathMatchers(HttpMethod.OPTIONS, "/**").permitAll();
         http.authorizeExchange().anyExchange().authenticated();
 
         //Activate security

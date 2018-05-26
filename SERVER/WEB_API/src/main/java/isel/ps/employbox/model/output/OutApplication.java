@@ -1,7 +1,7 @@
 package isel.ps.employbox.model.output;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import isel.ps.employbox.controllers.UserController;
+import isel.ps.employbox.controllers.UserAccountController;
 import org.springframework.hateoas.ResourceSupport;
 
 import java.sql.Timestamp;
@@ -29,6 +29,6 @@ public class OutApplication extends ResourceSupport {
         this.curriculumId = curriculumId;
         this.date = date;
         //TODO link not well done
-        this.add( linkTo( methodOn(UserController.class).getApplication(userId, jobId)).withSelfRel());
+        this.add( linkTo( methodOn(UserAccountController.class).getApplication(userId, jobId)).withSelfRel());
     }
 }

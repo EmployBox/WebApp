@@ -43,7 +43,7 @@ public class CompanyService {
                             return companyRepo.create(company);
                         }
                 ).thenApply(res -> {
-                    if (!res) throw new BadRequestException(ErrorMessages.BAD_REQUEST_ITEM_CREATION);
+                    if (res.isPresent()) throw new BadRequestException(ErrorMessages.BAD_REQUEST_ITEM_CREATION);
                     return company;
                 });
     }
@@ -57,7 +57,7 @@ public class CompanyService {
                                     return companyRepo.deleteById(cid);
                                 }
                         ).thenAccept(res -> {
-                    if (!res) throw new BadRequestException(ErrorMessages.BAD_REQUEST_ITEM_DELETION);
+                    if (res.isPresent()) throw new BadRequestException(ErrorMessages.BAD_REQUEST_ITEM_DELETION);
                 })
         );
     }
@@ -71,7 +71,7 @@ public class CompanyService {
                                     return companyRepo.update(company);
                                 }
                         ).thenAccept(res -> {
-                    if (!res) throw new BadRequestException(ErrorMessages.BAD_REQUEST_ITEM_UPDATE);
+                    if (res.isPresent()) throw new BadRequestException(ErrorMessages.BAD_REQUEST_ITEM_UPDATE);
                 })
         );
     }
