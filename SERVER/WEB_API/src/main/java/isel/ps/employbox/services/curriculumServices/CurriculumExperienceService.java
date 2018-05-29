@@ -9,6 +9,7 @@ import javafx.util.Pair;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
+import java.util.Collection;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Stream;
 
@@ -25,7 +26,7 @@ public class CurriculumExperienceService {
 
     public CompletableFuture<Stream<CurriculumExperience>> getCurriculumExperiences(long curriculumId){
         return curriculumExperienceRepo.findWhere(new Pair<>("curriculumId",curriculumId))
-                .thenApply( curriculumExperiences -> curriculumExperiences.stream());
+                .thenApply(Collection::stream);
     }
 
     public CompletableFuture<CurriculumExperience> addCurriculumExperience(
@@ -39,7 +40,7 @@ public class CurriculumExperienceService {
         return curriculumService.getCurriculum(accountId, curriculumId, email)
                 .thenCompose(__ -> curriculumExperienceRepo.create(curriculumExperience))
                 .thenApply(res -> {
-                    if (!res) throw new BadRequestException(ErrorMessages.BAD_REQUEST_ITEM_DELETION);
+                    if (res.isPresent()) throw new BadRequestException(ErrorMessages.BAD_REQUEST_ITEM_DELETION);
                     return curriculumExperience;
                 });
     }
@@ -54,7 +55,7 @@ public class CurriculumExperienceService {
                 .thenCompose(__ -> curriculumExperienceRepo.update(curriculumExperience)
                         .thenAccept(
                                 res -> {
-                                    if (!res) throw new BadRequestException(ErrorMessages.BAD_REQUEST_ITEM_DELETION);
+                                    if (res.isPresent()) throw new BadRequestException(ErrorMessages.BAD_REQUEST_ITEM_DELETION);
                                 }
                         ))
         );
@@ -71,7 +72,7 @@ public class CurriculumExperienceService {
                         .thenCompose(__ -> curriculumExperienceRepo.deleteById(curriculumExperienceId))
                         .thenAccept(
                                 res -> {
-                                    if (!res) throw new BadRequestException(ErrorMessages.BAD_REQUEST_ITEM_DELETION);
+                                    if (res.isPresent()) throw new BadRequestException(ErrorMessages.BAD_REQUEST_ITEM_DELETION);
                                 }
                         )
         );

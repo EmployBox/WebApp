@@ -38,33 +38,22 @@ public class CompanyController {
     }
 
     @PostMapping
-    public Mono<OutCompany> createCompany(
-            @RequestBody InCompany inCompany,
-            Authentication authentication
-    ){
+    public Mono<OutCompany> createCompany(@RequestBody InCompany inCompany){
         return companyBinder.bindOutput(
-                companyService.createCompany(companyBinder.bindInput(inCompany), authentication.getName())
+                companyService.createCompany(companyBinder.bindInput(inCompany))
         );
     }
 
     @PutMapping("/{id}")
-    public Mono<Void> updateCompany(
-            @PathVariable long id,
-            @RequestBody InCompany inCompany,
-            Authentication authentication
-    ){
+    public Mono<Void> updateCompany(@PathVariable long id, @RequestBody InCompany inCompany, Authentication authentication){
         if(id != inCompany.getAccountId()) throw new BadRequestException(BAD_REQUEST_IDS_MISMATCH);
         return companyService.updateCompany(
-                companyBinder.bindInput(inCompany),
-                authentication.getName()
+                companyBinder.bindInput(inCompany), authentication.getName()
         );
     }
 
     @DeleteMapping("/{cid}")
-    public Mono<Void> deleteCompany(
-            @PathVariable long cid,
-            Authentication authentication
-    ){
+    public Mono<Void> deleteCompany(@PathVariable long cid, Authentication authentication){
         return companyService.deleteCompany(cid, authentication.getName());
     }
 }

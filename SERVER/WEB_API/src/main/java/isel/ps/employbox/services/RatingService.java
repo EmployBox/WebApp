@@ -15,11 +15,11 @@ import java.util.stream.Stream;
 @Service
 public class RatingService {
     private final DataRepository<Rating, Rating.RatingKey> ratingRepo;
-    private final UserService userService;
+    private final UserAccountService userAccountService;
 
-    public RatingService(DataRepository<Rating, Rating.RatingKey> ratingRepo, UserService userService) {
+    public RatingService(DataRepository<Rating, Rating.RatingKey> ratingRepo, UserAccountService userAccountService) {
         this.ratingRepo = ratingRepo;
-        this.userService = userService;
+        this.userAccountService = userAccountService;
     }
 
     public CompletableFuture<Stream<Rating>> getRatings(long accountId, String type) {
@@ -43,7 +43,7 @@ public class RatingService {
     public Mono<Void> updateRating(Rating rating, String email) {
         return Mono.fromFuture(
                 CompletableFuture.allOf(
-                        userService.getUser(rating.getAccountIdFrom(), email),//throws exceptions
+                        userAccountService.getUser(rating.getAccountIdFrom(), email),//throws exceptions
                         getRating(rating.getAccountIdFrom(), rating.getAccountIdTo())
                 )
                 .thenCompose (__-> ratingRepo.update(rating))
@@ -56,8 +56,8 @@ public class RatingService {
     public Mono<Rating> createRating(Rating rating, String email) {
         return Mono.fromFuture(
                 CompletableFuture.allOf(
-                        userService.getUser(rating.getAccountIdFrom(),email),
-                        userService.getUser(rating.getAccountIdTo())
+                        userAccountService.getUser(rating.getAccountIdFrom(),email),
+                        userAccountService.getUser(rating.getAccountIdTo())
                 )
                 .thenCompose ( __-> ratingRepo.create( rating ))
                 .thenApply(res -> {
@@ -69,7 +69,7 @@ public class RatingService {
 
     public Mono<Void> deleteRating(long accountIDFrom, long accountIDTo, String email) {
         return Mono.fromFuture(
-                userService.getUser(accountIDFrom, email)
+                userAccountService.getUser(accountIDFrom, email)
                         .thenCompose(__-> getRating(accountIDFrom, accountIDTo))
                         .thenAccept( rating -> ratingRepo.delete(rating))
         );

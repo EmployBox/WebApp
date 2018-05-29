@@ -40,7 +40,7 @@ public class ProjectService {
         return curriculumService.getCurriculum(accountId, curriculumId,email)
                 .thenCompose( __ -> projectRepo.create( project))
                 .thenApply( res -> {
-                    if (!res) throw new BadRequestException(ErrorMessages.BAD_REQUEST_ITEM_DELETION);
+                    if (res.isPresent()) throw new BadRequestException(ErrorMessages.BAD_REQUEST_ITEM_DELETION);
                     return project;
                 });
     }
@@ -58,7 +58,7 @@ public class ProjectService {
                 .thenCompose(__ -> projectRepo.update(project)
                         .thenAccept(
                                 res -> {
-                                    if (!res) throw new BadRequestException(ErrorMessages.BAD_REQUEST_ITEM_DELETION);
+                                    if (res.isPresent()) throw new BadRequestException(ErrorMessages.BAD_REQUEST_ITEM_DELETION);
                                 }
                         ))
         );
@@ -75,7 +75,7 @@ public class ProjectService {
                         .thenCompose(__ -> projectRepo.deleteById(projectId))
                         .thenAccept(
                                 res -> {
-                                    if (!res) throw new BadRequestException(ErrorMessages.BAD_REQUEST_ITEM_DELETION);
+                                    if (res.isPresent()) throw new BadRequestException(ErrorMessages.BAD_REQUEST_ITEM_DELETION);
                                 }
                         )
         );

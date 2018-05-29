@@ -85,7 +85,7 @@ create table PreviousJobs (
   version bigint default 1,
 
   FOREIGN KEY (curriculumId) REFERENCES Curriculum,
-  CHECK(workLoad = 'partial' OR workLoad = 'total')
+  CHECK(workload = 'partial' OR workload = 'total')
 );
 
 create table Local (
@@ -154,7 +154,7 @@ CREATE TABLE Rating(
   accountIdFrom BIGINT,
   accountIdTo BIGINT,
   moderatorId BIGINT references Moderator,
-  workLoad real DEFAULT 0.0  check (workLoad >= 0.0 AND workLoad <= 10.0),
+  workload real DEFAULT 0.0  check (workload >= 0.0 AND workload <= 10.0),
   wage real DEFAULT 0.0 check (wage >= 0.0 AND wage <= 10.0),
   workEnviroment real DEFAULT 0.0 check (workEnviroment >= 0.0 AND workEnviroment <= 10.0),
   competences real DEFAULT 0.0 check (competences >= 0.0 AND competences <= 10.0),

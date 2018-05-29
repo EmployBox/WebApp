@@ -1,7 +1,7 @@
 package isel.ps.employbox.model.binder;
 
 import isel.ps.employbox.model.entities.UserAccount;
-import isel.ps.employbox.model.input.InUser;
+import isel.ps.employbox.model.input.InUserAccount;
 import isel.ps.employbox.model.output.OutUser;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
@@ -10,7 +10,7 @@ import reactor.core.publisher.Mono;
 import java.util.concurrent.CompletableFuture;
 
 @Component
-public class UserBinder implements ModelBinder<UserAccount,OutUser,InUser> {
+public class UserBinder implements ModelBinder<UserAccount,OutUser,InUserAccount> {
 
     private final PasswordEncoder passwordEncoder;
 
@@ -34,16 +34,16 @@ public class UserBinder implements ModelBinder<UserAccount,OutUser,InUser> {
     }
 
     @Override
-    public UserAccount bindInput(InUser inUser) {
+    public UserAccount bindInput(InUserAccount inUserAccount) {
         return new UserAccount(
-                inUser.getId(),
-                inUser.getEmail(),
-                inUser.getPassword() != null ? passwordEncoder.encode(inUser.getPassword()) : null,
+                inUserAccount.getId(),
+                inUserAccount.getEmail(),
+                inUserAccount.getPassword() != null ? passwordEncoder.encode(inUserAccount.getPassword()) : null,
                 0,
-                inUser.getName(),
-                inUser.getSummary(),
-                inUser.getPhoto_url(),
-                inUser.getAccountVersion(),
-                inUser.getUserVersion());
+                inUserAccount.getName(),
+                inUserAccount.getSummary(),
+                inUserAccount.getPhoto_url(),
+                inUserAccount.getAccountVersion(),
+                inUserAccount.getUserVersion());
     }
 }

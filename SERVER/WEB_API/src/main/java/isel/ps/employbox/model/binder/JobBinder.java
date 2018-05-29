@@ -9,25 +9,25 @@ import reactor.core.publisher.Mono;
 import java.util.concurrent.CompletableFuture;
 
 @Component
-public class JobBinder implements ModelBinder<Job,OutJob,InJob> {
+public class JobBinder implements ModelBinder<Job, OutJob, InJob> {
 
     @Override
     public Mono<OutJob> bindOutput(CompletableFuture<Job> jobCompletableFuture) {
         return Mono.fromFuture(
                 jobCompletableFuture
-                        .thenApply(job-> new OutJob(
-                                    job.getAccountId(),
-                                    job.getIdentityKey(),
-                                    job.getTitle(),
-                                    job.getAddress(),
-                                    job.getWage(),
-                                    job.getDescription(),
-                                    job.getSchedule(),
-                                    job.getOfferBeginDate(),
-                                    job.getOfferEndDate(),
-                                    job.getOfferType()
+                        .thenApply(job -> new OutJob(
+                                        job.getAccountId(),
+                                        job.getIdentityKey(),
+                                        job.getTitle(),
+                                        job.getAddress(),
+                                        job.getWage(),
+                                        job.getDescription(),
+                                        job.getSchedule(),
+                                        job.getOfferBeginDate(),
+                                        job.getOfferEndDate(),
+                                        job.getOfferType()
+                                )
                         )
-                )
         );
     }
 

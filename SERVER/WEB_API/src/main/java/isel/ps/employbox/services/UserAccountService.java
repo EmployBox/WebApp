@@ -21,13 +21,13 @@ import java.util.stream.Stream;
 import static isel.ps.employbox.ErrorMessages.RESOURCE_NOTFOUND_USER;
 
 @Service
-public class UserService {
+public class UserAccountService {
 
     private final DataRepository<UserAccount, Long> userRepo;
     private final DataRepository<Curriculum, Long> curriculumRepo;
     private final DataRepository<Application, Long> applicationRepo;
 
-    public UserService(
+    public UserAccountService(
             DataRepository<UserAccount, Long> userRepo,
             DataRepository<Curriculum, Long> curriculumRepo,
             DataRepository<Application, Long> applicationRepo
@@ -68,7 +68,6 @@ public class UserService {
                 });
     }
 
-
     public CompletableFuture<Stream<Application>> getAllApplications(long accountId)
     {
         return userRepo.findById(accountId)
@@ -78,28 +77,6 @@ public class UserService {
                 .exceptionally(throwable -> {
                     throw new ResourceNotFoundException(ErrorMessages.RESOURCE_NOTFOUND_USER);
                 });
-    }
-
-
-    public Mono<Void> updateUser(UserAccount userAccount, String email) {
-        return Mono.fromFuture(
-                getUser(userAccount.getIdentityKey(), email)
-                        .thenCompose(__ -> userRepo.update(userAccount))
-                        .thenAccept(res -> {
-                            if (res.isPresent()) throw new BadRequestException(ErrorMessages.BAD_REQUEST_ITEM_CREATION);
-                        })
-        );
-    }
-
-    public Mono<Void> updateApplication(Application application, String email) {
-        return Mono.fromFuture(
-                getUser(application.getAccountId(), email)
-                        .thenCompose(__ -> getApplication(application.getAccountId(), application.getJobId()))
-                        .thenCompose(__ -> applicationRepo.update(application))
-                        .thenAccept(res -> {
-                            if (res.isPresent()) throw new BadRequestException(ErrorMessages.BAD_REQUEST_ITEM_CREATION);
-                        })
-        );
     }
 
     public CompletableFuture<UserAccount> createUser(UserAccount userAccount) {
@@ -123,6 +100,27 @@ public class UserService {
                     if (res.isPresent()) throw new BadRequestException(ErrorMessages.BAD_REQUEST_ITEM_CREATION);
                     return application;
                 });
+    }
+
+    public Mono<Void> updateUser(UserAccount userAccount, String email) {
+        return Mono.fromFuture(
+                getUser(userAccount.getIdentityKey(), email)
+                        .thenCompose(__ -> userRepo.update(userAccount))
+                        .thenAccept(res -> {
+                            if (res.isPresent()) throw new BadRequestException(ErrorMessages.BAD_REQUEST_ITEM_CREATION);
+                        })
+        );
+    }
+
+    public Mono<Void> updateApplication(Application application, String email) {
+        return Mono.fromFuture(
+                getUser(application.getAccountId(), email)
+                        .thenCompose(__ -> getApplication(application.getAccountId(), application.getJobId()))
+                        .thenCompose(__ -> applicationRepo.update(application))
+                        .thenAccept(res -> {
+                            if (res.isPresent()) throw new BadRequestException(ErrorMessages.BAD_REQUEST_ITEM_CREATION);
+                        })
+        );
     }
 
     public Mono<Void> deleteUser(long id, String email) {

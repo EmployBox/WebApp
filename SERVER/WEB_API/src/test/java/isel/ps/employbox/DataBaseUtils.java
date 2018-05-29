@@ -1,10 +1,6 @@
 package isel.ps.employbox;
 
-import com.github.jayield.rapper.DataRepository;
 import com.github.jayield.rapper.utils.ConnectionManager;
-import isel.ps.employbox.model.binder.UserBinder;
-import isel.ps.employbox.model.entities.UserAccount;
-import isel.ps.employbox.model.input.InUser;
 
 import java.net.URLDecoder;
 import java.sql.Connection;

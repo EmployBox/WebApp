@@ -1,11 +1,17 @@
 CREATE PROCEDURE populateDB()
   MODIFIES SQL DATA
   begin atomic
-    declare authorId int;
-    declare bookId int;
-    begin atomic
-        insert into JOB(TITLE) values ('very gud job');
-    end;
+    insert into ACCOUNT(EMAIL, PASSWORD) values ('teste@gmail.com', 'password');
+    insert into ACCOUNT(EMAIL, PASSWORD) values ('lol@hotmail.com', 'teste123');
+
+    insert into USERACCOUNT(ACCOUNTID, NAME) values (
+      (select ACCOUNTID from ACCOUNT where EMAIL = 'teste@gmail.com'),
+      'Bruno'
+    );
+    insert into USERACCOUNT(ACCOUNTID, NAME) values (
+      (select ACCOUNTID from ACCOUNT where EMAIL = 'lol@hotmail.com'),
+      'Maria'
+    );
   end;
 
 create procedure deleteDB()

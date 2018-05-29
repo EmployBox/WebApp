@@ -39,7 +39,7 @@ public class PreviousJobService {
         return curriculumService.getCurriculum(accountId, curriculumId,email)
                 .thenCompose( __ ->previousJobsRepo.create( previousJobs))
                 .thenApply( res -> {
-                    if (!res) throw new BadRequestException(ErrorMessages.BAD_REQUEST_ITEM_DELETION);
+                    if (res.isPresent()) throw new BadRequestException(ErrorMessages.BAD_REQUEST_ITEM_DELETION);
                     return previousJobs;
                 });
     }
@@ -56,11 +56,9 @@ public class PreviousJobService {
             throw new BadRequestException(ErrorMessages.BAD_REQUEST_IDS_MISMATCH);
         return Mono.fromFuture(curriculumService.getCurriculum(accountId, curriculumId, email)
                 .thenCompose(__ -> previousJobsRepo.update(previousJobs))
-                .thenAccept(
-                        res -> {
-                            if (!res) throw new BadRequestException(ErrorMessages.BAD_REQUEST_ITEM_DELETION);
-                        }
-                )
+                .thenAccept(res -> {
+                            if (res.isPresent()) throw new BadRequestException(ErrorMessages.BAD_REQUEST_ITEM_DELETION);
+                        })
         );
     }
 
@@ -73,11 +71,9 @@ public class PreviousJobService {
         return Mono.fromFuture(
                 curriculumService.getCurriculum(accountId, curriculumId, email)
                         .thenCompose(__ -> previousJobsRepo.deleteById(previousJobId))
-                        .thenAccept(
-                                res -> {
-                                    if (!res) throw new BadRequestException(ErrorMessages.BAD_REQUEST_ITEM_DELETION);
-                                }
-                        )
+                        .thenAccept(res -> {
+                                    if (res.isPresent()) throw new BadRequestException(ErrorMessages.BAD_REQUEST_ITEM_DELETION);
+                                })
         );
     }
 

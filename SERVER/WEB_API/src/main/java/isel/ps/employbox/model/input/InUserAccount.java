@@ -1,6 +1,6 @@
 package isel.ps.employbox.model.input;
 
-public class InUser {
+public class InUserAccount {
     private long id;
     private String email;
     private String password;

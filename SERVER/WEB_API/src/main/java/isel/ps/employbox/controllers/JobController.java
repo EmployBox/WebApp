@@ -63,14 +63,6 @@ public class JobController {
         return jobExperienceBinder.bindOutput(jobService.getJobExperience(jid, expId));
     }
 
-    @PutMapping("/{jid}")
-    public Mono<Void> updateJob(@PathVariable long jid, @RequestBody InJob job, Authentication authentication){
-        if(job.getJobID() != jid) throw new BadRequestException(BAD_REQUEST_IDS_MISMATCH);
-        Job updateJob = jobBinder.bindInput(job);
-
-        return jobService.updateJob(updateJob, authentication.getName());
-    }
-
     @PostMapping
     public Mono<OutJob> createJob(@RequestBody InJob job, Authentication authentication){
         Job newJob = jobBinder.bindInput(job);
@@ -81,10 +73,17 @@ public class JobController {
     public Mono<Void> createJobExperiences(
             @PathVariable long jid,
             @RequestBody List<JobExperience> jobExperience,
-            Authentication authentication)
-    {
+            Authentication authentication
+    ) {
         return Mono.fromFuture( jobService.addJobExperienceToJob(jid, jobExperience, authentication.getName()));
+    }
 
+    @PutMapping("/{jid}")
+    public Mono<Void> updateJob(@PathVariable long jid, @RequestBody InJob job, Authentication authentication){
+        if(job.getJobID() != jid) throw new BadRequestException(BAD_REQUEST_IDS_MISMATCH);
+        Job updateJob = jobBinder.bindInput(job);
+
+        return jobService.updateJob(updateJob, authentication.getName());
     }
 
     @PutMapping("/{jid}/experience/{jxpId}")

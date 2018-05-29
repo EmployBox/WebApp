@@ -10,12 +10,10 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 public class Job implements DomainObject<Long> {
-
     @Id(isIdentity =  true)
     private long jobId;
-
     private final String title;
-    private final long accountId;
+    private final Long accountId;
     private final String address;
     private final int wage;
     private final String description;
@@ -25,16 +23,14 @@ public class Job implements DomainObject<Long> {
     private final String offerType;
     @Version
     private final long version;
-
     @ColumnName(foreignName = "jobId")
     private final CompletableFuture<List<Application>> applications;
-
     @ColumnName(foreignName = "jobId")
     private final CompletableFuture<List<JobExperience>> experiences;
 
     public Job(){
         title = null;
-        accountId = 0;
+        accountId = null;
         address = null;
         wage = 0;
         description = null;
@@ -60,8 +56,8 @@ public class Job implements DomainObject<Long> {
             String offerType,
             long version,
             CompletableFuture<List<Application>> applications,
-            CompletableFuture<List<JobExperience>> experiences)
-    {
+            CompletableFuture<List<JobExperience>> experiences
+    ) {
         this.jobId = id;
         this.title = title;
         this.accountId = accountID;
@@ -90,8 +86,7 @@ public class Job implements DomainObject<Long> {
             String offerType,
             List<JobExperience> experiences,
             long version
-    )
-    {
+    ) {
         this.jobId = jobId;
         this.accountId = accountID;
         this.title = title;
@@ -116,7 +111,7 @@ public class Job implements DomainObject<Long> {
         return version;
     }
 
-    public long getAccountId() {
+    public Long getAccountId() {
         return accountId;
     }
 
@@ -147,7 +142,6 @@ public class Job implements DomainObject<Long> {
     public String getAddress() {
         return address;
     }
-
 
     public String getTitle() {
         return title;

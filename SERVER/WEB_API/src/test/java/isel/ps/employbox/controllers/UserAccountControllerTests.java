@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.jayield.rapper.DataRepository;
 import isel.ps.employbox.model.binder.UserBinder;
 import isel.ps.employbox.model.entities.UserAccount;
-import isel.ps.employbox.model.input.InUser;
+import isel.ps.employbox.model.input.InUserAccount;
 import javafx.util.Pair;
 import org.junit.After;
 import org.junit.Before;
@@ -24,6 +24,7 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.List;
 
 import static isel.ps.employbox.DataBaseUtils.prepareDB;
 import static junit.framework.TestCase.assertFalse;
@@ -41,7 +42,7 @@ public class UserAccountControllerTests {
     @Autowired
     private ApplicationContext context;
     @Autowired
-    private DataRepository<UserAccount, Long> userRepo;
+    private DataRepository<UserAccount, Long> userAccountRepo;
     @Autowired
     private UserBinder userBinder;
     private WebTestClient webTestClient;
@@ -57,20 +58,17 @@ public class UserAccountControllerTests {
                 .filter(basicAuthentication())
                 .filter(documentationConfiguration(restDocumentation))
                 .build();
-        InUser user = new InUser();
-        user.setEmail("teste@gmail.com");
-        user.setPassword("password");
-        user.setName("Bruno");
-        UserAccount userAccount = userBinder.bindInput(user);
-        assertTrue(!userRepo.create(userAccount).join().isPresent());
 
+        /*InUserAccount user = new InUserAccount();
         user.setEmail("lol@hotmail.com");
         user.setPassword("teste123");
         user.setName("Maria");
-        userAccount = userBinder.bindInput(user);
-        assertTrue(!userRepo.create(userAccount).join().isPresent());
+        UserAccount userAccount = userBinder.bindInput(user);
+        assertTrue(!userAccountRepo.create(userAccount).join().isPresent());*/
 
-        userAccountId = userAccount.getIdentityKey();
+        List<UserAccount> userAccounts = userAccountRepo.findWhere(new Pair<>("email", "lol@hotmail.com")).join();
+        assertTrue(userAccounts.size() != 0);
+        userAccountId = userAccounts.get(0).getIdentityKey()/*userAccount.getIdentityKey()*/;
     }
 
     @After
@@ -102,7 +100,7 @@ public class UserAccountControllerTests {
 
     @Test
     public void testCreateUserAccount() throws Exception {
-        InUser user = new InUser();
+        InUserAccount user = new InUserAccount();
         user.setEmail("someEmail@hotmail.com");
         user.setName("Manuel");
         user.setPassword("1234");
@@ -121,21 +119,21 @@ public class UserAccountControllerTests {
                 .expectBody()
                 .consumeWith(document("createUserAccount"));
 
-        assertTrue(userRepo.findWhere(new Pair<>("email", "someEmail@hotmail.com")).join().size() != 0);
+        assertTrue(userAccountRepo.findWhere(new Pair<>("email", "someEmail@hotmail.com")).join().size() != 0);
     }
 
     @Test
     @WithMockUser(username = "teste@gmail.com")
     public void testUpdateWrongUserAccount() throws JsonProcessingException {
-        InUser inUser = new InUser();
-        inUser.setId(userAccountId);
-        inUser.setEmail("someEmail@hotmail.com");
-        inUser.setName("Manuel");
-        inUser.setPassword("1234");
-        inUser.setSummary("Sou um tipo simpatico");
+        InUserAccount inUserAccount = new InUserAccount();
+        inUserAccount.setId(userAccountId);
+        inUserAccount.setEmail("someEmail@hotmail.com");
+        inUserAccount.setName("Manuel");
+        inUserAccount.setPassword("1234");
+        inUserAccount.setSummary("Sou um tipo simpatico");
 
         ObjectMapper objectMapper = new ObjectMapper();
-        String json = objectMapper.writeValueAsString(inUser);
+        String json = objectMapper.writeValueAsString(inUserAccount);
 
         webTestClient
                 .put()
@@ -151,15 +149,15 @@ public class UserAccountControllerTests {
     @Test
     @WithMockUser(username = "lol@hotmail.com")
     public void testUpdateUserAccount() throws JsonProcessingException {
-        InUser inUser = new InUser();
-        inUser.setId(userAccountId);
-        inUser.setEmail("someEmail@hotmail.com");
-        inUser.setName("Manuel");
-        inUser.setPassword("1234");
-        inUser.setSummary("Sou um tipo simpatico");
+        InUserAccount inUserAccount = new InUserAccount();
+        inUserAccount.setId(userAccountId);
+        inUserAccount.setEmail("someEmail@hotmail.com");
+        inUserAccount.setName("Manuel");
+        inUserAccount.setPassword("1234");
+        inUserAccount.setSummary("Sou um tipo simpatico");
 
         ObjectMapper objectMapper = new ObjectMapper();
-        String json = objectMapper.writeValueAsString(inUser);
+        String json = objectMapper.writeValueAsString(inUserAccount);
 
         webTestClient
                 .put()
@@ -207,6 +205,6 @@ public class UserAccountControllerTests {
                 .expectBody()
                 .consumeWith(document("deleteUserAccount"));
 
-        assertFalse(userRepo.findById(userAccountId).join().isPresent());
+        assertFalse(userAccountRepo.findById(userAccountId).join().isPresent());
     }
 }

@@ -41,7 +41,7 @@ public class AcademicBackgroundService {
         return curriculumService.getCurriculum(accountId, curriculumId, email)
                 .thenCompose( __ -> academicBackgroundRepo.create( academicBackground))
                 .thenApply( res -> {
-                    if (!res) throw new BadRequestException(ErrorMessages.BAD_REQUEST_ITEM_DELETION);
+                    if (res.isPresent()) throw new BadRequestException(ErrorMessages.BAD_REQUEST_ITEM_DELETION);
                     return academicBackground;
                 });
     }
@@ -56,7 +56,7 @@ public class AcademicBackgroundService {
                 .thenCompose(__ -> academicBackgroundRepo.update(academicBackground)
                         .thenAccept(
                                 res -> {
-                                    if (!res) throw new BadRequestException(ErrorMessages.BAD_REQUEST_ITEM_DELETION);
+                                    if (res.isPresent()) throw new BadRequestException(ErrorMessages.BAD_REQUEST_ITEM_DELETION);
                                 }
                         ))
         );
@@ -72,7 +72,7 @@ public class AcademicBackgroundService {
                 .thenCompose(__ -> academicBackgroundRepo.deleteById(academicBackgroundId))
                 .thenAccept(
                         res -> {
-                            if (!res) throw new BadRequestException(ErrorMessages.BAD_REQUEST_ITEM_DELETION);
+                            if (res.isPresent()) throw new BadRequestException(ErrorMessages.BAD_REQUEST_ITEM_DELETION);
                         }
                 )
         );
