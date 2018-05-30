@@ -1,31 +1,41 @@
 package isel.ps.employbox.services;
 
 import com.github.jayield.rapper.DataRepository;
+import com.github.jayield.rapper.Transaction;
 import isel.ps.employbox.ErrorMessages;
 import isel.ps.employbox.exceptions.BadRequestException;
 import isel.ps.employbox.exceptions.ConflictException;
 import isel.ps.employbox.exceptions.ResourceNotFoundException;
+import isel.ps.employbox.exceptions.UnauthorizedException;
+import isel.ps.employbox.model.entities.Account;
+import isel.ps.employbox.model.entities.Application;
 import isel.ps.employbox.model.entities.Job;
 import isel.ps.employbox.model.entities.JobExperience;
 import javafx.util.Pair;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
+import java.sql.Connection;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Service
 public class JobService {
     private final DataRepository<Job, Long> jobRepo;
     private final DataRepository<JobExperience, Long> jobExperienceRepo;
+    private final DataRepository<Account, Long> accountRepo;
+    private final DataRepository<Application, Long> applicationRepo;
     private final AccountService accountService;
 
-    public JobService(DataRepository<Job, Long> jobRepo, DataRepository<JobExperience, Long> jobExperienceExperienceRepo, AccountService userService) {
+    public JobService(DataRepository<Job, Long> jobRepo, DataRepository<JobExperience, Long> jobExperienceExperienceRepo, DataRepository<Account, Long> accountRepo, DataRepository<Application, Long> applicationRepo, AccountService userService) {
         this.jobRepo = jobRepo;
         this.jobExperienceRepo = jobExperienceExperienceRepo;
+        this.accountRepo = accountRepo;
+        this.applicationRepo = applicationRepo;
         this.accountService = userService;
     }
 
@@ -53,18 +63,6 @@ public class JobService {
                 });
     }
 
-    public Mono<Void> updateJob(Job job, String email) {
-        return Mono.fromFuture(
-                CompletableFuture.allOf(
-                        getJob(job.getIdentityKey()),
-                        accountService.getAccount(job.getAccountId(), email)
-                ).thenCompose( __-> jobRepo.update(job))
-                 .thenAccept( res -> {
-                    if(res.isPresent()) throw new BadRequestException(ErrorMessages.BAD_REQUEST_ITEM_CREATION);
-                })
-        );
-    }
-
     public CompletableFuture<Job> createJob(Job job, String email) {
         return accountService.getAccount(job.getAccountId(), email)
                 .thenCompose(__ -> jobRepo.create(job))
@@ -87,27 +85,26 @@ public class JobService {
                 );
     }
 
-    public Mono<Void> deleteJob( long id, String email) {
-        return Mono.fromFuture(
-           accountService.getAccount(id, email)
-                   .thenAccept(user -> getJob(id).thenCompose( job -> {
-                           if(job.getAccountId() != user.getIdentityKey())
-                               throw new BadRequestException(ErrorMessages.UN_AUTHORIZED_ID_AND_EMAIL_MISMATCH);
-                            return jobRepo.delete(job);
-                       }).thenAccept( res -> {
-                           if(res.isPresent()) throw new BadRequestException(ErrorMessages.BAD_REQUEST_ITEM_DELETION);
-                       })
-                   )
-       );
-    }
-
     public CompletableFuture<Void> addJobExperienceToJob(long jobId, List<JobExperience> jobExperience, String username){
         return getJob(jobId)
                 .thenCompose(job -> accountService.getAccount(job.getAccountId(), username))
                 .thenCompose( __ -> jobExperienceRepo.createAll(jobExperience))
                 .thenAccept( res -> {
-                   if(res.isPresent()) throw new BadRequestException(ErrorMessages.BAD_REQUEST_ITEM_CREATION);
+                    if(res.isPresent()) throw new BadRequestException(ErrorMessages.BAD_REQUEST_ITEM_CREATION);
                 });
+    }
+
+    public Mono<Void> updateJob(Job job, String email) {
+        return Mono.fromFuture(
+                CompletableFuture.allOf(
+                        getJob(job.getIdentityKey()),
+                        accountService.getAccount(job.getAccountId(), email)
+                )
+                        .thenCompose(__ -> jobRepo.update(job))
+                        .thenAccept(res -> {
+                            if (res.isPresent()) throw new BadRequestException(ErrorMessages.BAD_REQUEST_ITEM_CREATION);
+                        })
+        );
     }
 
     public Mono<Void> updateJobExperience(long jxpId, long jobId, JobExperience jobExperience, String username) {
@@ -123,6 +120,38 @@ public class JobService {
                                     if (res.isPresent()) throw new BadRequestException(ErrorMessages.BAD_REQUEST_ITEM_DELETION);
                                 }
                         )
+        );
+    }
+
+    public Mono<Void> deleteJob(long jobId, String email) {
+        return Mono.fromFuture(
+                accountRepo.findWhere(new Pair<>("email", email))
+                        .thenApply(accounts -> {
+                            if (accounts.isEmpty())
+                                throw new UnauthorizedException(ErrorMessages.UN_AUTHORIZED);
+                            return accounts.get(0);
+                        })
+                        .thenAccept(account -> getJob(jobId)
+                                .thenCompose(job -> {
+                                    if (!job.getAccountId().equals(account.getIdentityKey()))
+                                        throw new BadRequestException(ErrorMessages.UN_AUTHORIZED_ID_AND_EMAIL_MISMATCH);
+                                    return new Transaction(Connection.TRANSACTION_READ_UNCOMMITTED)
+                                            .andDo(() -> job.getApplications()
+                                                    .thenCompose(applications -> {
+                                                        List<Long> applicationIds = applications.stream().map(Application::getIdentityKey).collect(Collectors.toList());
+                                                        return applicationRepo.deleteAll(applicationIds);
+                                                    }))
+                                            .andDo(() -> job.getExperiences()
+                                                    .thenCompose(jobExperiences -> {
+                                                        List<Long> jobExpIds = jobExperiences.stream().map(JobExperience::getIdentityKey).collect(Collectors.toList());
+                                                        return jobExperienceRepo.deleteAll(jobExpIds);
+                                                    }))
+                                            .andDo(() -> jobRepo.delete(job))
+                                            .commit();
+                                })
+                                .thenAccept(res -> res.ifPresent(throwable -> {
+                                    throw new BadRequestException(ErrorMessages.BAD_REQUEST_ITEM_DELETION);
+                                })))
         );
     }
 

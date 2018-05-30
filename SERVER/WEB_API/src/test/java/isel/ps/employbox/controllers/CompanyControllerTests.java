@@ -24,10 +24,10 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.List;
 
 import static isel.ps.employbox.DataBaseUtils.prepareDB;
-import static junit.framework.TestCase.assertFalse;
-import static junit.framework.TestCase.assertTrue;
+import static junit.framework.TestCase.*;
 import static org.springframework.restdocs.webtestclient.WebTestClientRestDocumentation.document;
 import static org.springframework.restdocs.webtestclient.WebTestClientRestDocumentation.documentationConfiguration;
 import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.springSecurity;
@@ -40,8 +40,6 @@ public class CompanyControllerTests {
     public JUnitRestDocumentation restDocumentation = new JUnitRestDocumentation();
     @Autowired
     private ApplicationContext context;
-    @Autowired
-    private CompanyBinder companyBinder;
     @Autowired
     private DataRepository<Company, Long> companyRepo;
     private Connection con;
@@ -57,19 +55,9 @@ public class CompanyControllerTests {
                 .filter(basicAuthentication())
                 .filter(documentationConfiguration(restDocumentation))
                 .build();
-
-        InCompany inCompany = new InCompany();
-        inCompany.setEmail("company1@gmail.com");
-        inCompany.setPassword("741");
-        Company company = companyBinder.bindInput(inCompany);
-        assertTrue(!companyRepo.create(company).join().isPresent());
-
-        inCompany.setEmail("company2@gmail.com");
-        inCompany.setPassword("567");
-        company = companyBinder.bindInput(inCompany);
-        assertTrue(!companyRepo.create(company).join().isPresent());
-
-        companyId = company.getIdentityKey();
+        List<Company> companies = companyRepo.findWhere(new Pair<>("email", "company2@gmail.com")).join();
+        assertEquals(1, companies.size());
+        companyId = companies.get(0).getIdentityKey();
     }
 
     @After

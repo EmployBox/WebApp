@@ -1,6 +1,7 @@
 package isel.ps.employbox.services;
 
 import com.github.jayield.rapper.DataRepository;
+import com.github.jayield.rapper.Transaction;
 import isel.ps.employbox.ErrorMessages;
 import isel.ps.employbox.exceptions.BadRequestException;
 import isel.ps.employbox.exceptions.ConflictException;
@@ -13,9 +14,12 @@ import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
 import java.security.InvalidParameterException;
+import java.sql.Connection;
 import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static isel.ps.employbox.ErrorMessages.RESOURCE_NOTFOUND_USER;
@@ -126,7 +130,15 @@ public class UserAccountService {
     public Mono<Void> deleteUser(long id, String email) {
         return Mono.fromFuture(
                 getUser(id, email)
-                        .thenCompose(userRepo::delete)
+                        //TODO remove entries from other tables where user has foreign key
+                        .thenCompose(userAccount -> new Transaction(Connection.TRANSACTION_READ_COMMITTED)
+                                .andDo(() -> userAccount.getApplications()
+                                        .thenCompose(applications -> {
+                                            List<Long> applicationIds = applications.stream().map(Application::getIdentityKey).collect(Collectors.toList());
+                                            return applicationRepo.deleteAll(applicationIds);
+                                        }))
+                                .andDo(() -> userRepo.delete(userAccount))
+                                .commit())
                         .thenAccept(res -> {
                             if (res.isPresent()) throw new BadRequestException(ErrorMessages.BAD_REQUEST_ITEM_DELETION);
                         })

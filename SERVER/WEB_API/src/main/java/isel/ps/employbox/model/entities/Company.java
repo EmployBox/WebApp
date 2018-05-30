@@ -8,7 +8,7 @@ import java.util.concurrent.CompletableFuture;
 public class Company extends Account {
     private final String name;
     private final String specialization;
-    private final short yearFounded;
+    private final Short yearFounded;
     private final String logoUrl;
     private final String webPageUrl;
     private final String description;
@@ -18,7 +18,7 @@ public class Company extends Account {
     public Company(){
         name = null;
         specialization = null;
-        yearFounded = 0;
+        yearFounded = null;
         logoUrl = null;
         webPageUrl = null;
         description = null;
@@ -84,7 +84,7 @@ public class Company extends Account {
         return specialization;
     }
 
-    public short getYearFounded() {
+    public Short getYearFounded() {
         return yearFounded;
     }
 

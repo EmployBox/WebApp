@@ -5,6 +5,7 @@ import isel.ps.employbox.ErrorMessages;
 import isel.ps.employbox.exceptions.ResourceNotFoundException;
 import isel.ps.employbox.exceptions.UnauthorizedException;
 import isel.ps.employbox.model.entities.Account;
+import javafx.util.Pair;
 import org.springframework.stereotype.Service;
 
 import java.security.InvalidParameterException;

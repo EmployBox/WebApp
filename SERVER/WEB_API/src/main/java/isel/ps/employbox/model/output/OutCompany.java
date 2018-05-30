@@ -9,7 +9,7 @@ import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 public class OutCompany extends ResourceSupport {
 
     @JsonProperty
-    private final long accountId;
+    private final Long accountId;
 
     @JsonProperty
     private final String email;
@@ -24,7 +24,7 @@ public class OutCompany extends ResourceSupport {
     private final String specialization;
 
     @JsonProperty
-    private final short yearFounded;
+    private final Short yearFounded;
 
     @JsonProperty
     private final String logoUrl;
@@ -35,7 +35,7 @@ public class OutCompany extends ResourceSupport {
     @JsonProperty
     private final String description;
 
-    public OutCompany(long accountId, String email, double rating, String name, String specialization, short yearFounded, String logoUrl, String webpageUrl, String description) {
+    public OutCompany(Long accountId, String email, double rating, String name, String specialization, Short yearFounded, String logoUrl, String webpageUrl, String description) {
         this.accountId = accountId;
         this.email = email;
         this.rating = rating;

@@ -3,10 +3,12 @@ package isel.ps.employbox.controllers;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.jayield.rapper.DataRepository;
-import isel.ps.employbox.model.binder.UserBinder;
+import isel.ps.employbox.model.binder.JobBinder;
 import isel.ps.employbox.model.entities.Job;
+import isel.ps.employbox.model.entities.JobExperience;
 import isel.ps.employbox.model.entities.UserAccount;
-import isel.ps.employbox.model.input.InUserAccount;
+import isel.ps.employbox.model.input.InJob;
+import isel.ps.employbox.model.input.InJobExperience;
 import javafx.util.Pair;
 import org.junit.After;
 import org.junit.Before;
@@ -25,6 +27,7 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 
 import static isel.ps.employbox.DataBaseUtils.prepareDB;
@@ -36,19 +39,20 @@ import static org.springframework.web.reactive.function.client.ExchangeFilterFun
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
-public class UserAccountControllerTests {
+public class JobControllerTests {
     @Rule
     public JUnitRestDocumentation restDocumentation = new JUnitRestDocumentation();
     @Autowired
     private ApplicationContext context;
     @Autowired
-    private DataRepository<UserAccount, Long> userAccountRepo;
-    @Autowired
     private DataRepository<Job, Long> jobRepo;
-    private WebTestClient webTestClient;
+    @Autowired
+    private DataRepository<JobExperience, Long> jobExperienceRepo;
     private Connection con;
-    private long userAccountId;
+    private WebTestClient webTestClient;
     private long jobId;
+    private long accountId;
+    private Long jobExperienceId;
 
     @Before
     public void setUp() throws SQLException {
@@ -59,13 +63,18 @@ public class UserAccountControllerTests {
                 .filter(basicAuthentication())
                 .filter(documentationConfiguration(restDocumentation))
                 .build();
-        List<UserAccount> userAccounts = userAccountRepo.findWhere(new Pair<>("email", "lol@hotmail.com")).join();
-        assertEquals(1, userAccounts.size());
-        userAccountId = userAccounts.get(0).getIdentityKey();
 
         List<Job> jobs = jobRepo.findWhere(new Pair<>("title", "Great Job")).join();
         assertEquals(1, jobs.size());
-        jobId = jobs.get(0).getIdentityKey();
+        Job job = jobs.get(0);
+
+        List<JobExperience> jobExperiences = jobExperienceRepo.findWhere(new Pair<>("JOBID", job.getIdentityKey())).join();
+        assertEquals(1, jobExperiences.size());
+        JobExperience jobExperience = jobExperiences.get(0);
+
+        accountId = job.getAccountId();
+        jobId = job.getIdentityKey();
+        jobExperienceId = jobExperience.getIdentityKey();
     }
 
     @After
@@ -74,156 +83,185 @@ public class UserAccountControllerTests {
     }
 
     @Test
-    public void testGetAllUserAccounts() {
+    public void testGetAllJobs(){
         webTestClient
                 .get()
-                .uri("/accounts/users")
+                .uri("/jobs")
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody()
-                .consumeWith(document("getAllUserAccounts"));
+                .consumeWith(document("getAllJobs"));
     }
 
     @Test
-    public void testGetUserAccount() {
+    public void testGetJob(){
         webTestClient
                 .get()
-                .uri("/accounts/users/" + userAccountId)
+                .uri("/jobs/" + jobId)
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody()
-                .consumeWith(document("getUserAccount"));
+                .consumeWith(document("getJob"));
     }
 
     @Test
-    public void testGetAllApplications() {
+    public void testGetAllJobExperiences(){
         webTestClient
                 .get()
-                .uri("/accounts/users/" + userAccountId + "/applications")
+                .uri("/jobs/" + jobId + "/experiences")
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody()
-                .consumeWith(document("getAllApplications"));
+                .consumeWith(document("getAllJobExperiences"));
     }
 
     @Test
-    public void testGetApplication() {
+    public void testGetJobExperience(){
         webTestClient
                 .get()
-                .uri("/accounts/users/" + userAccountId + "/applications/" + jobId)
+                .uri("/jobs/" + jobId + "/experiences/" + jobExperienceId)
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody()
-                .consumeWith(document("getApplication"));
-    }
-
-    @Test
-    public void testCreateUserAccount() throws Exception {
-        InUserAccount user = new InUserAccount();
-        user.setEmail("someEmail@hotmail.com");
-        user.setName("Manuel");
-        user.setPassword("1234");
-        user.setSummary("Sou um tipo simpatico");
-
-        ObjectMapper objectMapper = new ObjectMapper();
-        String json = objectMapper.writeValueAsString(user);
-
-        webTestClient
-                .post()
-                .uri("/accounts/users")
-                .contentType(MediaType.APPLICATION_JSON)
-                .syncBody(json)
-                .exchange()
-                .expectStatus().isOk()
-                .expectBody()
-                .consumeWith(document("createUserAccount"));
-
-        assertEquals(1, userAccountRepo.findWhere(new Pair<>("email", "someEmail@hotmail.com")).join().size());
+                .consumeWith(document("getJobExperience"));
     }
 
     @Test
     @WithMockUser(username = "teste@gmail.com")
-    public void testUpdateWrongUserAccount() throws JsonProcessingException {
-        InUserAccount inUserAccount = new InUserAccount();
-        inUserAccount.setId(userAccountId);
-        inUserAccount.setEmail("someEmail@hotmail.com");
-        inUserAccount.setName("Manuel");
-        inUserAccount.setPassword("1234");
-        inUserAccount.setSummary("Sou um tipo simpatico");
+    public void testCreateJob() throws Exception {
+        InJob inJob = new InJob();
+        inJob.setAccountId(accountId);
+        inJob.setTitle("Verrryyy gud job, come come");
+        inJob.setWage(1);
+        inJob.setOfferType("Looking for Worker");
+        inJob.setDescription("Lavar o chão");
 
         ObjectMapper objectMapper = new ObjectMapper();
-        String json = objectMapper.writeValueAsString(inUserAccount);
+        String json = objectMapper.writeValueAsString(inJob);
 
         webTestClient
-                .put()
-                .uri("/accounts/users/" + userAccountId)
-                .contentType(MediaType.APPLICATION_JSON)
-                .syncBody(json)
-                .exchange()
-                .expectStatus().isUnauthorized()
-                .expectBody()
-                .consumeWith(document("updateWrongUserAccount"));
-    }
-
-    @Test
-    @WithMockUser(username = "lol@hotmail.com")
-    public void testUpdateUserAccount() throws JsonProcessingException {
-        InUserAccount inUserAccount = new InUserAccount();
-        inUserAccount.setId(userAccountId);
-        inUserAccount.setEmail("someEmail@hotmail.com");
-        inUserAccount.setName("Manuel");
-        inUserAccount.setPassword("1234");
-        inUserAccount.setSummary("Sou um tipo simpatico");
-
-        ObjectMapper objectMapper = new ObjectMapper();
-        String json = objectMapper.writeValueAsString(inUserAccount);
-
-        webTestClient
-                .put()
-                .uri("/accounts/users/" + userAccountId)
+                .post()
+                .uri("/jobs")
                 .contentType(MediaType.APPLICATION_JSON)
                 .syncBody(json)
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody()
-                .consumeWith(document("updateUserAccount"));
+                .consumeWith(document("createJob"));
+
+        assertTrue(jobRepo.findWhere(new Pair<>("title", "Verrryyy gud job, come come")).join().size() != 0);
+    }
+
+    @Test
+    @WithMockUser(username = "teste@gmail.com")
+    public void testCreateJobExperience() throws Exception {
+        InJobExperience inJobExperience = new InJobExperience();
+        inJobExperience.setJobId(jobId);
+        inJobExperience.setCompetences("C#");
+        inJobExperience.setYears((short) 2);
+
+        List<InJobExperience> list = new ArrayList<>();
+        list.add(inJobExperience);
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        String json = objectMapper.writeValueAsString(list);
+
+        webTestClient
+                .post()
+                .uri("/jobs/" + jobId + "/experiences")
+                .contentType(MediaType.APPLICATION_JSON)
+                .syncBody(json)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody()
+                .consumeWith(document("createJobExperience"));
+
+        assertEquals(1, jobExperienceRepo.findWhere(new Pair<>("jobId", jobId), new Pair<>("COMPETENCES", "C#")).join().size());
+    }
+
+    @Test
+    @WithMockUser(username = "company1@gmail.com")
+    public void testUpdateWrongJob() throws JsonProcessingException {
+        InJob inJob = new InJob();
+        inJob.setAccountId(accountId);
+        inJob.setJobID(jobId);
+        inJob.setWage(1);
+        inJob.setOfferType("Looking for Worker");
+        inJob.setDescription("Sou uma empresa simpatica");
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        String json = objectMapper.writeValueAsString(inJob);
+
+        webTestClient
+                .put()
+                .uri("/jobs/" + jobId)
+                .contentType(MediaType.APPLICATION_JSON)
+                .syncBody(json)
+                .exchange()
+                .expectStatus().isUnauthorized()
+                .expectBody()
+                .consumeWith(document("updateWrongJob"));
+    }
+
+    @Test
+    @WithMockUser(username = "teste@gmail.com")
+    public void testUpdateJob() throws JsonProcessingException {
+        InJob inJob = new InJob();
+        inJob.setAccountId(accountId);
+        inJob.setJobID(jobId);
+        inJob.setWage(1);
+        inJob.setOfferType("Looking for Worker");
+        inJob.setDescription("Sou uma empresa simpatica");
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        String json = objectMapper.writeValueAsString(inJob);
+
+        webTestClient
+                .put()
+                .uri("/jobs/" + jobId)
+                .contentType(MediaType.APPLICATION_JSON)
+                .syncBody(json)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody()
+                .consumeWith(document("updateJob"));
     }
 
     @Test
     @WithAnonymousUser
-    public void testDeleteUserAccountWhenNotAuthenticated() {
+    public void testDeleteJobWhenNotAuthenticated() {
         webTestClient
                 .delete()
-                .uri("/accounts/users/" + userAccountId)
+                .uri("/jobs/" + jobId)
                 .exchange()
                 .expectStatus().isUnauthorized()
                 .expectBody()
-                .consumeWith(document("deleteUserAccountWhenNotAuthenticated"));
+                .consumeWith(document("deleteJobWhenNotAuthenticated"));
     }
 
     @Test
     @WithMockUser
-    public void testDeleteWrongUserAccount() {
+    public void testDeleteWrongJob() {
         webTestClient
                 .delete()
-                .uri("/accounts/users/" + userAccountId)
+                .uri("/jobs/" + jobId)
                 .exchange()
                 .expectStatus().isUnauthorized()
                 .expectBody()
-                .consumeWith(document("deleteWrongUserAccount"));
+                .consumeWith(document("deleteWrongJob"));
     }
 
     @Test
-    @WithMockUser(username = "lol@hotmail.com")
-    public void testDeleteUserAccount(){
+    @WithMockUser(username = "teste@gmail.com")
+    public void testDeleteJob(){
         webTestClient
                 .delete()
-                .uri("/accounts/users/" + userAccountId)
+                .uri("/jobs/" + jobId)
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody()
-                .consumeWith(document("deleteUserAccount"));
+                .consumeWith(document("deleteJob"));
 
-        assertFalse(userAccountRepo.findById(userAccountId).join().isPresent());
+        assertFalse(jobRepo.findById(jobId).join().isPresent());
     }
 }

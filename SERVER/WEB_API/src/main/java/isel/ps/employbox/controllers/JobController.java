@@ -69,7 +69,7 @@ public class JobController {
         return jobBinder.bindOutput(jobService.createJob(newJob, authentication.getName()));
     }
 
-    @PostMapping("/{jid}/experience")
+    @PostMapping("/{jid}/experiences")
     public Mono<Void> createJobExperiences(
             @PathVariable long jid,
             @RequestBody List<JobExperience> jobExperience,
@@ -86,13 +86,13 @@ public class JobController {
         return jobService.updateJob(updateJob, authentication.getName());
     }
 
-    @PutMapping("/{jid}/experience/{jxpId}")
+    @PutMapping("/{jid}/experiences/{jxpId}")
     public Mono<Void> updateJobExperiences(
             @PathVariable long jxpId,
             @PathVariable long jid,
             @RequestBody JobExperience jobExperience,
-            Authentication authentication)
-    {
+            Authentication authentication
+    ) {
         return jobService.updateJobExperience(jxpId, jid, jobExperience, authentication.getName());
     }
 
@@ -107,6 +107,6 @@ public class JobController {
 
     @DeleteMapping("/{jid}")
     public Mono<Void> deleteJob(@PathVariable long jid, Authentication authentication){
-        return jobService.deleteJob(jid, authentication.getName() );
+        return jobService.deleteJob(jid, authentication.getName());
     }
 }
