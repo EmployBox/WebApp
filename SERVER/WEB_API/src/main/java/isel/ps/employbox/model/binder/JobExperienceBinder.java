@@ -27,7 +27,8 @@ public class JobExperienceBinder implements ModelBinder<JobExperience,OutJobExpe
     }
 
     @Override
-    public JobExperience bindInput(InJobExperience object) {
-        return new JobExperience( object.getYears(), object.getCompetences(), object.getYears());
+    public JobExperience bindInput(InJobExperience inJobExperience) {
+        return new JobExperience(inJobExperience.getJobExperienceId(), inJobExperience.getJobId(), inJobExperience.getCompetences(), inJobExperience.getYears(),
+                inJobExperience.getVersion());
     }
 }

@@ -3,9 +3,11 @@ package isel.ps.employbox.controllers;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.jayield.rapper.DataRepository;
-import isel.ps.employbox.model.binder.UserBinder;
+import isel.ps.employbox.exceptions.ResourceNotFoundException;
+import isel.ps.employbox.model.entities.Application;
 import isel.ps.employbox.model.entities.Job;
 import isel.ps.employbox.model.entities.UserAccount;
+import isel.ps.employbox.model.input.InApplication;
 import isel.ps.employbox.model.input.InUserAccount;
 import javafx.util.Pair;
 import org.junit.After;
@@ -25,6 +27,7 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.List;
 
 import static isel.ps.employbox.DataBaseUtils.prepareDB;
@@ -45,10 +48,13 @@ public class UserAccountControllerTests {
     private DataRepository<UserAccount, Long> userAccountRepo;
     @Autowired
     private DataRepository<Job, Long> jobRepo;
+    @Autowired
+    private DataRepository<Application, Long> applicationRepo;
     private WebTestClient webTestClient;
     private Connection con;
-    private long userAccountId;
+    private UserAccount userAccount;
     private long jobId;
+    private Application application;
 
     @Before
     public void setUp() throws SQLException {
@@ -61,11 +67,15 @@ public class UserAccountControllerTests {
                 .build();
         List<UserAccount> userAccounts = userAccountRepo.findWhere(new Pair<>("email", "lol@hotmail.com")).join();
         assertEquals(1, userAccounts.size());
-        userAccountId = userAccounts.get(0).getIdentityKey();
+        userAccount = userAccounts.get(0);
 
         List<Job> jobs = jobRepo.findWhere(new Pair<>("title", "Great Job")).join();
         assertEquals(1, jobs.size());
         jobId = jobs.get(0).getIdentityKey();
+
+        List<Application> applications = applicationRepo.findWhere(new Pair<>("accountId", userAccount.getIdentityKey()), new Pair<>("jobId", jobId)).join();
+        assertEquals(1, applications.size());
+        application = applications.get(0);
     }
 
     @After
@@ -88,7 +98,7 @@ public class UserAccountControllerTests {
     public void testGetUserAccount() {
         webTestClient
                 .get()
-                .uri("/accounts/users/" + userAccountId)
+                .uri("/accounts/users/" + userAccount.getIdentityKey())
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody()
@@ -99,7 +109,7 @@ public class UserAccountControllerTests {
     public void testGetAllApplications() {
         webTestClient
                 .get()
-                .uri("/accounts/users/" + userAccountId + "/applications")
+                .uri("/accounts/users/" + userAccount.getIdentityKey() + "/applications")
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody()
@@ -110,7 +120,7 @@ public class UserAccountControllerTests {
     public void testGetApplication() {
         webTestClient
                 .get()
-                .uri("/accounts/users/" + userAccountId + "/applications/" + jobId)
+                .uri("/accounts/users/" + userAccount.getIdentityKey() + "/applications/" + jobId)
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody()
@@ -142,10 +152,33 @@ public class UserAccountControllerTests {
     }
 
     @Test
+    @WithMockUser(username =  "lol@hotmail.com")
+    public void testCreateApplication() throws Exception {
+        InApplication inApplication = new InApplication();
+        inApplication.setAccountId(userAccount.getIdentityKey());
+        inApplication.setJobId(jobId);
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        String json = objectMapper.writeValueAsString(inApplication);
+
+        webTestClient
+                .post()
+                .uri("/accounts/users/" + userAccount.getIdentityKey() + "/applications/" + jobId)
+                .contentType(MediaType.APPLICATION_JSON)
+                .syncBody(json)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody()
+                .consumeWith(document("createApplication"));
+
+        assertEquals(2, applicationRepo.findWhere(new Pair<>("accountId", userAccount.getIdentityKey()), new Pair<>("jobId", jobId)).join().size());
+    }
+
+    @Test
     @WithMockUser(username = "teste@gmail.com")
     public void testUpdateWrongUserAccount() throws JsonProcessingException {
         InUserAccount inUserAccount = new InUserAccount();
-        inUserAccount.setId(userAccountId);
+        inUserAccount.setId(userAccount.getIdentityKey());
         inUserAccount.setEmail("someEmail@hotmail.com");
         inUserAccount.setName("Manuel");
         inUserAccount.setPassword("1234");
@@ -156,7 +189,7 @@ public class UserAccountControllerTests {
 
         webTestClient
                 .put()
-                .uri("/accounts/users/" + userAccountId)
+                .uri("/accounts/users/" + userAccount.getIdentityKey())
                 .contentType(MediaType.APPLICATION_JSON)
                 .syncBody(json)
                 .exchange()
@@ -166,27 +199,83 @@ public class UserAccountControllerTests {
     }
 
     @Test
+    @WithMockUser(username = "teste@gmail.com")
+    public void testUpdateWrongApplication() throws JsonProcessingException {
+        InApplication inApplication = new InApplication();
+        inApplication.setAccountId(userAccount.getIdentityKey());
+        inApplication.setJobId(jobId);
+        inApplication.setDate(new Timestamp(2019, 2, 2, 2, 2, 2, 2));
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        String json = objectMapper.writeValueAsString(inApplication);
+
+        webTestClient
+                .put()
+                .uri("/accounts/users/" + userAccount.getIdentityKey() + "/applications/" + jobId)
+                .contentType(MediaType.APPLICATION_JSON)
+                .syncBody(json)
+                .exchange()
+                .expectStatus().isUnauthorized()
+                .expectBody()
+                .consumeWith(document("updateWrongApplication"));
+    }
+
+    @Test
     @WithMockUser(username = "lol@hotmail.com")
     public void testUpdateUserAccount() throws JsonProcessingException {
         InUserAccount inUserAccount = new InUserAccount();
-        inUserAccount.setId(userAccountId);
+        inUserAccount.setId(userAccount.getIdentityKey());
         inUserAccount.setEmail("someEmail@hotmail.com");
         inUserAccount.setName("Manuel");
         inUserAccount.setPassword("1234");
         inUserAccount.setSummary("Sou um tipo simpatico");
+        inUserAccount.setUserVersion(userAccount.getVersion());
+        inUserAccount.setAccountVersion(userAccount.getAccountVersion());
 
         ObjectMapper objectMapper = new ObjectMapper();
         String json = objectMapper.writeValueAsString(inUserAccount);
 
         webTestClient
                 .put()
-                .uri("/accounts/users/" + userAccountId)
+                .uri("/accounts/users/" + userAccount.getIdentityKey())
                 .contentType(MediaType.APPLICATION_JSON)
                 .syncBody(json)
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody()
                 .consumeWith(document("updateUserAccount"));
+
+        UserAccount userAccount = userAccountRepo.findById(this.userAccount.getIdentityKey()).join().orElseThrow(() -> new ResourceNotFoundException("UserAccount not found"));
+        assertEquals("Sou um tipo simpatico", userAccount.getSummary());
+        assertEquals("Manuel", userAccount.getName());
+        assertEquals("someEmail@hotmail.com", userAccount.getEmail());
+    }
+
+    @Test
+    @WithMockUser(username = "lol@hotmail.com")
+    public void testUpdateApplication() throws JsonProcessingException {
+        InApplication inApplication = new InApplication();
+        inApplication.setApplicationId(application.getIdentityKey());
+        inApplication.setAccountId(userAccount.getIdentityKey());
+        inApplication.setJobId(jobId);
+        inApplication.setDate(new Timestamp(2019, 2, 2, 2, 2, 2, 2));
+        inApplication.setVersion(application.getVersion());
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        String json = objectMapper.writeValueAsString(inApplication);
+
+        webTestClient
+                .put()
+                .uri("/accounts/users/" + userAccount.getIdentityKey() + "/applications/" + jobId)
+                .contentType(MediaType.APPLICATION_JSON)
+                .syncBody(json)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody()
+                .consumeWith(document("updateApplication"));
+
+        Application updatedApplication = applicationRepo.findById(application.getIdentityKey()).join().orElseThrow(() -> new ResourceNotFoundException("Application not found"));
+        assertTrue(updatedApplication.getVersion() != application.getVersion());
     }
 
     @Test
@@ -194,7 +283,7 @@ public class UserAccountControllerTests {
     public void testDeleteUserAccountWhenNotAuthenticated() {
         webTestClient
                 .delete()
-                .uri("/accounts/users/" + userAccountId)
+                .uri("/accounts/users/" + userAccount.getIdentityKey())
                 .exchange()
                 .expectStatus().isUnauthorized()
                 .expectBody()
@@ -206,7 +295,7 @@ public class UserAccountControllerTests {
     public void testDeleteWrongUserAccount() {
         webTestClient
                 .delete()
-                .uri("/accounts/users/" + userAccountId)
+                .uri("/accounts/users/" + userAccount.getIdentityKey())
                 .exchange()
                 .expectStatus().isUnauthorized()
                 .expectBody()
@@ -218,12 +307,38 @@ public class UserAccountControllerTests {
     public void testDeleteUserAccount(){
         webTestClient
                 .delete()
-                .uri("/accounts/users/" + userAccountId)
+                .uri("/accounts/users/" + userAccount.getIdentityKey())
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody()
                 .consumeWith(document("deleteUserAccount"));
 
-        assertFalse(userAccountRepo.findById(userAccountId).join().isPresent());
+        assertFalse(userAccountRepo.findById(userAccount.getIdentityKey()).join().isPresent());
+    }
+
+    @Test
+    @WithMockUser
+    public void testDeleteWrongApplication() {
+        webTestClient
+                .delete()
+                .uri("/accounts/users/" + userAccount.getIdentityKey() + "/applications/" + jobId)
+                .exchange()
+                .expectStatus().isUnauthorized()
+                .expectBody()
+                .consumeWith(document("deleteWrongApplication"));
+    }
+
+    @Test
+    @WithMockUser(username = "lol@hotmail.com")
+    public void testDeleteApplication(){
+        webTestClient
+                .delete()
+                .uri("/accounts/users/" + userAccount.getIdentityKey() + "/applications/" + jobId)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody()
+                .consumeWith(document("deleteApplication"));
+
+        assertTrue(applicationRepo.findWhere(new Pair<>("accountId", userAccount.getIdentityKey()), new Pair<>("jobId", jobId)).join().isEmpty());
     }
 }

@@ -32,6 +32,22 @@ public class JobExperience implements DomainObject<Long> {
         version = 0;
     }
 
+    public JobExperience(long jobExperienceId, long jobId, String competences, short years) {
+        this.jobExperienceId = jobExperienceId;
+        this.jobId = jobId;
+        this.competences = competences;
+        this.years = years;
+        version = 0;
+    }
+
+    public JobExperience(long jobExperienceId, long jobId, String competences, short years, long version) {
+        this.jobExperienceId = jobExperienceId;
+        this.jobId = jobId;
+        this.competences = competences;
+        this.years = years;
+        this.version = version;
+    }
+
     @JsonIgnore
     @Override
     public Long getIdentityKey() {

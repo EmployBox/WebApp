@@ -104,4 +104,8 @@ public class Company extends Account {
     public long getVersion() {
         return version;
     }
+
+    public long getAccountVersion() {
+        return super.getVersion();
+    }
 }

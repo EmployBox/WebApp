@@ -3,6 +3,7 @@ package isel.ps.employbox.controllers;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.jayield.rapper.DataRepository;
+import isel.ps.employbox.exceptions.ResourceNotFoundException;
 import isel.ps.employbox.model.binder.JobBinder;
 import isel.ps.employbox.model.entities.Job;
 import isel.ps.employbox.model.entities.JobExperience;
@@ -50,9 +51,9 @@ public class JobControllerTests {
     private DataRepository<JobExperience, Long> jobExperienceRepo;
     private Connection con;
     private WebTestClient webTestClient;
-    private long jobId;
     private long accountId;
-    private Long jobExperienceId;
+    private Job job;
+    private JobExperience jobExperience;
 
     @Before
     public void setUp() throws SQLException {
@@ -66,15 +67,13 @@ public class JobControllerTests {
 
         List<Job> jobs = jobRepo.findWhere(new Pair<>("title", "Great Job")).join();
         assertEquals(1, jobs.size());
-        Job job = jobs.get(0);
+        job = jobs.get(0);
 
         List<JobExperience> jobExperiences = jobExperienceRepo.findWhere(new Pair<>("JOBID", job.getIdentityKey())).join();
         assertEquals(1, jobExperiences.size());
-        JobExperience jobExperience = jobExperiences.get(0);
+        jobExperience = jobExperiences.get(0);
 
         accountId = job.getAccountId();
-        jobId = job.getIdentityKey();
-        jobExperienceId = jobExperience.getIdentityKey();
     }
 
     @After
@@ -97,7 +96,7 @@ public class JobControllerTests {
     public void testGetJob(){
         webTestClient
                 .get()
-                .uri("/jobs/" + jobId)
+                .uri("/jobs/" + job.getIdentityKey())
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody()
@@ -108,7 +107,7 @@ public class JobControllerTests {
     public void testGetAllJobExperiences(){
         webTestClient
                 .get()
-                .uri("/jobs/" + jobId + "/experiences")
+                .uri("/jobs/" + job.getIdentityKey() + "/experiences")
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody()
@@ -119,7 +118,7 @@ public class JobControllerTests {
     public void testGetJobExperience(){
         webTestClient
                 .get()
-                .uri("/jobs/" + jobId + "/experiences/" + jobExperienceId)
+                .uri("/jobs/" + job.getIdentityKey() + "/experiences/" + jobExperience.getIdentityKey())
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody()
@@ -156,7 +155,7 @@ public class JobControllerTests {
     @WithMockUser(username = "teste@gmail.com")
     public void testCreateJobExperience() throws Exception {
         InJobExperience inJobExperience = new InJobExperience();
-        inJobExperience.setJobId(jobId);
+        inJobExperience.setJobId(job.getIdentityKey());
         inJobExperience.setCompetences("C#");
         inJobExperience.setYears((short) 2);
 
@@ -168,7 +167,7 @@ public class JobControllerTests {
 
         webTestClient
                 .post()
-                .uri("/jobs/" + jobId + "/experiences")
+                .uri("/jobs/" + job.getIdentityKey() + "/experiences")
                 .contentType(MediaType.APPLICATION_JSON)
                 .syncBody(json)
                 .exchange()
@@ -176,7 +175,7 @@ public class JobControllerTests {
                 .expectBody()
                 .consumeWith(document("createJobExperience"));
 
-        assertEquals(1, jobExperienceRepo.findWhere(new Pair<>("jobId", jobId), new Pair<>("COMPETENCES", "C#")).join().size());
+        assertEquals(1, jobExperienceRepo.findWhere(new Pair<>("jobId", job.getIdentityKey()), new Pair<>("COMPETENCES", "C#")).join().size());
     }
 
     @Test
@@ -184,7 +183,7 @@ public class JobControllerTests {
     public void testUpdateWrongJob() throws JsonProcessingException {
         InJob inJob = new InJob();
         inJob.setAccountId(accountId);
-        inJob.setJobID(jobId);
+        inJob.setJobID(job.getIdentityKey());
         inJob.setWage(1);
         inJob.setOfferType("Looking for Worker");
         inJob.setDescription("Sou uma empresa simpatica");
@@ -194,7 +193,7 @@ public class JobControllerTests {
 
         webTestClient
                 .put()
-                .uri("/jobs/" + jobId)
+                .uri("/jobs/" + job.getIdentityKey())
                 .contentType(MediaType.APPLICATION_JSON)
                 .syncBody(json)
                 .exchange()
@@ -204,27 +203,88 @@ public class JobControllerTests {
     }
 
     @Test
+    @WithMockUser(username = "company1@gmail.com")
+    public void testUpdateWrongJobExperience() throws JsonProcessingException {
+        InJobExperience inJobExperience = new InJobExperience();
+        inJobExperience.setJobExperienceId(jobExperience.getIdentityKey());
+        inJobExperience.setJobId(job.getIdentityKey());
+        inJobExperience.setCompetences("C#");
+        inJobExperience.setYears((short) 2);
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        String json = objectMapper.writeValueAsString(inJobExperience);
+
+        webTestClient
+                .put()
+                .uri("/jobs/" + job.getIdentityKey() + "/experiences/" + jobExperience.getIdentityKey())
+                .contentType(MediaType.APPLICATION_JSON)
+                .syncBody(json)
+                .exchange()
+                .expectStatus().isUnauthorized()
+                .expectBody()
+                .consumeWith(document("updateWrongJobExperience"));
+    }
+
+    @Test
     @WithMockUser(username = "teste@gmail.com")
     public void testUpdateJob() throws JsonProcessingException {
         InJob inJob = new InJob();
         inJob.setAccountId(accountId);
-        inJob.setJobID(jobId);
+        inJob.setJobID(job.getIdentityKey());
+        inJob.setTitle("Qualquer coisa");
         inJob.setWage(1);
         inJob.setOfferType("Looking for Worker");
         inJob.setDescription("Sou uma empresa simpatica");
+        inJob.setVersion(job.getVersion());
 
         ObjectMapper objectMapper = new ObjectMapper();
         String json = objectMapper.writeValueAsString(inJob);
 
         webTestClient
                 .put()
-                .uri("/jobs/" + jobId)
+                .uri("/jobs/" + job.getIdentityKey())
                 .contentType(MediaType.APPLICATION_JSON)
                 .syncBody(json)
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody()
                 .consumeWith(document("updateJob"));
+
+        Job updatedJob = jobRepo.findById(job.getIdentityKey()).join().orElseThrow(() -> new ResourceNotFoundException("Job not found"));
+
+        assertEquals("Looking for Worker", updatedJob.getOfferType());
+        assertEquals("Sou uma empresa simpatica", updatedJob.getDescription());
+        assertEquals(1, updatedJob.getWage());
+        assertEquals("Qualquer coisa", updatedJob.getTitle());
+    }
+
+    @Test
+    @WithMockUser(username = "teste@gmail.com")
+    public void testUpdateJobExperience() throws JsonProcessingException {
+        InJobExperience inJobExperience = new InJobExperience();
+        inJobExperience.setJobExperienceId(jobExperience.getIdentityKey());
+        inJobExperience.setJobId(job.getIdentityKey());
+        inJobExperience.setCompetences("C#");
+        inJobExperience.setYears((short) 2);
+        inJobExperience.setVersion(jobExperience.getVersion());
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        String json = objectMapper.writeValueAsString(inJobExperience);
+
+        webTestClient
+                .put()
+                .uri("/jobs/" + job.getIdentityKey() + "/experiences/" + jobExperience.getIdentityKey())
+                .contentType(MediaType.APPLICATION_JSON)
+                .syncBody(json)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody()
+                .consumeWith(document("updateJobExperience"));
+
+        JobExperience updatedJobExperience = jobExperienceRepo.findById(jobExperience.getIdentityKey()).join().orElseThrow(() -> new ResourceNotFoundException("JobExperience not found"));
+
+        assertEquals((short) 2, updatedJobExperience.getYears());
+        assertEquals("C#", updatedJobExperience.getCompetences());
     }
 
     @Test
@@ -232,7 +292,7 @@ public class JobControllerTests {
     public void testDeleteJobWhenNotAuthenticated() {
         webTestClient
                 .delete()
-                .uri("/jobs/" + jobId)
+                .uri("/jobs/" + job.getIdentityKey())
                 .exchange()
                 .expectStatus().isUnauthorized()
                 .expectBody()
@@ -244,7 +304,7 @@ public class JobControllerTests {
     public void testDeleteWrongJob() {
         webTestClient
                 .delete()
-                .uri("/jobs/" + jobId)
+                .uri("/jobs/" + job.getIdentityKey())
                 .exchange()
                 .expectStatus().isUnauthorized()
                 .expectBody()
@@ -256,12 +316,12 @@ public class JobControllerTests {
     public void testDeleteJob(){
         webTestClient
                 .delete()
-                .uri("/jobs/" + jobId)
+                .uri("/jobs/" + job.getIdentityKey())
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody()
                 .consumeWith(document("deleteJob"));
 
-        assertFalse(jobRepo.findById(jobId).join().isPresent());
+        assertFalse(jobRepo.findById(job.getIdentityKey()).join().isPresent());
     }
 }
