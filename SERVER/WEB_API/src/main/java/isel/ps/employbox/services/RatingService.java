@@ -46,7 +46,7 @@ public class RatingService {
                         userAccountService.getUser(rating.getAccountIdFrom(), email),//throws exceptions
                         getRating(rating.getAccountIdFrom(), rating.getAccountIdTo())
                 )
-                        .thenCompose(__ -> ratingRepo.update(rating))
+                        .thenCompose(aVoid -> ratingRepo.update(rating))
         );
     }
 
@@ -56,7 +56,7 @@ public class RatingService {
                         userAccountService.getUser(rating.getAccountIdFrom(), email),
                         userAccountService.getUser(rating.getAccountIdTo())
                 )
-                        .thenCompose(__ -> ratingRepo.create(rating))
+                        .thenCompose(aVoid -> ratingRepo.create(rating))
                         .thenApply(res -> rating)
         );
     }
@@ -64,8 +64,8 @@ public class RatingService {
     public Mono<Void> deleteRating(long accountIDFrom, long accountIDTo, String email) {
         return Mono.fromFuture(
                 userAccountService.getUser(accountIDFrom, email)
-                        .thenCompose(__-> getRating(accountIDFrom, accountIDTo))
-                        .thenAccept( rating -> ratingRepo.delete(rating))
+                        .thenCompose(userAccount-> getRating(accountIDFrom, accountIDTo))
+                        .thenAccept(ratingRepo::delete)
         );
     }
 }

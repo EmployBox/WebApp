@@ -50,9 +50,9 @@ public class CurriculumService {
             throw new BadRequestException(ErrorMessages.BAD_REQUEST_IDS_MISMATCH);
 
         return userAccountService.getUser(userId, email)
-                .thenCompose(__ -> curriculumRepo.create(curriculum))
+                .thenCompose(userAccount -> curriculumRepo.create(curriculum))
                 .thenApply(res -> curriculum)
-                .thenCompose(__ -> {
+                .thenCompose(curriculum1 -> {
                     List<CompletableFuture<Void>> list = new ArrayList<>();
                     populateChildList(list, curriculum, userId);
                     return CompletableFuture.allOf(list.toArray(new CompletableFuture[list.size()]));
@@ -70,7 +70,7 @@ public class CurriculumService {
                     return previousJobsList;
                 })
                 .thenCompose( list -> {
-                    if(list.size() == 0) return CompletableFuture.completedFuture(null);
+                    if(list.isEmpty()) return CompletableFuture.completedFuture(null);
                     return previousJobsRepo.createAll(list);
                 })
         );
@@ -84,7 +84,7 @@ public class CurriculumService {
                     return academicBackgroundList;
                 })
                 .thenCompose(list -> {
-                    if (list.size() == 0) return CompletableFuture.completedFuture(null);
+                    if (list.isEmpty()) return CompletableFuture.completedFuture(null);
                     return academicBackgroundRepo.createAll(list);
                 })
         );
@@ -98,7 +98,7 @@ public class CurriculumService {
                     return experienceList;
                 })
                 .thenCompose(list -> {
-                    if (list.size() == 0) return CompletableFuture.completedFuture(null);
+                    if (list.isEmpty()) return CompletableFuture.completedFuture(null);
                     return curriculumExperienceRepo.createAll(list);
                 })
         );
@@ -112,7 +112,7 @@ public class CurriculumService {
                     return projectList;
                 })
                 .thenCompose(list -> {
-                    if (list.size() == 0)
+                    if (list.isEmpty())
                         return CompletableFuture.completedFuture(null);
                     return projectRepo.createAll(list);
                 })
@@ -134,18 +134,18 @@ public class CurriculumService {
         return userAccountService.getUser(userId, email)
                 .thenCompose(UserAccount::getCurricula)
                 .thenApply(curricula -> {
-                    Optional<Curriculum> oret;
-                    if (curricula.isEmpty() || !(oret = curricula.stream().filter(curr -> curr.getIdentityKey() == cid).findFirst()).isPresent())
+                    Optional<Curriculum> optionalCurriculum = curricula.stream().filter(curr -> curr.getIdentityKey() == cid).findFirst();
+                    if (curricula.isEmpty() || !optionalCurriculum.isPresent())
                         throw new ResourceNotFoundException(ErrorMessages.RESOURCE_NOTFOUND_CURRICULUM);
-                    return oret.get();
+                    return optionalCurriculum.get();
                 });
     }
 
     public Mono<Void> updateCurriculum(Curriculum curriculum, String email) {
         return Mono.fromFuture(
                 userAccountService.getUser(curriculum.getAccountId(), email)
-                        .thenCompose(__ -> getCurriculum(curriculum.getAccountId(), curriculum.getIdentityKey(), email))
-                        .thenCompose(__ -> curriculumRepo.update(curriculum))
+                        .thenCompose(userAccount -> getCurriculum(curriculum.getAccountId(), curriculum.getIdentityKey(), email))
+                        .thenCompose(curriculum1 -> curriculumRepo.update(curriculum))
         );
     }
 

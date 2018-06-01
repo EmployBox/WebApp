@@ -18,7 +18,6 @@ import reactor.core.publisher.Mono;
 import java.sql.Connection;
 import java.util.Collection;
 import java.util.List;
-import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -65,7 +64,7 @@ public class JobService {
 
     public CompletableFuture<Job> createJob(Job job, String email) {
         return accountService.getAccount(job.getAccountId(), email)
-                .thenCompose(__ -> jobRepo.create(job))
+                .thenCompose(account -> jobRepo.create(job))
                 .thenCompose(aVoid -> job.getExperiences())
                 .thenCompose(experienceList -> {
                     if (experienceList.isEmpty()) return CompletableFuture.completedFuture(null);
@@ -78,7 +77,7 @@ public class JobService {
     public CompletableFuture<Void> addJobExperienceToJob(long jobId, List<JobExperience> jobExperience, String username){
         return getJob(jobId)
                 .thenCompose(job -> accountService.getAccount(job.getAccountId(), username))
-                .thenCompose(__ -> jobExperienceRepo.createAll(jobExperience));
+                .thenCompose(account -> jobExperienceRepo.createAll(jobExperience));
     }
 
     public Mono<Void> updateJob(Job job, String email) {
@@ -87,7 +86,7 @@ public class JobService {
                         getJob(job.getIdentityKey()),
                         accountService.getAccount(job.getAccountId(), email)
                 )
-                        .thenCompose(__ -> jobRepo.update(job))
+                        .thenCompose(aVoid -> jobRepo.update(job))
         );
     }
 
@@ -107,7 +106,7 @@ public class JobService {
                                 throw new UnauthorizedException(ErrorMessages.UN_AUTHORIZED);
                             return accounts.get(0);
                         })
-                        .thenAccept(account -> getJob(jobId)
+                        .thenCompose(account -> getJob(jobId)
                                 .thenCompose(job -> {
                                     if (!job.getAccountId().equals(account.getIdentityKey()))
                                         throw new BadRequestException(ErrorMessages.UN_AUTHORIZED_ID_AND_EMAIL_MISMATCH);
@@ -125,9 +124,6 @@ public class JobService {
                                             .andDo(() -> jobRepo.delete(job))
                                             .commit();
                                 })
-                                .exceptionally(throwable -> {
-                                    throw new BadRequestException(ErrorMessages.BAD_REQUEST_ITEM_DELETION);
-                                })
                         )
         );
     }
@@ -136,7 +132,7 @@ public class JobService {
         return Mono.fromFuture(
                 getJob(jobId)
                         .thenCompose(job-> accountService.getAccount(job.getAccountId(), email))
-                        .thenCompose(__ -> jobExperienceRepo.deleteById(jxpId))
+                        .thenCompose(account -> jobExperienceRepo.deleteById(jxpId))
         );
     }
 }

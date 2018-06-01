@@ -9,6 +9,7 @@ import isel.ps.employbox.model.entities.CurriculumChilds.Project;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
+import java.util.Collection;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Stream;
 
@@ -25,7 +26,7 @@ public class ProjectService {
 
     public CompletableFuture<Stream<Project>> getCurriculumProjects(long curriculumId){
         return projectRepo.findWhere(new Pair<>("curriculumId",curriculumId))
-                .thenApply( projectList -> projectList.stream());
+                .thenApply(Collection::stream);
     }
 
 
@@ -38,7 +39,7 @@ public class ProjectService {
         if(project.getAccountId() != accountId || project.getCurriculumId() != curriculumId)
             throw new ConflictException(ErrorMessages.BAD_REQUEST_IDS_MISMATCH);
         return curriculumService.getCurriculum(accountId, curriculumId,email)
-                .thenCompose( __ -> projectRepo.create( project))
+                .thenCompose(curriculum -> projectRepo.create( project))
                 .thenApply(res -> project);
     }
 
@@ -52,7 +53,7 @@ public class ProjectService {
         if(project.getIdentityKey() != projectId)
             throw new BadRequestException(ErrorMessages.BAD_REQUEST_IDS_MISMATCH);
         return Mono.fromFuture(curriculumService.getCurriculum(accountId, curriculumId, email)
-                .thenCompose(__ -> projectRepo.update(project))
+                .thenCompose(curriculum -> projectRepo.update(project))
         );
     }
 
@@ -64,7 +65,7 @@ public class ProjectService {
     ) {
         return Mono.fromFuture(
                 curriculumService.getCurriculum(accountId, curriculumId, email)
-                        .thenCompose(__ -> projectRepo.deleteById(projectId))
+                        .thenCompose(curriculum -> projectRepo.deleteById(projectId))
         );
     }
 }

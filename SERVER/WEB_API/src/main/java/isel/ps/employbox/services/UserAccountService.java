@@ -28,16 +28,13 @@ import static isel.ps.employbox.ErrorMessages.RESOURCE_NOTFOUND_USER;
 public class UserAccountService {
 
     private final DataRepository<UserAccount, Long> userRepo;
-    private final DataRepository<Curriculum, Long> curriculumRepo;
     private final DataRepository<Application, Long> applicationRepo;
 
     public UserAccountService(
             DataRepository<UserAccount, Long> userRepo,
-            DataRepository<Curriculum, Long> curriculumRepo,
             DataRepository<Application, Long> applicationRepo
     ) {
         this.userRepo = userRepo;
-        this.curriculumRepo = curriculumRepo;
         this.applicationRepo = applicationRepo;
     }
 
@@ -96,22 +93,22 @@ public class UserAccountService {
             throw new BadRequestException(ErrorMessages.BAD_REQUEST_IDS_MISMATCH);
 
         return getUser(userId, email)
-                .thenCompose(__ -> applicationRepo.create(application))
+                .thenCompose(userAccount -> applicationRepo.create(application))
                 .thenApply(res -> application);
     }
 
     public Mono<Void> updateUser(UserAccount userAccount, String email) {
         return Mono.fromFuture(
                 getUser(userAccount.getIdentityKey(), email)
-                        .thenCompose(__ -> userRepo.update(userAccount))
+                        .thenCompose(userAccount1 -> userRepo.update(userAccount))
         );
     }
 
     public Mono<Void> updateApplication(Application application, String email) {
         return Mono.fromFuture(
                 getUser(application.getAccountId(), email)
-                        .thenCompose(__ -> getApplication(application.getAccountId(), application.getJobId()))
-                        .thenCompose(__ -> applicationRepo.update(application))
+                        .thenCompose(userAccount -> getApplication(application.getAccountId(), application.getJobId()))
+                        .thenCompose(application1 -> applicationRepo.update(application))
         );
     }
 
@@ -133,7 +130,7 @@ public class UserAccountService {
     public Mono<Void> deleteApplication(long userId, long jobId, String email) {
         return Mono.fromFuture(
                 getUser(userId, email)
-                        .thenCompose(__ -> getApplication(userId, jobId))
+                        .thenCompose(userAccount -> getApplication(userId, jobId))
                         .thenCompose(applicationRepo::delete)
         );
     }

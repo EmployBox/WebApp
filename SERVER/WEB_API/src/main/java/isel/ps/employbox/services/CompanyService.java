@@ -15,12 +15,10 @@ import java.util.stream.Stream;
 
 @Service
 public class CompanyService {
-    private DataRepository<Account, Long> accountRepo;
     private DataRepository<Company, Long> companyRepo;
     private AccountService accountService;
 
-    public CompanyService(DataRepository<Account, Long> accountRepo, DataRepository<Company, Long> companyRepo, AccountService accountService){
-        this.accountRepo = accountRepo;
+    public CompanyService(DataRepository<Company, Long> companyRepo, AccountService accountService){
         this.companyRepo = companyRepo;
         this.accountService = accountService;
     }
@@ -32,9 +30,7 @@ public class CompanyService {
 
     public CompletableFuture<Company> getCompany(long cid) {
         return companyRepo.findById(cid)
-                .thenApply(
-                        optionalCompany -> optionalCompany.orElseThrow(() -> new ResourceNotFoundException(ErrorMessages.RESOURCE_NOTFOUND_COMPANY))
-                );
+                .thenApply(optionalCompany -> optionalCompany.orElseThrow(() -> new ResourceNotFoundException(ErrorMessages.RESOURCE_NOTFOUND_COMPANY)));
     }
 
     public CompletableFuture<Company> createCompany(Company company) {
@@ -45,8 +41,7 @@ public class CompanyService {
     public Mono<Void> updateCompany(Company company, String email) {
         return Mono.fromFuture(
                 accountService.getAccount(company.getIdentityKey(), email)
-                        .thenCompose(account -> companyRepo.update(company)
-                        )
+                        .thenCompose(account -> companyRepo.update(company))
         );
     }
 

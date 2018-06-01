@@ -38,7 +38,7 @@ public class PreviousJobService {
         if(previousJobs.getAccountId() != accountId || previousJobs.getCurriculumId() != curriculumId)
             throw new ConflictException(ErrorMessages.BAD_REQUEST_IDS_MISMATCH);
         return curriculumService.getCurriculum(accountId, curriculumId,email)
-                .thenCompose(__ -> previousJobsRepo.create( previousJobs))
+                .thenCompose(curriculum -> previousJobsRepo.create( previousJobs))
                 .thenApply(aVoid -> previousJobs);
     }
 
@@ -53,7 +53,7 @@ public class PreviousJobService {
         if(previousJobs.getAccountId() != pvjId)
             throw new BadRequestException(ErrorMessages.BAD_REQUEST_IDS_MISMATCH);
         return Mono.fromFuture(curriculumService.getCurriculum(accountId, curriculumId, email)
-                .thenCompose(__ -> previousJobsRepo.update(previousJobs))
+                .thenCompose(curriculum -> previousJobsRepo.update(previousJobs))
         );
     }
 
@@ -65,7 +65,7 @@ public class PreviousJobService {
     ) {
         return Mono.fromFuture(
                 curriculumService.getCurriculum(accountId, curriculumId, email)
-                        .thenCompose(__ -> previousJobsRepo.deleteById(previousJobId))
+                        .thenCompose(curriculum -> previousJobsRepo.deleteById(previousJobId))
         );
     }
 

@@ -7,8 +7,6 @@ public class InJobExperience {
     private short years;
     private long version;
 
-    public InJobExperience(){}
-
     public String getCompetences() {
         return competences;
     }

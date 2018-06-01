@@ -65,7 +65,7 @@ public class CommentController {
     }
 
     @DeleteMapping("{commentId}")
-    public void deleteComment( @PathVariable long commentId, Authentication authentication){
-        commentService.deleteComment( commentId,  authentication.getName());
+    public Mono<Void> deleteComment(@PathVariable long commentId, Authentication authentication){
+        return commentService.deleteComment(commentId,  authentication.getName());
     }
 }

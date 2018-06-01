@@ -36,7 +36,7 @@ public class CommentService {
 
     public CompletableFuture<Comment> getComment(long accountFromId, long accountToId, long commentId, String email) {
         return accountService.getAccount(accountFromId, email)
-                .thenCompose(__ -> commentRepo.findById(commentId)
+                .thenCompose(account -> commentRepo.findById(commentId)
                                 .thenApply(ocomment -> {
                                             Comment comment = ocomment.orElseThrow(() -> new ResourceNotFoundException(ErrorMessages.RESOURCE_NOTFOUND_COMMENT));
                                             if (comment.getAccountIdFrom() != accountFromId && comment.getAccountIdDest() != accountToId)
@@ -49,7 +49,7 @@ public class CommentService {
     public Mono<Void> updateComment(Comment comment, String username) {
         return Mono.fromFuture(
                 getComment(comment.getAccountIdFrom(), comment.getAccountIdDest(), comment.getIdentityKey(), username)
-                        .thenCompose(__ -> commentRepo.update(comment))
+                        .thenCompose(comment1 -> commentRepo.update(comment))
         );
     }
 
@@ -58,7 +58,7 @@ public class CommentService {
                 accountService.getAccount(comment.getAccountIdFrom(), email),
                 accountService.getAccount(comment.getAccountIdDest())
         )
-                .thenCompose(__ -> commentRepo.create(comment))
+                .thenCompose(aVoid -> commentRepo.create(comment))
                 .thenApply(res -> comment);
     }
 

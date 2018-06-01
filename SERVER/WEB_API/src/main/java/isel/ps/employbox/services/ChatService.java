@@ -37,7 +37,7 @@ public class ChatService {
     }
 
     public CompletableFuture<Stream<Message>> getAccountChatsMessages(long accountId, long cid, String email) {
-        return accountService.getAccount(accountId, email).thenCompose(__ ->
+        return accountService.getAccount(accountId, email).thenCompose(account ->
                 msgRepo.findAll()
                         .thenApply(list -> list
                                 .stream()
@@ -53,13 +53,13 @@ public class ChatService {
                     if (msg.getChatId() != cid)
                         throw new BadRequestException(BAD_REQUEST_IDS_MISMATCH);
                     return accountService.getAccount(msg.getAccountId(), email)//throws exceptions
-                            .thenApply(__ -> msg);
+                            .thenApply(account -> msg);
                 });
     }
 
     public CompletableFuture<Message> createNewChatMessage(long accountId, long chatId, Message msg, String email) {
         return accountService.getAccount(accountId, email)
-                .thenCompose(__ -> getChat(chatId))
+                .thenCompose(account -> getChat(chatId))
                 .thenCompose(chat -> {
                     if (chat.getAccountIdFirst() != accountId)
                         throw new UnauthorizedException(ErrorMessages.UN_AUTHORIZED_MESSAGE);
@@ -68,7 +68,7 @@ public class ChatService {
                 .thenApply(res -> msg);
     }
 
-    public CompletableFuture<Chat> getChat(long chatId){
+    private CompletableFuture<Chat> getChat(long chatId){
         return chatRepo.findById(chatId)
                 .thenApply(ochat -> ochat.orElseThrow( () -> new ResourceNotFoundException(ErrorMessages.RESOURCE_NOT_FOUND_CHAT)));
     }
@@ -79,7 +79,7 @@ public class ChatService {
                         accountService.getAccount(accountIdFrom, username),
                         accountService.getAccount(inChat.getAccountIdSecond())
                 )
-                        .thenCompose(__ -> chatRepo.create(inChat))
+                        .thenCompose(aVoid -> chatRepo.create(inChat))
                         .thenApply(res -> inChat)
         );
     }

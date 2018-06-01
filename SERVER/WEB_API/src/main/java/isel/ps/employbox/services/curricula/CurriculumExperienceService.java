@@ -38,7 +38,7 @@ public class CurriculumExperienceService {
         if (curriculumExperience.getAccountId() != accountId || curriculumExperience.getCurriculumId() != curriculumId)
             throw new ConflictException(ErrorMessages.BAD_REQUEST_IDS_MISMATCH);
         return curriculumService.getCurriculum(accountId, curriculumId, email)
-                .thenCompose(__ -> curriculumExperienceRepo.create(curriculumExperience))
+                .thenCompose(curriculum -> curriculumExperienceRepo.create(curriculumExperience))
                 .thenApply(res -> curriculumExperience);
     }
 
@@ -49,7 +49,7 @@ public class CurriculumExperienceService {
             String email
     ) {
         return Mono.fromFuture(curriculumService.getCurriculum(accountId, curriculumId, email)
-                .thenCompose(__ -> curriculumExperienceRepo.update(curriculumExperience)
+                .thenCompose(curriculum -> curriculumExperienceRepo.update(curriculumExperience)
                 )
         );
     }
@@ -62,7 +62,7 @@ public class CurriculumExperienceService {
     ) {
         return Mono.fromFuture(
                 curriculumService.getCurriculum(accountId, curriculumId, email)
-                        .thenCompose(__ -> curriculumExperienceRepo.deleteById(curriculumExperienceId))
+                        .thenCompose(curriculum -> curriculumExperienceRepo.deleteById(curriculumExperienceId))
         );
     }
 }

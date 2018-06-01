@@ -3,7 +3,6 @@ package isel.ps.employbox.services.curricula;
 import com.github.jayield.rapper.DataRepository;
 import com.github.jayield.rapper.utils.Pair;
 import isel.ps.employbox.ErrorMessages;
-import isel.ps.employbox.exceptions.BadRequestException;
 import isel.ps.employbox.exceptions.ConflictException;
 import isel.ps.employbox.model.entities.CurriculumChilds.AcademicBackground;
 import org.springframework.stereotype.Service;
@@ -16,8 +15,8 @@ import java.util.stream.Stream;
 @Service
 public class AcademicBackgroundService {
 
-    public final CurriculumService curriculumService;
-    public final DataRepository<AcademicBackground, Long> academicBackgroundRepo;
+    private final CurriculumService curriculumService;
+    private final DataRepository<AcademicBackground, Long> academicBackgroundRepo;
 
     public AcademicBackgroundService(CurriculumService curriculumService, DataRepository<AcademicBackground, Long> academicBackgroundRepo) {
         this.curriculumService = curriculumService;
@@ -40,7 +39,7 @@ public class AcademicBackgroundService {
             throw new ConflictException(ErrorMessages.BAD_REQUEST_IDS_MISMATCH);
 
         return curriculumService.getCurriculum(accountId, curriculumId, email)
-                .thenCompose(__ -> academicBackgroundRepo.create( academicBackground))
+                .thenCompose(curriculum -> academicBackgroundRepo.create( academicBackground))
                 .thenApply(res -> academicBackground);
     }
 
@@ -51,7 +50,7 @@ public class AcademicBackgroundService {
             String email
     ) {
         return Mono.fromFuture(curriculumService.getCurriculum(accountId, curriculumId, email)
-                .thenCompose(__ -> academicBackgroundRepo.update(academicBackground))
+                .thenCompose(curriculum -> academicBackgroundRepo.update(academicBackground))
         );
     }
 
@@ -62,7 +61,7 @@ public class AcademicBackgroundService {
             String email
     ) {
         return Mono.fromFuture(curriculumService.getCurriculum(accountId, curriculumId, email)
-                .thenCompose(__ -> academicBackgroundRepo.deleteById(academicBackgroundId))
+                .thenCompose(curriculum -> academicBackgroundRepo.deleteById(academicBackgroundId))
         );
     }
 }
