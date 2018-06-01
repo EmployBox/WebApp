@@ -65,10 +65,7 @@ public class ChatService {
                         throw new UnauthorizedException(ErrorMessages.UN_AUTHORIZED_MESSAGE);
                     return msgRepo.create(msg);
                 })
-                .thenApply(res -> {
-                    if (res.isPresent()) throw new BadRequestException(ErrorMessages.BAD_REQUEST_ITEM_CREATION);
-                    return msg;
-                });
+                .thenApply(res -> msg);
     }
 
     public CompletableFuture<Chat> getChat(long chatId){
@@ -81,11 +78,9 @@ public class ChatService {
                 CompletableFuture.allOf(
                         accountService.getAccount(accountIdFrom, username),
                         accountService.getAccount(inChat.getAccountIdSecond())
-                ).thenCompose(__ -> chatRepo.create(inChat)
-                ).thenApply(res -> {
-                    if (res.isPresent()) throw new BadRequestException(ErrorMessages.BAD_REQUEST_ITEM_CREATION);
-                    return inChat;
-                })
+                )
+                        .thenCompose(__ -> chatRepo.create(inChat))
+                        .thenApply(res -> inChat)
         );
     }
 }

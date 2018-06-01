@@ -1,11 +1,11 @@
-package isel.ps.employbox.services.curriculumServices;
+package isel.ps.employbox.services.curricula;
 
 import com.github.jayield.rapper.DataRepository;
+import com.github.jayield.rapper.utils.Pair;
 import isel.ps.employbox.ErrorMessages;
 import isel.ps.employbox.exceptions.BadRequestException;
 import isel.ps.employbox.exceptions.ConflictException;
 import isel.ps.employbox.model.entities.CurriculumChilds.Project;
-import javafx.util.Pair;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
@@ -39,10 +39,7 @@ public class ProjectService {
             throw new ConflictException(ErrorMessages.BAD_REQUEST_IDS_MISMATCH);
         return curriculumService.getCurriculum(accountId, curriculumId,email)
                 .thenCompose( __ -> projectRepo.create( project))
-                .thenApply( res -> {
-                    if (res.isPresent()) throw new BadRequestException(ErrorMessages.BAD_REQUEST_ITEM_DELETION);
-                    return project;
-                });
+                .thenApply(res -> project);
     }
 
     public Mono<Void> updateProject(
@@ -55,12 +52,7 @@ public class ProjectService {
         if(project.getIdentityKey() != projectId)
             throw new BadRequestException(ErrorMessages.BAD_REQUEST_IDS_MISMATCH);
         return Mono.fromFuture(curriculumService.getCurriculum(accountId, curriculumId, email)
-                .thenCompose(__ -> projectRepo.update(project)
-                        .thenAccept(
-                                res -> {
-                                    if (res.isPresent()) throw new BadRequestException(ErrorMessages.BAD_REQUEST_ITEM_DELETION);
-                                }
-                        ))
+                .thenCompose(__ -> projectRepo.update(project))
         );
     }
 
@@ -73,11 +65,6 @@ public class ProjectService {
         return Mono.fromFuture(
                 curriculumService.getCurriculum(accountId, curriculumId, email)
                         .thenCompose(__ -> projectRepo.deleteById(projectId))
-                        .thenAccept(
-                                res -> {
-                                    if (res.isPresent()) throw new BadRequestException(ErrorMessages.BAD_REQUEST_ITEM_DELETION);
-                                }
-                        )
         );
     }
 }

@@ -10,7 +10,7 @@ import isel.ps.employbox.model.entities.CurriculumChilds.PreviousJobs;
 import isel.ps.employbox.model.entities.CurriculumChilds.Project;
 import isel.ps.employbox.model.input.InCurriculum;
 import isel.ps.employbox.model.output.*;
-import isel.ps.employbox.services.curriculumServices.*;
+import isel.ps.employbox.services.curricula.*;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;

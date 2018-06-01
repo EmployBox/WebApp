@@ -1,14 +1,15 @@
-package isel.ps.employbox.services.curriculumServices;
+package isel.ps.employbox.services.curricula;
 
 import com.github.jayield.rapper.DataRepository;
+import com.github.jayield.rapper.utils.Pair;
 import isel.ps.employbox.ErrorMessages;
 import isel.ps.employbox.exceptions.BadRequestException;
 import isel.ps.employbox.exceptions.ConflictException;
 import isel.ps.employbox.model.entities.CurriculumChilds.PreviousJobs;
-import javafx.util.Pair;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
+import java.util.Collection;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Stream;
 
@@ -24,7 +25,7 @@ public class PreviousJobService {
 
     public CompletableFuture<Stream<PreviousJobs>> getCurriculumPreviousJobs(long curriculumId){
         return previousJobsRepo.findWhere(new Pair<>("curriculumId",curriculumId))
-                .thenApply( opreviousJobs -> opreviousJobs.stream());
+                .thenApply(Collection::stream);
     }
 
 
@@ -37,11 +38,8 @@ public class PreviousJobService {
         if(previousJobs.getAccountId() != accountId || previousJobs.getCurriculumId() != curriculumId)
             throw new ConflictException(ErrorMessages.BAD_REQUEST_IDS_MISMATCH);
         return curriculumService.getCurriculum(accountId, curriculumId,email)
-                .thenCompose( __ ->previousJobsRepo.create( previousJobs))
-                .thenApply( res -> {
-                    if (res.isPresent()) throw new BadRequestException(ErrorMessages.BAD_REQUEST_ITEM_DELETION);
-                    return previousJobs;
-                });
+                .thenCompose(__ -> previousJobsRepo.create( previousJobs))
+                .thenApply(aVoid -> previousJobs);
     }
 
 
@@ -56,9 +54,6 @@ public class PreviousJobService {
             throw new BadRequestException(ErrorMessages.BAD_REQUEST_IDS_MISMATCH);
         return Mono.fromFuture(curriculumService.getCurriculum(accountId, curriculumId, email)
                 .thenCompose(__ -> previousJobsRepo.update(previousJobs))
-                .thenAccept(res -> {
-                            if (res.isPresent()) throw new BadRequestException(ErrorMessages.BAD_REQUEST_ITEM_DELETION);
-                        })
         );
     }
 
@@ -71,9 +66,6 @@ public class PreviousJobService {
         return Mono.fromFuture(
                 curriculumService.getCurriculum(accountId, curriculumId, email)
                         .thenCompose(__ -> previousJobsRepo.deleteById(previousJobId))
-                        .thenAccept(res -> {
-                                    if (res.isPresent()) throw new BadRequestException(ErrorMessages.BAD_REQUEST_ITEM_DELETION);
-                                })
         );
     }
 

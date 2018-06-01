@@ -23,22 +23,22 @@ export default class extends React.Component {
 
   render () {
     const listItems = []
-    for (let i = 0; i < options.length; i++) {
+    options.map(option => {
       let itemClass
-      if (options[i] === this.state.active) itemClass = 'nav-link active'
+      if (option === this.state.active) itemClass = 'nav-link active'
       else itemClass = 'nav-link'
       listItems.push(
-        <li class='nav-item' key={options[i]}>
-          <button class={itemClass} onClick={() => this.setState({active: options[i]})}>{options[i]}</button>
+        <li class='nav-item' key={option}>
+          <button class={itemClass} onClick={() => this.setState({active: option})}>{option}</button>
         </li>
       )
-    }
+    })
 
     const { active, searchText } = this.state
 
     return (
       <div class='container py-5'>
-        <h2 class='text-center'>Search {this.state.active}</h2>
+        <h2 class='text-center'>Search {active}</h2>
         <ul class='nav nav-tabs'>
           {listItems}
         </ul>

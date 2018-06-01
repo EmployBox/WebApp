@@ -1,11 +1,11 @@
-package isel.ps.employbox.services.curriculumServices;
+package isel.ps.employbox.services.curricula;
 
 import com.github.jayield.rapper.DataRepository;
+import com.github.jayield.rapper.utils.Pair;
 import isel.ps.employbox.ErrorMessages;
 import isel.ps.employbox.exceptions.BadRequestException;
 import isel.ps.employbox.exceptions.ConflictException;
 import isel.ps.employbox.model.entities.CurriculumChilds.CurriculumExperience;
-import javafx.util.Pair;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
@@ -39,10 +39,7 @@ public class CurriculumExperienceService {
             throw new ConflictException(ErrorMessages.BAD_REQUEST_IDS_MISMATCH);
         return curriculumService.getCurriculum(accountId, curriculumId, email)
                 .thenCompose(__ -> curriculumExperienceRepo.create(curriculumExperience))
-                .thenApply(res -> {
-                    if (res.isPresent()) throw new BadRequestException(ErrorMessages.BAD_REQUEST_ITEM_DELETION);
-                    return curriculumExperience;
-                });
+                .thenApply(res -> curriculumExperience);
     }
 
     public Mono<Void> updateCurriculumExperience(
@@ -53,11 +50,7 @@ public class CurriculumExperienceService {
     ) {
         return Mono.fromFuture(curriculumService.getCurriculum(accountId, curriculumId, email)
                 .thenCompose(__ -> curriculumExperienceRepo.update(curriculumExperience)
-                        .thenAccept(
-                                res -> {
-                                    if (res.isPresent()) throw new BadRequestException(ErrorMessages.BAD_REQUEST_ITEM_DELETION);
-                                }
-                        ))
+                )
         );
     }
 
@@ -70,11 +63,6 @@ public class CurriculumExperienceService {
         return Mono.fromFuture(
                 curriculumService.getCurriculum(accountId, curriculumId, email)
                         .thenCompose(__ -> curriculumExperienceRepo.deleteById(curriculumExperienceId))
-                        .thenAccept(
-                                res -> {
-                                    if (res.isPresent()) throw new BadRequestException(ErrorMessages.BAD_REQUEST_ITEM_DELETION);
-                                }
-                        )
         );
     }
 }

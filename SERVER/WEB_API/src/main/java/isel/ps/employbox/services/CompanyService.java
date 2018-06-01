@@ -39,31 +39,21 @@ public class CompanyService {
 
     public CompletableFuture<Company> createCompany(Company company) {
         return companyRepo.create(company)
-                .thenApply(res -> {
-                    if (res.isPresent()) throw new BadRequestException(ErrorMessages.BAD_REQUEST_ITEM_CREATION);
-                    return company;
-                });
+                .thenApply(res -> company);
     }
 
     public Mono<Void> updateCompany(Company company, String email) {
         return Mono.fromFuture(
                 accountService.getAccount(company.getIdentityKey(), email)
-                .thenCompose(account -> companyRepo.update(company)
-                        .thenAccept(res -> {
-                            if (res.isPresent()) throw new BadRequestException(ErrorMessages.BAD_REQUEST_ITEM_UPDATE);
-                        })
-                )
+                        .thenCompose(account -> companyRepo.update(company)
+                        )
         );
     }
 
     public Mono<Void> deleteCompany(long cid, String email) {
         return Mono.fromFuture(
                 accountService.getAccount(cid, email)
-                        .thenCompose(account -> companyRepo.deleteById(cid)
-                                .thenAccept(res -> res.ifPresent(throwable -> {
-                                    throw new BadRequestException(ErrorMessages.BAD_REQUEST_ITEM_DELETION);
-                                }))
-                        )
+                        .thenCompose(account -> companyRepo.deleteById(cid))
         );
     }
 }
