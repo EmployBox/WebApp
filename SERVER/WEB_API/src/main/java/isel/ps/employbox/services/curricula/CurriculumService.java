@@ -1,4 +1,4 @@
-package isel.ps.employbox.services.curriculumServices;
+package isel.ps.employbox.services.curricula;
 
 import com.github.jayield.rapper.DataRepository;
 import com.github.jayield.rapper.DomainObject;
@@ -29,13 +29,14 @@ public class CurriculumService {
     private final DataRepository<Project, Long> projectRepo;
     private final DataRepository<CurriculumExperience, Long> curriculumExperienceRepo;
 
-    public CurriculumService(UserAccountService userAccountService,
-                             DataRepository<Curriculum, Long> curriculumRepo,
-                             DataRepository<PreviousJobs, Long> previousJobsRepo,
-                             DataRepository<AcademicBackground, Long> academicBackgroundRepo,
-                             DataRepository<Project, Long> projectRepo,
-                             DataRepository<CurriculumExperience, Long> curriculumExperienceRepo)
-    {
+    public CurriculumService(
+            UserAccountService userAccountService,
+            DataRepository<Curriculum, Long> curriculumRepo,
+            DataRepository<PreviousJobs, Long> previousJobsRepo,
+            DataRepository<AcademicBackground, Long> academicBackgroundRepo,
+            DataRepository<Project, Long> projectRepo,
+            DataRepository<CurriculumExperience, Long> curriculumExperienceRepo
+    ) {
         this.userAccountService = userAccountService;
         this.curriculumRepo = curriculumRepo;
         this.previousJobsRepo = previousJobsRepo;
@@ -50,26 +51,16 @@ public class CurriculumService {
 
         return userAccountService.getUser(userId, email)
                 .thenCompose(__ -> curriculumRepo.create(curriculum))
-                .thenApply(res -> {
-                    if (res.isPresent()) throw new BadRequestException(ErrorMessages.BAD_REQUEST_ITEM_CREATION);
-                    return curriculum;
-                }).thenCompose(
-                        __ -> {
-                            List<CompletableFuture<Optional<Throwable>>> list = new ArrayList<>();
-                            populateChildList(list, curriculum, userId);
-                            return list
-                                    .stream()
-                                    .reduce(CompletableFuture.completedFuture(Optional.empty()), (a, b) -> a.thenCombine(b, (a2, b2) -> a2.isPresent() ? a2 : b2/*a2 && b2*/));
-                        }
-                ).thenApply(
-                        res -> {
-                            if (res.isPresent()) throw new BadRequestException(ErrorMessages.CHILDS_CREATION);
-                            return curriculum;
-                        }
-                );
+                .thenApply(res -> curriculum)
+                .thenCompose(__ -> {
+                    List<CompletableFuture<Void>> list = new ArrayList<>();
+                    populateChildList(list, curriculum, userId);
+                    return CompletableFuture.allOf(list.toArray(new CompletableFuture[list.size()]));
+                })
+                .thenApply(res -> curriculum);
     }
 
-    private void populateChildList(List<CompletableFuture<Optional<Throwable>>> creationList, Curriculum curriculum, long userId){
+    private void populateChildList(List<CompletableFuture<Void>> creationList, Curriculum curriculum, long userId){
         creationList.add(curriculum.getPreviousJobs()
                 .thenApply(previousJobsList -> {
                     previousJobsList.forEach(curr -> {
@@ -79,8 +70,7 @@ public class CurriculumService {
                     return previousJobsList;
                 })
                 .thenCompose( list -> {
-                    if(list.size() == 0)
-                        return CompletableFuture.completedFuture(Optional.empty());
+                    if(list.size() == 0) return CompletableFuture.completedFuture(null);
                     return previousJobsRepo.createAll(list);
                 })
         );
@@ -88,32 +78,30 @@ public class CurriculumService {
         creationList.add(curriculum.getAcademicBackground()
                 .thenApply(academicBackgroundList -> {
                     academicBackgroundList.forEach(curr -> {
-                                curr.setAccountId(userId);
-                                curr.setCurriculumId(curriculum.getIdentityKey());
-                            }
-                    );
+                        curr.setAccountId(userId);
+                        curr.setCurriculumId(curriculum.getIdentityKey());
+                    });
                     return academicBackgroundList;
-                }).thenCompose(
-                        list -> {
-                            if(list.size() == 0)
-                                return CompletableFuture.completedFuture(Optional.empty());
-                            return academicBackgroundRepo.createAll(list);
-                        })
+                })
+                .thenCompose(list -> {
+                    if (list.size() == 0) return CompletableFuture.completedFuture(null);
+                    return academicBackgroundRepo.createAll(list);
+                })
         );
 
-        creationList.add(curriculum.getExperiences().thenApply(experienceList -> {
-            experienceList.forEach(curr -> {
-                curr.setAccountId(userId);
-                curr.setCurriculumId(curriculum.getIdentityKey());
-            });
-            return experienceList;
-        }).thenCompose(
-                list -> {
-                    if(list.size() == 0)
-                        return CompletableFuture.completedFuture(Optional.empty());
+        creationList.add(curriculum.getExperiences()
+                .thenApply(experienceList -> {
+                    experienceList.forEach(curr -> {
+                        curr.setAccountId(userId);
+                        curr.setCurriculumId(curriculum.getIdentityKey());
+                    });
+                    return experienceList;
+                })
+                .thenCompose(list -> {
+                    if (list.size() == 0) return CompletableFuture.completedFuture(null);
                     return curriculumExperienceRepo.createAll(list);
-                }
-        ));
+                })
+        );
 
         creationList.add(curriculum.getProjects()
                 .thenApply(projectList -> {
@@ -123,12 +111,11 @@ public class CurriculumService {
                     });
                     return projectList;
                 })
-                .thenCompose(
-                        list -> {
-                            if(list.size() == 0)
-                                return  CompletableFuture.completedFuture(Optional.empty());
-                            return projectRepo.createAll(list);
-                        })
+                .thenCompose(list -> {
+                    if (list.size() == 0)
+                        return CompletableFuture.completedFuture(null);
+                    return projectRepo.createAll(list);
+                })
         );
     }
 
@@ -159,9 +146,6 @@ public class CurriculumService {
                 userAccountService.getUser(curriculum.getAccountId(), email)
                         .thenCompose(__ -> getCurriculum(curriculum.getAccountId(), curriculum.getIdentityKey(), email))
                         .thenCompose(__ -> curriculumRepo.update(curriculum))
-                        .thenAccept(res -> {
-                            if (res.isPresent()) throw new BadRequestException(ErrorMessages.BAD_REQUEST_ITEM_CREATION);
-                        })
         );
     }
 
@@ -169,9 +153,6 @@ public class CurriculumService {
         return Mono.fromFuture(
                 getCurriculum(userId, cid, name)
                         .thenCompose(curriculumRepo::delete)
-                        .thenAccept(res -> {
-                            if (res.isPresent()) throw new BadRequestException(ErrorMessages.BAD_REQUEST_ITEM_DELETION);
-                        })
         );
     }
 

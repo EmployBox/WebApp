@@ -1,11 +1,11 @@
 package isel.ps.employbox.services;
 
 import com.github.jayield.rapper.DataRepository;
+import com.github.jayield.rapper.utils.Pair;
 import isel.ps.employbox.ErrorMessages;
 import isel.ps.employbox.exceptions.BadRequestException;
 import isel.ps.employbox.exceptions.ResourceNotFoundException;
 import isel.ps.employbox.model.entities.Rating;
-import javafx.util.Pair;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
@@ -46,24 +46,18 @@ public class RatingService {
                         userAccountService.getUser(rating.getAccountIdFrom(), email),//throws exceptions
                         getRating(rating.getAccountIdFrom(), rating.getAccountIdTo())
                 )
-                .thenCompose (__-> ratingRepo.update(rating))
-                .thenAccept(res -> {
-                    if(res.isPresent()) throw new BadRequestException(ErrorMessages.BAD_REQUEST_ITEM_CREATION);
-                })
+                        .thenCompose(__ -> ratingRepo.update(rating))
         );
     }
 
     public Mono<Rating> createRating(Rating rating, String email) {
         return Mono.fromFuture(
                 CompletableFuture.allOf(
-                        userAccountService.getUser(rating.getAccountIdFrom(),email),
+                        userAccountService.getUser(rating.getAccountIdFrom(), email),
                         userAccountService.getUser(rating.getAccountIdTo())
                 )
-                .thenCompose ( __-> ratingRepo.create( rating ))
-                .thenApply(res -> {
-                    if(res.isPresent()) throw new BadRequestException(ErrorMessages.BAD_REQUEST_ITEM_CREATION);
-                    return rating;
-                })
+                        .thenCompose(__ -> ratingRepo.create(rating))
+                        .thenApply(res -> rating)
         );
     }
 

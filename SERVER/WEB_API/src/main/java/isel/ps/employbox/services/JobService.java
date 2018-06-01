@@ -2,6 +2,7 @@ package isel.ps.employbox.services;
 
 import com.github.jayield.rapper.DataRepository;
 import com.github.jayield.rapper.Transaction;
+import com.github.jayield.rapper.utils.Pair;
 import isel.ps.employbox.ErrorMessages;
 import isel.ps.employbox.exceptions.BadRequestException;
 import isel.ps.employbox.exceptions.ConflictException;
@@ -11,7 +12,6 @@ import isel.ps.employbox.model.entities.Account;
 import isel.ps.employbox.model.entities.Application;
 import isel.ps.employbox.model.entities.Job;
 import isel.ps.employbox.model.entities.JobExperience;
-import javafx.util.Pair;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
@@ -66,32 +66,19 @@ public class JobService {
     public CompletableFuture<Job> createJob(Job job, String email) {
         return accountService.getAccount(job.getAccountId(), email)
                 .thenCompose(__ -> jobRepo.create(job))
-                .thenCompose(res -> {
-                    if (res.isPresent()) throw new BadRequestException(ErrorMessages.BAD_REQUEST_ITEM_CREATION);
-                    return job.getExperiences();
+                .thenCompose(aVoid -> job.getExperiences())
+                .thenCompose(experienceList -> {
+                    if (experienceList.isEmpty()) return CompletableFuture.completedFuture(null);
+                    experienceList.forEach(curr -> curr.setJobId(job.getIdentityKey()));
+                    return jobExperienceRepo.createAll(experienceList);
                 })
-                .thenCompose(
-                        experienceList -> {
-                            if(experienceList.isEmpty())
-                                return CompletableFuture.completedFuture(Optional.empty());
-                            experienceList.forEach(curr -> curr.setJobId(job.getIdentityKey()));
-                            return jobExperienceRepo.createAll(experienceList);
-                        }
-                ).thenApply(res -> {
-                            if (res.isPresent()) throw new BadRequestException(ErrorMessages.CHILDS_CREATION);
-                            return job;
-                        }
-
-                );
+                .thenApply(aVoid -> job);
     }
 
     public CompletableFuture<Void> addJobExperienceToJob(long jobId, List<JobExperience> jobExperience, String username){
         return getJob(jobId)
                 .thenCompose(job -> accountService.getAccount(job.getAccountId(), username))
-                .thenCompose(__ -> jobExperienceRepo.createAll(jobExperience))
-                .thenAccept( res -> {
-                    if(res.isPresent()) throw new BadRequestException(ErrorMessages.BAD_REQUEST_ITEM_CREATION);
-                });
+                .thenCompose(__ -> jobExperienceRepo.createAll(jobExperience));
     }
 
     public Mono<Void> updateJob(Job job, String email) {
@@ -101,9 +88,6 @@ public class JobService {
                         accountService.getAccount(job.getAccountId(), email)
                 )
                         .thenCompose(__ -> jobRepo.update(job))
-                        .thenAccept(res -> {
-                            if (res.isPresent()) throw new BadRequestException(ErrorMessages.BAD_REQUEST_ITEM_CREATION);
-                        })
         );
     }
 
@@ -112,9 +96,6 @@ public class JobService {
                 getJob(jobExperience.getJobId())
                         .thenCompose(job -> accountService.getAccount(job.getAccountId(), username))
                         .thenCompose(account -> jobExperienceRepo.update(jobExperience))
-                        .thenAccept(res -> {
-                            if (res.isPresent()) throw new BadRequestException(ErrorMessages.BAD_REQUEST_ITEM_DELETION);
-                        })
         );
     }
 
@@ -144,9 +125,9 @@ public class JobService {
                                             .andDo(() -> jobRepo.delete(job))
                                             .commit();
                                 })
-                                .thenAccept(res -> res.ifPresent(throwable -> {
+                                .exceptionally(throwable -> {
                                     throw new BadRequestException(ErrorMessages.BAD_REQUEST_ITEM_DELETION);
-                                }))
+                                })
                         )
         );
     }
@@ -156,7 +137,6 @@ public class JobService {
                 getJob(jobId)
                         .thenCompose(job-> accountService.getAccount(job.getAccountId(), email))
                         .thenCompose(__ -> jobExperienceRepo.deleteById(jxpId))
-                        .thenAccept(res -> { if (res.isPresent()) throw new BadRequestException(ErrorMessages.BAD_REQUEST_ITEM_DELETION); })
         );
     }
 }
