@@ -1,8 +1,8 @@
 import React from 'react'
-import { Link } from 'react-router-dom'
+import { Link, withRouter } from 'react-router-dom'
 
-export default (props) => (
-  <nav class='navbar navbar-expand-lg navbar-dark bg-dark fixed-top'>
+export default withRouter((props) => (
+  <nav class='navbar navbar-expand-lg navbar-dark bg-dark navbar-fixed-top'>
     <div class='container'>
       <Link class='navbar-brand' to='/'>EmployBox</Link>
       <button class='navbar-toggler' type='button' data-toggle='collapse' data-target='#navbarResponsive' aria-controls='navbarResponsive' aria-expanded='false'
@@ -24,4 +24,4 @@ export default (props) => (
       </div>
     </div>
   </nav>
-)
+))
