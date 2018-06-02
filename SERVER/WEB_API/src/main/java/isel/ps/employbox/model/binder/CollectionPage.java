@@ -4,7 +4,7 @@ import java.security.InvalidParameterException;
 import java.util.stream.Stream;
 
 public class CollectionPage<T>{
-    public static final short PAGE_SIZE = 10;
+    public static final short PAGE_SIZE = 5;
     private final long totalElements ;
     private final int currentPage;
     private final int lastPageNumber;

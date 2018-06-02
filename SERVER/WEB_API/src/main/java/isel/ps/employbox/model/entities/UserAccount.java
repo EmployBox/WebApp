@@ -43,10 +43,11 @@ public class UserAccount extends Account {
             CompletableFuture<List<Chat>> chats,
             CompletableFuture<List<Comment>> comments,
             CompletableFuture<List<Rating>> ratings,
+            CompletableFuture<List<Account>> following,
             CompletableFuture<List<Account>> followers,
             long version
     ) {
-        super(accountID, email, password, rating, accountVersion, offeredJobs, comments, chats, ratings, followers);
+        super(accountID, email, password, rating, accountVersion, offeredJobs, comments, chats, ratings,following, followers);
         this.name = name;
         this.summary = summary;
         this.photoUrl = photoUrl;

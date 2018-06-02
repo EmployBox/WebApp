@@ -6,6 +6,7 @@ import isel.ps.employbox.ErrorMessages;
 import isel.ps.employbox.exceptions.BadRequestException;
 import isel.ps.employbox.exceptions.ConflictException;
 import isel.ps.employbox.exceptions.ResourceNotFoundException;
+import isel.ps.employbox.model.binder.CollectionPage;
 import isel.ps.employbox.model.entities.Curriculum;
 import isel.ps.employbox.model.entities.CurriculumChilds.*;
 import isel.ps.employbox.model.entities.UserAccount;
@@ -17,7 +18,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
-import java.util.stream.Stream;
 
 @Service
 public class CurriculumService {
@@ -119,15 +119,17 @@ public class CurriculumService {
         );
     }
 
-    public CompletableFuture<Stream<Curriculum>> getCurricula(long userId, String email)
+    public CompletableFuture<CollectionPage<Curriculum>> getCurricula(long userId, String email, int page)
     {
         return userAccountService.getUser(userId, email)
                 .thenCompose(UserAccount::getCurricula)
-                .thenApply( curricula ->
-                        curricula
-                                .stream()
-                                .filter(curr -> curr.getAccountId() == userId)
-        );
+                .thenApply( curricula -> new CollectionPage<>(
+                        curricula.size(),
+                        page,
+                        curricula.stream()
+                                .skip(CollectionPage.PAGE_SIZE * page)
+                                .limit(CollectionPage.PAGE_SIZE))
+                );
     }
 
     public CompletableFuture<Curriculum> getCurriculum(long userId, long cid, String email) {

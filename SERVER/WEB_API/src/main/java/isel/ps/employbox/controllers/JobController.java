@@ -7,6 +7,7 @@ import isel.ps.employbox.model.binder.JobExperienceBinder;
 import isel.ps.employbox.model.entities.Job;
 import isel.ps.employbox.model.entities.JobExperience;
 import isel.ps.employbox.model.input.InJob;
+import isel.ps.employbox.model.input.InJobExperience;
 import isel.ps.employbox.model.output.HalCollectionPage;
 import isel.ps.employbox.model.output.OutJob;
 import isel.ps.employbox.model.output.OutJobExperience;

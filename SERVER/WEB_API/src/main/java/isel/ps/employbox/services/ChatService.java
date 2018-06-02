@@ -1,6 +1,7 @@
 package isel.ps.employbox.services;
 
 import com.github.jayield.rapper.DataRepository;
+import com.github.jayield.rapper.utils.Pair;
 import isel.ps.employbox.ErrorMessages;
 import isel.ps.employbox.exceptions.BadRequestException;
 import isel.ps.employbox.exceptions.ResourceNotFoundException;
@@ -8,7 +9,6 @@ import isel.ps.employbox.exceptions.UnauthorizedException;
 import isel.ps.employbox.model.binder.CollectionPage;
 import isel.ps.employbox.model.entities.Chat;
 import isel.ps.employbox.model.entities.Message;
-import javafx.util.Pair;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 

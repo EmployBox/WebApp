@@ -1,31 +1,41 @@
 package isel.ps.employbox.services.curricula;
 
 import com.github.jayield.rapper.DataRepository;
-import com.github.jayield.rapper.utils.Pair;
 import isel.ps.employbox.ErrorMessages;
 import isel.ps.employbox.exceptions.BadRequestException;
 import isel.ps.employbox.exceptions.ConflictException;
+import isel.ps.employbox.exceptions.ResourceNotFoundException;
+import isel.ps.employbox.model.binder.CollectionPage;
+import isel.ps.employbox.model.entities.Curriculum;
 import isel.ps.employbox.model.entities.CurriculumChilds.PreviousJobs;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
-import java.util.Collection;
 import java.util.concurrent.CompletableFuture;
-import java.util.stream.Stream;
 
 @Service
 public class PreviousJobService {
     private final DataRepository<PreviousJobs, Long> previousJobsRepo;
+    private final DataRepository<Curriculum, Long> curriculumRepo;
     private final CurriculumService curriculumService;
 
-    public PreviousJobService(DataRepository<PreviousJobs, Long> previousJobsRepo, CurriculumService curriculumService) {
+    public PreviousJobService(DataRepository<PreviousJobs, Long> previousJobsRepo, DataRepository<Curriculum, Long> curriculumRepo, CurriculumService curriculumService) {
         this.previousJobsRepo = previousJobsRepo;
+        this.curriculumRepo = curriculumRepo;
         this.curriculumService = curriculumService;
     }
 
-    public CompletableFuture<Stream<PreviousJobs>> getCurriculumPreviousJobs(long curriculumId){
-        return previousJobsRepo.findWhere(new Pair<>("curriculumId",curriculumId))
-                .thenApply(Collection::stream);
+    public CompletableFuture<CollectionPage<PreviousJobs>> getCurriculumPreviousJobs(long curriculumId, int page){
+        return curriculumRepo.findById(curriculumId)
+                .thenApply( ocurriculum -> ocurriculum.orElseThrow(()-> new ResourceNotFoundException(ErrorMessages.RESOURCE_NOTFOUND_CURRICULUM)))
+                .thenCompose(Curriculum::getPreviousJobs)
+                .thenApply( list -> new CollectionPage<>(
+                        list.size(),
+                        page,
+                        list.stream()
+                                .skip(CollectionPage.PAGE_SIZE * page)
+                                .limit(CollectionPage.PAGE_SIZE))
+                );
     }
 
 

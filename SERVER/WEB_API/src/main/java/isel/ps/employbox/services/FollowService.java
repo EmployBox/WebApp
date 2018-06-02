@@ -1,7 +1,6 @@
 package isel.ps.employbox.services;
 
 import com.github.jayield.rapper.DataRepository;
-import com.github.jayield.rapper.utils.Pair;
 import isel.ps.employbox.model.binder.CollectionPage;
 import isel.ps.employbox.model.entities.Account;
 import isel.ps.employbox.model.entities.Follow;
@@ -21,23 +20,11 @@ public class FollowService {
     }
 
     public CompletableFuture<CollectionPage<Account>> getAccountFollowers(long followedAccountId, int page) {
-        return accountService.getAccount(followedAccountId)
-                .thenCompose(Account::getFollowers)
-                .thenAccept(accounts -> accounts.forEach(elem -> arr.add(accountService.getAccount(elem.getAccountIdFollower()))))
-                .thenCompose(aVoid -> CompletableFuture.allOf(arr.toArray(new CompletableFuture[arr.size()])))
-                .thenApply(aVoid -> arr.stream().map(CompletableFuture::join));
-                                .skip(CollectionPage.PAGE_SIZE * page)
-                                .limit(CollectionPage.PAGE_SIZE))
-                );
+        return null;
     }
 
     public CompletableFuture<CollectionPage<Account>> getAccountFollowing(long followerAccountId, int page) {
-        return accountService.getAccount(followerAccountId)
-                .thenCompose(Account::getFollowing)
-                .thenAccept(accounts -> accounts.forEach(elem -> arr.add(accountService.getAccount(elem.getAccountIdFollowed()))))
-                .thenCompose(aVoid -> CompletableFuture.allOf(arr.toArray(new CompletableFuture[arr.size()])))
-                .thenApply(aVoid -> arr.stream().map(CompletableFuture::join));
-                );
+        return null;
     }
 
     public Mono<Void> createFollower(long accountToBeFollowedId, long accountToFollowId, String username) {
