@@ -5,6 +5,7 @@ import isel.ps.employbox.ErrorMessages;
 import isel.ps.employbox.exceptions.BadRequestException;
 import isel.ps.employbox.exceptions.ResourceNotFoundException;
 import isel.ps.employbox.exceptions.UnauthorizedException;
+import isel.ps.employbox.model.binder.CollectionPage;
 import isel.ps.employbox.model.entities.Account;
 import isel.ps.employbox.model.entities.Comment;
 import javafx.util.Pair;
@@ -12,7 +13,6 @@ import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
 import java.util.concurrent.CompletableFuture;
-import java.util.stream.Stream;
 
 @Service
 public class CommentService {
@@ -27,11 +27,16 @@ public class CommentService {
     }
 
 
-    public CompletableFuture<Stream<Comment>> getComments(long accountFromId, String type) {
-        return commentRepo.findAll().thenApply(
-                list -> list
-                        .stream()
-                        .filter(curr -> type.equals("done") && curr.getAccountIdFrom() == accountFromId || type.equals("received") && curr.getAccountIdDest() == accountFromId));
+    public CompletableFuture<CollectionPage<Comment>> getComments(long accountFromId, int page) {
+        return accountService.getAccount(accountFromId)
+                .thenCompose(Account::getComments)
+                .thenApply(list -> new CollectionPage<>(
+                        list.size(),
+                        page,
+                        list.stream()
+                                .skip(CollectionPage.PAGE_SIZE * page)
+                                .limit(CollectionPage.PAGE_SIZE))
+                );
     }
 
     public CompletableFuture<Comment> getComment(long accountFromId, long accountToId, long commentId, String email) {

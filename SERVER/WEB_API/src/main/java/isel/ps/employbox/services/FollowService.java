@@ -3,15 +3,13 @@ package isel.ps.employbox.services;
 import com.github.jayield.rapper.DataRepository;
 import isel.ps.employbox.ErrorMessages;
 import isel.ps.employbox.exceptions.BadRequestException;
+import isel.ps.employbox.model.binder.CollectionPage;
 import isel.ps.employbox.model.entities.Account;
 import isel.ps.employbox.model.entities.Follow;
-import javafx.util.Pair;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
-import java.util.ArrayList;
 import java.util.concurrent.CompletableFuture;
-import java.util.stream.Stream;
 
 @Service
 public class FollowService {
@@ -23,24 +21,28 @@ public class FollowService {
         this.accountService = accountRepo;
     }
 
-    public CompletableFuture<Stream<Account>> getAccountFollowers(long followedAccountId) {
-        ArrayList<CompletableFuture<Account>> arr = new ArrayList<>();
-        return followsRepo.findWhere(new Pair<>("accountIdFollowed", followedAccountId))
-                .thenAccept(accounts -> accounts
-                        .forEach(elem -> arr.add(accountService.getAccount(elem.getAccountIdFollower()))))
-                .thenCompose(__ -> CompletableFuture.allOf(arr.toArray(new CompletableFuture[arr.size()])))
-                .thenApply(__ -> arr.stream().map(CompletableFuture::join));
+    public CompletableFuture<CollectionPage<Account>> getAccountFollowers(long followedAccountId, int page) {
+        return accountService.getAccount(followedAccountId)
+                .thenCompose(Account::getFollowers)
+                .thenApply(list -> new CollectionPage(
+                        list.size(),
+                        page,
+                        list.stream()
+                                .skip(CollectionPage.PAGE_SIZE * page)
+                                .limit(CollectionPage.PAGE_SIZE))
+                );
     }
 
-    public CompletableFuture<Stream<Account>> getAccountFollowing(long followerAccountId) {
-        ArrayList<CompletableFuture<Account>> arr = new ArrayList<>();
-        return followsRepo.findWhere(new Pair<>("accountIdFollower", followerAccountId))
-                .thenAccept(accounts -> accounts
-                        .forEach(elem -> arr.add(accountService.getAccount(elem.getAccountIdFollowed()))))
-                .thenCompose(
-                        __ -> CompletableFuture.allOf(arr.toArray(new CompletableFuture[arr.size()]))
-                )
-                .thenApply(__ -> arr.stream().map(CompletableFuture::join));
+    public CompletableFuture<CollectionPage<Account>> getAccountFollowing(long followerAccountId, int page) {
+        return accountService.getAccount(followerAccountId)
+                .thenCompose(Account::getFollowing)
+                .thenApply(list -> new CollectionPage(
+                        list.size(),
+                        page,
+                        list.stream()
+                                .skip(CollectionPage.PAGE_SIZE * page)
+                                .limit(CollectionPage.PAGE_SIZE))
+                );
     }
 
     public Mono<Void> createFollower(long accountToBeFollowedId, long accountToFollowId, String username) {

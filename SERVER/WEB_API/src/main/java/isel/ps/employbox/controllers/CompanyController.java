@@ -3,7 +3,7 @@ package isel.ps.employbox.controllers;
 import isel.ps.employbox.exceptions.BadRequestException;
 import isel.ps.employbox.model.binder.CompanyBinder;
 import isel.ps.employbox.model.input.InCompany;
-import isel.ps.employbox.model.output.HalCollection;
+import isel.ps.employbox.model.output.HalCollectionPage;
 import isel.ps.employbox.model.output.OutCompany;
 import isel.ps.employbox.services.CompanyService;
 import org.springframework.security.core.Authentication;
@@ -24,9 +24,9 @@ public class CompanyController {
     }
 
     @GetMapping
-    public Mono<HalCollection> getCompanies(){
+    public Mono<HalCollectionPage> getCompanies( @RequestParam(defaultValue = "0") int page){
         return companyBinder.bindOutput(
-                companyService.getCompanies(),
+                companyService.getCompanies(page),
                 this.getClass()
         );
     }

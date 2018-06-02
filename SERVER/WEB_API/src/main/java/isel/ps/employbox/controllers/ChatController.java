@@ -7,7 +7,7 @@ import isel.ps.employbox.model.binder.MessageBinder;
 import isel.ps.employbox.model.entities.Chat;
 import isel.ps.employbox.model.input.InChat;
 import isel.ps.employbox.model.input.InMessage;
-import isel.ps.employbox.model.output.HalCollection;
+import isel.ps.employbox.model.output.HalCollectionPage;
 import isel.ps.employbox.model.output.OutMessage;
 import isel.ps.employbox.services.ChatService;
 import org.springframework.security.core.Authentication;
@@ -31,9 +31,13 @@ public class ChatController {
 
 
     @GetMapping("/{cid}/messages")
-    public Mono<HalCollection> getChatsMessages (@PathVariable long id, @PathVariable long cid, Authentication authentication) {
+    public Mono<HalCollectionPage> getChatsMessages (
+            @PathVariable long id,
+            @PathVariable long cid,
+            @RequestParam(defaultValue = "0") int page,
+            Authentication authentication) {
         return messageBinder.bindOutput(
-                chatService.getAccountChatsMessages(id, cid, authentication.getName()),
+                chatService.getAccountChatsMessages(id, cid, authentication.getName(), page),
                 this.getClass(),
                 id,
                 cid

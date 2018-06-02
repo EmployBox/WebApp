@@ -70,9 +70,9 @@ public class CurriculumController {
     }
 
     @GetMapping
-    public Mono<HalCollection> getCurricula(@PathVariable long id, Authentication authentication){
+    public Mono<HalCollectionPage> getCurricula(@PathVariable long id, @RequestParam(defaultValue = "0") int page, Authentication authentication){
         return curriculumBinder.bindOutput(
-                curriculumService.getCurricula(id, authentication.getName()),
+                curriculumService.getCurricula(id, authentication.getName(), page),
                 this.getClass(),
                 id
         );
@@ -93,9 +93,9 @@ public class CurriculumController {
     }
 
     @GetMapping("/{cid}/academic")
-    public Mono<HalCollection> getAcademicBackground(@PathVariable long id, @PathVariable long cid){
+    public Mono<HalCollectionPage> getAcademicBackground(@PathVariable long id, @PathVariable long cid, @RequestParam(defaultValue = "0") int page){
         return academicBackgroundBinder.bindOutput(
-                academicBackgroundService.getCurriculumAcademicBackgrounds( cid ),
+                academicBackgroundService.getCurriculumAcademicBackgrounds( cid, page ),
                 this.getClass(),
                 id,
                 cid
@@ -111,9 +111,13 @@ public class CurriculumController {
     }
 
     @GetMapping("/{cid}/projects")
-    public Mono<HalCollection> getProjects(@PathVariable long id, @PathVariable long cid) {
+    public Mono<HalCollectionPage> getProjects(
+            @PathVariable long id,
+            @PathVariable long cid,
+            @RequestParam(defaultValue = "0") int page
+    ) {
         return projectBinder.bindOutput(
-                projectService.getCurriculumProjects(cid),
+                projectService.getCurriculumProjects(cid, page),
                 this.getClass(),
                 id,
                 cid
@@ -129,9 +133,13 @@ public class CurriculumController {
     }
 
     @GetMapping("/{cid}/previousJobs")
-    public Mono<HalCollection> getPreviousJobs(@PathVariable long id, @PathVariable long cid){
+    public Mono<HalCollectionPage> getPreviousJobs(
+            @PathVariable long id,
+            @PathVariable long cid,
+            @RequestParam(defaultValue = "0") int page
+    ){
         return previousJobsBinder.bindOutput(
-                previousJobService.getCurriculumPreviousJobs( cid ),
+                previousJobService.getCurriculumPreviousJobs( cid, page ),
                 this.getClass(),
                 id,
                 cid );
@@ -146,9 +154,13 @@ public class CurriculumController {
     }
 
     @GetMapping("/{cid}/experiences")
-    public Mono<HalCollection> getCurriculumExperiences (@PathVariable long id, @PathVariable long cid){
+    public Mono<HalCollectionPage> getCurriculumExperiences (
+            @PathVariable long id,
+            @PathVariable long cid,
+            @RequestParam(defaultValue = "0") int page
+    ){
         return curriculumExperienceBinder.bindOutput(
-                curriculumExperienceService.getCurriculumExperiences( cid),
+                curriculumExperienceService.getCurriculumExperiences(cid, page),
                 this.getClass(),
                 id
         );

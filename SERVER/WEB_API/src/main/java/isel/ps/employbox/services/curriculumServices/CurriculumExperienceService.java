@@ -4,29 +4,39 @@ import com.github.jayield.rapper.DataRepository;
 import isel.ps.employbox.ErrorMessages;
 import isel.ps.employbox.exceptions.BadRequestException;
 import isel.ps.employbox.exceptions.ConflictException;
+import isel.ps.employbox.exceptions.ResourceNotFoundException;
+import isel.ps.employbox.model.binder.CollectionPage;
+import isel.ps.employbox.model.entities.Curriculum;
 import isel.ps.employbox.model.entities.CurriculumChilds.CurriculumExperience;
-import javafx.util.Pair;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
-import java.util.Collection;
 import java.util.concurrent.CompletableFuture;
-import java.util.stream.Stream;
 
 @Service
 public class CurriculumExperienceService {
     private final DataRepository<CurriculumExperience, Long> curriculumExperienceRepo;
+    private final DataRepository<Curriculum, Long> curriculumRepo;
     private final CurriculumService curriculumService;
 
 
-    public CurriculumExperienceService(DataRepository<CurriculumExperience, Long> curriculumExperienceRepo, CurriculumService curriculumService) {
+    public CurriculumExperienceService(DataRepository<CurriculumExperience, Long> curriculumExperienceRepo, DataRepository<Curriculum, Long> curriculumRepo, CurriculumService curriculumService) {
         this.curriculumExperienceRepo = curriculumExperienceRepo;
+        this.curriculumRepo = curriculumRepo;
         this.curriculumService = curriculumService;
     }
 
-    public CompletableFuture<Stream<CurriculumExperience>> getCurriculumExperiences(long curriculumId){
-        return curriculumExperienceRepo.findWhere(new Pair<>("curriculumId",curriculumId))
-                .thenApply(Collection::stream);
+    public CompletableFuture<CollectionPage<CurriculumExperience>> getCurriculumExperiences(long curriculumId, int page){
+        return curriculumRepo.findById(curriculumId)
+                .thenApply( ocurriculum -> ocurriculum.orElseThrow(()-> new ResourceNotFoundException(ErrorMessages.RESOURCE_NOTFOUND_CURRICULUM)))
+                .thenCompose(Curriculum::getExperiences)
+                .thenApply( list -> new CollectionPage<>(
+                        list.size(),
+                        page,
+                        list.stream()
+                                .skip(CollectionPage.PAGE_SIZE * page)
+                                .limit(CollectionPage.PAGE_SIZE))
+                );
     }
 
     public CompletableFuture<CurriculumExperience> addCurriculumExperience(

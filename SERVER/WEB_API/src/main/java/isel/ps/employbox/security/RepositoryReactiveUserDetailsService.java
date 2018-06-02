@@ -29,11 +29,10 @@ public class RepositoryReactiveUserDetailsService implements ReactiveUserDetails
         return  Mono.fromFuture(
                 accountRepo
                         .findWhere(new Pair<>("email", username))
-                        .thenApply(accounts -> accounts.get(0))
-                        .thenApply(account -> {
-                            if (account != null)
-                                return new CustomUserDetails(account);
-                            throw new UsernameNotFoundException(RESOURCE_NOTFOUND_USER);
+                        .thenApply(accounts -> {
+                            if (!accounts.isEmpty())
+                                return new CustomUserDetails(accounts.get(0));
+                             throw new UsernameNotFoundException(RESOURCE_NOTFOUND_USER);
                         })
         );
     }
@@ -41,7 +40,7 @@ public class RepositoryReactiveUserDetailsService implements ReactiveUserDetails
     static class CustomUserDetails extends Account implements UserDetails {
         CustomUserDetails(Account account) {
             super(account.getIdentityKey(), account.getEmail(), account.getPassword(), account.getRating(), account.getVersion(), account.getOfferedJobs(),
-                    account.getComments(), account.getChats(), account.getRatings(), account.getFollowing());
+                    account.getComments(), account.getChats(), account.getRatings(), account.getFollowing(), account.getFollowers());
         }
 
         @Override

@@ -2,14 +2,15 @@ package isel.ps.employbox.model.output;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import isel.ps.employbox.controllers.ChatController;
-import org.springframework.hateoas.ResourceSupport;
 
 import java.sql.Date;
 
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 
-public class OutMessage extends ResourceSupport {
+public class OutMessage extends OutputDto{
+
+    private final long accountId;
 
     @JsonProperty
     private final long messageId;
@@ -23,11 +24,30 @@ public class OutMessage extends ResourceSupport {
     @JsonProperty
     private final String text;
 
+    @JsonProperty
+    private final _Links _links;
+
     public OutMessage(long accountId, long messageId, long chadId, Date date, String text) {
         this.messageId = messageId;
         this.chatId = chadId;
         this.date = date;
         this.text = text;
-        this.add( linkTo( methodOn(ChatController.class, accountId).getChatMessage(chatId, messageId, null)).withSelfRel());
+        this.accountId = accountId;
+        this._links = new _Links();
+    }
+
+    @Override
+    public Object getCollectionItemOutput() {
+        return null;
+    }
+
+    private class _Links {
+        @JsonProperty
+        private _Links.Self self = new _Links.Self();
+
+        private class Self {
+            @JsonProperty
+            final String href = HOSTNAME + linkTo( methodOn(ChatController.class, accountId).getChatMessage(chatId, messageId, null)).withSelfRel().getHref();
+        }
     }
 }

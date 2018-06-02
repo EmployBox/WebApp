@@ -5,17 +5,16 @@ import isel.ps.employbox.ErrorMessages;
 import isel.ps.employbox.exceptions.BadRequestException;
 import isel.ps.employbox.exceptions.ConflictException;
 import isel.ps.employbox.exceptions.ResourceNotFoundException;
+import isel.ps.employbox.model.binder.CollectionPage;
 import isel.ps.employbox.model.entities.Job;
 import isel.ps.employbox.model.entities.JobExperience;
-import javafx.util.Pair;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
-import java.util.stream.Stream;
 
 @Service
 public class JobService {
@@ -29,8 +28,8 @@ public class JobService {
         this.accountService = userService;
     }
 
-    public CompletableFuture<Stream<Job> > getAllJobs() {
-        return  jobRepo.findAll().thenApply(Collection::stream);
+    public CompletableFuture<CollectionPage<Job>> getAllJobs() {
+        throw new NotImplementedException();
     }
 
     public CompletableFuture<Job> getJob(long jid) {
@@ -38,9 +37,16 @@ public class JobService {
                 .thenApply(ojob -> ojob.orElseThrow(()-> new ResourceNotFoundException(ErrorMessages.RESOURCE_NOTFOUND_JOB)));
     }
 
-    public CompletableFuture<Stream<JobExperience>> getJobExperiences(long jid) {
-        return jobExperienceRepo.findWhere(new Pair<>("jobId", jid))
-                .thenApply(Collection::stream);
+    public CompletableFuture<CollectionPage<JobExperience>> getJobExperiences(long jid, int page) {
+        return getJob(jid)
+                .thenCompose(Job::getExperiences)
+                .thenApply(list -> new CollectionPage<>(
+                        list.size(),
+                        page,
+                        list.stream()
+                                .skip(CollectionPage.PAGE_SIZE * page)
+                                .limit(CollectionPage.PAGE_SIZE))
+                );
     }
 
     public CompletableFuture<JobExperience> getJobExperience(long id, long cid) {

@@ -4,30 +4,36 @@ import com.github.jayield.rapper.DataRepository;
 import isel.ps.employbox.ErrorMessages;
 import isel.ps.employbox.exceptions.BadRequestException;
 import isel.ps.employbox.exceptions.ResourceNotFoundException;
+import isel.ps.employbox.model.binder.CollectionPage;
+import isel.ps.employbox.model.entities.Account;
 import isel.ps.employbox.model.entities.Rating;
-import javafx.util.Pair;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
 import java.util.concurrent.CompletableFuture;
-import java.util.stream.Stream;
 
 @Service
 public class RatingService {
     private final DataRepository<Rating, Rating.RatingKey> ratingRepo;
     private final UserAccountService userAccountService;
+    private final AccountService accountService;
 
-    public RatingService(DataRepository<Rating, Rating.RatingKey> ratingRepo, UserAccountService userAccountService) {
+    public RatingService(DataRepository<Rating, Rating.RatingKey> ratingRepo, UserAccountService userAccountService, AccountService accountService) {
         this.ratingRepo = ratingRepo;
         this.userAccountService = userAccountService;
+        this.accountService = accountService;
     }
 
-    public CompletableFuture<Stream<Rating>> getRatings(long accountId, String type) {
-        return ratingRepo.findWhere(new Pair<>("accountId", accountId))
+    public CompletableFuture<CollectionPage<Rating>> getRatings(long accountId, int page) {
+        return accountService.getAccount(accountId)
+                .thenCompose(Account::getRatings)
                 .thenApply(list ->
-                        list.stream()
-                                .filter(curr-> type.equals("done") && curr.getAccountIdFrom() == accountId || type.equals("received")&& curr.getAccountIdTo()== accountId)
-
+                        new CollectionPage<>(
+                                list.size(),
+                                page,
+                                list.stream()
+                                    .skip(CollectionPage.PAGE_SIZE * page)
+                                    .limit(CollectionPage.PAGE_SIZE))
                 );
     }
 

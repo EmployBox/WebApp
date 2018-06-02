@@ -3,18 +3,17 @@ package isel.ps.employbox.model.output;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import isel.ps.employbox.controllers.CurriculumController;
-import org.springframework.hateoas.ResourceSupport;
 
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 
-public class OutAcademicBackground extends ResourceSupport {
+public class OutAcademicBackground extends OutputDto {
 
     private final long academicBackgroundId;
 
     private final long accountId;
 
-    private final long curriculumId;
+    protected final long curriculumId;
 
     @JsonProperty
     private final String institution;
@@ -30,6 +29,9 @@ public class OutAcademicBackground extends ResourceSupport {
 
     @JsonProperty
     private final String endDate;
+
+    @JsonProperty
+    private final _Links link = new _Links();
 
     public OutAcademicBackground(
             long academicBackgroundId,
@@ -49,6 +51,19 @@ public class OutAcademicBackground extends ResourceSupport {
         this.endDate = endDate;
         this.accountId = accountId;
         this.curriculumId = curriculumId;
-        this.add(linkTo( methodOn(CurriculumController.class).getAcademicBackground(this.accountId, this.curriculumId)).slash(academicBackgroundId).withSelfRel());
+    }
+
+    @Override
+    public Object getCollectionItemOutput() {
+        return null;
+    }
+
+    private class _Links{
+        @JsonProperty
+        private Self self = new Self();
+
+        private class Self{
+            String href = linkTo( methodOn(CurriculumController.class).getAcademicBackground(accountId, curriculumId, 0)).slash(academicBackgroundId).withSelfRel().getHref();
+        }
     }
 }

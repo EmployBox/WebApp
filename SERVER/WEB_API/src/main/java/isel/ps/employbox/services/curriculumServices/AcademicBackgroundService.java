@@ -4,28 +4,39 @@ import com.github.jayield.rapper.DataRepository;
 import isel.ps.employbox.ErrorMessages;
 import isel.ps.employbox.exceptions.BadRequestException;
 import isel.ps.employbox.exceptions.ConflictException;
+import isel.ps.employbox.exceptions.ResourceNotFoundException;
+import isel.ps.employbox.model.binder.CollectionPage;
+import isel.ps.employbox.model.entities.Curriculum;
 import isel.ps.employbox.model.entities.CurriculumChilds.AcademicBackground;
-import javafx.util.Pair;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
 import java.util.concurrent.CompletableFuture;
-import java.util.stream.Stream;
 
 @Service
 public class AcademicBackgroundService {
 
     public final CurriculumService curriculumService;
+    public final DataRepository<Curriculum, Long> curriculumRepo;
     public final DataRepository<AcademicBackground, Long> academicBackgroundRepo;
 
-    public AcademicBackgroundService(CurriculumService curriculumService, DataRepository<AcademicBackground, Long> academicBackgroundRepo) {
+    public AcademicBackgroundService(CurriculumService curriculumService, DataRepository<Curriculum, Long> curriculumRepo, DataRepository<AcademicBackground, Long> academicBackgroundRepo) {
         this.curriculumService = curriculumService;
+        this.curriculumRepo = curriculumRepo;
         this.academicBackgroundRepo = academicBackgroundRepo;
     }
 
-    public CompletableFuture<Stream<AcademicBackground>> getCurriculumAcademicBackgrounds(long curriculumId){
-        return academicBackgroundRepo.findWhere(new Pair<>("curriculumId",curriculumId))
-                .thenApply( academicBackgrounds -> academicBackgrounds.stream());
+    public CompletableFuture<CollectionPage<AcademicBackground>> getCurriculumAcademicBackgrounds(long curriculumId, int page){
+        return curriculumRepo.findById(curriculumId)
+                .thenApply( ocurriculum -> ocurriculum.orElseThrow(()-> new ResourceNotFoundException(ErrorMessages.RESOURCE_NOTFOUND_CURRICULUM)))
+                .thenCompose( curriculum -> curriculum.getAcademicBackground())
+                .thenApply( list -> new CollectionPage<>(
+                        list.size(),
+                        page,
+                        list.stream()
+                                .skip(CollectionPage.PAGE_SIZE * page)
+                                .limit(CollectionPage.PAGE_SIZE))
+                );
     }
 
     public CompletableFuture<AcademicBackground> addAcademicBackgroundToCurriculum (

@@ -2,6 +2,7 @@ package isel.ps.employbox.model.entities.CurriculumChilds;
 
 import com.github.jayield.rapper.DomainObject;
 import com.github.jayield.rapper.Id;
+import com.github.jayield.rapper.Version;
 import org.springframework.hateoas.ResourceSupport;
 
 import java.sql.Date;
@@ -15,10 +16,11 @@ public class PreviousJobs extends ResourceSupport implements DomainObject<Long>,
     private long curriculumId;
     private final Date beginDate;
     private final Date endDate;
-    private final long version;
     private final String companyName;
     private final String workLoad;
     private final String role;
+    @Version
+    private final long version;
 
 
     public PreviousJobs(){

@@ -1,69 +1,47 @@
 package isel.ps.employbox.model.binder;
 
-import isel.ps.employbox.model.output.HalCollection;
-import org.springframework.hateoas.Link;
-import org.springframework.hateoas.ResourceSupport;
-import org.springframework.hateoas.Resources;
-import org.springframework.hateoas.core.EmbeddedWrapper;
-import org.springframework.hateoas.core.EmbeddedWrappers;
-import org.springframework.hateoas.core.Relation;
+import isel.ps.employbox.model.output.CollectionItemSupplier;
+import isel.ps.employbox.model.output.HalCollectionPage;
 import reactor.core.publisher.Mono;
 
-import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public interface ModelBinder<T, O extends ResourceSupport, I> {
+public interface ModelBinder<T, O, I> {
     Mono<O> bindOutput(CompletableFuture<T> object);
+
     T bindInput(I object);
 
-    default Stream<T> bindInput(Stream<I> list){
+    default Stream<T> bindInput(Stream<I> list) {
         return list.map(this::bindInput);
     }
 
-    /*
-    default Mono<HalCollection> bindOutput(CompletableFuture<Stream<T>> listCompletableFuture, Class selfController, Object ... parameters) {
+    default Mono<HalCollectionPage> bindOutput(
+            CompletableFuture<CollectionPage<T>> elementsPage,
+            Class selfController,
+            Object... parameters) {
         return Mono.fromFuture(
-                listCompletableFuture
+                elementsPage
                         .thenApply(
-                                (stream) -> {
-                                    EmbeddedWrappers wrappers = new EmbeddedWrappers(true);
-                                    ArrayList<EmbeddedWrapper> embeddedPropertieList = new ArrayList<>();
-                                    stream.map(curr -> bindOutput(CompletableFuture.completedFuture(curr)).block())
-                                            .forEach(curr -> embeddedPropertieList.add(wrappers.wrap(new CollectionItem(curr.getId()))));
+                                (CollectionPage<T> elements) -> {
+                                    Stream<T> list = elements.getPageList();
 
-                                    return new HalCollection(
-                                            embeddedPropertieList.size(),
-                                            new Resources<>(embeddedPropertieList),
+                                    List<Object> items = list.map(curr-> ((CollectionItemSupplier)bindOutput(CompletableFuture.completedFuture(curr))
+                                            .block())
+                                            .getCollectionItemOutput())
+                                            .collect(Collectors.toList());
+
+                                    return new HalCollectionPage(
+                                            elements,
+                                            items,
                                             selfController,
-                                            parameters);
+                                            parameters
+                                    );
                                 }
+
                         )
         );
-    }*/
-
-    default Mono<HalCollection> bindOutput(CompletableFuture<Stream<T>> listCompletableFuture, Class selfController, Object ... parameters) {
-        EmbeddedWrappers wrappers = new EmbeddedWrappers(true);
-        ArrayList<EmbeddedWrapper> embeddedChecklists = new ArrayList<>();
-        Stream<T> list = listCompletableFuture.join();
-
-        list.map(curr-> bindOutput( CompletableFuture.completedFuture(curr)).block())
-                .forEach(curr -> embeddedChecklists.add( wrappers.wrap(new CollectionItem(curr.getId()))));
-
-        HalCollection ret = new HalCollection(
-                embeddedChecklists.size(),
-                new Resources<>(embeddedChecklists),
-                selfController,
-                parameters
-        );
-        return Mono.fromFuture( CompletableFuture.completedFuture(ret));
-    }
-
-    @Relation(value= "item", collectionRelation = "items")
-    class CollectionItem extends ResourceSupport {
-
-        public CollectionItem(Link self){
-            this.add(self);
-        }
     }
 }

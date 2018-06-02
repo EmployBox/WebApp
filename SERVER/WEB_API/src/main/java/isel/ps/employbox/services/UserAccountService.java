@@ -6,17 +6,17 @@ import isel.ps.employbox.exceptions.BadRequestException;
 import isel.ps.employbox.exceptions.ConflictException;
 import isel.ps.employbox.exceptions.ResourceNotFoundException;
 import isel.ps.employbox.exceptions.UnauthorizedException;
+import isel.ps.employbox.model.binder.CollectionPage;
 import isel.ps.employbox.model.entities.Application;
 import isel.ps.employbox.model.entities.Curriculum;
 import isel.ps.employbox.model.entities.UserAccount;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.security.InvalidParameterException;
-import java.util.Collection;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
-import java.util.stream.Stream;
 
 import static isel.ps.employbox.ErrorMessages.RESOURCE_NOTFOUND_USER;
 
@@ -37,9 +37,8 @@ public class UserAccountService {
         this.applicationRepo = applicationRepo;
     }
 
-    public CompletableFuture<Stream<UserAccount>> getAllUsers() {
-        return userRepo.findAll()
-                .thenApply(Collection::stream);
+    public CompletableFuture<CollectionPage<UserAccount>> getAllUsers() {
+        throw new NotImplementedException();
     }
 
     public CompletableFuture<UserAccount> getUser(long id, String... email) {
@@ -68,15 +67,18 @@ public class UserAccountService {
                 });
     }
 
-    public CompletableFuture<Stream<Application>> getAllApplications(long accountId)
+    public CompletableFuture<CollectionPage<Application>> getAllApplications(long accountId, int page)
     {
         return userRepo.findById(accountId)
                 .thenApply( ouser -> ouser.orElseThrow(()-> new ResourceNotFoundException(ErrorMessages.RESOURCE_NOTFOUND_USER)))
                 .thenCompose(UserAccount::getApplications)
-                .thenApply(Collection::stream)
-                .exceptionally(throwable -> {
-                    throw new ResourceNotFoundException(ErrorMessages.RESOURCE_NOTFOUND_USER);
-                });
+                .thenApply( list -> new CollectionPage<>(
+                        list.size(),
+                        page,
+                        list.stream()
+                            .skip(CollectionPage.PAGE_SIZE * page)
+                            .limit(CollectionPage.PAGE_SIZE)
+                ));
     }
 
     public CompletableFuture<UserAccount> createUser(UserAccount userAccount) {

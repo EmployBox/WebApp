@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import isel.ps.employbox.controllers.CommentController;
 import org.springframework.hateoas.ResourceSupport;
 
+import static isel.ps.employbox.model.output.OutputDto.HOSTNAME;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 
 public class OutComment extends ResourceSupport {
@@ -26,6 +27,9 @@ public class OutComment extends ResourceSupport {
     @JsonProperty
     private final String text;
 
+    @JsonProperty
+    private final _Links _links;
+
     public OutComment(long accountIdFrom, long accountIdTo, long commmentId, long mainCommentId, String datetime, String text) {
         this.accountIdFrom = accountIdFrom;
         this.accountIdTo = accountIdTo;
@@ -33,6 +37,16 @@ public class OutComment extends ResourceSupport {
         this.mainCommentId = mainCommentId;
         this.datetime = datetime;
         this.text = text;
-        this.add( linkTo (CommentController.class, accountIdFrom).slash(commmentId).withSelfRel());
+        this._links = new _Links();
+    }
+
+    private class _Links {
+        @JsonProperty
+        private Self self = new Self();
+
+        private class Self {
+            @JsonProperty
+            final String href = HOSTNAME + linkTo (CommentController.class, accountIdFrom).slash(commmentId).withSelfRel().getHref();
+        }
     }
 }

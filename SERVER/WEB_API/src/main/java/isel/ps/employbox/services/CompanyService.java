@@ -4,14 +4,13 @@ import com.github.jayield.rapper.DataRepository;
 import isel.ps.employbox.ErrorMessages;
 import isel.ps.employbox.exceptions.BadRequestException;
 import isel.ps.employbox.exceptions.ResourceNotFoundException;
+import isel.ps.employbox.model.binder.CollectionPage;
 import isel.ps.employbox.model.entities.Account;
 import isel.ps.employbox.model.entities.Company;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
-import java.util.Collection;
 import java.util.concurrent.CompletableFuture;
-import java.util.stream.Stream;
 
 @Service
 public class CompanyService {
@@ -25,9 +24,13 @@ public class CompanyService {
         this.accountService = accountService;
     }
 
-    public CompletableFuture<Stream<Company>> getCompanies() {
-        return companyRepo.findAll()
-                .thenApply(Collection::stream);
+    public CompletableFuture<CollectionPage<Company>> getCompanies(int page) {
+        return companyRepo.findAll(page, CollectionPage.PAGE_SIZE)
+                .thenApply(list -> new CollectionPage(
+                        page,
+                        21,
+                        list.stream()
+                ));
     }
 
     public CompletableFuture<Company> getCompany(long cid) {

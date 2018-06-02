@@ -6,7 +6,7 @@ import isel.ps.employbox.model.binder.JobExperienceBinder;
 import isel.ps.employbox.model.entities.Job;
 import isel.ps.employbox.model.entities.JobExperience;
 import isel.ps.employbox.model.input.InJob;
-import isel.ps.employbox.model.output.HalCollection;
+import isel.ps.employbox.model.output.HalCollectionPage;
 import isel.ps.employbox.model.output.OutJob;
 import isel.ps.employbox.model.output.OutJobExperience;
 import isel.ps.employbox.services.JobService;
@@ -33,7 +33,7 @@ public class JobController {
 
 
     @GetMapping
-    public Mono<HalCollection> getAllJobs(){
+    public Mono<HalCollectionPage> getAllJobs(){
         return jobBinder.bindOutput(
                 jobService.getAllJobs(),
                 this.getClass()
@@ -48,9 +48,9 @@ public class JobController {
     }
 
     @GetMapping("/{jid}/experiences")
-    public Mono<HalCollection> getJobExperiences(@PathVariable long jid){
+    public Mono<HalCollectionPage> getJobExperiences(@PathVariable long jid, @RequestParam(defaultValue = "0") int page){
         return jobExperienceBinder.bindOutput(
-                jobService.getJobExperiences(jid),
+                jobService.getJobExperiences(jid, page),
                 this.getClass(),
                 jid
         );

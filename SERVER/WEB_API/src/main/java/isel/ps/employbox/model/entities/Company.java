@@ -41,9 +41,10 @@ public class Company extends Account {
             CompletableFuture<List<Chat>> chats,
             CompletableFuture<List<Comment>> comments,
             CompletableFuture<List<Rating>> ratings,
-            CompletableFuture<List<Account>> following)
+            CompletableFuture<List<Account>> following,
+            CompletableFuture<List<Account>> followers)
     {
-        super(accountID, email, password, rating, version, offeredJobs,comments, chats, ratings, following);
+        super(accountID, email, password, rating, version, offeredJobs,comments, chats, ratings, following, followers);
         this.name = name;
         this.specialization = specialization;
         this.logoUrl = logoUrl;

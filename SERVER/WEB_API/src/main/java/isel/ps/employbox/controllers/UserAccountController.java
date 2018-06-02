@@ -7,7 +7,7 @@ import isel.ps.employbox.model.entities.Application;
 import isel.ps.employbox.model.entities.UserAccount;
 import isel.ps.employbox.model.input.InApplication;
 import isel.ps.employbox.model.input.InUserAccount;
-import isel.ps.employbox.model.output.HalCollection;
+import isel.ps.employbox.model.output.HalCollectionPage;
 import isel.ps.employbox.model.output.OutApplication;
 import isel.ps.employbox.model.output.OutUser;
 import isel.ps.employbox.services.UserAccountService;
@@ -32,7 +32,7 @@ public class UserAccountController {
     }
 
     @GetMapping
-    public Mono<HalCollection> getAllUsers(){
+    public Mono<HalCollectionPage> getAllUsers(){
         return userBinder.bindOutput(
                 userAccountService.getAllUsers(),
                 this.getClass()
@@ -45,9 +45,13 @@ public class UserAccountController {
     }
 
     @GetMapping("/{id}/applications")
-    public Mono<HalCollection> getAllApplications(@PathVariable long id){
+    public Mono<HalCollectionPage> getAllApplications(
+            @PathVariable long id,
+            @RequestParam(defaultValue = "0") int page
+
+    ){
         return applicationBinder.bindOutput(
-                userAccountService.getAllApplications(id),
+                userAccountService.getAllApplications(id, page),
                 this.getClass(),
                 id
         );

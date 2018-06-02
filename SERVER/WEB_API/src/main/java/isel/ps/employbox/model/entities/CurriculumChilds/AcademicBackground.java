@@ -2,6 +2,7 @@ package isel.ps.employbox.model.entities.CurriculumChilds;
 
 import com.github.jayield.rapper.DomainObject;
 import com.github.jayield.rapper.Id;
+import com.github.jayield.rapper.Version;
 
 import java.sql.Date;
 
@@ -17,6 +18,8 @@ public class AcademicBackground implements DomainObject<Long>,CurriculumChild {
     private final String studyArea;
     private final String institution;
     private final String degreeObtained;
+
+    @Version
     private final long version;
 
     public AcademicBackground(){

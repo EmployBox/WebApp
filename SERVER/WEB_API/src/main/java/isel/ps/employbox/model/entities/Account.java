@@ -4,9 +4,6 @@ import com.github.jayield.rapper.ColumnName;
 import com.github.jayield.rapper.DomainObject;
 import com.github.jayield.rapper.Id;
 import com.github.jayield.rapper.Version;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.Collections;
 import java.util.List;
@@ -34,6 +31,9 @@ public class Account implements DomainObject<Long> {
     @ColumnName(table = "Follows", foreignName = "accountIdFollowed", externalName = "accountIdFollower")
     protected final CompletableFuture<List<Account>> following;
 
+    @ColumnName(table = "Follows", foreignName = "accountIdFollower", externalName = "accountIdFollowed")
+    protected final CompletableFuture<List<Account>> followers;
+
     @ColumnName( foreignName = "accountIdFirst")
     protected final CompletableFuture<List<Chat>> chats;
 
@@ -50,6 +50,7 @@ public class Account implements DomainObject<Long> {
         offeredJobs = CompletableFuture.completedFuture(Collections.emptyList());
         comments = CompletableFuture.completedFuture(Collections.emptyList());
         following = CompletableFuture.completedFuture(Collections.emptyList());
+        followers = CompletableFuture.completedFuture(Collections.emptyList());
         chats = CompletableFuture.completedFuture(Collections.emptyList());
         ratings = CompletableFuture.completedFuture(Collections.emptyList());
     }
@@ -64,8 +65,8 @@ public class Account implements DomainObject<Long> {
             CompletableFuture<List<Comment>> comments,
             CompletableFuture<List<Chat>> chats,
             CompletableFuture<List<Rating>> ratings,
-            CompletableFuture<List<Account>> following
-    ) {
+            CompletableFuture<List<Account>> following,
+            CompletableFuture<List<Account>> follower) {
         this.accountId = accountID;
         this.email = email;
         this.password = password;
@@ -76,6 +77,7 @@ public class Account implements DomainObject<Long> {
         this.ratings = ratings;
         this.comments = comments;
         this.following = following;
+        this.followers = follower;
     }
 
     protected Account(long accountId, String email, String password, double rating, long version){
@@ -89,6 +91,7 @@ public class Account implements DomainObject<Long> {
         this.ratings = CompletableFuture.completedFuture(Collections.emptyList());
         this.comments = CompletableFuture.completedFuture(Collections.emptyList());
         this.following = CompletableFuture.completedFuture(Collections.emptyList());
+        this.followers = CompletableFuture.completedFuture(Collections.emptyList());
     }
 
     @Override
@@ -114,6 +117,10 @@ public class Account implements DomainObject<Long> {
 
     public CompletableFuture<List<Account>> getFollowing() {
         return following;
+    }
+
+    public CompletableFuture<List<Account>> getFollowers() {
+        return followers;
     }
 
     public CompletableFuture<List<Comment>> getComments() {

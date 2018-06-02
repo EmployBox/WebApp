@@ -1,7 +1,7 @@
 package isel.ps.employbox.controllers;
 
 import isel.ps.employbox.model.binder.AccountBinder;
-import isel.ps.employbox.model.output.HalCollection;
+import isel.ps.employbox.model.output.HalCollectionPage;
 import isel.ps.employbox.services.FollowService;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
@@ -20,18 +20,21 @@ public class FollowsController {
     }
 
     @GetMapping("/followers")
-    public Mono<HalCollection> getFollowers(@PathVariable long id){
+    public Mono<HalCollectionPage> getFollowers(
+            @PathVariable long id,
+            @RequestParam(defaultValue = "0") int page
+    ){
         return accountBinder.bindOutput(
-                followService.getAccountFollowers(id),
+                followService.getAccountFollowers(id, page),
                 this.getClass(),
                 id
         );
     }
 
     @GetMapping("/following")
-    public Mono<HalCollection> getFollowing(@PathVariable long id){
+    public Mono<HalCollectionPage> getFollowing(@PathVariable long id, @RequestParam(defaultValue = "0") int page){
         return accountBinder.bindOutput(
-                followService.getAccountFollowing(id),
+                followService.getAccountFollowing(id, page),
                 this.getClass(),
                 id
         );

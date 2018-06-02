@@ -5,8 +5,10 @@ import isel.ps.employbox.ErrorMessages;
 import isel.ps.employbox.exceptions.BadRequestException;
 import isel.ps.employbox.exceptions.ResourceNotFoundException;
 import isel.ps.employbox.exceptions.UnauthorizedException;
+import isel.ps.employbox.model.binder.CollectionPage;
 import isel.ps.employbox.model.entities.Chat;
 import isel.ps.employbox.model.entities.Message;
+import javafx.util.Pair;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
@@ -36,12 +38,16 @@ public class ChatService {
                         .filter(curr -> curr.getAccountIdFirst() == accountId));
     }
 
-    public CompletableFuture<Stream<Message>> getAccountChatsMessages(long accountId, long cid, String email) {
+    public CompletableFuture<CollectionPage<Message>> getAccountChatsMessages(long accountId, long cid, String email, int page) {
         return accountService.getAccount(accountId, email).thenCompose(__ ->
-                msgRepo.findAll()
-                        .thenApply(list -> list
-                                .stream()
-                                .filter(curr -> curr.getAccountId() == accountId && curr.getChatId() == cid))
+                msgRepo.findWhere(page, CollectionPage.PAGE_SIZE, new Pair<>("accountId",accountId))
+                        .thenApply(list -> new CollectionPage(
+                                list.size(),
+                                page,
+                                list.stream()
+                                        .skip(CollectionPage.PAGE_SIZE * page)
+                                        .limit(CollectionPage.PAGE_SIZE)
+                        ))
         );
     }
 

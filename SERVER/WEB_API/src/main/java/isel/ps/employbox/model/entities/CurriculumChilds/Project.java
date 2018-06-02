@@ -2,6 +2,7 @@ package isel.ps.employbox.model.entities.CurriculumChilds;
 
 import com.github.jayield.rapper.DomainObject;
 import com.github.jayield.rapper.Id;
+import com.github.jayield.rapper.Version;
 
 public class Project implements DomainObject<Long>,CurriculumChild {
 
@@ -11,6 +12,8 @@ public class Project implements DomainObject<Long>,CurriculumChild {
     private long curriculumId;
     private final String name;
     private final String description;
+
+    @Version
     private final long version;
 
 
