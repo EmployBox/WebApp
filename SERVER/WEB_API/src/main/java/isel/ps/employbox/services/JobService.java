@@ -15,7 +15,6 @@ import isel.ps.employbox.model.entities.Job;
 import isel.ps.employbox.model.entities.JobExperience;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.sql.Connection;
 import java.util.List;
@@ -38,8 +37,14 @@ public class JobService {
         this.accountService = userService;
     }
 
-    public CompletableFuture<CollectionPage<Job>> getAllJobs() {
-        throw new NotImplementedException();
+    public CompletableFuture<CollectionPage<Job>> getAllJobs(int page) {
+        List<Job>[] jobs = new List[1];
+        return jobRepo.findAll(page, CollectionPage.PAGE_SIZE)
+                .thenCompose(res -> {
+                    jobs[0] = res;
+                    return jobRepo.getNumberOfEntries();
+                } )
+                .thenApply( numberOfEntries -> new CollectionPage( (int)numberOfEntries.longValue(), page, jobs[0].stream() ));
     }
 
     public CompletableFuture<Job> getJob(long jid) {

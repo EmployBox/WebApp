@@ -1,5 +1,6 @@
 package isel.ps.employbox.model.output;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import isel.ps.employbox.controllers.JobController;
 import isel.ps.employbox.controllers.UserAccountController;
@@ -69,9 +70,36 @@ public class OutJob extends OutputDto {
         this._links = new _Links();
     }
 
+    @JsonIgnore
     @Override
     public Object getCollectionItemOutput() {
-        return null;
+        return new JobItemOutput(title, description);
+    }
+
+    class JobItemOutput {
+        @JsonProperty
+        private String title;
+
+        @JsonProperty
+        private final String description;
+
+        @JsonProperty
+        private final _Links _links = new _Links();
+
+        private JobItemOutput(String title, String description){
+            this.title = title;
+            this.description = description;
+        }
+
+        class _Links {
+            @JsonProperty
+            private Self self = new Self();
+
+            private class Self{
+                @JsonProperty
+                final String href = HOSTNAME + linkTo(JobController.class).slash(jobId).withSelfRel().getHref();
+            }
+        }
     }
 
     private class _Links {

@@ -119,8 +119,7 @@ public class CurriculumService {
         );
     }
 
-    public CompletableFuture<CollectionPage<Curriculum>> getCurricula(long userId, String email, int page)
-    {
+    public CompletableFuture<CollectionPage<Curriculum>> getCurricula(long userId, String email, int page) {
         return userAccountService.getUser(userId, email)
                 .thenCompose(UserAccount::getCurricula)
                 .thenApply( curricula -> new CollectionPage<>(
