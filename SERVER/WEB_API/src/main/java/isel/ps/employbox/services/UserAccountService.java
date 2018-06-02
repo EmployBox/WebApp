@@ -1,6 +1,7 @@
 package isel.ps.employbox.services;
 
 import com.github.jayield.rapper.DataRepository;
+import com.github.jayield.rapper.Transaction;
 import isel.ps.employbox.ErrorMessages;
 import isel.ps.employbox.exceptions.BadRequestException;
 import isel.ps.employbox.exceptions.ConflictException;
@@ -15,8 +16,11 @@ import reactor.core.publisher.Mono;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.security.InvalidParameterException;
+import java.sql.Connection;
+import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
 
 import static isel.ps.employbox.ErrorMessages.RESOURCE_NOTFOUND_USER;
 
@@ -24,16 +28,13 @@ import static isel.ps.employbox.ErrorMessages.RESOURCE_NOTFOUND_USER;
 public class UserAccountService {
 
     private final DataRepository<UserAccount, Long> userRepo;
-    private final DataRepository<Curriculum, Long> curriculumRepo;
     private final DataRepository<Application, Long> applicationRepo;
 
     public UserAccountService(
             DataRepository<UserAccount, Long> userRepo,
-            DataRepository<Curriculum, Long> curriculumRepo,
             DataRepository<Application, Long> applicationRepo
     ) {
         this.userRepo = userRepo;
-        this.curriculumRepo = curriculumRepo;
         this.applicationRepo = applicationRepo;
     }
 
@@ -83,11 +84,8 @@ public class UserAccountService {
 
     public CompletableFuture<UserAccount> createUser(UserAccount userAccount) {
         return userRepo.create(userAccount)
-                .thenApply(res -> {
-                    if (res.isPresent()) throw new BadRequestException(ErrorMessages.BAD_REQUEST_ITEM_CREATION);
-                    return userAccount;
-                })
-                .exceptionally(e -> {
+                .thenApply(res -> userAccount)
+                .exceptionally(throwable -> {
                     throw new ConflictException(ErrorMessages.CONFLIT_USERNAME_TAKEN);
                 });
     }
@@ -97,52 +95,45 @@ public class UserAccountService {
             throw new BadRequestException(ErrorMessages.BAD_REQUEST_IDS_MISMATCH);
 
         return getUser(userId, email)
-                .thenCompose(__ -> applicationRepo.create(application))
-                .thenApply(res -> {
-                    if (res.isPresent()) throw new BadRequestException(ErrorMessages.BAD_REQUEST_ITEM_CREATION);
-                    return application;
-                });
+                .thenCompose(userAccount -> applicationRepo.create(application))
+                .thenApply(res -> application);
     }
 
     public Mono<Void> updateUser(UserAccount userAccount, String email) {
         return Mono.fromFuture(
                 getUser(userAccount.getIdentityKey(), email)
-                        .thenCompose(__ -> userRepo.update(userAccount))
-                        .thenAccept(res -> {
-                            if (res.isPresent()) throw new BadRequestException(ErrorMessages.BAD_REQUEST_ITEM_CREATION);
-                        })
+                        .thenCompose(userAccount1 -> userRepo.update(userAccount))
         );
     }
 
     public Mono<Void> updateApplication(Application application, String email) {
         return Mono.fromFuture(
                 getUser(application.getAccountId(), email)
-                        .thenCompose(__ -> getApplication(application.getAccountId(), application.getJobId()))
-                        .thenCompose(__ -> applicationRepo.update(application))
-                        .thenAccept(res -> {
-                            if (res.isPresent()) throw new BadRequestException(ErrorMessages.BAD_REQUEST_ITEM_CREATION);
-                        })
+                        .thenCompose(userAccount -> getApplication(application.getAccountId(), application.getJobId()))
+                        .thenCompose(application1 -> applicationRepo.update(application))
         );
     }
 
     public Mono<Void> deleteUser(long id, String email) {
         return Mono.fromFuture(
                 getUser(id, email)
-                        .thenCompose(userRepo::delete)
-                        .thenAccept(res -> {
-                            if (res.isPresent()) throw new BadRequestException(ErrorMessages.BAD_REQUEST_ITEM_DELETION);
-                        })
+                        //TODO remove entries from other tables where user has foreign key
+                        .thenCompose(userAccount -> new Transaction(Connection.TRANSACTION_READ_COMMITTED)
+                                .andDo(() -> userAccount.getApplications()
+                                        .thenCompose(applications -> {
+                                            List<Long> applicationIds = applications.stream().map(Application::getIdentityKey).collect(Collectors.toList());
+                                            return applicationRepo.deleteAll(applicationIds);
+                                        }))
+                                .andDo(() -> userRepo.delete(userAccount))
+                                .commit())
         );
     }
 
     public Mono<Void> deleteApplication(long userId, long jobId, String email) {
         return Mono.fromFuture(
                 getUser(userId, email)
-                        .thenCompose(__ -> getApplication(userId, jobId))
+                        .thenCompose(userAccount -> getApplication(userId, jobId))
                         .thenCompose(applicationRepo::delete)
-                        .thenAccept(res -> {
-                            if (res.isPresent()) throw new BadRequestException(ErrorMessages.BAD_REQUEST_ITEM_DELETION);
-                        })
         );
     }
 }

@@ -1,8 +1,8 @@
 package isel.ps.employbox.security;
 
 import com.github.jayield.rapper.DataRepository;
+import com.github.jayield.rapper.utils.Pair;
 import isel.ps.employbox.model.entities.Account;
-import javafx.util.Pair;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.ReactiveUserDetailsService;
 import org.springframework.security.core.userdetails.UserDetails;

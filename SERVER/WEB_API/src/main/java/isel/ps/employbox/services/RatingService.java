@@ -1,6 +1,7 @@
 package isel.ps.employbox.services;
 
 import com.github.jayield.rapper.DataRepository;
+import com.github.jayield.rapper.utils.Pair;
 import isel.ps.employbox.ErrorMessages;
 import isel.ps.employbox.exceptions.BadRequestException;
 import isel.ps.employbox.exceptions.ResourceNotFoundException;
@@ -52,32 +53,26 @@ public class RatingService {
                         userAccountService.getUser(rating.getAccountIdFrom(), email),//throws exceptions
                         getRating(rating.getAccountIdFrom(), rating.getAccountIdTo())
                 )
-                .thenCompose (__-> ratingRepo.update(rating))
-                .thenAccept(res -> {
-                    if(res.isPresent()) throw new BadRequestException(ErrorMessages.BAD_REQUEST_ITEM_CREATION);
-                })
+                        .thenCompose(aVoid -> ratingRepo.update(rating))
         );
     }
 
     public Mono<Rating> createRating(Rating rating, String email) {
         return Mono.fromFuture(
                 CompletableFuture.allOf(
-                        userAccountService.getUser(rating.getAccountIdFrom(),email),
+                        userAccountService.getUser(rating.getAccountIdFrom(), email),
                         userAccountService.getUser(rating.getAccountIdTo())
                 )
-                .thenCompose ( __-> ratingRepo.create( rating ))
-                .thenApply(res -> {
-                    if(res.isPresent()) throw new BadRequestException(ErrorMessages.BAD_REQUEST_ITEM_CREATION);
-                    return rating;
-                })
+                        .thenCompose(aVoid -> ratingRepo.create(rating))
+                        .thenApply(res -> rating)
         );
     }
 
     public Mono<Void> deleteRating(long accountIDFrom, long accountIDTo, String email) {
         return Mono.fromFuture(
                 userAccountService.getUser(accountIDFrom, email)
-                        .thenCompose(__-> getRating(accountIDFrom, accountIDTo))
-                        .thenAccept( rating -> ratingRepo.delete(rating))
+                        .thenCompose(userAccount-> getRating(accountIDFrom, accountIDTo))
+                        .thenAccept(ratingRepo::delete)
         );
     }
 }

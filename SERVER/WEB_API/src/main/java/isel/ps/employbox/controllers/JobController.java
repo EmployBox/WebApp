@@ -1,5 +1,6 @@
 package isel.ps.employbox.controllers;
 
+import isel.ps.employbox.ErrorMessages;
 import isel.ps.employbox.exceptions.BadRequestException;
 import isel.ps.employbox.model.binder.JobBinder;
 import isel.ps.employbox.model.binder.JobExperienceBinder;
@@ -69,7 +70,7 @@ public class JobController {
         return jobBinder.bindOutput(jobService.createJob(newJob, authentication.getName()));
     }
 
-    @PostMapping("/{jid}/experience")
+    @PostMapping("/{jid}/experiences")
     public Mono<Void> createJobExperiences(
             @PathVariable long jid,
             @RequestBody List<JobExperience> jobExperience,
@@ -79,21 +80,26 @@ public class JobController {
     }
 
     @PutMapping("/{jid}")
-    public Mono<Void> updateJob(@PathVariable long jid, @RequestBody InJob job, Authentication authentication){
-        if(job.getJobID() != jid) throw new BadRequestException(BAD_REQUEST_IDS_MISMATCH);
-        Job updateJob = jobBinder.bindInput(job);
+    public Mono<Void> updateJob(@PathVariable long jid, @RequestBody InJob inJob, Authentication authentication){
+        if(inJob.getJobID() != jid) throw new BadRequestException(BAD_REQUEST_IDS_MISMATCH);
+        Job updateJob = jobBinder.bindInput(inJob);
 
         return jobService.updateJob(updateJob, authentication.getName());
     }
 
-    @PutMapping("/{jid}/experience/{jxpId}")
+    @PutMapping("/{jid}/experiences/{jxpId}")
     public Mono<Void> updateJobExperiences(
             @PathVariable long jxpId,
             @PathVariable long jid,
-            @RequestBody JobExperience jobExperience,
-            Authentication authentication)
-    {
-        return jobService.updateJobExperience(jxpId, jid, jobExperience, authentication.getName());
+            @RequestBody InJobExperience inJobExperience,
+            Authentication authentication
+    ) {
+        if(jid != inJobExperience.getJobId() || jxpId != inJobExperience.getJobExperienceId())
+            throw new BadRequestException(ErrorMessages.BAD_REQUEST_IDS_MISMATCH);
+
+        JobExperience jobExperience = jobExperienceBinder.bindInput(inJobExperience);
+
+        return jobService.updateJobExperience(jobExperience, authentication.getName());
     }
 
     @DeleteMapping("/{jid}/experience/{jxpId}")
@@ -107,6 +113,6 @@ public class JobController {
 
     @DeleteMapping("/{jid}")
     public Mono<Void> deleteJob(@PathVariable long jid, Authentication authentication){
-        return jobService.deleteJob(jid, authentication.getName() );
+        return jobService.deleteJob(jid, authentication.getName());
     }
 }

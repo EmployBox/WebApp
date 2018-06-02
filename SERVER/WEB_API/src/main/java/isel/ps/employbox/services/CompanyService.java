@@ -14,12 +14,10 @@ import java.util.concurrent.CompletableFuture;
 
 @Service
 public class CompanyService {
-    private DataRepository<Account, Long> accountRepo;
     private DataRepository<Company, Long> companyRepo;
     private AccountService accountService;
 
-    public CompanyService(DataRepository<Account, Long> accountRepo, DataRepository<Company, Long> companyRepo, AccountService accountService){
-        this.accountRepo = accountRepo;
+    public CompanyService(DataRepository<Company, Long> companyRepo, AccountService accountService){
         this.companyRepo = companyRepo;
         this.accountService = accountService;
     }
@@ -35,38 +33,25 @@ public class CompanyService {
 
     public CompletableFuture<Company> getCompany(long cid) {
         return companyRepo.findById(cid)
-                .thenApply(
-                        optionalCompany -> optionalCompany.orElseThrow(() -> new ResourceNotFoundException(ErrorMessages.RESOURCE_NOTFOUND_COMPANY))
-                );
+                .thenApply(optionalCompany -> optionalCompany.orElseThrow(() -> new ResourceNotFoundException(ErrorMessages.RESOURCE_NOTFOUND_COMPANY)));
     }
 
     public CompletableFuture<Company> createCompany(Company company) {
         return companyRepo.create(company)
-                .thenApply(res -> {
-                    if (res.isPresent()) throw new BadRequestException(ErrorMessages.BAD_REQUEST_ITEM_CREATION);
-                    return company;
-                });
+                .thenApply(res -> company);
     }
 
     public Mono<Void> updateCompany(Company company, String email) {
         return Mono.fromFuture(
                 accountService.getAccount(company.getIdentityKey(), email)
-                .thenCompose(account -> companyRepo.update(company)
-                        .thenAccept(res -> {
-                            if (res.isPresent()) throw new BadRequestException(ErrorMessages.BAD_REQUEST_ITEM_UPDATE);
-                        })
-                )
+                        .thenCompose(account -> companyRepo.update(company))
         );
     }
 
     public Mono<Void> deleteCompany(long cid, String email) {
         return Mono.fromFuture(
                 accountService.getAccount(cid, email)
-                        .thenCompose(account -> companyRepo.deleteById(cid)
-                                .thenAccept(res -> res.ifPresent(throwable -> {
-                                    throw new BadRequestException(ErrorMessages.BAD_REQUEST_ITEM_DELETION);
-                                }))
-                        )
+                        .thenCompose(account -> companyRepo.deleteById(cid))
         );
     }
 }

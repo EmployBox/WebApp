@@ -39,7 +39,7 @@ public class ChatService {
     }
 
     public CompletableFuture<CollectionPage<Message>> getAccountChatsMessages(long accountId, long cid, String email, int page) {
-        return accountService.getAccount(accountId, email).thenCompose(__ ->
+        return accountService.getAccount(accountId, email).thenCompose(account ->
                 msgRepo.findWhere(page, CollectionPage.PAGE_SIZE, new Pair<>("accountId",accountId))
                         .thenApply(list -> new CollectionPage(
                                 list.size(),
@@ -59,25 +59,22 @@ public class ChatService {
                     if (msg.getChatId() != cid)
                         throw new BadRequestException(BAD_REQUEST_IDS_MISMATCH);
                     return accountService.getAccount(msg.getAccountId(), email)//throws exceptions
-                            .thenApply(__ -> msg);
+                            .thenApply(account -> msg);
                 });
     }
 
     public CompletableFuture<Message> createNewChatMessage(long accountId, long chatId, Message msg, String email) {
         return accountService.getAccount(accountId, email)
-                .thenCompose(__ -> getChat(chatId))
+                .thenCompose(account -> getChat(chatId))
                 .thenCompose(chat -> {
                     if (chat.getAccountIdFirst() != accountId)
                         throw new UnauthorizedException(ErrorMessages.UN_AUTHORIZED_MESSAGE);
                     return msgRepo.create(msg);
                 })
-                .thenApply(res -> {
-                    if (res.isPresent()) throw new BadRequestException(ErrorMessages.BAD_REQUEST_ITEM_CREATION);
-                    return msg;
-                });
+                .thenApply(res -> msg);
     }
 
-    public CompletableFuture<Chat> getChat(long chatId){
+    private CompletableFuture<Chat> getChat(long chatId){
         return chatRepo.findById(chatId)
                 .thenApply(ochat -> ochat.orElseThrow( () -> new ResourceNotFoundException(ErrorMessages.RESOURCE_NOT_FOUND_CHAT)));
     }
@@ -87,11 +84,9 @@ public class ChatService {
                 CompletableFuture.allOf(
                         accountService.getAccount(accountIdFrom, username),
                         accountService.getAccount(inChat.getAccountIdSecond())
-                ).thenCompose(__ -> chatRepo.create(inChat)
-                ).thenApply(res -> {
-                    if (res.isPresent()) throw new BadRequestException(ErrorMessages.BAD_REQUEST_ITEM_CREATION);
-                    return inChat;
-                })
+                )
+                        .thenCompose(aVoid -> chatRepo.create(inChat))
+                        .thenApply(res -> inChat)
         );
     }
 }

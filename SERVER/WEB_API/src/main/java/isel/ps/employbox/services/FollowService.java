@@ -1,8 +1,7 @@
 package isel.ps.employbox.services;
 
 import com.github.jayield.rapper.DataRepository;
-import isel.ps.employbox.ErrorMessages;
-import isel.ps.employbox.exceptions.BadRequestException;
+import com.github.jayield.rapper.utils.Pair;
 import isel.ps.employbox.model.binder.CollectionPage;
 import isel.ps.employbox.model.entities.Account;
 import isel.ps.employbox.model.entities.Follow;
@@ -24,10 +23,9 @@ public class FollowService {
     public CompletableFuture<CollectionPage<Account>> getAccountFollowers(long followedAccountId, int page) {
         return accountService.getAccount(followedAccountId)
                 .thenCompose(Account::getFollowers)
-                .thenApply(list -> new CollectionPage(
-                        list.size(),
-                        page,
-                        list.stream()
+                .thenAccept(accounts -> accounts.forEach(elem -> arr.add(accountService.getAccount(elem.getAccountIdFollower()))))
+                .thenCompose(aVoid -> CompletableFuture.allOf(arr.toArray(new CompletableFuture[arr.size()])))
+                .thenApply(aVoid -> arr.stream().map(CompletableFuture::join));
                                 .skip(CollectionPage.PAGE_SIZE * page)
                                 .limit(CollectionPage.PAGE_SIZE))
                 );
@@ -36,35 +34,23 @@ public class FollowService {
     public CompletableFuture<CollectionPage<Account>> getAccountFollowing(long followerAccountId, int page) {
         return accountService.getAccount(followerAccountId)
                 .thenCompose(Account::getFollowing)
-                .thenApply(list -> new CollectionPage(
-                        list.size(),
-                        page,
-                        list.stream()
-                                .skip(CollectionPage.PAGE_SIZE * page)
-                                .limit(CollectionPage.PAGE_SIZE))
+                .thenAccept(accounts -> accounts.forEach(elem -> arr.add(accountService.getAccount(elem.getAccountIdFollowed()))))
+                .thenCompose(aVoid -> CompletableFuture.allOf(arr.toArray(new CompletableFuture[arr.size()])))
+                .thenApply(aVoid -> arr.stream().map(CompletableFuture::join));
                 );
     }
 
     public Mono<Void> createFollower(long accountToBeFollowedId, long accountToFollowId, String username) {
         return Mono.fromFuture(
                 accountService.getAccount(accountToFollowId, username)
-                        .thenCompose(
-                                __ -> followsRepo.create(new Follow(accountToBeFollowedId, accountToFollowId))
-                                        .thenAccept(res -> {
-                                            if (res.isPresent())
-                                                throw new BadRequestException(ErrorMessages.BAD_REQUEST_ITEM_DELETION);
-                                        }))
+                        .thenCompose(account -> followsRepo.create(new Follow(accountToBeFollowedId, accountToFollowId)))
         );
     }
 
     public Mono<Void> deleteFollower(long id, long fid, String username) {
         return Mono.fromFuture(
                 accountService.getAccount(id, username)
-                        .thenCompose(__ -> followsRepo.deleteById(new Follow.FollowKey(id, fid)))
-                        .thenAccept(res -> {
-                            if (res.isPresent())
-                                throw new BadRequestException(ErrorMessages.BAD_REQUEST_ITEM_DELETION);
-                        })
+                        .thenCompose(account -> followsRepo.deleteById(new Follow.FollowKey(id, fid)))
         );
     }
 }

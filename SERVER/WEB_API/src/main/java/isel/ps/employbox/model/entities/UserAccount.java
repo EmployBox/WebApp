@@ -28,30 +28,31 @@ public class UserAccount extends Account {
         version = 0;
     }
 
-    public UserAccount(long accountID,
-                       String email,
-                       String password,
-                       float rating,
-                       long version,
-                       String name,
-                       String summary,
-                       String photoUrl,
-                       CompletableFuture<List<Job>> offeredJobs,
-                       CompletableFuture<List<Curriculum>> curricula,
-                       CompletableFuture<List<Application>> applications,
-                       CompletableFuture<List<Chat>> chats,
-                       CompletableFuture<List<Comment>> comments,
-                       CompletableFuture<List<Rating>> ratings,
-                       CompletableFuture<List<Account>> followers,
-                       long version1
+    public UserAccount(
+            long accountID,
+            String email,
+            String password,
+            float rating,
+            long accountVersion,
+            String name,
+            String summary,
+            String photoUrl,
+            CompletableFuture<List<Job>> offeredJobs,
+            CompletableFuture<List<Curriculum>> curricula,
+            CompletableFuture<List<Application>> applications,
+            CompletableFuture<List<Chat>> chats,
+            CompletableFuture<List<Comment>> comments,
+            CompletableFuture<List<Rating>> ratings,
+            CompletableFuture<List<Account>> followers,
+            long version
     ) {
-        super(accountID, email, password, rating, version, offeredJobs, comments, chats, ratings, followers, followers);
+        super(accountID, email, password, rating, accountVersion, offeredJobs, comments, chats, ratings, followers);
         this.name = name;
         this.summary = summary;
         this.photoUrl = photoUrl;
         this.curricula = curricula;
         this.applications = applications;
-        this.version = version1;
+        this.version = version;
     }
 
     public UserAccount(
@@ -60,7 +61,11 @@ public class UserAccount extends Account {
             String password,
             float rating,
             String name,
-            String summary, String photoUrl, long accountVersion, long version){
+            String summary,
+            String photoUrl,
+            long accountVersion,
+            long version
+    ){
         super(accountId, email, password, rating, accountVersion);
         this.name = name;
         this.summary = summary;
@@ -93,5 +98,9 @@ public class UserAccount extends Account {
     @Override
     public long getVersion() {
         return version;
+    }
+
+    public long getAccountVersion() {
+        return super.getVersion();
     }
 }
