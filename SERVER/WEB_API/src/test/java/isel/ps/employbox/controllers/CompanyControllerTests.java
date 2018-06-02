@@ -3,10 +3,10 @@ package isel.ps.employbox.controllers;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.jayield.rapper.DataRepository;
-import isel.ps.employbox.model.binder.CompanyBinder;
+import com.github.jayield.rapper.utils.Pair;
+import isel.ps.employbox.exceptions.ResourceNotFoundException;
 import isel.ps.employbox.model.entities.Company;
 import isel.ps.employbox.model.input.InCompany;
-import javafx.util.Pair;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -24,10 +24,10 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.List;
 
 import static isel.ps.employbox.DataBaseUtils.prepareDB;
-import static junit.framework.TestCase.assertFalse;
-import static junit.framework.TestCase.assertTrue;
+import static junit.framework.TestCase.*;
 import static org.springframework.restdocs.webtestclient.WebTestClientRestDocumentation.document;
 import static org.springframework.restdocs.webtestclient.WebTestClientRestDocumentation.documentationConfiguration;
 import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.springSecurity;
@@ -41,12 +41,10 @@ public class CompanyControllerTests {
     @Autowired
     private ApplicationContext context;
     @Autowired
-    private CompanyBinder companyBinder;
-    @Autowired
     private DataRepository<Company, Long> companyRepo;
     private Connection con;
     private WebTestClient webTestClient;
-    private long companyId;
+    private Company company;
 
     @Before
     public void setUp() throws SQLException {
@@ -57,19 +55,9 @@ public class CompanyControllerTests {
                 .filter(basicAuthentication())
                 .filter(documentationConfiguration(restDocumentation))
                 .build();
-
-        InCompany inCompany = new InCompany();
-        inCompany.setEmail("company1@gmail.com");
-        inCompany.setPassword("741");
-        Company company = companyBinder.bindInput(inCompany);
-        assertTrue(!companyRepo.create(company).join().isPresent());
-
-        inCompany.setEmail("company2@gmail.com");
-        inCompany.setPassword("567");
-        company = companyBinder.bindInput(inCompany);
-        assertTrue(!companyRepo.create(company).join().isPresent());
-
-        companyId = company.getIdentityKey();
+        List<Company> companies = companyRepo.findWhere(new Pair<>("email", "company2@gmail.com")).join();
+        assertEquals(1, companies.size());
+        company = companies.get(0);
     }
 
     @After
@@ -92,7 +80,7 @@ public class CompanyControllerTests {
     public void testGetCompany(){
         webTestClient
                 .get()
-                .uri("/accounts/companies/" + companyId)
+                .uri("/accounts/companies/" + company.getIdentityKey())
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody()
@@ -127,7 +115,7 @@ public class CompanyControllerTests {
     @WithMockUser(username = "company1@gmail.com")
     public void testUpdateWrongCompany() throws JsonProcessingException {
         InCompany inCompany = new InCompany();
-        inCompany.setAccountId(companyId);
+        inCompany.setAccountId(company.getIdentityKey());
         inCompany.setEmail("someEmail@hotmail.com");
         inCompany.setName("Microsoft");
         inCompany.setPassword("1234");
@@ -138,7 +126,7 @@ public class CompanyControllerTests {
 
         webTestClient
                 .put()
-                .uri("/accounts/companies/" + companyId)
+                .uri("/accounts/companies/" + company.getIdentityKey())
                 .contentType(MediaType.APPLICATION_JSON)
                 .syncBody(json)
                 .exchange()
@@ -151,24 +139,32 @@ public class CompanyControllerTests {
     @WithMockUser(username = "company2@gmail.com")
     public void testUpdateCompany() throws JsonProcessingException {
         InCompany inCompany = new InCompany();
-        inCompany.setAccountId(companyId);
+        inCompany.setAccountId(company.getIdentityKey());
         inCompany.setEmail("someEmail@hotmail.com");
         inCompany.setName("Microsoft");
         inCompany.setPassword("1234");
         inCompany.setDescription("Sou uma empresa simpatica");
+        inCompany.setAccountVersion(company.getAccountVersion());
+        inCompany.setCompanyVersion(company.getVersion());
 
         ObjectMapper objectMapper = new ObjectMapper();
         String json = objectMapper.writeValueAsString(inCompany);
 
         webTestClient
                 .put()
-                .uri("/accounts/companies/" + companyId)
+                .uri("/accounts/companies/" + company.getIdentityKey())
                 .contentType(MediaType.APPLICATION_JSON)
                 .syncBody(json)
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody()
                 .consumeWith(document("updateCompany"));
+
+        Company updatedCompany = companyRepo.findById(company.getIdentityKey()).join().orElseThrow(() -> new ResourceNotFoundException("Company not found"));
+
+        assertEquals("Microsoft", updatedCompany.getName());
+        assertEquals("Sou uma empresa simpatica", updatedCompany.getDescription());
+        assertEquals("someEmail@hotmail.com", updatedCompany.getEmail());
     }
 
     @Test
@@ -176,7 +172,7 @@ public class CompanyControllerTests {
     public void testDeleteCompanyWhenNotAuthenticated() {
         webTestClient
                 .delete()
-                .uri("/accounts/companies/" + companyId)
+                .uri("/accounts/companies/" + company.getIdentityKey())
                 .exchange()
                 .expectStatus().isUnauthorized()
                 .expectBody()
@@ -188,7 +184,7 @@ public class CompanyControllerTests {
     public void testDeleteWrongCompany() {
         webTestClient
                 .delete()
-                .uri("/accounts/companies/" + companyId)
+                .uri("/accounts/companies/" + company.getIdentityKey())
                 .exchange()
                 .expectStatus().isUnauthorized()
                 .expectBody()
@@ -200,12 +196,12 @@ public class CompanyControllerTests {
     public void testDeleteCompany(){
         webTestClient
                 .delete()
-                .uri("/accounts/companies/" + companyId)
+                .uri("/accounts/companies/" + company.getIdentityKey())
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody()
                 .consumeWith(document("deleteCompany"));
 
-        assertFalse(companyRepo.findById(companyId).join().isPresent());
+        assertFalse(companyRepo.findById(company.getIdentityKey()).join().isPresent());
     }
 }

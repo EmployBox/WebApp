@@ -7,6 +7,8 @@ public class InApplication {
     private long jobId;
     private Long curriculumId;
     private Timestamp date;
+    private long applicationId;
+    private long version;
 
     public long getAccountId() {
         return accountId;
@@ -38,5 +40,21 @@ public class InApplication {
 
     public void setDate(Timestamp date) {
         this.date = date;
+    }
+
+    public long getApplicationId() {
+        return applicationId;
+    }
+
+    public void setApplicationId(long applicationId) {
+        this.applicationId = applicationId;
+    }
+
+    public long getVersion() {
+        return version;
+    }
+
+    public void setVersion(long version) {
+        this.version = version;
     }
 }
