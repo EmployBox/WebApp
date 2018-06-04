@@ -165,8 +165,8 @@ public class CurriculumService {
             DataRepository<T,Long> repo,
             long accountId,
             long curriculumId,
-            long jexpId)
-    {
+            long jexpId
+    ) {
         return repo.findById(jexpId)
                 .thenApply( oChild -> oChild.orElseThrow( ()-> new ResourceNotFoundException(ErrorMessages.RESOURCE_NOTFOUND)))
                 .thenApply( child -> {

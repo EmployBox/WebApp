@@ -19,6 +19,7 @@ import reactor.core.publisher.Mono;
 import java.sql.Connection;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionStage;
 import java.util.stream.Collectors;
 
 @Service
@@ -37,9 +38,9 @@ public class JobService {
         this.accountService = userService;
     }
 
-    public CompletableFuture<CollectionPage<Job>> getAllJobs(int page) {
+    public CompletableFuture<CollectionPage<Job>> getAllJobs(int page, int numberOfItems) {
         List<Job>[] jobs = new List[1];
-        return jobRepo.findAll(page, CollectionPage.PAGE_SIZE)
+        return jobRepo.findAll(page, numberOfItems)
                 .thenCompose(res -> {
                     jobs[0] = res;
                     return jobRepo.getNumberOfEntries();
@@ -120,26 +121,33 @@ public class JobService {
                                 throw new UnauthorizedException(ErrorMessages.UN_AUTHORIZED);
                             return accounts.get(0);
                         })
-                        .thenCompose(account -> getJob(jobId)
-                                .thenCompose(job -> {
-                                    if (!job.getAccountId().equals(account.getIdentityKey()))
-                                        throw new BadRequestException(ErrorMessages.UN_AUTHORIZED_ID_AND_EMAIL_MISMATCH);
-                                    return new Transaction(Connection.TRANSACTION_READ_UNCOMMITTED)
-                                            .andDo(() -> job.getApplications()
-                                                    .thenCompose(applications -> {
-                                                        List<Long> applicationIds = applications.stream().map(Application::getIdentityKey).collect(Collectors.toList());
-                                                        return applicationRepo.deleteAll(applicationIds);
-                                                    }))
-                                            .andDo(() -> job.getExperiences()
-                                                    .thenCompose(jobExperiences -> {
-                                                        List<Long> jobExpIds = jobExperiences.stream().map(JobExperience::getIdentityKey).collect(Collectors.toList());
-                                                        return jobExperienceRepo.deleteAll(jobExpIds);
-                                                    }))
-                                            .andDo(() -> jobRepo.delete(job))
-                                            .commit();
-                                })
-                        )
+                        .thenCompose(account -> deleteJobAux(jobId, account))
         );
+    }
+
+    private CompletableFuture<Void> deleteJobAux(long jobId, Account account) {
+        return getJob(jobId)
+                .thenCompose(job -> {
+                    if (!job.getAccountId().equals(account.getIdentityKey()))
+                        throw new BadRequestException(ErrorMessages.UN_AUTHORIZED_ID_AND_EMAIL_MISMATCH);
+                    return executeDeleteTransaction(job);
+                });
+    }
+
+    private CompletionStage<Void> executeDeleteTransaction(Job job) {
+        return new Transaction(Connection.TRANSACTION_READ_UNCOMMITTED)
+                .andDo(() -> job.getApplications()
+                        .thenCompose(applications -> {
+                            List<Long> applicationIds = applications.stream().map(Application::getIdentityKey).collect(Collectors.toList());
+                            return applicationRepo.deleteAll(applicationIds);
+                        }))
+                .andDo(() -> job.getExperiences()
+                        .thenCompose(jobExperiences -> {
+                            List<Long> jobExpIds = jobExperiences.stream().map(JobExperience::getIdentityKey).collect(Collectors.toList());
+                            return jobExperienceRepo.deleteAll(jobExpIds);
+                        }))
+                .andDo(() -> jobRepo.delete(job))
+                .commit();
     }
 
     public Mono<Void> deleteJobExperience(long jxpId, long jobId, String email) {

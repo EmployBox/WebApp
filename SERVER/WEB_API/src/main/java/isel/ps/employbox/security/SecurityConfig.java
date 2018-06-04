@@ -26,17 +26,17 @@ public class SecurityConfig {
 
         // Disable authentication for the selected routes.
         http.authorizeExchange().pathMatchers(HttpMethod.POST,"/accounts/users").permitAll();
-        http.authorizeExchange().pathMatchers(HttpMethod.GET,"/accounts/users/**/").permitAll();
-        http.authorizeExchange().pathMatchers(HttpMethod.GET,"/accounts/users/**/applications").permitAll();
-        http.authorizeExchange().pathMatchers(HttpMethod.GET,"/accounts/users/**/applications/**/").permitAll();
+        http.authorizeExchange().pathMatchers(HttpMethod.GET,"/accounts/users/*").permitAll();
+        http.authorizeExchange().pathMatchers(HttpMethod.GET,"/accounts/users/*/applications").permitAll();
+        http.authorizeExchange().pathMatchers(HttpMethod.GET,"/accounts/users/*/applications/*").permitAll();
         http.authorizeExchange().pathMatchers(HttpMethod.POST, "/accounts/companies").permitAll();
         http.authorizeExchange().pathMatchers(HttpMethod.GET, "/accounts/companies").permitAll();
-        http.authorizeExchange().pathMatchers(HttpMethod.GET, "/accounts/companies/**/").permitAll();
-        http.authorizeExchange().pathMatchers(HttpMethod.GET, "/accounts/**/applications").permitAll();
-        http.authorizeExchange().pathMatchers(HttpMethod.GET, "/accounts/**/ratings").permitAll();
-        http.authorizeExchange().pathMatchers(HttpMethod.GET, "/accounts/**/comments").permitAll();
+        http.authorizeExchange().pathMatchers(HttpMethod.GET, "/accounts/companies/*").permitAll();
+        http.authorizeExchange().pathMatchers(HttpMethod.GET, "/accounts/*/applications").permitAll();
+        http.authorizeExchange().pathMatchers(HttpMethod.GET, "/accounts/*/ratings").permitAll();
+        http.authorizeExchange().pathMatchers(HttpMethod.GET, "/accounts/*/comments").permitAll();
         http.authorizeExchange().pathMatchers(HttpMethod.GET, "/jobs").permitAll();
-        http.authorizeExchange().pathMatchers(HttpMethod.GET, "/jobs/**/").permitAll();
+        http.authorizeExchange().pathMatchers(HttpMethod.GET, "/jobs/*").permitAll();
         http.authorizeExchange().pathMatchers(HttpMethod.OPTIONS, "/**").permitAll();
         http.authorizeExchange().anyExchange().authenticated();
 

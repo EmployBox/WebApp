@@ -35,9 +35,9 @@ public class JobController {
 
 
     @GetMapping
-    public Mono<HalCollectionPage> getAllJobs(@RequestParam(defaultValue = "0") int page){
+    public Mono<HalCollectionPage> getAllJobs(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "5") int numberOfItems){
         return jobBinder.bindOutput(
-                jobService.getAllJobs(page),
+                jobService.getAllJobs(page, numberOfItems),
                 this.getClass()
         );
     }
