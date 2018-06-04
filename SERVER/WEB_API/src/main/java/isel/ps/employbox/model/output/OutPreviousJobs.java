@@ -60,7 +60,20 @@ public class OutPreviousJobs extends OutputDto {
 
     @Override
     public Object getCollectionItemOutput() {
-        return null;
+        return new PreviousItemOutput();
+    }
+
+    class PreviousItemOutput {
+
+        private class _Links {
+            @JsonProperty
+            private _Links.Self self = new _Links.Self();
+
+            private class Self {
+                @JsonProperty
+                final String href = HOSTNAME + linkTo( methodOn(CurriculumController.class).getPreviousJobs(accountId, curriculumId, 0)).slash(previousJobId).withSelfRel().getHref();
+            }
+        }
     }
 
     private class _Links {

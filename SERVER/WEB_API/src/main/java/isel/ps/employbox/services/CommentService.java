@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
 import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
 
 @Service
 public class CommentService {
@@ -26,7 +27,6 @@ public class CommentService {
         this.accountService = accountService;
     }
 
-
     public CompletableFuture<CollectionPage<Comment>> getComments(long accountFromId, int page) {
         return accountService.getAccount(accountFromId)
                 .thenCompose(Account::getComments)
@@ -35,7 +35,9 @@ public class CommentService {
                         page,
                         list.stream()
                                 .skip(CollectionPage.PAGE_SIZE * page)
-                                .limit(CollectionPage.PAGE_SIZE))
+                                .limit(CollectionPage.PAGE_SIZE)
+                                .collect(Collectors.toList())
+                        )
                 );
     }
 
@@ -61,8 +63,7 @@ public class CommentService {
     public CompletableFuture<Comment> createComment(Comment comment, String email) {
         return CompletableFuture.allOf(
                 accountService.getAccount(comment.getAccountIdFrom(), email),
-                accountService.getAccount(comment.getAccountIdDest())
-        )
+                accountService.getAccount(comment.getAccountIdDest()))
                 .thenCompose(aVoid -> commentRepo.create(comment))
                 .thenApply(res -> comment);
     }

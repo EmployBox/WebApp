@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
 import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static isel.ps.employbox.ErrorMessages.BAD_REQUEST_IDS_MISMATCH;
@@ -30,7 +31,7 @@ public class ChatService {
         this.accountService = accountService;
     }
 
-
+    //todo
     public CompletableFuture<Stream<Chat>> getAccountChats(long accountId) {
         return chatRepo.findAll()
                 .thenApply(list -> list
@@ -47,6 +48,7 @@ public class ChatService {
                                 list.stream()
                                         .skip(CollectionPage.PAGE_SIZE * page)
                                         .limit(CollectionPage.PAGE_SIZE)
+                                        .collect(Collectors.toList())
                         ))
         );
     }

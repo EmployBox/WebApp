@@ -2,10 +2,8 @@ package isel.ps.employbox.services;
 
 import com.github.jayield.rapper.DataRepository;
 import isel.ps.employbox.ErrorMessages;
-import isel.ps.employbox.exceptions.BadRequestException;
 import isel.ps.employbox.exceptions.ResourceNotFoundException;
 import isel.ps.employbox.model.binder.CollectionPage;
-import isel.ps.employbox.model.entities.Account;
 import isel.ps.employbox.model.entities.Company;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
@@ -23,12 +21,15 @@ public class CompanyService {
     }
 
     public CompletableFuture<CollectionPage<Company>> getCompanies(int page) {
-        return companyRepo.findAll(page, CollectionPage.PAGE_SIZE)
-                .thenApply(list -> new CollectionPage(
-                        page,
-                        21,
-                        list.stream()
-                ));
+        return companyRepo.getNumberOfEntries()
+                .thenCompose(numberOfEntries ->
+                        companyRepo.findAll(page, CollectionPage.PAGE_SIZE)
+                                .thenApply(list -> new CollectionPage(
+                                        numberOfEntries,
+                                        page,
+                                        list
+                                ))
+                );
     }
 
     public CompletableFuture<Company> getCompany(long cid) {

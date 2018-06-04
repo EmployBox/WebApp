@@ -9,7 +9,6 @@ import isel.ps.employbox.exceptions.ResourceNotFoundException;
 import isel.ps.employbox.exceptions.UnauthorizedException;
 import isel.ps.employbox.model.binder.CollectionPage;
 import isel.ps.employbox.model.entities.Application;
-import isel.ps.employbox.model.entities.Curriculum;
 import isel.ps.employbox.model.entities.UserAccount;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
@@ -79,6 +78,7 @@ public class UserAccountService {
                         list.stream()
                             .skip(CollectionPage.PAGE_SIZE * page)
                             .limit(CollectionPage.PAGE_SIZE)
+                                .collect(Collectors.toList())
                 ));
     }
 

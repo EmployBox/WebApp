@@ -4,7 +4,7 @@ import com.github.jayield.rapper.DomainObject;
 import com.github.jayield.rapper.Id;
 import com.github.jayield.rapper.Version;
 
-public class CurriculumExperience implements DomainObject<Long>,CurriculumChild {
+public class CurriculumExperience extends CurriculumChild implements DomainObject<Long> {
 
     @Id(isIdentity = true)
     private final long curriculumExperienceId;

@@ -37,7 +37,31 @@ public class OutProject extends OutputDto {
 
     @Override
     public Object getCollectionItemOutput() {
-        return null;
+        return new ProjectsItemOutput(name, description);
+    }
+
+    class ProjectsItemOutput {
+        @JsonProperty
+        private final String name;
+
+        @JsonProperty
+        private final String description;
+
+
+        ProjectsItemOutput(String name, String description) {
+            this.name = name;
+            this.description = description;
+        }
+
+        private class _Links {
+            @JsonProperty
+            private Self self = new Self();
+
+            private class Self {
+                @JsonProperty
+                final String href = HOSTNAME +  linkTo( methodOn(CurriculumController.class).getProjects(accountId, curriculumId, 0)).slash(projectId).withSelfRel().getHref();
+            }
+        }
     }
 
     private class _Links {

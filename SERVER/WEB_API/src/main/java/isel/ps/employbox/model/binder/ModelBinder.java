@@ -26,7 +26,7 @@ public interface ModelBinder<T, O, I> {
                 elementsPage
                         .thenApply(
                                 (CollectionPage<T> elements) -> {
-                                    Stream<T> list = elements.getPageList();
+                                    Stream<T> list = elements.getPageList().stream();
 
                                     List<Object> items = list.map(curr-> ((CollectionItemSupplier)bindOutput(CompletableFuture.completedFuture(curr))
                                             .block())

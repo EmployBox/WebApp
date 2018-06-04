@@ -40,6 +40,19 @@ public class OutCurriculumExperience extends OutputDto {
         return null;
     }
 
+    class CurriculumExperienceItemOutput {
+
+        private class _Links {
+            @JsonProperty
+            private Self self = new Self();
+
+            private class Self {
+                @JsonProperty
+                final String href = HOSTNAME + linkTo( methodOn(CurriculumController.class).getCurriculumExperience(accountId, curriculumId, curriculumExperienceId)).withSelfRel().getHref();
+            }
+        }
+    }
+
     private class _Links {
         @JsonProperty
         private Self self = new _Links.Self();

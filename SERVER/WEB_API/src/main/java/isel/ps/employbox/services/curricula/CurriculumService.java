@@ -18,6 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
 
 @Service
 public class CurriculumService {
@@ -122,12 +123,15 @@ public class CurriculumService {
     public CompletableFuture<CollectionPage<Curriculum>> getCurricula(long userId, String email, int page) {
         return userAccountService.getUser(userId, email)
                 .thenCompose(UserAccount::getCurricula)
-                .thenApply( curricula -> new CollectionPage<>(
+                .thenApply( curricula -> new CollectionPage(
                         curricula.size(),
                         page,
                         curricula.stream()
                                 .skip(CollectionPage.PAGE_SIZE * page)
-                                .limit(CollectionPage.PAGE_SIZE))
+                                .limit(CollectionPage.PAGE_SIZE)
+                                .collect(Collectors.toList())
+                        )
+
                 );
     }
 

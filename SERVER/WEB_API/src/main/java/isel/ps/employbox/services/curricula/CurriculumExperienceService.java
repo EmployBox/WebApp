@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
 import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
 
 @Service
 public class CurriculumExperienceService {
@@ -29,12 +30,14 @@ public class CurriculumExperienceService {
         return curriculumRepo.findById(curriculumId)
                 .thenApply( ocurriculum -> ocurriculum.orElseThrow(()-> new ResourceNotFoundException(ErrorMessages.RESOURCE_NOTFOUND_CURRICULUM)))
                 .thenCompose(Curriculum::getExperiences)
-                .thenApply( list -> new CollectionPage<>(
+                .thenApply( list -> new CollectionPage(
                         list.size(),
                         page,
                         list.stream()
                                 .skip(CollectionPage.PAGE_SIZE * page)
-                                .limit(CollectionPage.PAGE_SIZE))
+                                .limit(CollectionPage.PAGE_SIZE)
+                                .collect(Collectors.toList())
+                        )
                 );
     }
 

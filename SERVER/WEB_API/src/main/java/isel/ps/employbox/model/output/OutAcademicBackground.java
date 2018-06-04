@@ -58,6 +58,30 @@ public class OutAcademicBackground extends OutputDto {
         return null;
     }
 
+    class AcademicBackgroundItemOutput {
+        @JsonProperty
+        private final String institution;
+
+        @JsonProperty
+        private final String degree;
+
+        AcademicBackgroundItemOutput(String institution, String degree) {
+            this.institution = institution;
+            this.degree = degree;
+        }
+
+
+        private class _Links {
+            @JsonProperty
+            private _Links.Self self = new _Links.Self();
+
+            private class Self {
+                @JsonProperty
+                final String href = HOSTNAME +  linkTo( methodOn(CurriculumController.class).getAcademicBackground(accountId, curriculumId, 0)).slash(academicBackgroundId).withSelfRel().getHref();
+            }
+        }
+    }
+
     private class _Links{
         @JsonProperty
         private Self self = new Self();

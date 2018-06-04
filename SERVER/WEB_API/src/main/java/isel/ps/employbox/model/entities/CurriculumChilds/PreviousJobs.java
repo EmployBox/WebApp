@@ -3,11 +3,10 @@ package isel.ps.employbox.model.entities.CurriculumChilds;
 import com.github.jayield.rapper.DomainObject;
 import com.github.jayield.rapper.Id;
 import com.github.jayield.rapper.Version;
-import org.springframework.hateoas.ResourceSupport;
 
 import java.sql.Date;
 
-public class PreviousJobs extends ResourceSupport implements DomainObject<Long>,CurriculumChild {
+public class PreviousJobs extends CurriculumChild implements DomainObject<Long> {
 
     @Id(isIdentity = true)
     private final long previousJobId;

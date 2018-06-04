@@ -44,7 +44,7 @@ public class JobService {
                     jobs[0] = res;
                     return jobRepo.getNumberOfEntries();
                 } )
-                .thenApply( numberOfEntries -> new CollectionPage( (int)numberOfEntries.longValue(), page, jobs[0].stream() ));
+                .thenApply( numberOfEntries -> new CollectionPage( (int)numberOfEntries.longValue(), page, jobs[0] ));
     }
 
     public CompletableFuture<Job> getJob(long jid) {
@@ -55,12 +55,14 @@ public class JobService {
     public CompletableFuture<CollectionPage<JobExperience>> getJobExperiences(long jid, int page) {
         return getJob(jid)
                 .thenCompose(Job::getExperiences)
-                .thenApply(list -> new CollectionPage<>(
+                .thenApply(list -> new CollectionPage(
                         list.size(),
                         page,
                         list.stream()
                                 .skip(CollectionPage.PAGE_SIZE * page)
-                                .limit(CollectionPage.PAGE_SIZE))
+                                .limit(CollectionPage.PAGE_SIZE)
+                                .collect(Collectors.toList())
+                        )
                 );
     }
 

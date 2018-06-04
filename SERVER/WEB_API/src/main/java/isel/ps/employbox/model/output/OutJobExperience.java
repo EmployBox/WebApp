@@ -34,7 +34,20 @@ public class OutJobExperience extends OutputDto {
 
     @Override
     public Object getCollectionItemOutput() {
-        return null;
+        return new JobExperienceItemOutput();
+    }
+
+    class JobExperienceItemOutput {
+
+        private class _Links {
+            @JsonProperty
+            private Self self = new Self();
+
+            private class Self {
+                @JsonProperty
+                final String href = HOSTNAME + linkTo( methodOn(JobController.class).getJobExperiences(jobId, 0)).slash(jobExperienceId).withSelfRel().getHref();
+            }
+        }
     }
 
     private class _Links {

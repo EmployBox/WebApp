@@ -18,11 +18,12 @@ public class FollowService {
         this.followsRepo = followeRepo;
         this.accountService = accountRepo;
     }
-
+    //todo
     public CompletableFuture<CollectionPage<Account>> getAccountFollowers(long followedAccountId, int page) {
         return null;
     }
 
+    //todo
     public CompletableFuture<CollectionPage<Account>> getAccountFollowing(long followerAccountId, int page) {
         return null;
     }

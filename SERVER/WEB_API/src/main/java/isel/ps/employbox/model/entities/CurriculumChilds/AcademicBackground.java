@@ -6,7 +6,7 @@ import com.github.jayield.rapper.Version;
 
 import java.sql.Date;
 
-public class AcademicBackground implements DomainObject<Long>,CurriculumChild {
+public class AcademicBackground extends CurriculumChild implements DomainObject<Long> {
 
     @Id(isIdentity = true)
     private final long academicBackgroundKey;

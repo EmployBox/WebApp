@@ -1,16 +1,16 @@
 package isel.ps.employbox.model.binder;
 
 import java.security.InvalidParameterException;
-import java.util.stream.Stream;
+import java.util.List;
 
 public class CollectionPage<T>{
     public static final short PAGE_SIZE = 5;
     private final long totalElements ;
     private final int currentPage;
     private final int lastPageNumber;
-    private final Stream<T> pageList;
+    private final List<T> pageList;
 
-    public CollectionPage(long totalElements, int currentPage, Stream<T> pageList) {
+    public CollectionPage(long totalElements, int currentPage, List<T> pageList) {
 
         if(currentPage < 0 || currentPage > totalElements / PAGE_SIZE)
             throw new InvalidParameterException("Current page number provided is invalid");
@@ -36,7 +36,7 @@ public class CollectionPage<T>{
         return lastPageNumber;
     }
 
-    public Stream<T> getPageList() {
+    public List<T> getPageList() {
         return pageList;
     }
 }

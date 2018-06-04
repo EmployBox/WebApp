@@ -1,8 +1,11 @@
 package isel.ps.employbox.model.entities.CurriculumChilds;
 
-public interface CurriculumChild {
-    long getCurriculumId();
-    long getAccountId();
-    void setAccountId(long l);
-    void setCurriculumId(long l);
+import org.springframework.stereotype.Component;
+
+@Component
+public abstract class CurriculumChild {
+    public abstract long getCurriculumId();
+    public abstract long getAccountId();
+    public abstract void setAccountId(long l);
+    public abstract void setCurriculumId(long l);
 }
