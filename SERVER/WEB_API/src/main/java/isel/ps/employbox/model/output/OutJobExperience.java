@@ -1,5 +1,6 @@
 package isel.ps.employbox.model.output;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import isel.ps.employbox.controllers.JobController;
 
@@ -32,6 +33,7 @@ public class OutJobExperience extends OutputDto {
         this._links = new _Links();
     }
 
+    @JsonIgnore
     @Override
     public Object getCollectionItemOutput() {
         return new JobExperienceItemOutput();
@@ -45,7 +47,7 @@ public class OutJobExperience extends OutputDto {
 
             private class Self {
                 @JsonProperty
-                final String href = HOSTNAME + linkTo( methodOn(JobController.class).getJobExperiences(jobId, 0)).slash(jobExperienceId).withSelfRel().getHref();
+                final String href = HOSTNAME + linkTo( methodOn(JobController.class).getJobExperiences(jobId, 0,0)).slash(jobExperienceId).withSelfRel().getHref();
             }
         }
     }
@@ -56,7 +58,7 @@ public class OutJobExperience extends OutputDto {
 
         private class Self {
             @JsonProperty
-            final String href = HOSTNAME + linkTo( methodOn(JobController.class).getJobExperiences(jobId, 0)).slash(jobExperienceId).withSelfRel().getHref();
+            final String href = HOSTNAME + linkTo( methodOn(JobController.class).getJobExperiences(jobId, 0,0)).slash(jobExperienceId).withSelfRel().getHref();
         }
     }
 }

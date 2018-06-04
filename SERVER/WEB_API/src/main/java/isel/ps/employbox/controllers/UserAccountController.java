@@ -47,11 +47,12 @@ public class UserAccountController {
     @GetMapping("/{id}/applications")
     public Mono<HalCollectionPage> getAllApplications(
             @PathVariable long id,
-            @RequestParam(defaultValue = "0") int page
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "5") int numberOfItems
 
     ){
         return applicationBinder.bindOutput(
-                userAccountService.getAllApplications(id, page),
+                userAccountService.getAllApplications(id, page, numberOfItems),
                 this.getClass(),
                 id
         );

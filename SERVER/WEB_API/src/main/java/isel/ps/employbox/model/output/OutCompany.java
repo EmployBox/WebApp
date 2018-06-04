@@ -2,12 +2,10 @@ package isel.ps.employbox.model.output;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import isel.ps.employbox.controllers.CompanyController;
-import org.springframework.hateoas.ResourceSupport;
 
-import static isel.ps.employbox.model.output.OutputDto.HOSTNAME;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 
-public class OutCompany extends ResourceSupport {
+public class OutCompany extends OutputDto {
 
     @JsonProperty
     private final Long accountId;
@@ -50,6 +48,37 @@ public class OutCompany extends ResourceSupport {
         this.webpageUrl = webpageUrl;
         this.description = description;
         this._links = new _Links();
+    }
+
+    @Override
+    public Object getCollectionItemOutput() {
+        return new CompanyItemOutput(rating, name);
+    }
+
+    class CompanyItemOutput {
+        @JsonProperty
+        private final String name;
+
+        @JsonProperty
+        private final double rating;
+
+        @JsonProperty
+        private final _Links _links = new _Links();
+
+        private CompanyItemOutput(double rating, String name){
+            this.rating = rating;
+            this.name = name;
+        }
+
+        class _Links {
+            @JsonProperty
+            private _Links.Self self = new _Links.Self();
+
+            private class Self{
+                @JsonProperty
+                final String href = HOSTNAME + linkTo(CompanyController.class).slash(accountId).withSelfRel().withSelfRel().getHref();
+            }
+        }
     }
 
     private class _Links {

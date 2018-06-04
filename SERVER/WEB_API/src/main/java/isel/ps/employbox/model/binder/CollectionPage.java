@@ -4,24 +4,25 @@ import java.security.InvalidParameterException;
 import java.util.List;
 
 public class CollectionPage<T>{
-    public static final short PAGE_SIZE = 5;
+    public  final int pageSize;
     private final long totalElements ;
     private final int currentPage;
     private final int lastPageNumber;
     private final List<T> pageList;
 
-    public CollectionPage(long totalElements, int currentPage, List<T> pageList) {
+    public CollectionPage(long totalElements,int pageSize, int currentPage, List<T> pageList) {
 
-        if(currentPage < 0 || currentPage > totalElements / PAGE_SIZE)
+        this.pageSize = pageSize;
+        if(currentPage < 0 || currentPage > totalElements / this.pageSize)
             throw new InvalidParameterException("Current page number provided is invalid");
 
         this.totalElements = totalElements;
         this.currentPage = currentPage;
         this.pageList = pageList;
-        if(totalElements != 0 && totalElements % PAGE_SIZE == 0)
-            this.lastPageNumber = (int)totalElements / PAGE_SIZE - 1;
+        if(totalElements != 0 && totalElements % this.pageSize == 0)
+            this.lastPageNumber = (int)totalElements / this.pageSize - 1;
         else
-            this.lastPageNumber = (int)totalElements / PAGE_SIZE;
+            this.lastPageNumber = (int)totalElements / this.pageSize;
     }
 
     public long getTotalNumberOfElement() {

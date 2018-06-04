@@ -51,9 +51,9 @@ public class JobController {
     }
 
     @GetMapping("/{jid}/experiences")
-    public Mono<HalCollectionPage> getJobExperiences(@PathVariable long jid, @RequestParam(defaultValue = "0") int page){
+    public Mono<HalCollectionPage> getJobExperiences(@PathVariable long jid, @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "5") int numberOfItems){
         return jobExperienceBinder.bindOutput(
-                jobService.getJobExperiences(jid, page),
+                jobService.getJobExperiences(jid, page, numberOfItems),
                 this.getClass(),
                 jid
         );

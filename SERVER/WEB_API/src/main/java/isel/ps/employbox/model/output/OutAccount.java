@@ -1,9 +1,8 @@
 package isel.ps.employbox.model.output;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import org.springframework.hateoas.ResourceSupport;
 
-public class OutAccount extends ResourceSupport {
+public class OutAccount extends OutputDto {
 
     @JsonProperty
     private final long accountId;
@@ -38,5 +37,10 @@ public class OutAccount extends ResourceSupport {
 
     public long getVersion() {
         return version;
+    }
+
+    @Override
+    public Object getCollectionItemOutput() {
+        return null;
     }
 }

@@ -1,12 +1,16 @@
 package isel.ps.employbox.services;
 
 import com.github.jayield.rapper.DataRepository;
+import com.github.jayield.rapper.Transaction;
+import com.github.jayield.rapper.utils.Pair;
 import isel.ps.employbox.model.binder.CollectionPage;
 import isel.ps.employbox.model.entities.Account;
 import isel.ps.employbox.model.entities.Follow;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
+import java.sql.Connection;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 @Service
@@ -19,13 +23,34 @@ public class FollowService {
         this.accountService = accountRepo;
     }
     //todo
-    public CompletableFuture<CollectionPage<Account>> getAccountFollowers(long followedAccountId, int page) {
-        return null;
+    public CompletableFuture<CollectionPage<Account>> getAccountFollowers(long followedAccountId, int page, int pageSize) {
+        return getAccountFutureByFollowType("accountIdFollower", followedAccountId, page, pageSize);
     }
 
     //todo
-    public CompletableFuture<CollectionPage<Account>> getAccountFollowing(long followerAccountId, int page) {
-        return null;
+    public CompletableFuture<CollectionPage<Account>> getAccountFollowing(long followerAccountId, int page, int pageSize) {
+        return getAccountFutureByFollowType("accountIdFollowing", followerAccountId, page, pageSize);
+    }
+
+    private CompletableFuture<CollectionPage<Account>> getAccountFutureByFollowType(String collum, long id, int page, int pageSize) {
+        List[] list = new List[1];
+        CollectionPage[] ret = new CollectionPage[1];
+
+        return new Transaction(Connection.TRANSACTION_SERIALIZABLE)
+                .andDo(() -> followsRepo.findWhere(page, pageSize, new Pair<>(collum, id))
+                        .thenCompose(listRes -> {
+                            list[0] = listRes;
+                            return followsRepo.getNumberOfEntries(/*todo filter support*/);
+                        })
+                        .thenAccept(numberOfEntries ->
+                                ret[0] = new CollectionPage(
+                                        numberOfEntries,
+                                        pageSize,
+                                        page,
+                                        list[0]
+                                ))
+                ).commit()
+                .thenApply(__ -> ret[0]);
     }
 
     public Mono<Void> createFollower(long accountToBeFollowedId, long accountToFollowId, String username) {

@@ -35,7 +35,19 @@ public class OutApplication extends OutputDto {
 
     @Override
     public Object getCollectionItemOutput() {
-        return null;
+        return new ApplicationItemOutput();
+    }
+
+    class ApplicationItemOutput {
+        private class _Links {
+            @JsonProperty
+            private Self self = new _Links.Self();
+
+            private class Self {
+                @JsonProperty
+                final String href = HOSTNAME + linkTo( methodOn(UserAccountController.class).getApplication(accountId, jobId)).withSelfRel().getHref();
+            }
+        }
     }
 
     private class _Links {

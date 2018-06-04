@@ -71,7 +71,7 @@ public class OutPreviousJobs extends OutputDto {
 
             private class Self {
                 @JsonProperty
-                final String href = HOSTNAME + linkTo( methodOn(CurriculumController.class).getPreviousJobs(accountId, curriculumId, 0)).slash(previousJobId).withSelfRel().getHref();
+                final String href = HOSTNAME + linkTo( methodOn(CurriculumController.class).getPreviousJobs(accountId, curriculumId, 0,0)).slash(previousJobId).withSelfRel().getHref();
             }
         }
     }
@@ -82,7 +82,7 @@ public class OutPreviousJobs extends OutputDto {
 
         private class Self {
             @JsonProperty
-            final String href = HOSTNAME +   linkTo( methodOn(CurriculumController.class).getPreviousJobs(accountId, curriculumId, 0)).slash(previousJobId).withSelfRel().getHref();
+            final String href = HOSTNAME +   linkTo( methodOn(CurriculumController.class).getPreviousJobs(accountId, curriculumId, 0,0)).slash(previousJobId).withSelfRel().getHref();
         }
     }
 }

@@ -55,7 +55,7 @@ public class OutAcademicBackground extends OutputDto {
 
     @Override
     public Object getCollectionItemOutput() {
-        return null;
+        return new AcademicBackgroundItemOutput(institution, degree);
     }
 
     class AcademicBackgroundItemOutput {

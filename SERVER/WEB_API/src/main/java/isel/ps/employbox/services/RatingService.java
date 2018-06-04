@@ -1,16 +1,18 @@
 package isel.ps.employbox.services;
 
 import com.github.jayield.rapper.DataRepository;
+import com.github.jayield.rapper.Transaction;
+import com.github.jayield.rapper.utils.Pair;
 import isel.ps.employbox.ErrorMessages;
 import isel.ps.employbox.exceptions.ResourceNotFoundException;
 import isel.ps.employbox.model.binder.CollectionPage;
-import isel.ps.employbox.model.entities.Account;
 import isel.ps.employbox.model.entities.Rating;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
+import java.sql.Connection;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
-import java.util.stream.Collectors;
 
 @Service
 public class RatingService {
@@ -24,18 +26,25 @@ public class RatingService {
         this.accountService = accountService;
     }
 
-    public CompletableFuture<CollectionPage<Rating>> getRatings(long accountId, int page) {
-        return accountService.getAccount(accountId)
-                .thenCompose(Account::getRatings)
-                .thenApply(list ->
-                        new CollectionPage<>(
-                                list.size(),
-                                page,
-                                list.stream()
-                                    .skip(CollectionPage.PAGE_SIZE * page)
-                                    .limit(CollectionPage.PAGE_SIZE)
-                                        .collect(Collectors.toList()))
-                );
+    public CompletableFuture<CollectionPage<Rating>> getRatings(long accountId, int pageSize, int page) {
+        List[] list = new List[1];
+        CollectionPage[] ret = new CollectionPage[1];
+
+        return new Transaction(Connection.TRANSACTION_SERIALIZABLE)
+                .andDo(() ->
+                        accountService.getAccount(accountId)
+                                .thenCompose(__ -> ratingRepo.findWhere(page, pageSize, new Pair<>("accountId", accountId)))
+                                .thenCompose(listRes -> {
+                                    list[0] = listRes;
+                                    return ratingRepo.getNumberOfEntries(/*todo filter support*/);
+                                })
+                                .thenApply(collectionSize ->
+                                        ret[0] = new CollectionPage(
+                                                collectionSize,
+                                                pageSize,
+                                                page,
+                                                list[0])
+                                )).commit().thenApply(___ -> ret[0]);
     }
 
     public CompletableFuture<Rating> getRating(long accountFrom, long accountTo) {

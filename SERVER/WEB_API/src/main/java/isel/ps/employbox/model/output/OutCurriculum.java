@@ -93,12 +93,12 @@ public class OutCurriculum extends OutputDto {
 
         private class PreviousJobs {
             @JsonProperty
-            final String href = HOSTNAME +  linkTo ( methodOn(CurriculumController.class).getPreviousJobs(userId,curriculumId, 0)).withRel("previousJobs").getHref();
+            final String href = HOSTNAME +  linkTo ( methodOn(CurriculumController.class).getPreviousJobs(userId,curriculumId, 0,0)).withRel("previousJobs").getHref();
         }
 
         private class CurriculumExperiences {
             @JsonProperty
-            final String href = HOSTNAME +  linkTo ( methodOn(CurriculumController.class).getCurriculumExperiences(userId,curriculumId, 0)).withRel("curriculumExperience").getHref();
+            final String href = HOSTNAME +  linkTo ( methodOn(CurriculumController.class).getCurriculumExperiences(userId,curriculumId, 0,0)).withRel("curriculumExperience").getHref();
         }
     }
 }

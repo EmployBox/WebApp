@@ -37,10 +37,16 @@ public class OutCurriculumExperience extends OutputDto {
 
     @Override
     public Object getCollectionItemOutput() {
-        return null;
+        return new CurriculumExperienceItemOutput(curriculumId);
     }
 
     class CurriculumExperienceItemOutput {
+        @JsonProperty
+        private final long curriculumId;
+
+        CurriculumExperienceItemOutput(long curriculumId) {
+            this.curriculumId = curriculumId;
+        }
 
         private class _Links {
             @JsonProperty

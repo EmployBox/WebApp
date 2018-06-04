@@ -1,6 +1,8 @@
 package isel.ps.employbox.services.curricula;
 
 import com.github.jayield.rapper.DataRepository;
+import com.github.jayield.rapper.Transaction;
+import com.github.jayield.rapper.utils.Pair;
 import isel.ps.employbox.ErrorMessages;
 import isel.ps.employbox.exceptions.ConflictException;
 import isel.ps.employbox.exceptions.ResourceNotFoundException;
@@ -10,8 +12,9 @@ import isel.ps.employbox.model.entities.CurriculumChilds.CurriculumExperience;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
+import java.sql.Connection;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
-import java.util.stream.Collectors;
 
 @Service
 public class CurriculumExperienceService {
@@ -26,19 +29,26 @@ public class CurriculumExperienceService {
         this.curriculumService = curriculumService;
     }
 
-    public CompletableFuture<CollectionPage<CurriculumExperience>> getCurriculumExperiences(long curriculumId, int page){
+    public CompletableFuture<CollectionPage<CurriculumExperience>> getCurriculumExperiences(long curriculumId, int pageSize, int page) {
+        List[] list = new List[1];
+        CollectionPage[] ret = new CollectionPage[1];
+
         return curriculumRepo.findById(curriculumId)
-                .thenApply( ocurriculum -> ocurriculum.orElseThrow(()-> new ResourceNotFoundException(ErrorMessages.RESOURCE_NOTFOUND_CURRICULUM)))
-                .thenCompose(Curriculum::getExperiences)
-                .thenApply( list -> new CollectionPage(
-                        list.size(),
-                        page,
-                        list.stream()
-                                .skip(CollectionPage.PAGE_SIZE * page)
-                                .limit(CollectionPage.PAGE_SIZE)
-                                .collect(Collectors.toList())
-                        )
-                );
+                .thenApply(ocurriculum -> ocurriculum.orElseThrow(() -> new ResourceNotFoundException(ErrorMessages.RESOURCE_NOTFOUND_CURRICULUM)))
+                .thenCompose(__ -> new Transaction(Connection.TRANSACTION_SERIALIZABLE)
+                        .andDo(() -> curriculumExperienceRepo.findWhere(page, pageSize, new Pair<>("curriculumId", curriculumId))
+                                .thenCompose(listRes -> {
+                                    list[0] = listRes;
+                                    return curriculumExperienceRepo.getNumberOfEntries(/*todo filter support*/);
+                                })
+                                .thenApply(collectionSize -> new CollectionPage(
+                                        collectionSize,
+                                        pageSize,
+                                        page,
+                                        list[0])
+                                )
+                        ).commit())
+                .thenApply(__ -> ret[0]);
     }
 
     public CompletableFuture<CurriculumExperience> addCurriculumExperience(

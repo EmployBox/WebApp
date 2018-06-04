@@ -1,5 +1,6 @@
 package isel.ps.employbox.model.output;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import isel.ps.employbox.controllers.ChatController;
 
@@ -10,6 +11,7 @@ import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 
 public class OutMessage extends OutputDto{
 
+    @JsonProperty
     private final long accountId;
 
     @JsonProperty
@@ -36,9 +38,29 @@ public class OutMessage extends OutputDto{
         this._links = new _Links();
     }
 
+    @JsonIgnore
     @Override
     public Object getCollectionItemOutput() {
-        return null;
+        return new MessageItemOutput(messageId);
+    }
+
+    class MessageItemOutput {
+        @JsonProperty
+        private final long messageId;
+
+        MessageItemOutput(long messageId) {
+            this.messageId = messageId;
+        }
+
+        private class _Links {
+            @JsonProperty
+            private _Links.Self self = new _Links.Self();
+
+            private class Self {
+                @JsonProperty
+                final String href = HOSTNAME + linkTo( methodOn(ChatController.class, accountId).getChatMessage(chatId, messageId, null)).withSelfRel().getHref();
+            }
+        }
     }
 
     private class _Links {

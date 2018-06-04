@@ -64,6 +64,29 @@ public class OutRating extends OutputDto {
         return null;
     }
 
+    class RatingsItemOutput {
+        @JsonProperty
+        private final long accountIDFrom;
+
+        @JsonProperty
+        private final long accountIDTo;
+
+        RatingsItemOutput(long accountIDFrom, long accountIDTo) {
+            this.accountIDFrom = accountIDFrom;
+            this.accountIDTo = accountIDTo;
+        }
+
+        private class _Links {
+            @JsonProperty
+            private _Links.Self self = new _Links.Self();
+
+            private class Self {
+                @JsonProperty
+                final String href = HOSTNAME + linkTo(RatingController.class, accountIDFrom).withSelfRel().getHref();
+            }
+        }
+    }
+
     private class _Links {
         @JsonProperty
         private Self self = new Self();

@@ -2,6 +2,8 @@ package isel.ps.employbox.services.curricula;
 
 import com.github.jayield.rapper.DataRepository;
 import com.github.jayield.rapper.DomainObject;
+import com.github.jayield.rapper.Transaction;
+import com.github.jayield.rapper.utils.Pair;
 import isel.ps.employbox.ErrorMessages;
 import isel.ps.employbox.exceptions.BadRequestException;
 import isel.ps.employbox.exceptions.ConflictException;
@@ -14,11 +16,11 @@ import isel.ps.employbox.services.UserAccountService;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
+import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
-import java.util.stream.Collectors;
 
 @Service
 public class CurriculumService {
@@ -120,19 +122,26 @@ public class CurriculumService {
         );
     }
 
-    public CompletableFuture<CollectionPage<Curriculum>> getCurricula(long userId, String email, int page) {
-        return userAccountService.getUser(userId, email)
-                .thenCompose(UserAccount::getCurricula)
-                .thenApply( curricula -> new CollectionPage(
-                        curricula.size(),
-                        page,
-                        curricula.stream()
-                                .skip(CollectionPage.PAGE_SIZE * page)
-                                .limit(CollectionPage.PAGE_SIZE)
-                                .collect(Collectors.toList())
-                        )
+    public CompletableFuture<CollectionPage<Curriculum>> getCurricula(long accountId, String email, int pageSize, int page) {
+        List[] list = new List[1];
+        CollectionPage[] ret = new CollectionPage[1];
 
-                );
+        return userAccountService.getUser(accountId, email)
+                .thenCompose(__ ->  new Transaction(Connection.TRANSACTION_SERIALIZABLE)
+                    .andDo(() ->
+                        curriculumRepo.findWhere(page, pageSize, new Pair<>("accountId", accountId))
+                                .thenCompose(listRes -> {
+                                    list[0] = listRes;
+                                    return curriculumRepo.getNumberOfEntries(/*todo filter support*/);
+                                })
+                                .thenApply(collectionSize -> new CollectionPage(
+                                collectionSize,
+                                pageSize,
+                                page,
+                                list[0])
+                        )
+                    ).commit()
+                ).thenApply(__ -> ret[0]);
     }
 
     public CompletableFuture<Curriculum> getCurriculum(long userId, long cid, String email) {

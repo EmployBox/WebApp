@@ -19,7 +19,6 @@ import reactor.core.publisher.Mono;
 import java.sql.Connection;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.CompletionStage;
 import java.util.stream.Collectors;
 
 @Service
@@ -38,14 +37,24 @@ public class JobService {
         this.accountService = userService;
     }
 
-    public CompletableFuture<CollectionPage<Job>> getAllJobs(int page, int numberOfItems) {
-        List<Job>[] jobs = new List[1];
-        return jobRepo.findAll(page, numberOfItems)
-                .thenCompose(res -> {
-                    jobs[0] = res;
-                    return jobRepo.getNumberOfEntries();
-                } )
-                .thenApply( numberOfEntries -> new CollectionPage( (int)numberOfEntries.longValue(), page, jobs[0] ));
+    public CompletableFuture<CollectionPage<Job>> getAllJobs(int page, int pageSize) {
+        List[] list = new List[1];
+        CollectionPage[] ret = new CollectionPage[1];
+
+        return new Transaction(Connection.TRANSACTION_SERIALIZABLE)
+                .andDo(() -> jobRepo.findAll(page, pageSize)
+                        .thenCompose(res -> {
+                            list[0] = res;
+                            return jobRepo.getNumberOfEntries();
+                        })
+                        .thenAccept(numberOfEntries ->
+                                ret[0] = new CollectionPage(
+                                        numberOfEntries,
+                                        pageSize,
+                                        page,
+                                        list[0])
+                        )).commit()
+         .thenApply(__ -> ret[0]);
     }
 
     public CompletableFuture<Job> getJob(long jid) {
@@ -53,17 +62,26 @@ public class JobService {
                 .thenApply(ojob -> ojob.orElseThrow(()-> new ResourceNotFoundException(ErrorMessages.RESOURCE_NOTFOUND_JOB)));
     }
 
-    public CompletableFuture<CollectionPage<JobExperience>> getJobExperiences(long jid, int page) {
+    public CompletableFuture<CollectionPage<JobExperience>> getJobExperiences(long jid, int pageSize, int page) {
+        List[] list = new List[1];
+        CollectionPage[] ret = new CollectionPage[1];
         return getJob(jid)
-                .thenCompose(Job::getExperiences)
-                .thenApply(list -> new CollectionPage(
-                        list.size(),
-                        page,
-                        list.stream()
-                                .skip(CollectionPage.PAGE_SIZE * page)
-                                .limit(CollectionPage.PAGE_SIZE)
-                                .collect(Collectors.toList())
-                        )
+                .thenCompose(
+                        __ -> new Transaction(Connection.TRANSACTION_SERIALIZABLE)
+                                .andDo(() -> jobExperienceRepo.findWhere(page, pageSize, new Pair<>("jobId", jobRepo))
+                                        .thenCompose(listRes -> {
+                                            list[0] = listRes;
+                                            return jobRepo.getNumberOfEntries(/*todo filter support*/);
+                                        })
+                                        .thenApply(collectionSize ->
+                                                ret[0] = new CollectionPage(
+                                                        collectionSize,
+                                                        pageSize,
+                                                        page,
+                                                        list[0])
+                                        )
+                                ).commit()
+                                .thenApply(___ -> ret[0])
                 );
     }
 

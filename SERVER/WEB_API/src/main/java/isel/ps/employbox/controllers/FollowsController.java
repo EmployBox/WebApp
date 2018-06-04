@@ -22,19 +22,25 @@ public class FollowsController {
     @GetMapping("/followers")
     public Mono<HalCollectionPage> getFollowers(
             @PathVariable long id,
-            @RequestParam(defaultValue = "0") int page
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "5") int numberOfItems
     ){
         return accountBinder.bindOutput(
-                followService.getAccountFollowers(id, page),
+                followService.getAccountFollowers(id, page, numberOfItems),
                 this.getClass(),
                 id
         );
     }
 
     @GetMapping("/following")
-    public Mono<HalCollectionPage> getFollowing(@PathVariable long id, @RequestParam(defaultValue = "0") int page){
+    public Mono<HalCollectionPage> getFollowing(
+            @PathVariable long id,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "5") int numberOfItems
+
+    ){
         return accountBinder.bindOutput(
-                followService.getAccountFollowing(id, page),
+                followService.getAccountFollowing(id, page, numberOfItems),
                 this.getClass(),
                 id
         );

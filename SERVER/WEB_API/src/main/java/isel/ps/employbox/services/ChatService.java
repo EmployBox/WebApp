@@ -1,6 +1,7 @@
 package isel.ps.employbox.services;
 
 import com.github.jayield.rapper.DataRepository;
+import com.github.jayield.rapper.Transaction;
 import com.github.jayield.rapper.utils.Pair;
 import isel.ps.employbox.ErrorMessages;
 import isel.ps.employbox.exceptions.BadRequestException;
@@ -12,9 +13,9 @@ import isel.ps.employbox.model.entities.Message;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
+import java.sql.Connection;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import static isel.ps.employbox.ErrorMessages.BAD_REQUEST_IDS_MISMATCH;
 import static isel.ps.employbox.ErrorMessages.RESOURCE_NOT_FOUND_MESSAGE;
@@ -31,26 +32,47 @@ public class ChatService {
         this.accountService = accountService;
     }
 
-    //todo
-    public CompletableFuture<Stream<Chat>> getAccountChats(long accountId) {
-        return chatRepo.findAll()
-                .thenApply(list -> list
-                        .stream()
-                        .filter(curr -> curr.getAccountIdFirst() == accountId));
+    //todo endpoint
+    public CompletableFuture<CollectionPage<Chat>> getAccountChats(long accountId, int pageSize, int page) {
+        List[] list = new List[1];
+        CollectionPage[] ret = new CollectionPage[1];
+        return accountService.getAccount(accountId)
+                .thenCompose(__ -> new Transaction(Connection.TRANSACTION_SERIALIZABLE)
+                        .andDo(() -> chatRepo.findAll(page, pageSize)
+                                .thenCompose(listRes -> {
+                                    list[0] = listRes;
+                                    return chatRepo.getNumberOfEntries(/*todo filter support*/);
+                                })
+                                .thenAccept(collectionSize ->
+                                        ret[0] = new CollectionPage(
+                                                collectionSize,
+                                                pageSize,
+                                                page,
+                                                list[0])
+                                )
+                        ).commit())
+                .thenApply( __ -> ret[0]);
     }
 
-    public CompletableFuture<CollectionPage<Message>> getAccountChatsMessages(long accountId, long cid, String email, int page) {
-        return accountService.getAccount(accountId, email).thenCompose(account ->
-                msgRepo.findWhere(page, CollectionPage.PAGE_SIZE, new Pair<>("accountId",accountId))
-                        .thenApply(list -> new CollectionPage(
-                                list.size(),
-                                page,
-                                list.stream()
-                                        .skip(CollectionPage.PAGE_SIZE * page)
-                                        .limit(CollectionPage.PAGE_SIZE)
-                                        .collect(Collectors.toList())
-                        ))
-        );
+    public CompletableFuture<CollectionPage<Message>> getAccountChatsMessages(long accountId, String email, int pageSize, int page) {
+        List[] list = new List[1];
+        CollectionPage[] ret = new CollectionPage[1];
+        return accountService.getAccount(accountId, email)
+                .thenCompose(__ -> new Transaction(Connection.TRANSACTION_SERIALIZABLE)
+                        .andDo(() -> msgRepo.findWhere(page, pageSize, new Pair<>("accountId", accountId))
+                                .thenCompose(listRes -> {
+                                    list[0] = listRes;
+                                    return msgRepo.getNumberOfEntries(/*todo filter support*/);
+                                })
+                                .thenAccept(numberOfEntries ->
+                                        ret[0] = new CollectionPage(
+                                                numberOfEntries,
+                                                pageSize,
+                                                page,
+                                                list[0])
+                                ))
+                        .commit()
+                ).thenApply(__ -> ret[0]);
     }
 
 

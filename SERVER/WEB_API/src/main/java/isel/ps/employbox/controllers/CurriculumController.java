@@ -70,9 +70,13 @@ public class CurriculumController {
     }
 
     @GetMapping
-    public Mono<HalCollectionPage> getCurricula(@PathVariable long id, @RequestParam(defaultValue = "0") int page, Authentication authentication){
+    public Mono<HalCollectionPage> getCurricula(
+            @PathVariable long id,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "5") int numberOfItems,
+            Authentication authentication){
         return curriculumBinder.bindOutput(
-                curriculumService.getCurricula(id, authentication.getName(), page),
+                curriculumService.getCurricula(id, authentication.getName(), page, numberOfItems),
                 this.getClass(),
                 id
         );
@@ -93,9 +97,14 @@ public class CurriculumController {
     }
 
     @GetMapping("/{cid}/academic")
-    public Mono<HalCollectionPage> getAcademicBackground(@PathVariable long id, @PathVariable long cid, @RequestParam(defaultValue = "0") int page){
+    public Mono<HalCollectionPage> getAcademicBackground
+            (@PathVariable long id,
+             @PathVariable long cid,
+             @RequestParam(defaultValue = "0") int page,
+             @RequestParam(defaultValue = "5") int numberOfItems
+            ){
         return academicBackgroundBinder.bindOutput(
-                academicBackgroundService.getCurriculumAcademicBackgrounds( cid, page ),
+                academicBackgroundService.getCurriculumAcademicBackgrounds( cid, page, numberOfItems ),
                 this.getClass(),
                 id,
                 cid
@@ -114,10 +123,11 @@ public class CurriculumController {
     public Mono<HalCollectionPage> getProjects(
             @PathVariable long id,
             @PathVariable long cid,
-            @RequestParam(defaultValue = "0") int page
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "5") int numberOfItems
     ) {
         return projectBinder.bindOutput(
-                projectService.getCurriculumProjects(cid, page),
+                projectService.getCurriculumProjects(cid, page, numberOfItems),
                 this.getClass(),
                 id,
                 cid
@@ -136,10 +146,11 @@ public class CurriculumController {
     public Mono<HalCollectionPage> getPreviousJobs(
             @PathVariable long id,
             @PathVariable long cid,
-            @RequestParam(defaultValue = "0") int page
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "5") int numberOfItems
     ){
         return previousJobsBinder.bindOutput(
-                previousJobService.getCurriculumPreviousJobs( cid, page ),
+                previousJobService.getCurriculumPreviousJobs( cid, page, numberOfItems ),
                 this.getClass(),
                 id,
                 cid );
@@ -157,10 +168,11 @@ public class CurriculumController {
     public Mono<HalCollectionPage> getCurriculumExperiences (
             @PathVariable long id,
             @PathVariable long cid,
-            @RequestParam(defaultValue = "0") int page
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "5") int numberOfItems
     ){
         return curriculumExperienceBinder.bindOutput(
-                curriculumExperienceService.getCurriculumExperiences(cid, page),
+                curriculumExperienceService.getCurriculumExperiences(cid, page, numberOfItems),
                 this.getClass(),
                 id
         );

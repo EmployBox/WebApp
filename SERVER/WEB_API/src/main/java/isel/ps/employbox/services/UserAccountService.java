@@ -2,6 +2,7 @@ package isel.ps.employbox.services;
 
 import com.github.jayield.rapper.DataRepository;
 import com.github.jayield.rapper.Transaction;
+import com.github.jayield.rapper.utils.Pair;
 import isel.ps.employbox.ErrorMessages;
 import isel.ps.employbox.exceptions.BadRequestException;
 import isel.ps.employbox.exceptions.ConflictException;
@@ -67,19 +68,24 @@ public class UserAccountService {
                 });
     }
 
-    public CompletableFuture<CollectionPage<Application>> getAllApplications(long accountId, int page)
-    {
+    public CompletableFuture<CollectionPage<Application>> getAllApplications(long accountId, int pageSize, int page) {
+        List[] list = new List[1];
+        CollectionPage[] ret = new CollectionPage[1];
+
         return userRepo.findById(accountId)
-                .thenApply( ouser -> ouser.orElseThrow(()-> new ResourceNotFoundException(ErrorMessages.RESOURCE_NOTFOUND_USER)))
-                .thenCompose(UserAccount::getApplications)
-                .thenApply( list -> new CollectionPage<>(
-                        list.size(),
-                        page,
-                        list.stream()
-                            .skip(CollectionPage.PAGE_SIZE * page)
-                            .limit(CollectionPage.PAGE_SIZE)
-                                .collect(Collectors.toList())
-                ));
+                .thenApply(ouser -> ouser.orElseThrow(() -> new ResourceNotFoundException(ErrorMessages.RESOURCE_NOTFOUND_USER)))
+                .thenCompose(__ -> applicationRepo.findWhere(page, pageSize, new Pair<>("accountId", accountId))
+                        .thenCompose(listRes -> {
+                            list[0] = listRes;
+                            return applicationRepo.getNumberOfEntries(/*todo filter support*/);
+                        })
+                        .thenApply(collectionSize ->
+                                ret[0] = new CollectionPage(
+                                        collectionSize,
+                                        pageSize,
+                                        page,
+                                        list[0])
+                        ));
     }
 
     public CompletableFuture<UserAccount> createUser(UserAccount userAccount) {

@@ -1,5 +1,6 @@
 package isel.ps.employbox.model.output;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import isel.ps.employbox.controllers.CurriculumController;
 
@@ -35,6 +36,7 @@ public class OutProject extends OutputDto {
         this._links = new _Links();
     }
 
+    @JsonIgnore
     @Override
     public Object getCollectionItemOutput() {
         return new ProjectsItemOutput(name, description);

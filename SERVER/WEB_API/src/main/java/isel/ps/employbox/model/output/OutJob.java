@@ -5,10 +5,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import isel.ps.employbox.controllers.JobController;
 import isel.ps.employbox.controllers.UserAccountController;
-import isel.ps.employbox.model.entities.Account;
 
 import java.sql.Timestamp;
-import java.util.concurrent.CompletableFuture;
 
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
@@ -124,12 +122,12 @@ public class OutJob extends OutputDto {
 
         private class Experiences {
             @JsonProperty
-            final String href = HOSTNAME + linkTo ( methodOn(JobController.class).getJobExperiences(jobId, 0)).withRel("experiences").getHref();
+            final String href = HOSTNAME + linkTo ( methodOn(JobController.class).getJobExperiences(jobId, 0,0)).withRel("experiences").getHref();
         }
 
         private class Applications {
             @JsonProperty
-            final String href = HOSTNAME + linkTo ( methodOn(UserAccountController.class).getAllApplications(account.getAccountId(), 0)).withRel("applications").getHref();
+            final String href = HOSTNAME + linkTo ( methodOn(UserAccountController.class).getAllApplications(account.getAccountId(), 0,0)).withRel("applications").getHref();
         }
     }
 }
