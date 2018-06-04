@@ -71,7 +71,7 @@ public class JobControllerTests {
         assertEquals(1, jobExperiences.size());
         jobExperience = jobExperiences.get(0);
 
-        accountId = job.getAccountId();
+        accountId = job.getAccount().join().getIdentityKey();
     }
 
     @After

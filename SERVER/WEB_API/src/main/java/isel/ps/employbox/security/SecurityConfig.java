@@ -25,6 +25,7 @@ public class SecurityConfig {
         //http.securityContextRepository(securityContextRepository);
 
         // Disable authentication for the selected routes.
+        http.authorizeExchange().pathMatchers(HttpMethod.GET,"/accounts/users").permitAll();
         http.authorizeExchange().pathMatchers(HttpMethod.POST,"/accounts/users").permitAll();
         http.authorizeExchange().pathMatchers(HttpMethod.GET,"/accounts/users/*").permitAll();
         http.authorizeExchange().pathMatchers(HttpMethod.GET,"/accounts/users/*/applications").permitAll();
@@ -36,7 +37,7 @@ public class SecurityConfig {
         http.authorizeExchange().pathMatchers(HttpMethod.GET, "/accounts/*/ratings").permitAll();
         http.authorizeExchange().pathMatchers(HttpMethod.GET, "/accounts/*/comments").permitAll();
         http.authorizeExchange().pathMatchers(HttpMethod.GET, "/jobs").permitAll();
-        http.authorizeExchange().pathMatchers(HttpMethod.GET, "/jobs/*").permitAll();
+        http.authorizeExchange().pathMatchers(HttpMethod.GET, "/jobs/**").permitAll();
         http.authorizeExchange().pathMatchers(HttpMethod.OPTIONS, "/**").permitAll();
         http.authorizeExchange().anyExchange().authenticated();
 

@@ -23,4 +23,20 @@ public class OutAccount extends ResourceSupport {
         this.rating = rating;
         this.version = version;
     }
+
+    public long getAccountId() {
+        return accountId;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public double getRating() {
+        return rating;
+    }
+
+    public long getVersion() {
+        return version;
+    }
 }

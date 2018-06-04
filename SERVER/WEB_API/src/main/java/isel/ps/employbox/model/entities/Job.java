@@ -13,7 +13,8 @@ public class Job implements DomainObject<Long> {
     @Id(isIdentity =  true)
     private long jobId;
     private final String title;
-    private final Long accountId;
+    @ColumnName(name = "accountId")
+    private final CompletableFuture<Account> account;
     private final String address;
     private final int wage;
     private final String description;
@@ -30,7 +31,7 @@ public class Job implements DomainObject<Long> {
 
     public Job(){
         title = null;
-        accountId = null;
+        account = null;
         address = null;
         wage = 0;
         description = null;
@@ -46,7 +47,7 @@ public class Job implements DomainObject<Long> {
     public Job(
             long id,
             String title,
-            long accountID,
+            CompletableFuture<Account> accountID,
             String address,
             int wage,
             String description,
@@ -60,7 +61,7 @@ public class Job implements DomainObject<Long> {
     ) {
         this.jobId = id;
         this.title = title;
-        this.accountId = accountID;
+        this.account = accountID;
         this.address = address;
         this.wage = wage;
         this.description = description;
@@ -74,7 +75,7 @@ public class Job implements DomainObject<Long> {
     }
 
     public Job(
-            long accountID,
+            CompletableFuture<Account> account,
             long jobId,
             String title,
             String address,
@@ -88,7 +89,7 @@ public class Job implements DomainObject<Long> {
             long version
     ) {
         this.jobId = jobId;
-        this.accountId = accountID;
+        this.account = account;
         this.title = title;
         this.address = address;
         this.wage = wage;
@@ -111,8 +112,8 @@ public class Job implements DomainObject<Long> {
         return version;
     }
 
-    public Long getAccountId() {
-        return accountId;
+    public CompletableFuture<Account> getAccount() {
+        return account;
     }
 
     public int getWage() {

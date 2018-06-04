@@ -3,8 +3,8 @@ import fetch from 'isomorphic-fetch'
 import {makeCancellable} from './promises'
 
 export default class extends React.Component {
-  // ({String: method, String: authorization, String: url, String: body, Component: onLoad, function: onError(error):Component,
-  // function: onResult(result):Component, [OPTIONAL] function: afterResult(json):void})
+  // ({[OPTIONAL] String: method, [OPTIONAL] String: authorization, String: url, [OPTIONAL] String: body, [OPTIONAL] Component: onLoad, [OPTIONAL] function: onError(error):Component,
+  // [OPTIONAL] function: onResult(result):Component, [OPTIONAL] function: afterResult(json):void})
   constructor (props) {
     super(props)
     this.state = {

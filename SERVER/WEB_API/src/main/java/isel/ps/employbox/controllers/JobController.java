@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static isel.ps.employbox.ErrorMessages.BAD_REQUEST_IDS_MISMATCH;
 
@@ -74,10 +75,11 @@ public class JobController {
     @PostMapping("/{jid}/experiences")
     public Mono<Void> createJobExperiences(
             @PathVariable long jid,
-            @RequestBody List<JobExperience> jobExperience,
+            @RequestBody List<InJobExperience> inJobExperiences,
             Authentication authentication
     ) {
-        return Mono.fromFuture( jobService.addJobExperienceToJob(jid, jobExperience, authentication.getName()));
+        List<JobExperience> jobExperiences = inJobExperiences.stream().map(jobExperienceBinder::bindInput).collect(Collectors.toList());
+        return Mono.fromFuture( jobService.addJobExperienceToJob(jid, jobExperiences, authentication.getName()));
     }
 
     @PutMapping("/{jid}")
