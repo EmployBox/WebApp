@@ -61,7 +61,7 @@ public class OutRating extends OutputDto {
 
     @Override
     public Object getCollectionItemOutput() {
-        return null;
+        return new RatingsItemOutput(accountIDFrom, accountIDTo);
     }
 
     class RatingsItemOutput {
@@ -70,6 +70,10 @@ public class OutRating extends OutputDto {
 
         @JsonProperty
         private final long accountIDTo;
+
+        @JsonProperty
+        private final _Links _links = new _Links();
+
 
         RatingsItemOutput(long accountIDFrom, long accountIDTo) {
             this.accountIDFrom = accountIDFrom;

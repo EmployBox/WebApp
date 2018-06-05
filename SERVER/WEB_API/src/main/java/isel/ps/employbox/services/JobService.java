@@ -71,7 +71,7 @@ public class JobService {
                                 .andDo(() -> jobExperienceRepo.findWhere(page, pageSize, new Pair<>("jobId", jobRepo))
                                         .thenCompose(listRes -> {
                                             list[0] = listRes;
-                                            return jobRepo.getNumberOfEntries(/*todo filter support*/);
+                                            return jobRepo.getNumberOfEntries( new Pair<>("jobId", jobRepo));
                                         })
                                         .thenApply(collectionSize ->
                                                 ret[0] = new CollectionPage(

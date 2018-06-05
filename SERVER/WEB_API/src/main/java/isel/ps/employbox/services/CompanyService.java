@@ -32,7 +32,7 @@ public class CompanyService {
                         companyRepo.findAll(page, pageSize)
                                 .thenCompose(listRes -> {
                                     list[0] = listRes;
-                                    return companyRepo.getNumberOfEntries(/*todo filter support*/);
+                                    return companyRepo.getNumberOfEntries();
                                 })
                                 .thenAccept(numberOfEntries ->
                                         ret[0] = new CollectionPage(

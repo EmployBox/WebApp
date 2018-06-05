@@ -41,7 +41,7 @@ public class ChatService {
                         .andDo(() -> chatRepo.findAll(page, pageSize)
                                 .thenCompose(listRes -> {
                                     list[0] = listRes;
-                                    return chatRepo.getNumberOfEntries(/*todo filter support*/);
+                                    return chatRepo.getNumberOfEntries();
                                 })
                                 .thenAccept(collectionSize ->
                                         ret[0] = new CollectionPage(
@@ -62,7 +62,7 @@ public class ChatService {
                         .andDo(() -> msgRepo.findWhere(page, pageSize, new Pair<>("accountId", accountId))
                                 .thenCompose(listRes -> {
                                     list[0] = listRes;
-                                    return msgRepo.getNumberOfEntries(/*todo filter support*/);
+                                    return msgRepo.getNumberOfEntries( new Pair<>("accountId", accountId));
                                 })
                                 .thenAccept(numberOfEntries ->
                                         ret[0] = new CollectionPage(

@@ -40,7 +40,7 @@ public class FollowService {
                 .andDo(() -> followsRepo.findWhere(page, pageSize, new Pair<>(collum, id))
                         .thenCompose(listRes -> {
                             list[0] = listRes;
-                            return followsRepo.getNumberOfEntries(/*todo filter support*/);
+                            return followsRepo.getNumberOfEntries( new Pair<>(collum, id));
                         })
                         .thenAccept(numberOfEntries ->
                                 ret[0] = new CollectionPage(

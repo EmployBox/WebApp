@@ -72,7 +72,7 @@ public class OutUser extends OutputDto{
         }
     }
 
-    private class _Links{
+    public class _Links{
         @JsonProperty
         private Self self = new Self();
 
