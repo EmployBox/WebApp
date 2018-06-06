@@ -6,14 +6,11 @@ import isel.ps.employbox.model.entities.Account;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.ReactiveUserDetailsService;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 
 import java.util.Collection;
 import java.util.Collections;
-
-import static isel.ps.employbox.ErrorMessages.RESOURCE_NOTFOUND_USER;
 
 @Component
 public class RepositoryReactiveUserDetailsService implements ReactiveUserDetailsService {
@@ -26,13 +23,13 @@ public class RepositoryReactiveUserDetailsService implements ReactiveUserDetails
 
     @Override
     public Mono<UserDetails> findByUsername(String username) {
-        return  Mono.fromFuture(
+        return Mono.fromFuture(
                 accountRepo
                         .findWhere(new Pair<>("email", username))
                         .thenApply(accounts -> {
                             if (!accounts.isEmpty())
                                 return new CustomUserDetails(accounts.get(0));
-                             throw new UsernameNotFoundException(RESOURCE_NOTFOUND_USER);
+                            return null;
                         })
         );
     }
