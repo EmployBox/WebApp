@@ -5,7 +5,7 @@ import isel.ps.employbox.controllers.RatingController;
 
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 
-public class OutRating extends OutputDto {
+public class OutRating implements OutputDto {
     @JsonProperty
     private final long accountIDFrom;
 

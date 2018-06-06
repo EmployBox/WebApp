@@ -9,7 +9,7 @@ import java.sql.Date;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 
-public class OutMessage extends OutputDto{
+public class OutMessage implements OutputDto {
 
     @JsonProperty
     private final long accountId;

@@ -5,7 +5,7 @@ import isel.ps.employbox.controllers.CommentController;
 
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 
-public class OutComment extends OutputDto {
+public class OutComment implements OutputDto {
 
     @JsonProperty
     private final long accountIdFrom;

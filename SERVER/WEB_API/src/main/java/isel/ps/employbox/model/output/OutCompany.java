@@ -5,7 +5,7 @@ import isel.ps.employbox.controllers.CompanyController;
 
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 
-public class OutCompany extends OutputDto {
+public class OutCompany implements OutputDto {
 
     @JsonProperty
     private final Long accountId;

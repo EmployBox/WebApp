@@ -7,7 +7,7 @@ import isel.ps.employbox.controllers.CurriculumController;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 
-public class OutProject extends OutputDto {
+public class OutProject implements OutputDto {
 
     @JsonProperty
     private final long projectId;

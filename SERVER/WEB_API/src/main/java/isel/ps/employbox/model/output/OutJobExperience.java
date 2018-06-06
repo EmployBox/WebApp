@@ -7,7 +7,7 @@ import isel.ps.employbox.controllers.JobController;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 
-public class OutJobExperience extends OutputDto {
+public class OutJobExperience implements OutputDto {
 
 
     @JsonProperty
