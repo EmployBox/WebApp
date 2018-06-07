@@ -14,8 +14,7 @@ import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 //todo embedded
 public class OutJob implements OutputDto {
 
-    @JsonProperty
-    private final OutAccount account;
+    private final OutAccount _account;
 
     @JsonProperty
     private final long jobId;
@@ -49,6 +48,9 @@ public class OutJob implements OutputDto {
     @JsonProperty
     private final _Links _links;
 
+    @JsonProperty
+    private final _Embedded _embedded;
+
     public OutJob(
             OutAccount account,
             long jobId,
@@ -61,7 +63,7 @@ public class OutJob implements OutputDto {
             Timestamp offerEndDate,
             String offerType)
     {
-        this.account = account;
+        this._account = account;
         this.jobId = jobId;
         this.title = title;
         this.address = address;
@@ -72,6 +74,7 @@ public class OutJob implements OutputDto {
         this.offerEndDate = offerEndDate;
         this.offerType = offerType;
         this._links = new _Links();
+        _embedded = new _Embedded();
     }
 
     @JsonIgnore
@@ -106,6 +109,12 @@ public class OutJob implements OutputDto {
         }
     }
 
+    private class _Embedded{
+        @JsonProperty
+        private final OutAccount account = _account;
+
+    }
+
     private class _Links {
         @JsonProperty
         private _Links.Self self = new _Links.Self();
@@ -128,7 +137,7 @@ public class OutJob implements OutputDto {
 
         private class Applications {
             @JsonProperty
-            final String href = HOSTNAME + linkTo ( methodOn(UserAccountController.class).getAllApplications(account.getAccountId(), 0,0)).withRel("applications").getHref();
+            final String href = HOSTNAME + linkTo ( methodOn(UserAccountController.class).getAllApplications(_account.getAccountId(), 0,0)).withRel("applications").getHref();
         }
     }
 }
