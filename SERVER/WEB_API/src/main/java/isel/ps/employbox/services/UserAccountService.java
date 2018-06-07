@@ -39,6 +39,7 @@ public class UserAccountService {
     }
 
     public CompletableFuture<CollectionPage<UserAccount>> getAllUsers() {
+
         throw new NotImplementedException();
     }
 

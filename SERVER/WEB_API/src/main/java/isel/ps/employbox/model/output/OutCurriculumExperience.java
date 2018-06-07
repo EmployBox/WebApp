@@ -44,6 +44,9 @@ public class OutCurriculumExperience implements OutputDto {
         @JsonProperty
         private final long curriculumId;
 
+        @JsonProperty
+        private _Links _links = new _Links();
+
         CurriculumExperienceItemOutput(long curriculumId) {
             this.curriculumId = curriculumId;
         }

@@ -58,6 +58,7 @@ public class OutPreviousJobs implements OutputDto {
         this._links = new _Links();
     }
 
+    @JsonIgnore
     @Override
     public Object getCollectionItemOutput() {
         return new PreviousItemOutput();

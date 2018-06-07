@@ -39,9 +39,9 @@ public class AcademicBackgroundService {
                         .andDo(() -> academicBackgroundRepo.findWhere(page, pageSize, new Pair<>("curriculumId", curriculumId))
                                 .thenCompose(listRes -> {
                                     list[0] = listRes;
-                                    return academicBackgroundRepo.getNumberOfEntries(/*todo filter support*/);
+                                    return academicBackgroundRepo.getNumberOfEntries(new Pair<>("curriculumId", curriculumId));
                                 })
-                                .thenApply(collectionSize -> new CollectionPage(
+                                .thenApply(collectionSize -> ret[0] = new CollectionPage(
                                         collectionSize,
                                         pageSize,
                                         page,

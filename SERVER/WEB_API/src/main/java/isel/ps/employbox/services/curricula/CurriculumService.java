@@ -127,24 +127,24 @@ public class CurriculumService {
         CollectionPage[] ret = new CollectionPage[1];
 
         return userAccountService.getUser(accountId, email)
-                .thenCompose(__ ->  new Transaction(Connection.TRANSACTION_SERIALIZABLE)
-                    .andDo(() ->
-                        curriculumRepo.findWhere(page, pageSize, new Pair<>("accountId", accountId))
-                                .thenCompose(listRes -> {
-                                    list[0] = listRes;
-                                    return curriculumRepo.getNumberOfEntries(/*todo filter support*/);
-                                })
-                                .thenApply(collectionSize -> new CollectionPage(
-                                collectionSize,
-                                pageSize,
-                                page,
-                                list[0])
-                        )
-                    ).commit()
+                .thenCompose(__ -> new Transaction(Connection.TRANSACTION_SERIALIZABLE)
+                        .andDo(() ->
+                                curriculumRepo.findWhere(page, pageSize, new Pair<>("accountId", accountId))
+                                        .thenCompose(listRes -> {
+                                            list[0] = listRes;
+                                            return curriculumRepo.getNumberOfEntries(/*todo filter support*/);
+                                        })
+                                        .thenApply(collectionSize -> ret[0] = new CollectionPage(
+                                                collectionSize,
+                                                pageSize,
+                                                page,
+                                                list[0])
+                                        )
+                        ).commit()
                 ).thenApply(__ -> ret[0]);
     }
 
-    public CompletableFuture<Curriculum> getCurriculum(long userId, long cid, String email) {
+    public CompletableFuture<Curriculum> getCurriculum(long userId, long cid, String... email) {
         return userAccountService.getUser(userId, email)
                 .thenCompose(UserAccount::getCurricula)
                 .thenApply(curricula -> {

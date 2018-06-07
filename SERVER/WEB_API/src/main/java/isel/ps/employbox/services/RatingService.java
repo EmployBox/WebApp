@@ -38,12 +38,11 @@ public class RatingService {
                                     list[0] = listRes;
                                     return ratingRepo.getNumberOfEntries(new Pair<>("accountId", accountId));
                                 })
-                                .thenApply(collectionSize ->
-                                        ret[0] = new CollectionPage(
-                                                collectionSize,
-                                                pageSize,
-                                                page,
-                                                list[0])
+                                .thenApply(collectionSize -> ret[0] = new CollectionPage(
+                                        collectionSize,
+                                        pageSize,
+                                        page,
+                                        list[0])
                                 )).commit().thenApply(___ -> ret[0]);
     }
 

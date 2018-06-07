@@ -49,6 +49,8 @@ public class OutProject implements OutputDto {
         @JsonProperty
         private final String description;
 
+        @JsonProperty
+        private _Links _links = new _Links();
 
         ProjectsItemOutput(String name, String description) {
             this.name = name;

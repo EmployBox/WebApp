@@ -71,14 +71,13 @@ public class JobService {
                                 .andDo(() -> jobExperienceRepo.findWhere(page, numberOfItems, new Pair<>("jobId", jid))
                                         .thenCompose(listRes -> {
                                             list[0] = listRes;
-                                            return jobRepo.getNumberOfEntries( new Pair<>("jobId", jid));
+                                            return jobRepo.getNumberOfEntries(new Pair<>("jobId", jid));
                                         })
-                                        .thenApply(collectionSize ->
-                                                ret[0] = new CollectionPage(
-                                                        collectionSize,
-                                                        numberOfItems,
-                                                        page,
-                                                        list[0])
+                                        .thenApply(collectionSize -> ret[0] = new CollectionPage(
+                                                collectionSize,
+                                                numberOfItems,
+                                                page,
+                                                list[0])
                                         )
                                 ).commit()
                                 .thenApply(___ -> ret[0])

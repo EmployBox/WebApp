@@ -55,6 +55,9 @@ public class OutUser implements OutputDto {
         @JsonProperty
         private final double rating;
 
+        @JsonProperty
+        private _Links _links = new _Links();
+
         UserItemOutput(String name, String email, double rating) {
             this.name = name;
             this.email = email;

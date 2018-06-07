@@ -83,9 +83,9 @@ public class CurriculumController {
     }
 
     @GetMapping("/{cid}")
-    public Mono<OutCurriculum> getCurriculum(@PathVariable long id, @PathVariable long cid,  Authentication authentication){
+    public Mono<OutCurriculum> getCurriculum(@PathVariable long id, @PathVariable long cid){
         return curriculumBinder.bindOutput(
-                curriculumService.getCurriculum(id, cid, authentication.getName()));
+                curriculumService.getCurriculum(id, cid));
     }
 
     @GetMapping("/{cid}/academic/{academicId}")

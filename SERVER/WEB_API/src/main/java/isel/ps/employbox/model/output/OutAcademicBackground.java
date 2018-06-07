@@ -1,6 +1,7 @@
 package isel.ps.employbox.model.output;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import isel.ps.employbox.controllers.CurriculumController;
 
@@ -53,6 +54,7 @@ public class OutAcademicBackground implements OutputDto {
         this.curriculumId = curriculumId;
     }
 
+    @JsonIgnore
     @Override
     public Object getCollectionItemOutput() {
         return new AcademicBackgroundItemOutput(institution, degree);
@@ -65,11 +67,13 @@ public class OutAcademicBackground implements OutputDto {
         @JsonProperty
         private final String degree;
 
+        @JsonProperty
+        private _Links _links = new _Links();
+
         AcademicBackgroundItemOutput(String institution, String degree) {
             this.institution = institution;
             this.degree = degree;
         }
-
 
         private class _Links {
             @JsonProperty

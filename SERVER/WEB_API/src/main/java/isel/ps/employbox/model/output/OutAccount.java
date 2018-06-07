@@ -1,5 +1,6 @@
 package isel.ps.employbox.model.output;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class OutAccount implements OutputDto {
@@ -39,6 +40,7 @@ public class OutAccount implements OutputDto {
         return version;
     }
 
+    @JsonIgnore
     @Override
     public Object getCollectionItemOutput() {
         return null;

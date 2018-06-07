@@ -1,5 +1,6 @@
 package isel.ps.employbox.model.output;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import isel.ps.employbox.controllers.CommentController;
 
@@ -38,12 +39,16 @@ public class OutComment implements OutputDto {
         this._links = new _Links();
     }
 
+    @JsonIgnore
     @Override
     public Object getCollectionItemOutput() {
         return new CommentItemOutput();
     }
 
     class CommentItemOutput {
+        @JsonProperty
+        private _Links _links = new _Links();
+
         private class _Links {
             @JsonProperty
             private _Links.Self self = new _Links.Self();

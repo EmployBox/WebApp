@@ -22,12 +22,11 @@ public class FollowService {
         this.followsRepo = followeRepo;
         this.accountService = accountRepo;
     }
-    //todo
+
     public CompletableFuture<CollectionPage<Account>> getAccountFollowers(long followedAccountId, int page, int pageSize) {
         return getAccountFutureByFollowType("accountIdFollower", followedAccountId, page, pageSize);
     }
 
-    //todo
     public CompletableFuture<CollectionPage<Account>> getAccountFollowing(long followerAccountId, int page, int pageSize) {
         return getAccountFutureByFollowType("accountIdFollowing", followerAccountId, page, pageSize);
     }
@@ -40,15 +39,14 @@ public class FollowService {
                 .andDo(() -> followsRepo.findWhere(page, pageSize, new Pair<>(collum, id))
                         .thenCompose(listRes -> {
                             list[0] = listRes;
-                            return followsRepo.getNumberOfEntries( new Pair<>(collum, id));
+                            return followsRepo.getNumberOfEntries(new Pair<>(collum, id));
                         })
-                        .thenAccept(numberOfEntries ->
-                                ret[0] = new CollectionPage(
-                                        numberOfEntries,
-                                        pageSize,
-                                        page,
-                                        list[0]
-                                ))
+                        .thenAccept(numberOfEntries -> ret[0] = new CollectionPage(
+                                numberOfEntries,
+                                pageSize,
+                                page,
+                                list[0]
+                        ))
                 ).commit()
                 .thenApply(__ -> ret[0]);
     }
