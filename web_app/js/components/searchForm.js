@@ -6,7 +6,7 @@ export default class extends React.Component {
   constructor (props) {
     super(props)
     this.state = {
-      active: props.options[0],
+      active: props.options[Object.keys(props.options)[0]],
       searchText: ''
     }
 
@@ -21,7 +21,9 @@ export default class extends React.Component {
 
   render () {
     const listItems = []
-    this.props.options.map(option => {
+    Object.keys(this.props.options).map(property => {
+      const option = this.props.options[property]
+
       let itemClass
       if (option.name === this.state.active.name) itemClass = 'nav-link active'
       else itemClass = 'nav-link'

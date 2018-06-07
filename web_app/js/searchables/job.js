@@ -9,6 +9,19 @@ export default class extends Searchable {
     super('Jobs', 'Job\'s title', `/jobs${numberOfItems}`)
   }
 
+  renderFilters () {
+    return (
+      <div class='row'>
+        <div class='form-check'>
+          <input class='form-check-input' type='checkbox' value='' id='defaultCheck1' />
+          <label class='form-check-label' for='defaultCheck1'>
+          Default checkbox
+          </label>
+        </div>
+      </div>
+    )
+  }
+
   renderTable (jobs) {
     let tableRows = <tr><td>Empty</td></tr>
     if (jobs._embedded) {
@@ -17,18 +30,32 @@ export default class extends Searchable {
           <HttpRequest
             key={item._links.self.href}
             url={item._links.self.href}
-            onResult={data => (
-              <tr>
-                <td>
-                  <Link to={'/accounts/'}>{data.account.name}</Link>
-                </td>
-                <td>{data.account.rating}</td>
-                <td>{data.title}</td>
-                <td>{data.offerBeginDate}</td>
-                <td>{data.address || 'Not defined'}</td>
-                <td>{data.offerType}</td>
-              </tr>
-            )} />
+            onLoad={<tr><td>Loading...</td></tr>}
+            onResult={data => {
+              const { account } = data._embedded
+
+              let link
+              if (account.accountType === 'USR') {
+                link = '/accounts/users/' + account.accountId
+              } else if (account.accountType === 'CMP') {
+                link = '/accounts/companies/' + account.accountId
+              } else {
+                link = '/accounts/moderators/' + account.accountId
+              }
+
+              return (
+                <tr>
+                  <td>
+                    <Link to={link}>{account.name}</Link>
+                  </td>
+                  <td>{account.rating}</td>
+                  <td>{data.title}</td>
+                  <td>{data.offerBeginDate}</td>
+                  <td>{data.address || 'Not defined'}</td>
+                  <td>{data.offerType}</td>
+                </tr>
+              )
+            }} />
         )
       })
     }
@@ -40,7 +67,7 @@ export default class extends Searchable {
             <th>Account</th>
             <th>☆</th>
             <th>Title</th>
-            <th>Posted</th>
+            <th>Opens</th>
             <th>Location</th>
             <th>Type</th>
           </tr>

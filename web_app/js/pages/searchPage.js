@@ -12,6 +12,9 @@ export default (props) => {
       <div class='row'>
         <div class='col col-lg-3'>
           <h3 class='text-center text-white border bg-dark'>Filters</h3>
+          <div class='container'>
+            {entity.renderFilters()}
+          </div>
         </div>
         <div class='col'>
           <h3 class='text-center text-white border bg-dark'>Results</h3>

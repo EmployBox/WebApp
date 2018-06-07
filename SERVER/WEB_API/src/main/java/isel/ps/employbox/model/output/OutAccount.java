@@ -27,9 +27,10 @@ public class OutAccount implements OutputDto {
     private final String accountType;
     @JsonProperty
     private final long version;
+    @JsonProperty
+    private final _Links _links;
 
     private final HashMap<String, String> accountLinks = new HashMap();
-    private final _Links _links;
 
     public OutAccount(long accountID, String name, String email, double rating, String accountType, long version) {
         this.accountId = accountID;
