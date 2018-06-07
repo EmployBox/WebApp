@@ -25,6 +25,7 @@ public class SecurityConfig {
         //http.securityContextRepository(securityContextRepository);
 
         // Disable authentication for the selected routes.
+        http.authorizeExchange().pathMatchers(HttpMethod.GET, "/").permitAll();
         http.authorizeExchange().pathMatchers(HttpMethod.GET,"/accounts/users").permitAll();
         http.authorizeExchange().pathMatchers(HttpMethod.POST,"/accounts/users").permitAll();
         http.authorizeExchange().pathMatchers(HttpMethod.GET,"/accounts/users/*").permitAll();

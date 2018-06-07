@@ -18,7 +18,7 @@ public class RootPage{
     private final AccountsCollectionLink accounts;
 
     @JsonProperty
-    private final CompanyCollectionLink companys;
+    private final CompanyCollectionLink companies;
 
     @JsonProperty
     private final UsersCollectionLinks users;
@@ -30,7 +30,7 @@ public class RootPage{
     public RootPage() {
         this.self = new Self();
         this.accounts = new AccountsCollectionLink();
-        this.companys = new CompanyCollectionLink();
+        this.companies = new CompanyCollectionLink();
         this.users = new UsersCollectionLinks();
         this.jobs = new JobsCollectionLinks();
     }

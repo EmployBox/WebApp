@@ -25,7 +25,7 @@ public class Moderator extends Account {
             CompletableFuture<List<Rating>> ratings,
             CompletableFuture<List<Rating>> ratingsModerated
     ) {
-        super(accountID, name, email, password, rating, version, null, comments, chats, ratings, null, null);
+        super(accountID, name, email, password, "MOD", rating, version, null, comments, chats, ratings, null, null);
         this.ratingsModerated = ratingsModerated;
     }
 

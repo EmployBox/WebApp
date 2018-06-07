@@ -16,10 +16,12 @@ CREATE TABLE [Account] (
 	name NVARCHAR(40) not null,
 	email NVARCHAR(25) UNIQUE NOT NULL,
 	rating float(24) default(0.0),
+	accountType NVARCHAR(3) not null,
 	password NVARCHAR(100) NOT NULL,
 	[version] rowversion,
 
-	CHECK (rating >= 0.0 AND rating <= 10.0)
+	CHECK (rating >= 0.0 AND rating <= 10.0),
+	CHECK (accountType in ('USR', 'CMP', 'MOD'))
 )
 
 CREATE TABLE [Company] (

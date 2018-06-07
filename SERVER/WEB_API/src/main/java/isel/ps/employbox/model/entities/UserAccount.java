@@ -45,7 +45,7 @@ public class UserAccount extends Account {
             CompletableFuture<List<Account>> followers,
             long version
     ) {
-        super(accountID, name, email, password, rating, accountVersion, offeredJobs, comments, chats, ratings,following, followers);
+        super(accountID, name, email, password, "USR", rating, accountVersion, offeredJobs, comments, chats, ratings,following, followers);
         this.summary = summary;
         this.photoUrl = photoUrl;
         this.curricula = curricula;
@@ -64,7 +64,7 @@ public class UserAccount extends Account {
             long accountVersion,
             long version
     ){
-        super(accountId, name, email, password, rating, accountVersion);
+        super(accountId, name, email, password, "USR", rating, accountVersion);
         this.summary = summary;
         this.photoUrl = photoUrl;
         this.version = version;

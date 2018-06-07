@@ -23,6 +23,7 @@ public class AccountBinder implements ModelBinder<Account,OutAccount,InAccount> 
                                             account.getName(),
                                             account.getEmail(),
                                             account.getRating(),
+                                            account.getAccountType(),
                                             account.getVersion())
                     )
         );

@@ -13,13 +13,16 @@ public class OutAccount implements OutputDto {
     @JsonProperty
     private final double rating;
     @JsonProperty
+    private final String accountType;
+    @JsonProperty
     private final long version;
 
-    public OutAccount(long accountID, String name, String email, double rating, long version) {
+    public OutAccount(long accountID, String name, String email, double rating, String accountType, long version) {
         this.accountId = accountID;
         this.name = name;
         this.email = email;
         this.rating = rating;
+        this.accountType = accountType;
         this.version = version;
     }
 

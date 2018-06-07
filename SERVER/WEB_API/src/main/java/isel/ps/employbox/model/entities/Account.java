@@ -12,14 +12,15 @@ import java.util.concurrent.CompletableFuture;
 import static isel.ps.employbox.model.entities.Role.DEFAULT;
 
 public class Account implements DomainObject<Long> {
+    private static final Role role = DEFAULT;
 
     @Id (isIdentity =  true)
     protected long accountId;
     protected final String name;
     protected final String email;
     protected final String password;
+    protected final String accountType;
     protected final double rating;
-    private static final Role role = DEFAULT;
     @Version
     private final long version;
 
@@ -48,6 +49,7 @@ public class Account implements DomainObject<Long> {
         email = null;
         password = null;
         rating = 0;
+        accountType = null;
         version = 0;
         offeredJobs = CompletableFuture.completedFuture(Collections.emptyList());
         comments = CompletableFuture.completedFuture(Collections.emptyList());
@@ -61,7 +63,7 @@ public class Account implements DomainObject<Long> {
             long accountID,
             String name, String email,
             String password,
-            double rating,
+            String accountType, double rating,
             long version,
             CompletableFuture<List<Job>> offeredJobs,
             CompletableFuture<List<Comment>> comments,
@@ -73,6 +75,7 @@ public class Account implements DomainObject<Long> {
         this.name = name;
         this.email = email;
         this.password = password;
+        this.accountType = accountType;
         this.rating = rating;
         this.version = version;
         this.offeredJobs = offeredJobs;
@@ -83,9 +86,10 @@ public class Account implements DomainObject<Long> {
         this.followers = follower;
     }
 
-    protected Account(long accountId, String name, String email, String password, double rating, long version){
+    protected Account(long accountId, String name, String email, String password, String accountType, double rating, long version){
         this.accountId = accountId;
         this.name = name;
+        this.accountType = accountType;
         this.version = version;
         this.email = email;
         this.password = password;
@@ -117,6 +121,10 @@ public class Account implements DomainObject<Long> {
 
     public double getRating() {
         return rating;
+    }
+
+    public String getAccountType() {
+        return accountType;
     }
 
     public CompletableFuture<List<Job>> getOfferedJobs() {

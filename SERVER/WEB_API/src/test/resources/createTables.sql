@@ -4,9 +4,11 @@ create table Account (
   email VARCHAR(25) UNIQUE NOT NULL,
   rating float(24) default(0.0),
   password VARCHAR(100) NOT NULL,
+  accountType VARCHAR (3) not null,
   version bigint default 1,
 
-  CHECK (rating >= 0.0 AND rating <= 10.0)
+  CHECK (rating >= 0.0 AND rating <= 10.0),
+  CHECK (accountType in ('USR', 'CMP', 'MOD'))
 );
 
 create table Company (

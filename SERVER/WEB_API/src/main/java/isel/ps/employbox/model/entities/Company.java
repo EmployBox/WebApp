@@ -42,7 +42,7 @@ public class Company extends Account {
             CompletableFuture<List<Account>> following,
             CompletableFuture<List<Account>> followers)
     {
-        super(accountID, name, email, password, rating, version, offeredJobs,comments, chats, ratings, following, followers);
+        super(accountID, name, email, password, "CMP", rating, version, offeredJobs,comments, chats, ratings, following, followers);
         this.specialization = specialization;
         this.logoUrl = logoUrl;
         this.webPageUrl = webPageUrl;
@@ -64,7 +64,7 @@ public class Company extends Account {
             String description,
             long version,
             long accountVersion) {
-        super(accountID, name, email, password, rating, accountVersion);
+        super(accountID, name, email, password, "CMP", rating, accountVersion);
         this.specialization = specialization;
         this.logoUrl = logoUrl;
         this.webPageUrl = webPageUrl;
