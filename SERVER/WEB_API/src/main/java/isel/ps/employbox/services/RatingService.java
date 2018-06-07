@@ -36,7 +36,7 @@ public class RatingService {
                                 .thenCompose(__ -> ratingRepo.findWhere(page, pageSize, new Pair<>("accountId", accountId)))
                                 .thenCompose(listRes -> {
                                     list[0] = listRes;
-                                    return ratingRepo.getNumberOfEntries(/*todo filter support*/);
+                                    return ratingRepo.getNumberOfEntries(new Pair<>("accountId", accountId));
                                 })
                                 .thenApply(collectionSize ->
                                         ret[0] = new CollectionPage(

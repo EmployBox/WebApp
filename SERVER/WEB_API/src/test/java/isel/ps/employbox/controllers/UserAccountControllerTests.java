@@ -78,11 +78,6 @@ public class UserAccountControllerTests {
         application = applications.get(0);
     }
 
-    @After
-    public void after() throws SQLException {
-        con.close();
-    }
-
     @Test
     public void testGetAllUserAccounts() {
         webTestClient

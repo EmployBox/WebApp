@@ -33,7 +33,7 @@ public class CommentService {
                 .thenCompose(__-> accountRepo.findWhere(page, pageSize, new Pair<>("accountIdFrom", accountFromId)))
                 .thenCompose( listRes -> {
                     list[0] = listRes;
-                    return accountRepo.getNumberOfEntries(/*todo find*/);
+                    return accountRepo.getNumberOfEntries(new Pair<>("accountIdFrom", accountFromId));
                 })
                 .thenApply(collectionSize -> new CollectionPage(
                         collectionSize,

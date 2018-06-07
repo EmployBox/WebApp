@@ -7,7 +7,7 @@ import isel.ps.employbox.controllers.*;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 
-public class OutUser extends OutputDto{
+public class OutUser implements OutputDto {
     @JsonProperty
     private final long id;
 
@@ -72,7 +72,7 @@ public class OutUser extends OutputDto{
         }
     }
 
-    private class _Links{
+    public class _Links{
         @JsonProperty
         private Self self = new Self();
 

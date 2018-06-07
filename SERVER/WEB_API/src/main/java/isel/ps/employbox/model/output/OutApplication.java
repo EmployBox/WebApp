@@ -8,7 +8,7 @@ import java.sql.Timestamp;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 
-public class OutApplication extends OutputDto {
+public class OutApplication implements OutputDto {
 
     @JsonProperty
     private long accountId;
@@ -39,6 +39,9 @@ public class OutApplication extends OutputDto {
     }
 
     class ApplicationItemOutput {
+        @JsonProperty
+        private final _Links _links = new _Links();
+
         private class _Links {
             @JsonProperty
             private Self self = new _Links.Self();

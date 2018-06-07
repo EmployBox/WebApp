@@ -42,7 +42,6 @@ public class CompanyControllerTests {
     private ApplicationContext context;
     @Autowired
     private DataRepository<Company, Long> companyRepo;
-    private Connection con;
     private WebTestClient webTestClient;
     private Company company;
 
@@ -58,11 +57,6 @@ public class CompanyControllerTests {
         List<Company> companies = companyRepo.findWhere(new Pair<>("email", "company2@gmail.com")).join();
         assertEquals(1, companies.size());
         company = companies.get(0);
-    }
-
-    @After
-    public void after() throws SQLException {
-        con.close();
     }
 
     @Test

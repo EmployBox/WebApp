@@ -11,7 +11,7 @@ import java.sql.Timestamp;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 
-public class OutJob extends OutputDto {
+public class OutJob implements OutputDto {
 
     @JsonProperty
     private final OutAccount account;

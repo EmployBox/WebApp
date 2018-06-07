@@ -1,7 +1,7 @@
 package isel.ps.employbox.model.binder;
 
-import isel.ps.employbox.model.output.CollectionItemSupplier;
 import isel.ps.employbox.model.output.HalCollectionPage;
+import isel.ps.employbox.model.output.OutputDto;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
@@ -29,7 +29,7 @@ public interface ModelBinder<T, O, I> {
                                 (CollectionPage<T> elements) -> {
                                     Stream<T> list = elements.getPageList().stream();
 
-                                    List<Object> items = list.map(curr-> ((CollectionItemSupplier)bindOutput(CompletableFuture.completedFuture(curr))
+                                    List<Object> items = list.map(curr-> ((OutputDto)bindOutput(CompletableFuture.completedFuture(curr))
                                             .block())
                                             .getCollectionItemOutput())
                                             .collect(Collectors.toList());

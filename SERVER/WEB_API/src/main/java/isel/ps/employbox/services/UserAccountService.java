@@ -68,21 +68,21 @@ public class UserAccountService {
                 });
     }
 
-    public CompletableFuture<CollectionPage<Application>> getAllApplications(long accountId, int pageSize, int page) {
+    public CompletableFuture<CollectionPage<Application>> getAllApplications(long accountId, int page, int numberOfItems) {
         List[] list = new List[1];
         CollectionPage[] ret = new CollectionPage[1];
 
         return userRepo.findById(accountId)
                 .thenApply(ouser -> ouser.orElseThrow(() -> new ResourceNotFoundException(ErrorMessages.RESOURCE_NOTFOUND_USER)))
-                .thenCompose(__ -> applicationRepo.findWhere(page, pageSize, new Pair<>("accountId", accountId))
+                .thenCompose(__ -> applicationRepo.findWhere(page, numberOfItems, new Pair<>("accountId", accountId))
                         .thenCompose(listRes -> {
                             list[0] = listRes;
-                            return applicationRepo.getNumberOfEntries(/*todo filter support*/);
+                            return applicationRepo.getNumberOfEntries(new Pair<>("accountId", accountId));
                         })
                         .thenApply(collectionSize ->
                                 ret[0] = new CollectionPage(
                                         collectionSize,
-                                        pageSize,
+                                        numberOfItems,
                                         page,
                                         list[0])
                         ));

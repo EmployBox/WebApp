@@ -2,7 +2,7 @@ package isel.ps.employbox.model.output;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class OutAccount extends OutputDto {
+public class OutAccount implements OutputDto {
 
     @JsonProperty
     private final long accountId;
