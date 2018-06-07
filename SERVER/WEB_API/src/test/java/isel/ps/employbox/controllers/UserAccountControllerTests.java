@@ -58,7 +58,7 @@ public class UserAccountControllerTests {
 
     @Before
     public void setUp() throws SQLException {
-        con = prepareDB();
+        prepareDB();
         webTestClient = WebTestClient.bindToApplicationContext(context)
                 .apply(springSecurity())
                 .configureClient()

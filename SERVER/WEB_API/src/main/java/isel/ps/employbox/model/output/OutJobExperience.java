@@ -8,8 +8,6 @@ import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 
 public class OutJobExperience extends OutputDto {
-
-
     @JsonProperty
     private final long jobId;
 
@@ -40,8 +38,10 @@ public class OutJobExperience extends OutputDto {
     }
 
     class JobExperienceItemOutput {
+        @JsonProperty
+        private final _Links _links = new _Links();
 
-        private class _Links {
+        class _Links {
             @JsonProperty
             private Self self = new Self();
 

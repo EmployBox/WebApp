@@ -47,7 +47,6 @@ public class JobControllerTests {
     private DataRepository<Job, Long> jobRepo;
     @Autowired
     private DataRepository<JobExperience, Long> jobExperienceRepo;
-    private Connection con;
     private WebTestClient webTestClient;
     private long accountId;
     private Job job;
@@ -55,7 +54,7 @@ public class JobControllerTests {
 
     @Before
     public void setUp() throws SQLException {
-        con = prepareDB();
+        prepareDB();
         webTestClient = WebTestClient.bindToApplicationContext(context)
                 .apply(springSecurity())
                 .configureClient()
@@ -72,11 +71,6 @@ public class JobControllerTests {
         jobExperience = jobExperiences.get(0);
 
         accountId = job.getAccount().join().getIdentityKey();
-    }
-
-    @After
-    public void after() throws SQLException {
-        con.close();
     }
 
     @Test

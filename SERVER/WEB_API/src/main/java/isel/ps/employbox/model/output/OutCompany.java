@@ -37,7 +37,7 @@ public class OutCompany extends OutputDto {
     @JsonProperty
     private final _Links _links;
 
-    public OutCompany(long accountId, String email, double rating, String name, String specialization, short yearFounded, String logoUrl, String webpageUrl, String description) {
+    public OutCompany(long accountId, String email, double rating, String name, String specialization, Short yearFounded, String logoUrl, String webpageUrl, String description) {
         this.accountId = accountId;
         this.email = email;
         this.rating = rating;

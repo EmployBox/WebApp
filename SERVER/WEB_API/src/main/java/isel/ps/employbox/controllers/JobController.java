@@ -62,7 +62,8 @@ public class JobController {
     @GetMapping("/{jid}/experiences/{expId}")
     public Mono<OutJobExperience> getJobExperience(
             @PathVariable long jid,
-            @PathVariable long expId){
+            @PathVariable long expId
+    ){
         return jobExperienceBinder.bindOutput(jobService.getJobExperience(jid, expId));
     }
 
@@ -105,6 +106,11 @@ public class JobController {
         return jobService.updateJobExperience(jobExperience, authentication.getName());
     }
 
+    @DeleteMapping("/{jid}")
+    public Mono<Void> deleteJob(@PathVariable long jid, Authentication authentication){
+        return jobService.deleteJob(jid, authentication.getName());
+    }
+
     @DeleteMapping("/{jid}/experience/{jxpId}")
     public Mono<Void> deleteJobExperiences(
             @PathVariable long jxpId,
@@ -112,10 +118,5 @@ public class JobController {
             Authentication authentication)
     {
         return jobService.deleteJobExperience(jxpId, jid, authentication.getName());
-    }
-
-    @DeleteMapping("/{jid}")
-    public Mono<Void> deleteJob(@PathVariable long jid, Authentication authentication){
-        return jobService.deleteJob(jid, authentication.getName());
     }
 }

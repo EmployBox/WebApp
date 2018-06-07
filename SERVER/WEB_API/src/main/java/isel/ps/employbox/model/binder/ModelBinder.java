@@ -21,7 +21,8 @@ public interface ModelBinder<T, O, I> {
     default Mono<HalCollectionPage> bindOutput(
             CompletableFuture<CollectionPage<T>> elementsPage,
             Class selfController,
-            Object... parameters) {
+            Object... parameters
+    ) {
         return Mono.fromFuture(
                 elementsPage
                         .thenApply(

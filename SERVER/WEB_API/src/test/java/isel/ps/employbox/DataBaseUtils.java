@@ -9,7 +9,7 @@ import java.sql.SQLException;
 import static junit.framework.TestCase.assertTrue;
 
 public class DataBaseUtils {
-    public static Connection prepareDB() throws SQLException {
+    public static void prepareDB() throws SQLException {
         ConnectionManager connectionManager = ConnectionManager.getConnectionManager(
                 "jdbc:hsqldb:file:" + URLDecoder.decode(DataBaseUtils.class.getClassLoader().getResource("testdb").getPath()) + "/testdb",
                 "SA", "");
@@ -17,6 +17,6 @@ public class DataBaseUtils {
         con.prepareCall("{call deleteDB()}").execute();
         con.prepareCall("{call populateDB()}").execute();
         con.commit();
-        return con;
+        con.close();
     }
 }

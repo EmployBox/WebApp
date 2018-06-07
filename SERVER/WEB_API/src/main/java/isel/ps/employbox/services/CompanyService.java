@@ -23,13 +23,13 @@ public class CompanyService {
         this.accountService = accountService;
     }
 
-    public CompletableFuture<CollectionPage<Company>> getCompanies(int pageSize, int page) {
+    public CompletableFuture<CollectionPage<Company>> getCompanies(int page, int numberOfItems) {
         List[] list = new List[1];
         CollectionPage[] ret = new CollectionPage[1];
 
         return new Transaction(Connection.TRANSACTION_SERIALIZABLE)
                 .andDo(() ->
-                        companyRepo.findAll(page, pageSize)
+                        companyRepo.findAll(page, numberOfItems)
                                 .thenCompose(listRes -> {
                                     list[0] = listRes;
                                     return companyRepo.getNumberOfEntries(/*todo filter support*/);
@@ -37,7 +37,7 @@ public class CompanyService {
                                 .thenAccept(numberOfEntries ->
                                         ret[0] = new CollectionPage(
                                                 numberOfEntries,
-                                                pageSize,
+                                                numberOfItems,
                                                 page,
                                                 list[0]
                                         ))

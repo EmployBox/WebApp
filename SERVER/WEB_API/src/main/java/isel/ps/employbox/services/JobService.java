@@ -62,13 +62,13 @@ public class JobService {
                 .thenApply(ojob -> ojob.orElseThrow(()-> new ResourceNotFoundException(ErrorMessages.RESOURCE_NOTFOUND_JOB)));
     }
 
-    public CompletableFuture<CollectionPage<JobExperience>> getJobExperiences(long jid, int pageSize, int page) {
+    public CompletableFuture<CollectionPage<JobExperience>> getJobExperiences(long jid, int page, int numberOfItems) {
         List[] list = new List[1];
         CollectionPage[] ret = new CollectionPage[1];
         return getJob(jid)
                 .thenCompose(
                         __ -> new Transaction(Connection.TRANSACTION_SERIALIZABLE)
-                                .andDo(() -> jobExperienceRepo.findWhere(page, pageSize, new Pair<>("jobId", jobRepo))
+                                .andDo(() -> jobExperienceRepo.findWhere(page, numberOfItems, new Pair<>("jobId", jid))
                                         .thenCompose(listRes -> {
                                             list[0] = listRes;
                                             return jobRepo.getNumberOfEntries(/*todo filter support*/);
@@ -76,7 +76,7 @@ public class JobService {
                                         .thenApply(collectionSize ->
                                                 ret[0] = new CollectionPage(
                                                         collectionSize,
-                                                        pageSize,
+                                                        numberOfItems,
                                                         page,
                                                         list[0])
                                         )
