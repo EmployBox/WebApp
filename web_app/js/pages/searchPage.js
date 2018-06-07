@@ -6,8 +6,7 @@ import Configuration from '../configuration'
 const config = new Configuration()
 
 export default (props) => {
-  const entity = config[props.match.params.type]
-
+  const entity = config.searchableEntities[props.match.params.type]
   return (
     <div class='container'>
       <div class='row'>

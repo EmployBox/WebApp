@@ -1,16 +1,16 @@
-import JobRender from './renders/jobRender'
-import CompanyRender from './renders/companyRender'
-import UserRender from './renders/userRender'
+import SearchableJob from './searchables/job'
+import SearchableCompany from './searchables/company'
+import SearchableUser from './searchables/user'
 
 export default class {
   constructor () {
     this.hostname = 'http://localhost:8080'
     this.numberOfItems = '?numberOfItems=10'
 
-    this.jobs = new JobRender(this.numberOfItems)
-    this.companies = new CompanyRender(this.numberOfItems)
-    this.users = new UserRender(this.numberOfItems)
-
-    this.searchableEntities = [this.jobs, this.companies, this.users]
+    this.searchableEntities = {
+      jobs: new SearchableJob(this.numberOfItems),
+      companies: new SearchableCompany(this.numberOfItems),
+      users: new SearchableUser(this.numberOfItems)
+    }
   }
 }
