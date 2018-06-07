@@ -2,9 +2,9 @@ package isel.ps.employbox.model.input;
 
 public class InUserAccount {
     private long id;
+    private String name;
     private String email;
     private String password;
-    private String name;
     private String photo_url;
     private String summary;
     private long userVersion;

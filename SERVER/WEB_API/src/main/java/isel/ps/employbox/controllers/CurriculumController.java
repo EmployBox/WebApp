@@ -20,13 +20,10 @@ import static isel.ps.employbox.ErrorMessages.BAD_REQUEST_IDS_MISMATCH;
 @RestController
 @RequestMapping("/accounts/users/{id}/curricula")
 public class CurriculumController {
-
     private final DataRepository <Project, Long> projectRepo;
     private final DataRepository <AcademicBackground, Long> backgroundRepo;
     private final DataRepository <PreviousJobs, Long> prevJobRepo;
     private final DataRepository <CurriculumExperience, Long> currExpRepo;
-
-
     private final CurriculumBinder curriculumBinder;
     private final AcademicBackgroundBinder academicBackgroundBinder;
     private final PreviousJobsBinder previousJobsBinder;
@@ -51,8 +48,8 @@ public class CurriculumController {
             ProjectBinder projectBinder, PreviousJobService previousJobService,
             AcademicBackgroundService academicBackgroundService,
             ProjectService projectService,
-            CurriculumExperienceService curriculumExperienceService)
-    {
+            CurriculumExperienceService curriculumExperienceService
+    ) {
         this.projectRepo = projectRepository;
         this.backgroundRepo = academicBackgroundLongDataRepository;
         this.prevJobRepo = previousJobLongDataRepository;
@@ -73,10 +70,10 @@ public class CurriculumController {
     public Mono<HalCollectionPage> getCurricula(
             @PathVariable long id,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "5") int numberOfItems,
-            Authentication authentication){
+            @RequestParam(defaultValue = "5") int numberOfItems
+    ){
         return curriculumBinder.bindOutput(
-                curriculumService.getCurricula(id, authentication.getName(), page, numberOfItems),
+                curriculumService.getCurricula(id, page, numberOfItems),
                 this.getClass(),
                 id
         );
@@ -88,27 +85,28 @@ public class CurriculumController {
                 curriculumService.getCurriculum(id, cid));
     }
 
-    @GetMapping("/{cid}/academic/{academicId}")
-    public Mono<OutAcademicBackground> getAcademicBackground(
+    @GetMapping("/{cid}/academic")
+    public Mono<HalCollectionPage> getAllAcademicBackground(
             @PathVariable long id,
             @PathVariable long cid,
-            @PathVariable long academicId){
-        return academicBackgroundBinder.bindOutput(curriculumService.getCurriculumChild(backgroundRepo, id, cid, academicId));
-    }
-
-    @GetMapping("/{cid}/academic")
-    public Mono<HalCollectionPage> getAcademicBackground
-            (@PathVariable long id,
-             @PathVariable long cid,
-             @RequestParam(defaultValue = "0") int page,
-             @RequestParam(defaultValue = "5") int numberOfItems
-            ){
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "5") int numberOfItems
+    ) {
         return academicBackgroundBinder.bindOutput(
-                academicBackgroundService.getCurriculumAcademicBackgrounds( cid, page, numberOfItems ),
+                academicBackgroundService.getCurriculumAcademicBackgrounds(cid, page, numberOfItems),
                 this.getClass(),
                 id,
                 cid
         );
+    }
+
+    @GetMapping("/{cid}/academic/{academicId}")
+    public Mono<OutAcademicBackground> getAcademicBackground(
+            @PathVariable long id,
+            @PathVariable long cid,
+            @PathVariable long academicId
+    ){
+        return academicBackgroundBinder.bindOutput(curriculumService.getCurriculumChild(backgroundRepo, id, cid, academicId));
     }
 
     @GetMapping("/{cid}/projects/{projectId}")

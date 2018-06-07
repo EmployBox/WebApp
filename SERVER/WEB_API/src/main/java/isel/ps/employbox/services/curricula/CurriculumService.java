@@ -122,11 +122,11 @@ public class CurriculumService {
         );
     }
 
-    public CompletableFuture<CollectionPage<Curriculum>> getCurricula(long accountId, String email, int pageSize, int page) {
+    public CompletableFuture<CollectionPage<Curriculum>> getCurricula(long accountId, int page, int pageSize) {
         List[] list = new List[1];
         CollectionPage[] ret = new CollectionPage[1];
 
-        return userAccountService.getUser(accountId, email)
+        return userAccountService.getUser(accountId)
                 .thenCompose(__ -> new Transaction(Connection.TRANSACTION_SERIALIZABLE)
                         .andDo(() ->
                                 curriculumRepo.findWhere(page, pageSize, new Pair<>("accountId", accountId))
@@ -134,7 +134,7 @@ public class CurriculumService {
                                             list[0] = listRes;
                                             return curriculumRepo.getNumberOfEntries(/*todo filter support*/);
                                         })
-                                        .thenApply(collectionSize -> ret[0] = new CollectionPage(
+                                .thenAccept(collectionSize -> ret[0] = new CollectionPage(
                                                 collectionSize,
                                                 pageSize,
                                                 page,

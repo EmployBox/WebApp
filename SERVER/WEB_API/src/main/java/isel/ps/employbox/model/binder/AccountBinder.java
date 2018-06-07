@@ -20,6 +20,7 @@ public class AccountBinder implements ModelBinder<Account,OutAccount,InAccount> 
                             account ->
                                     new OutAccount(
                                             account.getIdentityKey(),
+                                            account.getName(),
                                             account.getEmail(),
                                             account.getRating(),
                                             account.getVersion())

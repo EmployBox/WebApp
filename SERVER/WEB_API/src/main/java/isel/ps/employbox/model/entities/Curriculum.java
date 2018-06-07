@@ -15,21 +15,16 @@ import java.util.concurrent.CompletableFuture;
 public class Curriculum implements DomainObject<Long> {
     @Id(isIdentity = true)
     private final long curriculumId;
-
     private final long accountId;
     private final String title;
     @Version
     private final long version;
-
     @ColumnName(foreignName = "curriculumId" )
     private final CompletableFuture<List<PreviousJobs>> previousJobs;
-
     @ColumnName(foreignName = "curriculumId" )
     private final CompletableFuture<List<AcademicBackground>> academicBackground;
-
     @ColumnName(foreignName = "curriculumId" )
     private final CompletableFuture<List<Project>> projects;
-
     @ColumnName(foreignName = "curriculumId" )
     private final CompletableFuture<List<CurriculumExperience>> experiences;
 
@@ -44,7 +39,7 @@ public class Curriculum implements DomainObject<Long> {
         curriculumId = 0;
     }
 
-    public Curriculum(long accountId, long curriculumId, String title) {
+    public Curriculum(long accountId, long curriculumId, String title, long version) {
         this.accountId = accountId;
         this.curriculumId = curriculumId;
         this.title= title;
@@ -52,17 +47,18 @@ public class Curriculum implements DomainObject<Long> {
         this.academicBackground = null;
         this.projects = null;
         this.experiences = null;
-        this.version = -1;
+        this.version = version;
     }
 
     public Curriculum(long accountId,
                       long curriculumId,
                       String title,
+                      long version,
                       List<PreviousJobs> previousJobsList,
-                      List<AcademicBackground> academicBackgroundList ,
+                      List<AcademicBackground> academicBackgroundList,
                       List<CurriculumExperience> experiencesList,
-                      List<Project> projectsList)
-    {
+                      List<Project> projectsList
+    ) {
         this.accountId = accountId;
         this.curriculumId = curriculumId;
         this.title = title;
@@ -70,7 +66,7 @@ public class Curriculum implements DomainObject<Long> {
         this.academicBackground = CompletableFuture.completedFuture( academicBackgroundList);
         this.experiences = CompletableFuture.completedFuture(experiencesList);
         this.projects = CompletableFuture.completedFuture(projectsList);
-        this.version = -1;
+        this.version = version;
     }
 
     @Override

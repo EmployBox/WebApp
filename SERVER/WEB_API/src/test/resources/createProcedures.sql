@@ -3,25 +3,28 @@ CREATE PROCEDURE populateDB()
   begin atomic
     declare account_id1, account_id2, company_id1, company_id2, job_id bigint;
     /*Insert Users*/
-    insert into ACCOUNT(EMAIL, PASSWORD) values ('teste@gmail.com', 'password');
+    insert into ACCOUNT(NAME, EMAIL, PASSWORD) values ('Bruno', 'teste@gmail.com', 'password');
     set account_id1 = IDENTITY();
-    insert into ACCOUNT(EMAIL, PASSWORD) values ('lol@hotmail.com', 'teste123');
+    insert into ACCOUNT(NAME, EMAIL, PASSWORD) values ('Maria', 'lol@hotmail.com', 'teste123');
     set account_id2 = IDENTITY();
 
-    insert into USERACCOUNT(ACCOUNTID, NAME) values (account_id1, 'Bruno');
-    insert into USERACCOUNT(ACCOUNTID, NAME) values (account_id2, 'Maria');
+    insert into USERACCOUNT(ACCOUNTID) values (account_id1);
+    insert into USERACCOUNT(ACCOUNTID) values (account_id2);
+
+    /*Insert Curricula*/
+    insert into CURRICULUM(ACCOUNTID, TITLE) values (account_id1, 'Engenharia Civil');
 
     /*Insert Companies*/
-    insert into ACCOUNT(EMAIL, PASSWORD) values ('company1@gmail.com', '741');
+    insert into ACCOUNT(NAME, EMAIL, PASSWORD) values ('company1', 'company1@gmail.com', '741');
     set company_id1 = IDENTITY();
-    insert into ACCOUNT(EMAIL, PASSWORD) values ('company2@gmail.com', '567');
+    insert into ACCOUNT(NAME, EMAIL, PASSWORD) values ('company2', 'company2@gmail.com', '567');
     set company_id2 = IDENTITY();
 
     insert into COMPANY(ACCOUNTID) values (company_id1);
     insert into COMPANY(ACCOUNTID) values (company_id2);
 
     /*Insert Jobs*/
-    insert into JOB(TITLE, ACCOUNTID, WAGE, DESCRIPTION) values ('Great Job', account_id1, 1, 'Sou uma oferta simpatica');
+    insert into JOB(TITLE, ACCOUNTID, WAGE, DESCRIPTION, OFFERTYPE) values ('Great Job', account_id1, 1, 'Sou uma oferta simpatica', 'Looking for work');
     set job_id = IDENTITY();
 
     /*Insert JobExperiences*/

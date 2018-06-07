@@ -15,6 +15,7 @@ public class Account implements DomainObject<Long> {
 
     @Id (isIdentity =  true)
     protected long accountId;
+    protected final String name;
     protected final String email;
     protected final String password;
     protected final double rating;
@@ -43,6 +44,7 @@ public class Account implements DomainObject<Long> {
 
     public Account(){
         accountId = 0;
+        name = null;
         email = null;
         password = null;
         rating = 0;
@@ -57,7 +59,7 @@ public class Account implements DomainObject<Long> {
 
     protected Account(
             long accountID,
-            String email,
+            String name, String email,
             String password,
             double rating,
             long version,
@@ -68,6 +70,7 @@ public class Account implements DomainObject<Long> {
             CompletableFuture<List<Account>> following,
             CompletableFuture<List<Account>> follower) {
         this.accountId = accountID;
+        this.name = name;
         this.email = email;
         this.password = password;
         this.rating = rating;
@@ -80,8 +83,9 @@ public class Account implements DomainObject<Long> {
         this.followers = follower;
     }
 
-    protected Account(long accountId, String email, String password, double rating, long version){
+    protected Account(long accountId, String name, String email, String password, double rating, long version){
         this.accountId = accountId;
+        this.name = name;
         this.version = version;
         this.email = email;
         this.password = password;
@@ -97,6 +101,10 @@ public class Account implements DomainObject<Long> {
     @Override
     public Long getIdentityKey() {
         return accountId;
+    }
+
+    public String getName() {
+        return name;
     }
 
     public String getEmail() {

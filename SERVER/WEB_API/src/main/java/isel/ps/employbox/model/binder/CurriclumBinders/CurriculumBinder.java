@@ -30,11 +30,11 @@ public class CurriculumBinder implements ModelBinder<Curriculum,OutCurriculum,In
                 obj.getAccountId(),
                 obj.getCurriculumId(),
                 obj.getTitle(),
+                obj.getVersion(),
                 obj.getPreviousJobs(),
                 obj.getAcademicBackground(),
                 obj.getExperiences(),
-                obj.getProjects()
-        );
+                obj.getProjects());
     }
 
     /*

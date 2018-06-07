@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 public class Company extends Account {
-    private final String name;
     private final String specialization;
     private final Short yearFounded;
     private final String logoUrl;
@@ -16,7 +15,6 @@ public class Company extends Account {
     private final long version;
 
     public Company(){
-        name = null;
         specialization = null;
         yearFounded = null;
         logoUrl = null;
@@ -44,8 +42,7 @@ public class Company extends Account {
             CompletableFuture<List<Account>> following,
             CompletableFuture<List<Account>> followers)
     {
-        super(accountID, email, password, rating, version, offeredJobs,comments, chats, ratings, following, followers);
-        this.name = name;
+        super(accountID, name, email, password, rating, version, offeredJobs,comments, chats, ratings, following, followers);
         this.specialization = specialization;
         this.logoUrl = logoUrl;
         this.webPageUrl = webPageUrl;
@@ -67,8 +64,7 @@ public class Company extends Account {
             String description,
             long version,
             long accountVersion) {
-        super(accountID, email, password, rating, accountVersion);
-        this.name = name;
+        super(accountID, name, email, password, rating, accountVersion);
         this.specialization = specialization;
         this.logoUrl = logoUrl;
         this.webPageUrl = webPageUrl;

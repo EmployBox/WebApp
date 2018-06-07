@@ -16,6 +16,7 @@ public class InCurriculum {
     private List<PreviousJobs> previousJobs = Collections.emptyList();
     private List<Project> projects = Collections.emptyList();
     private List<AcademicBackground> academicBackground = Collections.emptyList();
+    private long version;
 
     public long getAccountId() {
         return accountId;
@@ -73,4 +74,11 @@ public class InCurriculum {
         this.academicBackground = academicBackground;
     }
 
+    public long getVersion() {
+        return version;
+    }
+
+    public void setVersion(long version) {
+        this.version = version;
+    }
 }

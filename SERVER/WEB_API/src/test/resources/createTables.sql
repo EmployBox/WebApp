@@ -1,5 +1,6 @@
 create table Account (
   accountId BIGINT IDENTITY PRIMARY KEY,
+  name VARCHAR(40) not null,
   email VARCHAR(25) UNIQUE NOT NULL,
   rating float(24) default(0.0),
   password VARCHAR(100) NOT NULL,
@@ -10,7 +11,6 @@ create table Account (
 
 create table Company (
   accountId BIGINT primary key references Account,
-  name VARCHAR(40),
   yearFounded SMALLINT,
   specialization VARCHAR(20),
   webPageUrl VARCHAR(50),
@@ -25,7 +25,6 @@ create table Moderator (
 
 CREATE TABLE UserAccount (
   accountId BIGINT primary key references Account,
-  name VARCHAR(40),
   summary VARCHAR(1500),
   PhotoUrl VARCHAR(100),
   version bigint default 1
@@ -107,7 +106,7 @@ create table Job (
   description VARCHAR(50),
   offerBeginDate DATETIME DEFAULT CURRENT_DATE,
   offerEndDate DATETIME,
-  offerType VARCHAR(30),
+  offerType VARCHAR(30) NOT NULL,
   Address VARCHAR(50),
   version bigint default 1,
 
