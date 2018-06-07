@@ -1,7 +1,6 @@
 package isel.ps.employbox.services;
 
 import com.github.jayield.rapper.DataRepository;
-import com.github.jayield.rapper.Transaction;
 import isel.ps.employbox.ErrorMessages;
 import isel.ps.employbox.exceptions.ResourceNotFoundException;
 import isel.ps.employbox.model.binder.CollectionPage;
@@ -9,8 +8,6 @@ import isel.ps.employbox.model.entities.Company;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
-import java.sql.Connection;
-import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 @Service
@@ -23,26 +20,8 @@ public class CompanyService {
         this.accountService = accountService;
     }
 
-    public CompletableFuture<CollectionPage<Company>> getCompanies(int page, int numberOfItems) {
-        List[] list = new List[1];
-        CollectionPage[] ret = new CollectionPage[1];
-
-        return new Transaction(Connection.TRANSACTION_SERIALIZABLE)
-                .andDo(() ->
-                        companyRepo.findAll(page, numberOfItems)
-                                .thenCompose(listRes -> {
-                                    list[0] = listRes;
-                                    return companyRepo.getNumberOfEntries();
-                                })
-                                .thenAccept(numberOfEntries ->
-                                        ret[0] = new CollectionPage(
-                                                numberOfEntries,
-                                                numberOfItems,
-                                                page,
-                                                list[0]
-                                        ))
-                ).commit()
-                .thenApply(__ -> ret[0]);
+    public CompletableFuture<CollectionPage<Company>> getCompanies(int page, int pageSize) {
+        return ServiceUtils.getCollectionPageFuture(companyRepo, page, pageSize);
     }
 
     public CompletableFuture<Company> getCompany(long cid) {

@@ -12,7 +12,6 @@ import isel.ps.employbox.model.entities.Comment;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
-import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 @Service
@@ -28,19 +27,8 @@ public class CommentService {
     }
 
     public CompletableFuture<CollectionPage<Comment>> getComments(long accountFromId,int pageSize, int page) {
-        List[] list = new List[1];
         return accountService.getAccount(accountFromId)
-                .thenCompose(__-> accountRepo.findWhere(page, pageSize, new Pair<>("accountIdFrom", accountFromId)))
-                .thenCompose( listRes -> {
-                    list[0] = listRes;
-                    return accountRepo.getNumberOfEntries(new Pair<>("accountIdFrom", accountFromId));
-                })
-                .thenApply(collectionSize -> new CollectionPage(
-                        collectionSize,
-                        pageSize,
-                        page,
-                        list[0])
-                );
+                .thenCompose(__-> ServiceUtils.getCollectionPageFuture(commentRepo, page, pageSize, new Pair<>("accountIdFrom", accountFromId)));
     }
 
     public CompletableFuture<Comment> getComment(long accountFromId, long accountToId, long commentId, String email) {

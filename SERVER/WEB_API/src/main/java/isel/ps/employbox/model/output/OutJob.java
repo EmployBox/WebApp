@@ -11,6 +11,7 @@ import java.sql.Timestamp;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 
+//todo embedded
 public class OutJob implements OutputDto {
 
     @JsonProperty

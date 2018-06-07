@@ -1,7 +1,6 @@
 package isel.ps.employbox.services;
 
 import com.github.jayield.rapper.DataRepository;
-import com.github.jayield.rapper.Transaction;
 import com.github.jayield.rapper.utils.Pair;
 import isel.ps.employbox.ErrorMessages;
 import isel.ps.employbox.exceptions.BadRequestException;
@@ -13,8 +12,6 @@ import isel.ps.employbox.model.entities.Message;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
-import java.sql.Connection;
-import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 import static isel.ps.employbox.ErrorMessages.BAD_REQUEST_IDS_MISMATCH;
@@ -34,45 +31,13 @@ public class ChatService {
 
     //todo endpoint
     public CompletableFuture<CollectionPage<Chat>> getAccountChats(long accountId, int pageSize, int page) {
-        List[] list = new List[1];
-        CollectionPage[] ret = new CollectionPage[1];
         return accountService.getAccount(accountId)
-                .thenCompose(__ -> new Transaction(Connection.TRANSACTION_SERIALIZABLE)
-                        .andDo(() -> chatRepo.findAll(page, pageSize)
-                                .thenCompose(listRes -> {
-                                    list[0] = listRes;
-                                    return chatRepo.getNumberOfEntries();
-                                })
-                                .thenAccept(collectionSize ->
-                                        ret[0] = new CollectionPage(
-                                                collectionSize,
-                                                pageSize,
-                                                page,
-                                                list[0])
-                                )
-                        ).commit())
-                .thenApply( __ -> ret[0]);
+                .thenCompose(__ -> ServiceUtils.getCollectionPageFuture( chatRepo, page, pageSize, new Pair<>("accountId", accountId)));
     }
 
     public CompletableFuture<CollectionPage<Message>> getAccountChatsMessages(long accountId, String email, int pageSize, int page) {
-        List[] list = new List[1];
-        CollectionPage[] ret = new CollectionPage[1];
         return accountService.getAccount(accountId, email)
-                .thenCompose(__ -> new Transaction(Connection.TRANSACTION_SERIALIZABLE)
-                        .andDo(() -> msgRepo.findWhere(page, pageSize, new Pair<>("accountId", accountId))
-                                .thenCompose(listRes -> {
-                                    list[0] = listRes;
-                                    return msgRepo.getNumberOfEntries( new Pair<>("accountId", accountId));
-                                })
-                                .thenAccept(numberOfEntries ->
-                                        ret[0] = new CollectionPage(
-                                                numberOfEntries,
-                                                pageSize,
-                                                page,
-                                                list[0])
-                                ))
-                        .commit()
-                ).thenApply(__ -> ret[0]);
+                .thenCompose(__ -> ServiceUtils.getCollectionPageFuture( msgRepo, page, pageSize, new Pair<>("accountId", accountId)));
     }
 
 

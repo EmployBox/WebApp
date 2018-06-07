@@ -2,7 +2,6 @@ package isel.ps.employbox.services.curricula;
 
 import com.github.jayield.rapper.DataRepository;
 import com.github.jayield.rapper.DomainObject;
-import com.github.jayield.rapper.Transaction;
 import com.github.jayield.rapper.utils.Pair;
 import isel.ps.employbox.ErrorMessages;
 import isel.ps.employbox.exceptions.BadRequestException;
@@ -12,11 +11,11 @@ import isel.ps.employbox.model.binder.CollectionPage;
 import isel.ps.employbox.model.entities.Curriculum;
 import isel.ps.employbox.model.entities.CurriculumChilds.*;
 import isel.ps.employbox.model.entities.UserAccount;
+import isel.ps.employbox.services.ServiceUtils;
 import isel.ps.employbox.services.UserAccountService;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
-import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -63,85 +62,35 @@ public class CurriculumService {
                 .thenApply(res -> curriculum);
     }
 
-    private void populateChildList(List<CompletableFuture<Void>> creationList, Curriculum curriculum, long userId){
-        creationList.add(curriculum.getPreviousJobs()
-                .thenApply(previousJobsList -> {
-                    previousJobsList.forEach(curr -> {
-                        curr.setAccountId(userId);
-                        curr.setCurriculumId(curriculum.getIdentityKey());
-                    });
-                    return previousJobsList;
-                })
-                .thenCompose( list -> {
-                    if(list.isEmpty()) return CompletableFuture.completedFuture(null);
-                    return previousJobsRepo.createAll(list);
-                })
-        );
+    private <T extends CurriculumChild & DomainObject<K>, K> CompletableFuture<Void> addChildFutureFunction(
+            CompletableFuture<List<T>> future,
+            DataRepository<T, K> repo,
+            Curriculum curriculum,
+            long userId) {
 
-        creationList.add(curriculum.getAcademicBackground()
-                .thenApply(academicBackgroundList -> {
-                    academicBackgroundList.forEach(curr -> {
-                        curr.setAccountId(userId);
-                        curr.setCurriculumId(curriculum.getIdentityKey());
-                    });
-                    return academicBackgroundList;
-                })
+        return future.thenApply(list -> {
+            list.forEach(curr -> {
+                curr.setAccountId(userId);
+                curr.setCurriculumId(curriculum.getIdentityKey());
+            });
+            return list;
+        })
                 .thenCompose(list -> {
                     if (list.isEmpty()) return CompletableFuture.completedFuture(null);
-                    return academicBackgroundRepo.createAll(list);
-                })
-        );
+                    return repo.createAll(list);
+                });
+    }
 
-        creationList.add(curriculum.getExperiences()
-                .thenApply(experienceList -> {
-                    experienceList.forEach(curr -> {
-                        curr.setAccountId(userId);
-                        curr.setCurriculumId(curriculum.getIdentityKey());
-                    });
-                    return experienceList;
-                })
-                .thenCompose(list -> {
-                    if (list.isEmpty()) return CompletableFuture.completedFuture(null);
-                    return curriculumExperienceRepo.createAll(list);
-                })
-        );
-
-        creationList.add(curriculum.getProjects()
-                .thenApply(projectList -> {
-                    projectList.forEach(curr -> {
-                        curr.setAccountId(userId);
-                        curr.setCurriculumId(curriculum.getIdentityKey());
-                    });
-                    return projectList;
-                })
-                .thenCompose(list -> {
-                    if (list.isEmpty())
-                        return CompletableFuture.completedFuture(null);
-                    return projectRepo.createAll(list);
-                })
-        );
+    private void populateChildList(List<CompletableFuture<Void>> creationList, Curriculum curriculum, long userId) {
+        creationList.add(addChildFutureFunction(curriculum.getPreviousJobs(), previousJobsRepo, curriculum, userId));
+        creationList.add(addChildFutureFunction(curriculum.getAcademicBackground(), academicBackgroundRepo, curriculum, userId));
+        creationList.add(addChildFutureFunction(curriculum.getProjects(), projectRepo, curriculum, userId));
+        creationList.add(addChildFutureFunction(curriculum.getExperiences(), curriculumExperienceRepo, curriculum, userId));
     }
 
     public CompletableFuture<CollectionPage<Curriculum>> getCurricula(long accountId, int page, int pageSize) {
-        List[] list = new List[1];
-        CollectionPage[] ret = new CollectionPage[1];
-
         return userAccountService.getUser(accountId)
-                .thenCompose(__ -> new Transaction(Connection.TRANSACTION_SERIALIZABLE)
-                        .andDo(() ->
-                                curriculumRepo.findWhere(page, pageSize, new Pair<>("accountId", accountId))
-                                        .thenCompose(listRes -> {
-                                            list[0] = listRes;
-                                            return curriculumRepo.getNumberOfEntries(/*todo filter support*/);
-                                        })
-                                .thenAccept(collectionSize -> ret[0] = new CollectionPage(
-                                                collectionSize,
-                                                pageSize,
-                                                page,
-                                                list[0])
-                                        )
-                        ).commit()
-                ).thenApply(__ -> ret[0]);
+                .thenCompose(__ -> ServiceUtils.getCollectionPageFuture(curriculumRepo, page, pageSize, new Pair<>("accountId", accountId)));
     }
 
     public CompletableFuture<Curriculum> getCurriculum(long userId, long cid, String... email) {
@@ -171,15 +120,15 @@ public class CurriculumService {
     }
 
     public <T extends CurriculumChild & DomainObject<Long>> CompletableFuture<T> getCurriculumChild(
-            DataRepository<T,Long> repo,
+            DataRepository<T, Long> repo,
             long accountId,
             long curriculumId,
             long jexpId
     ) {
         return repo.findById(jexpId)
-                .thenApply( oChild -> oChild.orElseThrow( ()-> new ResourceNotFoundException(ErrorMessages.RESOURCE_NOTFOUND)))
-                .thenApply( child -> {
-                    if(child.getCurriculumId() != curriculumId || child.getAccountId() != accountId)
+                .thenApply(oChild -> oChild.orElseThrow(() -> new ResourceNotFoundException(ErrorMessages.RESOURCE_NOTFOUND)))
+                .thenApply(child -> {
+                    if (child.getCurriculumId() != curriculumId || child.getAccountId() != accountId)
                         throw new ConflictException(ErrorMessages.BAD_REQUEST_IDS_MISMATCH);
                     return child;
                 });

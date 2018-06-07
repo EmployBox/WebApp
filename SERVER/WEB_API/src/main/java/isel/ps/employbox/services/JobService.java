@@ -38,23 +38,7 @@ public class JobService {
     }
 
     public CompletableFuture<CollectionPage<Job>> getAllJobs(int page, int pageSize) {
-        List[] list = new List[1];
-        CollectionPage[] ret = new CollectionPage[1];
-
-        return new Transaction(Connection.TRANSACTION_SERIALIZABLE)
-                .andDo(() -> jobRepo.findAll(page, pageSize)
-                        .thenCompose(res -> {
-                            list[0] = res;
-                            return jobRepo.getNumberOfEntries();
-                        })
-                        .thenAccept(numberOfEntries ->
-                                ret[0] = new CollectionPage(
-                                        numberOfEntries,
-                                        pageSize,
-                                        page,
-                                        list[0])
-                        )).commit()
-         .thenApply(__ -> ret[0]);
+        return ServiceUtils.getCollectionPageFuture(jobRepo, page, pageSize);
     }
 
     public CompletableFuture<Job> getJob(long jid) {
@@ -63,25 +47,8 @@ public class JobService {
     }
 
     public CompletableFuture<CollectionPage<JobExperience>> getJobExperiences(long jid, int page, int numberOfItems) {
-        List[] list = new List[1];
-        CollectionPage[] ret = new CollectionPage[1];
         return getJob(jid)
-                .thenCompose(
-                        __ -> new Transaction(Connection.TRANSACTION_SERIALIZABLE)
-                                .andDo(() -> jobExperienceRepo.findWhere(page, numberOfItems, new Pair<>("jobId", jid))
-                                        .thenCompose(listRes -> {
-                                            list[0] = listRes;
-                                            return jobRepo.getNumberOfEntries(new Pair<>("jobId", jid));
-                                        })
-                                        .thenApply(collectionSize -> ret[0] = new CollectionPage(
-                                                collectionSize,
-                                                numberOfItems,
-                                                page,
-                                                list[0])
-                                        )
-                                ).commit()
-                                .thenApply(___ -> ret[0])
-                );
+                .thenCompose(__ -> ServiceUtils.getCollectionPageFuture(jobExperienceRepo, page, numberOfItems, new Pair<>("jobId", jid)));
     }
 
     public CompletableFuture<JobExperience> getJobExperience(long id, long cid) {

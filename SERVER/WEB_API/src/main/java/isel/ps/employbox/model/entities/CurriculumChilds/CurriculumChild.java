@@ -3,7 +3,7 @@ package isel.ps.employbox.model.entities.CurriculumChilds;
 import org.springframework.stereotype.Component;
 
 @Component
-public abstract class CurriculumChild {
+public abstract class CurriculumChild{
     public abstract long getCurriculumId();
     public abstract long getAccountId();
     public abstract void setAccountId(long l);

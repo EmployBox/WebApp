@@ -1,7 +1,6 @@
 package isel.ps.employbox.services;
 
 import com.github.jayield.rapper.DataRepository;
-import com.github.jayield.rapper.Transaction;
 import com.github.jayield.rapper.utils.Pair;
 import isel.ps.employbox.ErrorMessages;
 import isel.ps.employbox.exceptions.ResourceNotFoundException;
@@ -10,8 +9,6 @@ import isel.ps.employbox.model.entities.Rating;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
-import java.sql.Connection;
-import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 @Service
@@ -27,23 +24,7 @@ public class RatingService {
     }
 
     public CompletableFuture<CollectionPage<Rating>> getRatings(long accountId, int pageSize, int page) {
-        List[] list = new List[1];
-        CollectionPage[] ret = new CollectionPage[1];
-
-        return new Transaction(Connection.TRANSACTION_SERIALIZABLE)
-                .andDo(() ->
-                        accountService.getAccount(accountId)
-                                .thenCompose(__ -> ratingRepo.findWhere(page, pageSize, new Pair<>("accountId", accountId)))
-                                .thenCompose(listRes -> {
-                                    list[0] = listRes;
-                                    return ratingRepo.getNumberOfEntries(new Pair<>("accountId", accountId));
-                                })
-                                .thenApply(collectionSize -> ret[0] = new CollectionPage(
-                                        collectionSize,
-                                        pageSize,
-                                        page,
-                                        list[0])
-                                )).commit().thenApply(___ -> ret[0]);
+        return ServiceUtils.getCollectionPageFuture(ratingRepo, page, pageSize, new Pair<>("accountId", accountId));
     }
 
     public CompletableFuture<Rating> getRating(long accountFrom, long accountTo) {
