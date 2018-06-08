@@ -1,15 +1,15 @@
 package isel.ps.employbox.model.output;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import isel.ps.employbox.controllers.UserController;
-import org.springframework.hateoas.ResourceSupport;
+import isel.ps.employbox.controllers.UserAccountController;
 
 import java.sql.Timestamp;
 
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 
-public class OutApplication extends ResourceSupport {
+public class OutApplication implements OutputDto {
 
     @JsonProperty
     private long accountId;
@@ -23,12 +23,46 @@ public class OutApplication extends ResourceSupport {
     @JsonProperty
     private Timestamp date;
 
-    public OutApplication(long userId, long jobId, Long curriculumId, Timestamp date){
-        this.accountId = userId;
+    @JsonProperty
+    private final _Links _links;
+
+    public OutApplication(long accountId, long jobId, Long curriculumId, Timestamp date){
+        this.accountId = accountId;
         this.jobId = jobId;
         this.curriculumId = curriculumId;
         this.date = date;
-        //TODO link not well done
-        this.add( linkTo( methodOn(UserController.class).getApplication(userId, jobId)).withSelfRel());
+        this._links = new _Links();
     }
+
+    @JsonIgnore
+    @Override
+    public Object getCollectionItemOutput() {
+        return new ApplicationItemOutput();
+    }
+
+    class ApplicationItemOutput {
+        @JsonProperty
+        private final _Links _links = new _Links();
+
+        private class _Links {
+            @JsonProperty
+            private Self self = new _Links.Self();
+
+            private class Self {
+                @JsonProperty
+                final String href = HOSTNAME + linkTo( methodOn(UserAccountController.class).getApplication(accountId, jobId)).withSelfRel().getHref();
+            }
+        }
+    }
+
+    private class _Links {
+        @JsonProperty
+        private Self self = new Self();
+
+        private class Self {
+            @JsonProperty
+            final String href = HOSTNAME + linkTo( methodOn(UserAccountController.class).getApplication(accountId, jobId)).withSelfRel().getHref();
+        }
+    }
+
 }

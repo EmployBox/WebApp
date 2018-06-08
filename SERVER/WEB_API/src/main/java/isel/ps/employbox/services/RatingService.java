@@ -1,34 +1,30 @@
 package isel.ps.employbox.services;
 
 import com.github.jayield.rapper.DataRepository;
+import com.github.jayield.rapper.utils.Pair;
 import isel.ps.employbox.ErrorMessages;
-import isel.ps.employbox.exceptions.BadRequestException;
 import isel.ps.employbox.exceptions.ResourceNotFoundException;
+import isel.ps.employbox.model.binders.CollectionPage;
 import isel.ps.employbox.model.entities.Rating;
-import javafx.util.Pair;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
 import java.util.concurrent.CompletableFuture;
-import java.util.stream.Stream;
 
 @Service
 public class RatingService {
     private final DataRepository<Rating, Rating.RatingKey> ratingRepo;
-    private final UserService userService;
+    private final UserAccountService userAccountService;
+    private final AccountService accountService;
 
-    public RatingService(DataRepository<Rating, Rating.RatingKey> ratingRepo, UserService userService) {
+    public RatingService(DataRepository<Rating, Rating.RatingKey> ratingRepo, UserAccountService userAccountService, AccountService accountService) {
         this.ratingRepo = ratingRepo;
-        this.userService = userService;
+        this.userAccountService = userAccountService;
+        this.accountService = accountService;
     }
 
-    public CompletableFuture<Stream<Rating>> getRatings(long accountId, String type) {
-        return ratingRepo.findWhere(new Pair<>("accountId", accountId))
-                .thenApply(list ->
-                        list.stream()
-                                .filter(curr-> type.equals("done") && curr.getAccountIdFrom() == accountId || type.equals("received")&& curr.getAccountIdTo()== accountId)
-
-                );
+    public CompletableFuture<CollectionPage<Rating>> getRatings(long accountId, int pageSize, int page) {
+        return ServiceUtils.getCollectionPageFuture(ratingRepo, page, pageSize, new Pair<>("accountId", accountId));
     }
 
     public CompletableFuture<Rating> getRating(long accountFrom, long accountTo) {
@@ -43,35 +39,29 @@ public class RatingService {
     public Mono<Void> updateRating(Rating rating, String email) {
         return Mono.fromFuture(
                 CompletableFuture.allOf(
-                        userService.getUser(rating.getAccountIdFrom(), email),//throws exceptions
+                        userAccountService.getUser(rating.getAccountIdFrom(), email),//throws exceptions
                         getRating(rating.getAccountIdFrom(), rating.getAccountIdTo())
                 )
-                .thenCompose (__-> ratingRepo.update(rating))
-                .thenAccept(res -> {
-                    if(!res) throw new BadRequestException(ErrorMessages.BAD_REQUEST_ITEM_CREATION);
-                })
+                        .thenCompose(aVoid -> ratingRepo.update(rating))
         );
     }
 
     public Mono<Rating> createRating(Rating rating, String email) {
         return Mono.fromFuture(
                 CompletableFuture.allOf(
-                        userService.getUser(rating.getAccountIdFrom(),email),
-                        userService.getUser(rating.getAccountIdTo())
+                        userAccountService.getUser(rating.getAccountIdFrom(), email),
+                        userAccountService.getUser(rating.getAccountIdTo())
                 )
-                .thenCompose ( __-> ratingRepo.create( rating ))
-                .thenApply(res -> {
-                    if(!res) throw new BadRequestException(ErrorMessages.BAD_REQUEST_ITEM_CREATION);
-                    return rating;
-                })
+                        .thenCompose(aVoid -> ratingRepo.create(rating))
+                        .thenApply(res -> rating)
         );
     }
 
     public Mono<Void> deleteRating(long accountIDFrom, long accountIDTo, String email) {
         return Mono.fromFuture(
-                userService.getUser(accountIDFrom, email)
-                        .thenCompose(__-> getRating(accountIDFrom, accountIDTo))
-                        .thenAccept( rating -> ratingRepo.delete(rating))
+                userAccountService.getUser(accountIDFrom, email)
+                        .thenCompose(userAccount-> getRating(accountIDFrom, accountIDTo))
+                        .thenAccept(ratingRepo::delete)
         );
     }
 }

@@ -1,12 +1,12 @@
 package isel.ps.employbox.model.output;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import isel.ps.employbox.controllers.CommentController;
-import org.springframework.hateoas.ResourceSupport;
 
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 
-public class OutComment extends ResourceSupport {
+public class OutComment implements OutputDto {
 
     @JsonProperty
     private final long accountIdFrom;
@@ -26,6 +26,9 @@ public class OutComment extends ResourceSupport {
     @JsonProperty
     private final String text;
 
+    @JsonProperty
+    private final _Links _links;
+
     public OutComment(long accountIdFrom, long accountIdTo, long commmentId, long mainCommentId, String datetime, String text) {
         this.accountIdFrom = accountIdFrom;
         this.accountIdTo = accountIdTo;
@@ -33,6 +36,37 @@ public class OutComment extends ResourceSupport {
         this.mainCommentId = mainCommentId;
         this.datetime = datetime;
         this.text = text;
-        this.add( linkTo (CommentController.class, accountIdFrom).slash(commmentId).withSelfRel());
+        this._links = new _Links();
+    }
+
+    @JsonIgnore
+    @Override
+    public Object getCollectionItemOutput() {
+        return new CommentItemOutput();
+    }
+
+    class CommentItemOutput {
+        @JsonProperty
+        private _Links _links = new _Links();
+
+        private class _Links {
+            @JsonProperty
+            private _Links.Self self = new _Links.Self();
+
+            private class Self {
+                @JsonProperty
+                final String href = HOSTNAME + linkTo (CommentController.class, accountIdFrom).slash(commmentId).withSelfRel().getHref();
+            }
+        }
+    }
+
+    private class _Links {
+        @JsonProperty
+        private Self self = new Self();
+
+        private class Self {
+            @JsonProperty
+            final String href = HOSTNAME + linkTo (CommentController.class, accountIdFrom).slash(commmentId).withSelfRel().getHref();
+        }
     }
 }

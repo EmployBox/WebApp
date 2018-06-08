@@ -1,10 +1,10 @@
 package isel.ps.employbox.controllers;
 
 import isel.ps.employbox.exceptions.BadRequestException;
-import isel.ps.employbox.model.binder.RatingBinder;
+import isel.ps.employbox.model.binders.RatingBinder;
 import isel.ps.employbox.model.entities.Rating;
 import isel.ps.employbox.model.input.InRating;
-import isel.ps.employbox.model.output.HalCollection;
+import isel.ps.employbox.model.output.HalCollectionPage;
 import isel.ps.employbox.model.output.OutRating;
 import isel.ps.employbox.services.RatingService;
 import org.springframework.security.core.Authentication;
@@ -26,15 +26,16 @@ public class RatingController {
     }
 
     @GetMapping
-    public Mono<HalCollection> getRatings(@PathVariable long id, @RequestParam String type){
-        if(type.equals("done") || type.equals("received"))
+    public Mono<HalCollectionPage> getRatings(
+            @PathVariable long id,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "5") int numberOfItems
+    ){
             return ratingBinder.bindOutput(
-                    ratingService.getRatings(id, type),
+                    ratingService.getRatings(id, page, numberOfItems),
                     this.getClass(),
                     id
             );
-        else
-            throw new BadRequestException("Type must be either \"done\" or \"received\"");
     }
 
     @GetMapping("/single")

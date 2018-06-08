@@ -1,15 +1,15 @@
 package isel.ps.employbox.model.output;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import isel.ps.employbox.controllers.CompanyController;
-import org.springframework.hateoas.ResourceSupport;
 
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 
-public class OutCompany extends ResourceSupport {
+public class OutCompany implements OutputDto {
 
     @JsonProperty
-    private final long accountId;
+    private final Long accountId;
 
     @JsonProperty
     private final String email;
@@ -24,7 +24,7 @@ public class OutCompany extends ResourceSupport {
     private final String specialization;
 
     @JsonProperty
-    private final short yearFounded;
+    private final Short yearFounded;
 
     @JsonProperty
     private final String logoUrl;
@@ -35,7 +35,10 @@ public class OutCompany extends ResourceSupport {
     @JsonProperty
     private final String description;
 
-    public OutCompany(long accountId, String email, double rating, String name, String specialization, short yearFounded, String logoUrl, String webpageUrl, String description) {
+    @JsonProperty
+    private final _Links _links;
+
+    public OutCompany(long accountId, String email, double rating, String name, String specialization, Short yearFounded, String logoUrl, String webpageUrl, String description) {
         this.accountId = accountId;
         this.email = email;
         this.rating = rating;
@@ -45,6 +48,48 @@ public class OutCompany extends ResourceSupport {
         this.logoUrl = logoUrl;
         this.webpageUrl = webpageUrl;
         this.description = description;
-        this.add( linkTo(CompanyController.class).slash(accountId).withSelfRel());
+        this._links = new _Links();
+    }
+
+    @JsonIgnore
+    @Override
+    public Object getCollectionItemOutput() {
+        return new CompanyItemOutput(rating, name);
+    }
+
+    class CompanyItemOutput {
+        @JsonProperty
+        private final String name;
+
+        @JsonProperty
+        private final double rating;
+
+        @JsonProperty
+        private final _Links _links = new _Links();
+
+        private CompanyItemOutput(double rating, String name){
+            this.rating = rating;
+            this.name = name;
+        }
+
+        class _Links {
+            @JsonProperty
+            private _Links.Self self = new _Links.Self();
+
+            private class Self{
+                @JsonProperty
+                final String href = HOSTNAME + linkTo(CompanyController.class).slash(accountId).withSelfRel().withSelfRel().getHref();
+            }
+        }
+    }
+
+    private class _Links {
+        @JsonProperty
+        private Self self = new Self();
+
+        private class Self {
+            @JsonProperty
+            final String href = HOSTNAME + linkTo(CompanyController.class).slash(accountId).withSelfRel().withSelfRel().getHref();
+        }
     }
 }

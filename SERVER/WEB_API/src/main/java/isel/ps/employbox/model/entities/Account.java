@@ -4,30 +4,23 @@ import com.github.jayield.rapper.ColumnName;
 import com.github.jayield.rapper.DomainObject;
 import com.github.jayield.rapper.Id;
 import com.github.jayield.rapper.Version;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 
-import java.io.Serializable;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 import static isel.ps.employbox.model.entities.Role.DEFAULT;
 
-public class Account implements DomainObject<Long>, UserDetails, Serializable {
-
-    private final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+public class Account implements DomainObject<Long> {
+    private static final Role role = DEFAULT;
 
     @Id (isIdentity =  true)
     protected long accountId;
-
+    protected final String name;
     protected final String email;
     protected final String password;
+    protected final String accountType;
     protected final double rating;
-    private static final Role role = DEFAULT;
     @Version
     private final long version;
 
@@ -40,6 +33,9 @@ public class Account implements DomainObject<Long>, UserDetails, Serializable {
     @ColumnName(table = "Follows", foreignName = "accountIdFollowed", externalName = "accountIdFollower")
     protected final CompletableFuture<List<Account>> following;
 
+    @ColumnName(table = "Follows", foreignName = "accountIdFollower", externalName = "accountIdFollowed")
+    protected final CompletableFuture<List<Account>> followers;
+
     @ColumnName( foreignName = "accountIdFirst")
     protected final CompletableFuture<List<Chat>> chats;
 
@@ -49,32 +45,37 @@ public class Account implements DomainObject<Long>, UserDetails, Serializable {
 
     public Account(){
         accountId = 0;
+        name = null;
         email = null;
         password = null;
         rating = 0;
+        accountType = null;
         version = 0;
         offeredJobs = CompletableFuture.completedFuture(Collections.emptyList());
         comments = CompletableFuture.completedFuture(Collections.emptyList());
         following = CompletableFuture.completedFuture(Collections.emptyList());
+        followers = CompletableFuture.completedFuture(Collections.emptyList());
         chats = CompletableFuture.completedFuture(Collections.emptyList());
         ratings = CompletableFuture.completedFuture(Collections.emptyList());
     }
 
     protected Account(
             long accountID,
-            String email,
+            String name, String email,
             String password,
-            float rating,
+            String accountType, double rating,
             long version,
             CompletableFuture<List<Job>> offeredJobs,
             CompletableFuture<List<Comment>> comments,
             CompletableFuture<List<Chat>> chats,
             CompletableFuture<List<Rating>> ratings,
-            CompletableFuture<List<Account>> following
-    ) {
+            CompletableFuture<List<Account>> following,
+            CompletableFuture<List<Account>> follower) {
         this.accountId = accountID;
+        this.name = name;
         this.email = email;
-        this.password = passwordEncoder.encode(password);
+        this.password = password;
+        this.accountType = accountType;
         this.rating = rating;
         this.version = version;
         this.offeredJobs = offeredJobs;
@@ -82,19 +83,23 @@ public class Account implements DomainObject<Long>, UserDetails, Serializable {
         this.ratings = ratings;
         this.comments = comments;
         this.following = following;
+        this.followers = follower;
     }
 
-    protected Account(long accountId, String email, String password, float rating, long version){
+    protected Account(long accountId, String name, String email, String password, String accountType, double rating, long version){
         this.accountId = accountId;
+        this.name = name;
+        this.accountType = accountType;
         this.version = version;
         this.email = email;
-        this.password =  passwordEncoder.encode(password);
+        this.password = password;
         this.rating = rating;
         this.offeredJobs = CompletableFuture.completedFuture(Collections.emptyList());
         this.chats = CompletableFuture.completedFuture(Collections.emptyList());
         this.ratings = CompletableFuture.completedFuture(Collections.emptyList());
         this.comments = CompletableFuture.completedFuture(Collections.emptyList());
         this.following = CompletableFuture.completedFuture(Collections.emptyList());
+        this.followers = CompletableFuture.completedFuture(Collections.emptyList());
     }
 
     @Override
@@ -102,14 +107,24 @@ public class Account implements DomainObject<Long>, UserDetails, Serializable {
         return accountId;
     }
 
+    public String getName() {
+        return name;
+    }
 
     public String getEmail() {
         return email;
     }
 
+    public String getPassword() {
+        return password;
+    }
 
     public double getRating() {
         return rating;
+    }
+
+    public String getAccountType() {
+        return accountType;
     }
 
     public CompletableFuture<List<Job>> getOfferedJobs() {
@@ -118,6 +133,10 @@ public class Account implements DomainObject<Long>, UserDetails, Serializable {
 
     public CompletableFuture<List<Account>> getFollowing() {
         return following;
+    }
+
+    public CompletableFuture<List<Account>> getFollowers() {
+        return followers;
     }
 
     public CompletableFuture<List<Comment>> getComments() {
@@ -130,41 +149,6 @@ public class Account implements DomainObject<Long>, UserDetails, Serializable {
 
     public CompletableFuture<List<Rating>> getRatings() {
         return ratings;
-    }
-
-    @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        return Collections.emptyList();
-    }
-
-    @Override
-    public String getPassword() {
-        return password;
-    }
-
-    @Override
-    public String getUsername() {
-        return email;
-    }
-
-    @Override
-    public boolean isAccountNonExpired() {
-        return true;
-    }
-
-    @Override
-    public boolean isAccountNonLocked() {
-        return true;
-    }
-
-    @Override
-    public boolean isCredentialsNonExpired() {
-        return true;
-    }
-
-    @Override
-    public boolean isEnabled() {
-        return true;
     }
 
     @Override

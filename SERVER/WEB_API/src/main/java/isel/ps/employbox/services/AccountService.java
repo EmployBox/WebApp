@@ -4,13 +4,12 @@ import com.github.jayield.rapper.DataRepository;
 import isel.ps.employbox.ErrorMessages;
 import isel.ps.employbox.exceptions.ResourceNotFoundException;
 import isel.ps.employbox.exceptions.UnauthorizedException;
+import isel.ps.employbox.model.binders.CollectionPage;
 import isel.ps.employbox.model.entities.Account;
 import org.springframework.stereotype.Service;
 
 import java.security.InvalidParameterException;
-import java.util.Collection;
 import java.util.concurrent.CompletableFuture;
-import java.util.stream.Stream;
 
 import static isel.ps.employbox.ErrorMessages.RESOURCE_NOTFOUND_ACCOUNT;
 
@@ -22,8 +21,8 @@ public final class AccountService {
         this.accountRepo = accountRepo;
     }
 
-    public CompletableFuture<Stream<Account>> getAllAccounts() {
-        return accountRepo.findAll().thenApply(Collection::stream);
+    public CompletableFuture<CollectionPage<Account>> getAllAccounts(int page, int pageSize) {
+        return ServiceUtils.getCollectionPageFuture(accountRepo, page, pageSize);
     }
 
     public CompletableFuture<Account> getAccount(long id, String... email) {

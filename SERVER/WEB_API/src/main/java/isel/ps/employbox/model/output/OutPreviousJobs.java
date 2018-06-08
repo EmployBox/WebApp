@@ -2,13 +2,14 @@ package isel.ps.employbox.model.output;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import isel.ps.employbox.controllers.CurriculumController;
-import org.springframework.hateoas.ResourceSupport;
+import isel.ps.employbox.controllers.curricula.CurriculumController;
+import isel.ps.employbox.controllers.curricula.PreviousJobsController;
+import isel.ps.employbox.model.entities.curricula.childs.PreviousJobs;
 
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 
-public class OutPreviousJobs extends ResourceSupport {
+public class OutPreviousJobs implements OutputDto {
 
     @JsonProperty
     private final long previousJobId;
@@ -34,6 +35,9 @@ public class OutPreviousJobs extends ResourceSupport {
     @JsonIgnore
     private final long accountId;
 
+    @JsonProperty
+    private final _Links _links;
+
     public OutPreviousJobs(
             long previousJobId,
             long accountId,
@@ -53,6 +57,35 @@ public class OutPreviousJobs extends ResourceSupport {
         this.workload = workload;
         this.role = role;
         this.accountId = accountId;
-        this.add( linkTo( methodOn(CurriculumController.class).getPreviousJobs(this.accountId, curriculumId)).slash(previousJobId).withSelfRel());
+        this._links = new _Links();
+    }
+
+    @JsonIgnore
+    @Override
+    public Object getCollectionItemOutput() {
+        return new PreviousItemOutput();
+    }
+
+    class PreviousItemOutput {
+
+        private class _Links {
+            @JsonProperty
+            private _Links.Self self = new _Links.Self();
+
+            private class Self {
+                @JsonProperty
+                final String href = HOSTNAME + linkTo( methodOn(PreviousJobsController.class).getPreviousJobs(accountId, curriculumId, 0,0)).slash(previousJobId).withSelfRel().getHref();
+            }
+        }
+    }
+
+    private class _Links {
+        @JsonProperty
+        private _Links.Self self = new _Links.Self();
+
+        private class Self {
+            @JsonProperty
+            final String href = HOSTNAME +   linkTo( methodOn(PreviousJobsController.class).getPreviousJobs(accountId, curriculumId, 0,0)).slash(previousJobId).withSelfRel().getHref();
+        }
     }
 }

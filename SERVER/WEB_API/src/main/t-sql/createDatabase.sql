@@ -1,4 +1,3 @@
-
 IF DB_ID ('PS_API_DATABASE') IS NULL
 	CREATE DATABASE PS_API_DATABASE;
 GO
@@ -6,25 +5,27 @@ IF NOT EXISTS(SELECT * FROM sys.schemas WHERE name = 'ApiDatabase')
 BEGIN
 	EXEC ('CREATE SCHEMA ApiDatabase')
 END
-
 GO
+
 USE PS_API_DATABASE
 --USE PS_TEST_API_DATABASE
 GO
 
 CREATE TABLE [Account] (
 	accountId BIGINT IDENTITY(1,1) PRIMARY KEY NOT NULL,
+	name NVARCHAR(40) not null,
 	email NVARCHAR(25) UNIQUE NOT NULL,
 	rating float(24) default(0.0),
+	accountType NVARCHAR(3) not null,
 	password NVARCHAR(100) NOT NULL,
 	[version] rowversion,
 
-	CHECK (rating >= 0.0 AND rating <= 10.0)
+	CHECK (rating >= 0.0 AND rating <= 10.0),
+	CHECK (accountType in ('USR', 'CMP', 'MOD'))
 )
 
 CREATE TABLE [Company] (
 	accountId BIGINT primary key references Account,
-	name NVARCHAR(40),
 	yearFounded SMALLINT,
 	specialization NVARCHAR(20),
 	webPageUrl NVARCHAR(50),
@@ -39,7 +40,6 @@ CREATE TABLE [Moderator] (
 
 CREATE TABLE [UserAccount] (
 	accountId BIGINT primary key references Account,
-	name NVARCHAR(40),
 	summary NVARCHAR(1500),
 	PhotoUrl NVARCHAR(100),
 	[version] rowversion
@@ -78,13 +78,7 @@ CREATE TABLE [AcademicBackground](
 	FOREIGN KEY (accountId) REFERENCES Account,
 	FOREIGN KEY (curriculumId) REFERENCES curriculum(curriculumId),
 	check (endDate < beginDate),
-	check (degreeObtained = 'basic level 1' 
-			OR degreeObtained = 'basic level 2' 
-			OR degreeObtained = 'basic level 3'
-			OR degreeObtained = 'secundary'
-			OR degreeObtained = 'bachelor'
-			OR degreeObtained = 'master'
-			OR degreeObtained = 'PHD')				
+	check (degreeObtained in ('basic level 1', 'basic level 2', 'basic level 3', 'secundary', 'bachelor', 'master', 'PHD'))
 )
 
 CREATE TABLE [PreviousJobs](
@@ -122,7 +116,7 @@ CREATE TABLE [Job](
 	[description] NVARCHAR(50),
 	offerBeginDate DATETIME DEFAULT(GETDATE()),
 	offerEndDate DATETIME,
-	offerType NVARCHAR(30),
+	offerType NVARCHAR(30) NOT NULL,
 	[Address] NVARCHAR(50),
 	[version] rowversion,
 

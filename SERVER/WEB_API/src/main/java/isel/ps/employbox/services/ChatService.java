@@ -1,17 +1,18 @@
 package isel.ps.employbox.services;
 
 import com.github.jayield.rapper.DataRepository;
+import com.github.jayield.rapper.utils.Pair;
 import isel.ps.employbox.ErrorMessages;
 import isel.ps.employbox.exceptions.BadRequestException;
 import isel.ps.employbox.exceptions.ResourceNotFoundException;
 import isel.ps.employbox.exceptions.UnauthorizedException;
+import isel.ps.employbox.model.binders.CollectionPage;
 import isel.ps.employbox.model.entities.Chat;
 import isel.ps.employbox.model.entities.Message;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
 import java.util.concurrent.CompletableFuture;
-import java.util.stream.Stream;
 
 import static isel.ps.employbox.ErrorMessages.BAD_REQUEST_IDS_MISMATCH;
 import static isel.ps.employbox.ErrorMessages.RESOURCE_NOT_FOUND_MESSAGE;
@@ -28,21 +29,15 @@ public class ChatService {
         this.accountService = accountService;
     }
 
-
-    public CompletableFuture<Stream<Chat>> getAccountChats(long accountId) {
-        return chatRepo.findAll()
-                .thenApply(list -> list
-                        .stream()
-                        .filter(curr -> curr.getAccountIdFirst() == accountId));
+    //todo endpoint
+    public CompletableFuture<CollectionPage<Chat>> getAccountChats(long accountId, int pageSize, int page) {
+        return accountService.getAccount(accountId)
+                .thenCompose(__ -> ServiceUtils.getCollectionPageFuture( chatRepo, page, pageSize, new Pair<>("accountId", accountId)));
     }
 
-    public CompletableFuture<Stream<Message>> getAccountChatsMessages(long accountId, long cid, String email) {
-        return accountService.getAccount(accountId, email).thenCompose(__ ->
-                msgRepo.findAll()
-                        .thenApply(list -> list
-                                .stream()
-                                .filter(curr -> curr.getAccountId() == accountId && curr.getChatId() == cid))
-        );
+    public CompletableFuture<CollectionPage<Message>> getAccountChatsMessages(long accountId, String email, int pageSize, int page) {
+        return accountService.getAccount(accountId, email)
+                .thenCompose(__ -> ServiceUtils.getCollectionPageFuture( msgRepo, page, pageSize, new Pair<>("accountId", accountId)));
     }
 
 
@@ -53,25 +48,22 @@ public class ChatService {
                     if (msg.getChatId() != cid)
                         throw new BadRequestException(BAD_REQUEST_IDS_MISMATCH);
                     return accountService.getAccount(msg.getAccountId(), email)//throws exceptions
-                            .thenApply(__ -> msg);
+                            .thenApply(account -> msg);
                 });
     }
 
     public CompletableFuture<Message> createNewChatMessage(long accountId, long chatId, Message msg, String email) {
         return accountService.getAccount(accountId, email)
-                .thenCompose(__ -> getChat(chatId))
+                .thenCompose(account -> getChat(chatId))
                 .thenCompose(chat -> {
                     if (chat.getAccountIdFirst() != accountId)
                         throw new UnauthorizedException(ErrorMessages.UN_AUTHORIZED_MESSAGE);
                     return msgRepo.create(msg);
                 })
-                .thenApply(res -> {
-                    if (!res) throw new BadRequestException(ErrorMessages.BAD_REQUEST_ITEM_CREATION);
-                    return msg;
-                });
+                .thenApply(res -> msg);
     }
 
-    public CompletableFuture<Chat> getChat(long chatId){
+    private CompletableFuture<Chat> getChat(long chatId){
         return chatRepo.findById(chatId)
                 .thenApply(ochat -> ochat.orElseThrow( () -> new ResourceNotFoundException(ErrorMessages.RESOURCE_NOT_FOUND_CHAT)));
     }
@@ -81,11 +73,9 @@ public class ChatService {
                 CompletableFuture.allOf(
                         accountService.getAccount(accountIdFrom, username),
                         accountService.getAccount(inChat.getAccountIdSecond())
-                ).thenCompose(__ -> chatRepo.create(inChat)
-                ).thenApply(res -> {
-                    if (!res) throw new BadRequestException(ErrorMessages.BAD_REQUEST_ITEM_CREATION);
-                    return inChat;
-                })
+                )
+                        .thenCompose(aVoid -> chatRepo.create(inChat))
+                        .thenApply(res -> inChat)
         );
     }
 }

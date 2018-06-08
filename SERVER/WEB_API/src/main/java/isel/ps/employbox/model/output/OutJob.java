@@ -1,19 +1,20 @@
 package isel.ps.employbox.model.output;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import isel.ps.employbox.controllers.JobController;
-import isel.ps.employbox.controllers.UserController;
-import org.springframework.hateoas.ResourceSupport;
+import isel.ps.employbox.controllers.UserAccountController;
 
 import java.sql.Timestamp;
 
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 
-public class OutJob extends ResourceSupport {
+//todo embedded
+public class OutJob implements OutputDto {
 
-    @JsonProperty
-    private final long accountId;
+    private final OutAccount _account;
 
     @JsonProperty
     private final long jobId;
@@ -34,17 +35,24 @@ public class OutJob extends ResourceSupport {
     private final String schedule;
 
     @JsonProperty
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy hh:mm:ss")
     private final Timestamp offerBeginDate;
 
     @JsonProperty
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy hh:mm:ss")
     private final Timestamp offerEndDate;
 
     @JsonProperty
     private final String offerType;
 
+    @JsonProperty
+    private final _Links _links;
+
+    @JsonProperty
+    private final _Embedded _embedded;
 
     public OutJob(
-            long accountID,
+            OutAccount account,
             long jobId,
             String title,
             String address,
@@ -55,7 +63,7 @@ public class OutJob extends ResourceSupport {
             Timestamp offerEndDate,
             String offerType)
     {
-        this.accountId = accountID;
+        this._account = account;
         this.jobId = jobId;
         this.title = title;
         this.address = address;
@@ -65,8 +73,71 @@ public class OutJob extends ResourceSupport {
         this.offerBeginDate = offerBeginDate;
         this.offerEndDate = offerEndDate;
         this.offerType = offerType;
-        this.add( linkTo ( methodOn(JobController.class).getJobExperiences(jobId)).withRel("experiences"));
-        this.add( linkTo ( JobController.class).slash(jobId).withSelfRel());
-        this.add( linkTo ( methodOn(UserController.class).getAllApplications(accountID)).withRel("applications"));
+        this._links = new _Links();
+        _embedded = new _Embedded();
+    }
+
+    @JsonIgnore
+    @Override
+    public Object getCollectionItemOutput() {
+        return new JobItemOutput(title, description);
+    }
+
+    class JobItemOutput {
+        @JsonProperty
+        private String title;
+
+        @JsonProperty
+        private final String description;
+
+        @JsonProperty
+        private final _Links _links = new _Links();
+
+        private JobItemOutput(String title, String description){
+            this.title = title;
+            this.description = description;
+        }
+
+        class _Links {
+            @JsonProperty
+            private Self self = new Self();
+
+            private class Self{
+                @JsonProperty
+                final String href = HOSTNAME + linkTo(JobController.class).slash(jobId).withSelfRel().getHref();
+            }
+        }
+    }
+
+    private class _Embedded{
+        @JsonProperty
+        private final OutAccount account = _account;
+
+    }
+
+    private class _Links {
+        @JsonProperty
+        private _Links.Self self = new _Links.Self();
+
+        @JsonProperty
+        private Experiences experiences = new Experiences();
+
+        @JsonProperty
+        private Applications application = new Applications();
+
+        private class Self {
+            @JsonProperty
+            final String href = HOSTNAME + linkTo ( JobController.class).slash(jobId).withSelfRel().getHref();
+        }
+
+        private class Experiences {
+            @JsonProperty
+            final String href = HOSTNAME + linkTo ( methodOn(JobController.class).getJobExperiences(jobId, 0,0)).withRel("experiences").getHref();
+        }
+
+        private class Applications {
+            @JsonProperty
+            final String href = HOSTNAME + linkTo ( methodOn(UserAccountController.class).getAllApplications(_account.getAccountId(), 0,0)).withRel("applications").getHref();
+        }
     }
 }

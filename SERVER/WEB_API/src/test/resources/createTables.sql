@@ -1,16 +1,18 @@
 create table Account (
   accountId BIGINT IDENTITY PRIMARY KEY,
+  name VARCHAR(40) not null,
   email VARCHAR(25) UNIQUE NOT NULL,
   rating float(24) default(0.0),
   password VARCHAR(100) NOT NULL,
+  accountType VARCHAR (3) not null,
   version bigint default 1,
 
-  CHECK (rating >= 0.0 AND rating <= 10.0)
+  CHECK (rating >= 0.0 AND rating <= 10.0),
+  CHECK (accountType in ('USR', 'CMP', 'MOD'))
 );
 
 create table Company (
   accountId BIGINT primary key references Account,
-  name VARCHAR(40),
   yearFounded SMALLINT,
   specialization VARCHAR(20),
   webPageUrl VARCHAR(50),
@@ -25,7 +27,6 @@ create table Moderator (
 
 CREATE TABLE UserAccount (
   accountId BIGINT primary key references Account,
-  name VARCHAR(40),
   summary VARCHAR(1500),
   PhotoUrl VARCHAR(100),
   version bigint default 1
@@ -64,13 +65,7 @@ create table AcademicBackground (
   FOREIGN KEY (accountId) REFERENCES Account,
   FOREIGN KEY (curriculumId) REFERENCES curriculum(curriculumId),
   check (endDate < beginDate),
-  check (degreeObtained = 'basic level 1'
-         OR degreeObtained = 'basic level 2'
-         OR degreeObtained = 'basic level 3'
-         OR degreeObtained = 'secundary'
-         OR degreeObtained = 'bachelor'
-         OR degreeObtained = 'master'
-         OR degreeObtained = 'PHD')
+  check (degreeObtained in ('basic level 1', 'basic level 2', 'basic level 3', 'secundary', 'bachelor', 'master', 'PHD')
 );
 
 create table PreviousJobs (
@@ -85,7 +80,7 @@ create table PreviousJobs (
   version bigint default 1,
 
   FOREIGN KEY (curriculumId) REFERENCES Curriculum,
-  CHECK(workLoad = 'partial' OR workLoad = 'total')
+  CHECK(workload = 'partial' OR workload = 'total')
 );
 
 create table Local (
@@ -107,7 +102,7 @@ create table Job (
   description VARCHAR(50),
   offerBeginDate DATETIME DEFAULT CURRENT_DATE,
   offerEndDate DATETIME,
-  offerType VARCHAR(30),
+  offerType VARCHAR(30) NOT NULL,
   Address VARCHAR(50),
   version bigint default 1,
 
@@ -154,7 +149,7 @@ CREATE TABLE Rating(
   accountIdFrom BIGINT,
   accountIdTo BIGINT,
   moderatorId BIGINT references Moderator,
-  workLoad real DEFAULT 0.0  check (workLoad >= 0.0 AND workLoad <= 10.0),
+  workload real DEFAULT 0.0  check (workload >= 0.0 AND workload <= 10.0),
   wage real DEFAULT 0.0 check (wage >= 0.0 AND wage <= 10.0),
   workEnviroment real DEFAULT 0.0 check (workEnviroment >= 0.0 AND workEnviroment <= 10.0),
   competences real DEFAULT 0.0 check (competences >= 0.0 AND competences <= 10.0),

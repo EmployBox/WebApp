@@ -1,13 +1,14 @@
 package isel.ps.employbox.model.output;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import isel.ps.employbox.controllers.CurriculumController;
-import org.springframework.hateoas.ResourceSupport;
+import isel.ps.employbox.controllers.curricula.CurriculumController;
+import isel.ps.employbox.controllers.curricula.ProjectsController;
 
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 
-public class OutProject extends ResourceSupport {
+public class OutProject implements OutputDto {
 
     @JsonProperty
     private final long projectId;
@@ -24,6 +25,8 @@ public class OutProject extends ResourceSupport {
     @JsonProperty
     private final String description;
 
+    @JsonProperty
+    private final _Links _links;
 
     public OutProject(long projectId, long accountId, long curriculumId, String name, String description){
         this.projectId = projectId;
@@ -31,6 +34,48 @@ public class OutProject extends ResourceSupport {
         this.description = description;
         this.accountId = accountId;
         this.curriculumId = curriculumId;
-        this.add( linkTo( methodOn(CurriculumController.class).getProjects(this.accountId, this.curriculumId)).slash(projectId).withSelfRel());
+        this._links = new _Links();
+    }
+
+    @JsonIgnore
+    @Override
+    public Object getCollectionItemOutput() {
+        return new ProjectsItemOutput(name, description);
+    }
+
+    class ProjectsItemOutput {
+        @JsonProperty
+        private final String name;
+
+        @JsonProperty
+        private final String description;
+
+        @JsonProperty
+        private _Links _links = new _Links();
+
+        ProjectsItemOutput(String name, String description) {
+            this.name = name;
+            this.description = description;
+        }
+
+        private class _Links {
+            @JsonProperty
+            private Self self = new Self();
+
+            private class Self {
+                @JsonProperty
+                final String href = HOSTNAME +  linkTo( methodOn(ProjectsController.class).getProjects(accountId, curriculumId, 0)).slash(projectId).withSelfRel().getHref();
+            }
+        }
+    }
+
+    private class _Links {
+        @JsonProperty
+        private Self self = new Self();
+
+        private class Self {
+            @JsonProperty
+            final String href = HOSTNAME +  linkTo( methodOn(ProjectsController.class).getProjects(accountId, curriculumId, 0)).slash(projectId).withSelfRel().getHref();
+        }
     }
 }

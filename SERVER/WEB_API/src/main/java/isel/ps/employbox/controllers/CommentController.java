@@ -1,9 +1,9 @@
 package isel.ps.employbox.controllers;
 
 import isel.ps.employbox.exceptions.BadRequestException;
-import isel.ps.employbox.model.binder.CommentBinder;
+import isel.ps.employbox.model.binders.CommentBinder;
 import isel.ps.employbox.model.input.InComment;
-import isel.ps.employbox.model.output.HalCollection;
+import isel.ps.employbox.model.output.HalCollectionPage;
 import isel.ps.employbox.model.output.OutComment;
 import isel.ps.employbox.services.CommentService;
 import org.springframework.security.core.Authentication;
@@ -24,15 +24,16 @@ public class CommentController {
     }
 
     @GetMapping
-    public Mono<HalCollection> getAllComments(@PathVariable long id, @RequestParam String type){
-        if(type.equals("done") || type.equals("received"))
-            return commentBinder.bindOutput(
-                    commentService.getComments(id, type),
-                    this.getClass(),
-                    id
-            );
-        else
-            throw new BadRequestException("Type must be either \"done\" or \"received\"");
+    public Mono<HalCollectionPage> getAllComments(
+            @PathVariable long id,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "5") int numberOfItems
+    ) {
+        return commentBinder.bindOutput(
+                commentService.getComments(id, page, numberOfItems),
+                this.getClass(),
+                id
+        );
     }
 
     @GetMapping("{commentId}")
@@ -65,7 +66,7 @@ public class CommentController {
     }
 
     @DeleteMapping("{commentId}")
-    public void deleteComment( @PathVariable long commentId, Authentication authentication){
-        commentService.deleteComment( commentId,  authentication.getName());
+    public Mono<Void> deleteComment(@PathVariable long commentId, Authentication authentication){
+        return commentService.deleteComment(commentId,  authentication.getName());
     }
 }

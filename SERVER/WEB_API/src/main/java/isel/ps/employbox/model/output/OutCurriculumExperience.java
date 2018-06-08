@@ -1,13 +1,13 @@
 package isel.ps.employbox.model.output;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import isel.ps.employbox.controllers.CurriculumController;
-import org.springframework.hateoas.ResourceSupport;
+import isel.ps.employbox.controllers.curricula.CurriculumController;
+import isel.ps.employbox.controllers.curricula.CurriculumExperienceController;
 
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 
-public class OutCurriculumExperience extends ResourceSupport {
+public class OutCurriculumExperience implements OutputDto {
 
     @JsonProperty
     private final long curriculumExperienceId;
@@ -24,12 +24,52 @@ public class OutCurriculumExperience extends ResourceSupport {
     @JsonProperty
     private final int year;
 
+    @JsonProperty
+    private final _Links _links;
+
     public OutCurriculumExperience(long curriculumExperienceId, long accountId, long curriculumId, String competence, int year){
         this.curriculumExperienceId = curriculumExperienceId;
         this.competence = competence;
         this.year = year;
         this.accountId = accountId;
         this.curriculumId = curriculumId;
-        this.add( linkTo( methodOn(CurriculumController.class).getCurriculumExperience(this.accountId, this.curriculumId, curriculumExperienceId)).withSelfRel());
+        this._links = new _Links();
+    }
+
+    @Override
+    public Object getCollectionItemOutput() {
+        return new CurriculumExperienceItemOutput(curriculumId);
+    }
+
+    class CurriculumExperienceItemOutput {
+        @JsonProperty
+        private final long curriculumId;
+
+        @JsonProperty
+        private _Links _links = new _Links();
+
+        CurriculumExperienceItemOutput(long curriculumId) {
+            this.curriculumId = curriculumId;
+        }
+
+        private class _Links {
+            @JsonProperty
+            private Self self = new Self();
+
+            private class Self {
+                @JsonProperty
+                final String href = HOSTNAME + linkTo( methodOn(CurriculumExperienceController.class).getCurriculumExperience(accountId, curriculumId, curriculumExperienceId)).withSelfRel().getHref();
+            }
+        }
+    }
+
+    private class _Links {
+        @JsonProperty
+        private Self self = new _Links.Self();
+
+        private class Self {
+            @JsonProperty
+            final String href = HOSTNAME + linkTo( methodOn(CurriculumExperienceController.class).getCurriculumExperience(accountId, curriculumId, curriculumExperienceId)).withSelfRel().getHref();
+        }
     }
 }

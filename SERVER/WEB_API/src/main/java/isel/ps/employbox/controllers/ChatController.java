@@ -2,12 +2,12 @@ package isel.ps.employbox.controllers;
 
 import isel.ps.employbox.ErrorMessages;
 import isel.ps.employbox.exceptions.BadRequestException;
-import isel.ps.employbox.model.binder.ChatBinder;
-import isel.ps.employbox.model.binder.MessageBinder;
+import isel.ps.employbox.model.binders.ChatBinder;
+import isel.ps.employbox.model.binders.MessageBinder;
 import isel.ps.employbox.model.entities.Chat;
 import isel.ps.employbox.model.input.InChat;
 import isel.ps.employbox.model.input.InMessage;
-import isel.ps.employbox.model.output.HalCollection;
+import isel.ps.employbox.model.output.HalCollectionPage;
 import isel.ps.employbox.model.output.OutMessage;
 import isel.ps.employbox.services.ChatService;
 import org.springframework.security.core.Authentication;
@@ -31,9 +31,14 @@ public class ChatController {
 
 
     @GetMapping("/{cid}/messages")
-    public Mono<HalCollection> getChatsMessages (@PathVariable long id, @PathVariable long cid, Authentication authentication) {
+    public Mono<HalCollectionPage> getChatsMessages (
+            @PathVariable long id,
+            @PathVariable long cid,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "5") int numberOfItems,
+            Authentication authentication) {
         return messageBinder.bindOutput(
-                chatService.getAccountChatsMessages(id, cid, authentication.getName()),
+                chatService.getAccountChatsMessages(id, authentication.getName(), page, numberOfItems),
                 this.getClass(),
                 id,
                 cid

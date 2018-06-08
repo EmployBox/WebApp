@@ -6,9 +6,8 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 public class Company extends Account {
-    private final String name;
-    private final String Specialization;
-    private final short yearFounded;
+    private final String specialization;
+    private final Short yearFounded;
     private final String logoUrl;
     private final String webPageUrl;
     private final String description;
@@ -16,9 +15,8 @@ public class Company extends Account {
     private final long version;
 
     public Company(){
-        name = null;
-        Specialization = null;
-        yearFounded = 0;
+        specialization = null;
+        yearFounded = null;
         logoUrl = null;
         webPageUrl = null;
         description = null;
@@ -41,11 +39,11 @@ public class Company extends Account {
             CompletableFuture<List<Chat>> chats,
             CompletableFuture<List<Comment>> comments,
             CompletableFuture<List<Rating>> ratings,
-            CompletableFuture<List<Account>> following)
+            CompletableFuture<List<Account>> following,
+            CompletableFuture<List<Account>> followers)
     {
-        super(accountID, email, password, rating, version, offeredJobs,comments, chats, ratings, following);
-        this.name = name;
-        this.Specialization = specialization;
+        super(accountID, name, email, password, "CMP", rating, version, offeredJobs,comments, chats, ratings, following, followers);
+        this.specialization = specialization;
         this.logoUrl = logoUrl;
         this.webPageUrl = webPageUrl;
         this.description = description;
@@ -66,9 +64,8 @@ public class Company extends Account {
             String description,
             long version,
             long accountVersion) {
-        super(accountID, email, password, rating, accountVersion);
-        this.name = name;
-        this.Specialization = specialization;
+        super(accountID, name, email, password, "CMP", rating, accountVersion);
+        this.specialization = specialization;
         this.logoUrl = logoUrl;
         this.webPageUrl = webPageUrl;
         this.description = description;
@@ -81,10 +78,10 @@ public class Company extends Account {
     }
 
     public String getSpecialization() {
-        return Specialization;
+        return specialization;
     }
 
-    public short getYearFounded() {
+    public Short getYearFounded() {
         return yearFounded;
     }
 
@@ -103,5 +100,9 @@ public class Company extends Account {
     @Override
     public long getVersion() {
         return version;
+    }
+
+    public long getAccountVersion() {
+        return super.getVersion();
     }
 }

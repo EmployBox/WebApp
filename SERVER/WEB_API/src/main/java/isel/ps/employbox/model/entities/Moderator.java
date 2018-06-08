@@ -15,6 +15,7 @@ public class Moderator extends Account {
 
     public Moderator(
             long accountID,
+            String name,
             String email,
             String password,
             float rating,
@@ -24,7 +25,7 @@ public class Moderator extends Account {
             CompletableFuture<List<Rating>> ratings,
             CompletableFuture<List<Rating>> ratingsModerated
     ) {
-        super(accountID, email, password, rating, version, null, comments, chats, ratings, null);
+        super(accountID, name, email, password, "MOD", rating, version, null, comments, chats, ratings, null, null);
         this.ratingsModerated = ratingsModerated;
     }
 

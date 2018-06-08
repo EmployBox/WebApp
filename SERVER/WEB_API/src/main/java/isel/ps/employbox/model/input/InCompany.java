@@ -2,10 +2,10 @@ package isel.ps.employbox.model.input;
 
 public class InCompany {
     private long accountId;
+    private String name;
     private String email;
     private String password;
     private float rating;
-    private String name;
     private String specialization;
     private short yearFounded;
     private String logoUrl;

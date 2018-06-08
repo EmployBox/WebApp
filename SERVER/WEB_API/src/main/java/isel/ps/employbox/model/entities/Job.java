@@ -10,12 +10,11 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 public class Job implements DomainObject<Long> {
-
     @Id(isIdentity =  true)
-    private long jobId;
-
+    private final long jobId;
     private final String title;
-    private final long accountId;
+    @ColumnName(name = "accountId")
+    private final CompletableFuture<Account> account;
     private final String address;
     private final int wage;
     private final String description;
@@ -25,16 +24,14 @@ public class Job implements DomainObject<Long> {
     private final String offerType;
     @Version
     private final long version;
-
     @ColumnName(foreignName = "jobId")
     private final CompletableFuture<List<Application>> applications;
-
     @ColumnName(foreignName = "jobId")
     private final CompletableFuture<List<JobExperience>> experiences;
 
     public Job(){
         title = null;
-        accountId = 0;
+        account = null;
         address = null;
         wage = 0;
         description = null;
@@ -45,12 +42,13 @@ public class Job implements DomainObject<Long> {
         applications = null;
         experiences = null;
         version = 0;
+        jobId = 0;
     }
 
     public Job(
             long id,
             String title,
-            long accountID,
+            CompletableFuture<Account> accountID,
             String address,
             int wage,
             String description,
@@ -60,11 +58,11 @@ public class Job implements DomainObject<Long> {
             String offerType,
             long version,
             CompletableFuture<List<Application>> applications,
-            CompletableFuture<List<JobExperience>> experiences)
-    {
+            CompletableFuture<List<JobExperience>> experiences
+    ) {
         this.jobId = id;
         this.title = title;
-        this.accountId = accountID;
+        this.account = accountID;
         this.address = address;
         this.wage = wage;
         this.description = description;
@@ -78,7 +76,7 @@ public class Job implements DomainObject<Long> {
     }
 
     public Job(
-            long accountID,
+            CompletableFuture<Account> account,
             long jobId,
             String title,
             String address,
@@ -90,10 +88,9 @@ public class Job implements DomainObject<Long> {
             String offerType,
             List<JobExperience> experiences,
             long version
-    )
-    {
+    ) {
         this.jobId = jobId;
-        this.accountId = accountID;
+        this.account = account;
         this.title = title;
         this.address = address;
         this.wage = wage;
@@ -116,8 +113,8 @@ public class Job implements DomainObject<Long> {
         return version;
     }
 
-    public long getAccountId() {
-        return accountId;
+    public CompletableFuture<Account> getAccount() {
+        return account;
     }
 
     public int getWage() {
@@ -147,7 +144,6 @@ public class Job implements DomainObject<Long> {
     public String getAddress() {
         return address;
     }
-
 
     public String getTitle() {
         return title;

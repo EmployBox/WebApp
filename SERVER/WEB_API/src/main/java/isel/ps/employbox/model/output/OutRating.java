@@ -1,12 +1,12 @@
 package isel.ps.employbox.model.output;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import isel.ps.employbox.controllers.RatingController;
-import org.springframework.hateoas.ResourceSupport;
 
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 
-public class OutRating extends ResourceSupport{
+public class OutRating implements OutputDto {
     @JsonProperty
     private final long accountIDFrom;
 
@@ -34,6 +34,8 @@ public class OutRating extends ResourceSupport{
     @JsonProperty
     private final float demeanor;
 
+    @JsonProperty
+    private final _Links _links;
 
     public OutRating(
             long accountIDFrom,
@@ -55,6 +57,49 @@ public class OutRating extends ResourceSupport{
         this.pontuality = pontuality;
         this.assiduity = assiduity;
         this.demeanor = demeanor;
-        this.add(linkTo(RatingController.class, accountIDFrom).withSelfRel());
+        this._links = new _Links();
+    }
+
+    @JsonIgnore
+    @Override
+    public Object getCollectionItemOutput() {
+        return new RatingsItemOutput(accountIDFrom, accountIDTo);
+    }
+
+    class RatingsItemOutput {
+        @JsonProperty
+        private final long accountIDFrom;
+
+        @JsonProperty
+        private final long accountIDTo;
+
+        @JsonProperty
+        private final _Links _links = new _Links();
+
+
+        RatingsItemOutput(long accountIDFrom, long accountIDTo) {
+            this.accountIDFrom = accountIDFrom;
+            this.accountIDTo = accountIDTo;
+        }
+
+        private class _Links {
+            @JsonProperty
+            private _Links.Self self = new _Links.Self();
+
+            private class Self {
+                @JsonProperty
+                final String href = HOSTNAME + linkTo(RatingController.class, accountIDFrom).withSelfRel().getHref();
+            }
+        }
+    }
+
+    private class _Links {
+        @JsonProperty
+        private Self self = new Self();
+
+        private class Self {
+            @JsonProperty
+            final String href = HOSTNAME + linkTo(RatingController.class, accountIDFrom).withSelfRel().getHref();
+        }
     }
 }

@@ -1,9 +1,9 @@
 package isel.ps.employbox.controllers;
 
 import isel.ps.employbox.exceptions.BadRequestException;
-import isel.ps.employbox.model.binder.CompanyBinder;
+import isel.ps.employbox.model.binders.CompanyBinder;
 import isel.ps.employbox.model.input.InCompany;
-import isel.ps.employbox.model.output.HalCollection;
+import isel.ps.employbox.model.output.HalCollectionPage;
 import isel.ps.employbox.model.output.OutCompany;
 import isel.ps.employbox.services.CompanyService;
 import org.springframework.security.core.Authentication;
@@ -24,9 +24,9 @@ public class CompanyController {
     }
 
     @GetMapping
-    public Mono<HalCollection> getCompanies(){
+    public Mono<HalCollectionPage> getCompanies( @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "5") int numberOfItems){
         return companyBinder.bindOutput(
-                companyService.getCompanies(),
+                companyService.getCompanies(page, numberOfItems),
                 this.getClass()
         );
     }
@@ -38,33 +38,22 @@ public class CompanyController {
     }
 
     @PostMapping
-    public Mono<OutCompany> createCompany(
-            @RequestBody InCompany inCompany,
-            Authentication authentication
-    ){
+    public Mono<OutCompany> createCompany(@RequestBody InCompany inCompany){
         return companyBinder.bindOutput(
-                companyService.createCompany(companyBinder.bindInput(inCompany), authentication.getName())
+                companyService.createCompany(companyBinder.bindInput(inCompany))
         );
     }
 
     @PutMapping("/{id}")
-    public Mono<Void> updateCompany(
-            @PathVariable long id,
-            @RequestBody InCompany inCompany,
-            Authentication authentication
-    ){
+    public Mono<Void> updateCompany(@PathVariable long id, @RequestBody InCompany inCompany, Authentication authentication){
         if(id != inCompany.getAccountId()) throw new BadRequestException(BAD_REQUEST_IDS_MISMATCH);
         return companyService.updateCompany(
-                companyBinder.bindInput(inCompany),
-                authentication.getName()
+                companyBinder.bindInput(inCompany), authentication.getName()
         );
     }
 
     @DeleteMapping("/{cid}")
-    public Mono<Void> deleteCompany(
-            @PathVariable long cid,
-            Authentication authentication
-    ){
+    public Mono<Void> deleteCompany(@PathVariable long cid, Authentication authentication){
         return companyService.deleteCompany(cid, authentication.getName());
     }
 }

@@ -1,14 +1,14 @@
 package isel.ps.employbox.model.output;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import isel.ps.employbox.controllers.*;
-import org.springframework.hateoas.ResourceSupport;
+import isel.ps.employbox.controllers.curricula.CurriculumController;
 
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 
-public class OutUser extends ResourceSupport {
-
+public class OutUser implements OutputDto {
     @JsonProperty
     private final long id;
 
@@ -27,6 +27,9 @@ public class OutUser extends ResourceSupport {
     @JsonProperty
     private final double rating;
 
+    @JsonProperty
+    private final _Links _links;
+
     public OutUser(long id, String name, String email, String photo_url, String summary, double rating) {
         this.id = id;
         this.name = name;
@@ -34,14 +37,116 @@ public class OutUser extends ResourceSupport {
         this.photo_url = photo_url;
         this.summary = summary;
         this.rating = rating;
-        this.add( linkTo ( UserController.class).slash(id).withSelfRel());
-        this.add( linkTo ( JobController.class,id).withRel("offered_jobs"));
-        this.add( linkTo ( CurriculumController.class,id).withRel("curricula"));
-        this.add( linkTo ( methodOn(UserController.class).getAllApplications(id)).withRel("applications"));
-        this.add( linkTo ( ChatController.class,id).withRel("chats"));
-        this.add( linkTo ( CommentController.class,id).withRel("comments"));
-        this.add( linkTo ( RatingController.class,id).withRel("ratings"));
-        this.add( linkTo( methodOn(FollowsController.class,id).getFollowers(id) ).withRel("followers"));
-        this.add( linkTo( methodOn(FollowsController.class,id).getFollowing(id) ).withRel("following"));
+        this._links = new _Links();
+    }
+
+    @JsonIgnore
+    @Override
+    public Object getCollectionItemOutput() {
+        return new UserItemOutput(name, email, rating);
+    }
+
+    class UserItemOutput {
+        @JsonProperty
+        private final String name;
+
+        @JsonProperty
+        private final String email;
+
+        @JsonProperty
+        private final double rating;
+
+        @JsonProperty
+        private _Links _links = new _Links();
+
+        UserItemOutput(String name, String email, double rating) {
+            this.name = name;
+            this.email = email;
+            this.rating = rating;
+        }
+
+        private class _Links {
+            @JsonProperty
+            private _Links.Self self = new _Links.Self();
+
+            private class Self {
+                @JsonProperty
+                final String href = HOSTNAME + linkTo( UserAccountController.class).slash(id).withSelfRel().getHref();
+            }
+        }
+    }
+
+    public class _Links{
+        @JsonProperty
+        private Self self = new Self();
+
+        @JsonProperty
+        private Offered_jobs offered_jobs = new Offered_jobs();
+
+        @JsonProperty
+        private Curricula curricula = new Curricula();
+
+        @JsonProperty
+        private Applications applications = new Applications();
+
+        @JsonProperty
+        private Chats chats = new Chats();
+
+        @JsonProperty
+        private Comments comments = new Comments();
+
+        @JsonProperty
+        private Ratings ratings = new Ratings();
+
+        @JsonProperty
+        private Followers followers = new Followers();
+
+        @JsonProperty
+        private Following following = new Following();
+
+        private class Self{
+            @JsonProperty
+            final String href = HOSTNAME + linkTo( UserAccountController.class).slash(id).withSelfRel().getHref();
+        }
+
+        private class Offered_jobs{
+            @JsonProperty
+            final String href = HOSTNAME + linkTo( JobController.class,id).withRel("offered_jobs").getHref();
+        }
+
+        private class Curricula {
+            @JsonProperty
+            final String href = HOSTNAME + linkTo( CurriculumController.class,id).withRel("curricula").getHref();
+        }
+
+        private class Applications {
+            @JsonProperty
+            final String href = HOSTNAME + linkTo( methodOn(UserAccountController.class).getAllApplications(id, 0, 0)).withRel("applications").getHref();
+        }
+
+        private class Chats {
+            @JsonProperty
+            final String href = HOSTNAME + linkTo( ChatController.class,id).withRel("chats").getHref();
+        }
+
+        private class Comments {
+            @JsonProperty
+            final String href = HOSTNAME + linkTo( CommentController.class,id).withRel("comments").getHref();
+        }
+
+        private class Ratings {
+            @JsonProperty
+            final String href = HOSTNAME + linkTo ( RatingController.class,id).withRel("ratings").getHref();
+        }
+
+        private class Followers {
+            @JsonProperty
+            final String href = HOSTNAME + linkTo( methodOn(FollowsController.class,id).getFollowers(id, 0, 0) ).withRel("followers").getHref();
+        }
+
+        private class Following {
+            @JsonProperty
+            final String href = HOSTNAME + linkTo( methodOn(FollowsController.class,id).getFollowing(id, 0, 0) ).withRel("following").getHref();
+        }
     }
 }
