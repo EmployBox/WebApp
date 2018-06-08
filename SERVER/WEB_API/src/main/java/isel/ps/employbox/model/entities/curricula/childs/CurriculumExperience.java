@@ -1,4 +1,4 @@
-package isel.ps.employbox.model.entities.CurriculumChilds;
+package isel.ps.employbox.model.entities.curricula.childs;
 
 import com.github.jayield.rapper.DomainObject;
 import com.github.jayield.rapper.Id;

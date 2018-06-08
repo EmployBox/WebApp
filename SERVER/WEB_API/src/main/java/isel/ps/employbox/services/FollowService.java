@@ -2,7 +2,7 @@ package isel.ps.employbox.services;
 
 import com.github.jayield.rapper.DataRepository;
 import com.github.jayield.rapper.utils.Pair;
-import isel.ps.employbox.model.binder.CollectionPage;
+import isel.ps.employbox.model.binders.CollectionPage;
 import isel.ps.employbox.model.entities.Account;
 import isel.ps.employbox.model.entities.Follow;
 import org.springframework.stereotype.Service;

@@ -1,4 +1,4 @@
-package isel.ps.employbox.controllers;
+package isel.ps.employbox.controllers.curricula;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -6,7 +6,9 @@ import com.github.jayield.rapper.DataRepository;
 import com.github.jayield.rapper.utils.Pair;
 import isel.ps.employbox.exceptions.ResourceNotFoundException;
 import isel.ps.employbox.model.entities.Curriculum;
+import isel.ps.employbox.model.entities.curricula.childs.AcademicBackground;
 import isel.ps.employbox.model.entities.UserAccount;
+import isel.ps.employbox.model.input.InAcademicBackground;
 import isel.ps.employbox.model.input.InCurriculum;
 import org.junit.Before;
 import org.junit.Rule;

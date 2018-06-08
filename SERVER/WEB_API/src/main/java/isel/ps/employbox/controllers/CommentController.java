@@ -1,7 +1,7 @@
 package isel.ps.employbox.controllers;
 
 import isel.ps.employbox.exceptions.BadRequestException;
-import isel.ps.employbox.model.binder.CommentBinder;
+import isel.ps.employbox.model.binders.CommentBinder;
 import isel.ps.employbox.model.input.InComment;
 import isel.ps.employbox.model.output.HalCollectionPage;
 import isel.ps.employbox.model.output.OutComment;

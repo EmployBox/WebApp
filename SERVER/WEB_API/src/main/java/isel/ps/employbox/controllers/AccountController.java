@@ -1,7 +1,7 @@
 package isel.ps.employbox.controllers;
 
-import isel.ps.employbox.model.binder.AccountBinder;
-import isel.ps.employbox.model.binder.CollectionPage;
+import isel.ps.employbox.model.binders.AccountBinder;
+import isel.ps.employbox.model.binders.CollectionPage;
 import isel.ps.employbox.model.entities.Account;
 import isel.ps.employbox.services.AccountService;
 import org.springframework.web.bind.annotation.GetMapping;

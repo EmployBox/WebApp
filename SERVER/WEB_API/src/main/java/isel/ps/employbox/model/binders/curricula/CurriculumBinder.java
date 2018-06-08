@@ -1,6 +1,6 @@
-package isel.ps.employbox.model.binder.CurriclumBinders;
+package isel.ps.employbox.model.binders.curricula;
 
-import isel.ps.employbox.model.binder.ModelBinder;
+import isel.ps.employbox.model.binders.ModelBinder;
 import isel.ps.employbox.model.entities.Curriculum;
 import isel.ps.employbox.model.input.InCurriculum;
 import isel.ps.employbox.model.output.OutCurriculum;

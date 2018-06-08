@@ -20,14 +20,15 @@ export default class extends React.Component {
   }
 
   render () {
-    const listItems = []
-    Object.keys(this.props.options).map(property => {
-      const option = this.props.options[property]
+    const { options } = this.props
+
+    const listItems = Object.keys(options).map(property => {
+      const option = options[property]
 
       let itemClass
       if (option.name === this.state.active.name) itemClass = 'nav-link active'
       else itemClass = 'nav-link'
-      listItems.push(
+      return (
         <li class='nav-item' key={option.name}>
           <button class={itemClass} onClick={() => this.setState({active: option})}>{option.name}</button>
         </li>

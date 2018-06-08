@@ -11,7 +11,7 @@ import java.util.concurrent.CompletableFuture;
 
 public class Job implements DomainObject<Long> {
     @Id(isIdentity =  true)
-    private long jobId;
+    private final long jobId;
     private final String title;
     @ColumnName(name = "accountId")
     private final CompletableFuture<Account> account;
@@ -42,6 +42,7 @@ public class Job implements DomainObject<Long> {
         applications = null;
         experiences = null;
         version = 0;
+        jobId = 0;
     }
 
     public Job(

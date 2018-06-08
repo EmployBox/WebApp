@@ -1,4 +1,4 @@
-package isel.ps.employbox.model.binder;
+package isel.ps.employbox.model.binders;
 
 import isel.ps.employbox.model.entities.Account;
 import isel.ps.employbox.model.input.InAccount;

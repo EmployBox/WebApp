@@ -4,10 +4,10 @@ import com.github.jayield.rapper.ColumnName;
 import com.github.jayield.rapper.DomainObject;
 import com.github.jayield.rapper.Id;
 import com.github.jayield.rapper.Version;
-import isel.ps.employbox.model.entities.CurriculumChilds.AcademicBackground;
-import isel.ps.employbox.model.entities.CurriculumChilds.CurriculumExperience;
-import isel.ps.employbox.model.entities.CurriculumChilds.PreviousJobs;
-import isel.ps.employbox.model.entities.CurriculumChilds.Project;
+import isel.ps.employbox.model.entities.curricula.childs.AcademicBackground;
+import isel.ps.employbox.model.entities.curricula.childs.CurriculumExperience;
+import isel.ps.employbox.model.entities.curricula.childs.PreviousJobs;
+import isel.ps.employbox.model.entities.curricula.childs.Project;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;

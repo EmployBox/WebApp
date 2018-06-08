@@ -2,24 +2,30 @@ package isel.ps.employbox.services.curricula;
 
 import com.github.jayield.rapper.DataRepository;
 import com.github.jayield.rapper.DomainObject;
+import com.github.jayield.rapper.Transaction;
+import com.github.jayield.rapper.utils.ConnectionManager;
 import com.github.jayield.rapper.utils.Pair;
+import com.github.jayield.rapper.utils.SqlSupplier;
+import com.github.jayield.rapper.utils.UnitOfWork;
 import isel.ps.employbox.ErrorMessages;
 import isel.ps.employbox.exceptions.BadRequestException;
 import isel.ps.employbox.exceptions.ConflictException;
 import isel.ps.employbox.exceptions.ResourceNotFoundException;
-import isel.ps.employbox.model.binder.CollectionPage;
+import isel.ps.employbox.model.binders.CollectionPage;
 import isel.ps.employbox.model.entities.Curriculum;
-import isel.ps.employbox.model.entities.CurriculumChilds.*;
 import isel.ps.employbox.model.entities.UserAccount;
+import isel.ps.employbox.model.entities.curricula.childs.*;
 import isel.ps.employbox.services.ServiceUtils;
 import isel.ps.employbox.services.UserAccountService;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
+import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
 
 @Service
 public class CurriculumService {
@@ -90,7 +96,7 @@ public class CurriculumService {
 
     public CompletableFuture<CollectionPage<Curriculum>> getCurricula(long accountId, int page, int pageSize) {
         return userAccountService.getUser(accountId)
-                .thenCompose(__ -> ServiceUtils.getCollectionPageFuture(curriculumRepo, page, pageSize, new Pair<>("accountId", accountId)));
+                .thenCompose(userAccount -> ServiceUtils.getCollectionPageFuture(curriculumRepo, page, pageSize, new Pair<>("accountId", accountId)));
     }
 
     public CompletableFuture<Curriculum> getCurriculum(long userId, long cid, String... email) {
@@ -112,10 +118,37 @@ public class CurriculumService {
         );
     }
 
-    public Mono<Void> deleteCurriculum(long userId, long cid, String name) {
+    public Mono<Void> deleteCurriculum(long userId, long cid, String email) {
+        List<Curriculum> curriculum = new ArrayList<>(1);
+
         return Mono.fromFuture(
-                getCurriculum(userId, cid, name)
-                        .thenCompose(curriculumRepo::delete)
+                new Transaction(Connection.TRANSACTION_READ_COMMITTED)
+                        .andDo(() ->
+                                getCurriculum(userId, cid, email)
+                                        .thenAccept(curriculum1 -> curriculum.add(0, curriculum1))
+                        )
+                        .andDo(() ->
+                                curriculum.get(0).getAcademicBackground()
+                                        .thenApply(academicBackgrounds -> academicBackgrounds.stream().map(AcademicBackground::getIdentityKey).collect(Collectors.toList()))
+                                        .thenCompose(academicBackgroundRepo::deleteAll)
+                        )
+                        .andDo(() ->
+                                curriculum.get(0).getProjects()
+                                        .thenApply(projects -> projects.stream().map(Project::getIdentityKey).collect(Collectors.toList()))
+                                        .thenCompose(projectRepo::deleteAll)
+                        )
+                        .andDo(() ->
+                                curriculum.get(0).getPreviousJobs()
+                                        .thenApply(previousJobs -> previousJobs.stream().map(PreviousJobs::getIdentityKey).collect(Collectors.toList()))
+                                        .thenCompose(previousJobsRepo::deleteAll)
+                        )
+                        .andDo(() ->
+                                curriculum.get(0).getExperiences()
+                                        .thenApply(curriculumExperiences -> curriculumExperiences.stream().map(CurriculumExperience::getIdentityKey).collect(Collectors.toList()))
+                                        .thenCompose(curriculumExperienceRepo::deleteAll)
+                        )
+                        .andDo(() -> curriculumRepo.deleteById(cid))
+                        .commit()
         );
     }
 

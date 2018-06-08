@@ -1,4 +1,4 @@
-package isel.ps.employbox.model.binder;
+package isel.ps.employbox.model.binders;
 
 import isel.ps.employbox.model.output.HalCollectionPage;
 import isel.ps.employbox.model.output.OutputDto;

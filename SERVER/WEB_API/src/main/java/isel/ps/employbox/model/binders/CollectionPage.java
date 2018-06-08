@@ -1,4 +1,4 @@
-package isel.ps.employbox.model.binder;
+package isel.ps.employbox.model.binders;
 
 import java.security.InvalidParameterException;
 import java.util.List;

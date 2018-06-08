@@ -1,4 +1,4 @@
-package isel.ps.employbox.model.binder;
+package isel.ps.employbox.model.binders;
 
 import com.github.jayield.rapper.DataRepository;
 import isel.ps.employbox.exceptions.ResourceNotFoundException;

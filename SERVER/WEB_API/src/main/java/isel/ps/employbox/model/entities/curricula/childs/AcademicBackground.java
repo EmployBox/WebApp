@@ -1,24 +1,21 @@
-package isel.ps.employbox.model.entities.CurriculumChilds;
+package isel.ps.employbox.model.entities.curricula.childs;
 
 import com.github.jayield.rapper.DomainObject;
 import com.github.jayield.rapper.Id;
 import com.github.jayield.rapper.Version;
 
-import java.sql.Date;
+import java.sql.Timestamp;
 
 public class AcademicBackground extends CurriculumChild implements DomainObject<Long> {
-
     @Id(isIdentity = true)
     private final long academicBackgroundKey;
-
     private long accountId;
     private long curriculumId;
-    private final Date beginDate;
-    private final Date endDate;
+    private final Timestamp beginDate;
+    private final Timestamp endDate;
     private final String studyArea;
     private final String institution;
     private final String degreeObtained;
-
     @Version
     private final long version;
 
@@ -34,7 +31,7 @@ public class AcademicBackground extends CurriculumChild implements DomainObject<
         academicBackgroundKey = 0;
     }
 
-    public AcademicBackground(long userId, long curriculumId, Date beginDate, Date endDate, String studyArea, String institution, String degreeObtained, long version, Long academicBackgroundKey) {
+    public AcademicBackground(long userId, long curriculumId, Timestamp beginDate, Timestamp endDate, String studyArea, String institution, String degreeObtained, long version, long academicBackgroundKey) {
         this.accountId = userId;
         this.curriculumId = curriculumId;
         this.beginDate = beginDate;
@@ -63,11 +60,11 @@ public class AcademicBackground extends CurriculumChild implements DomainObject<
         return curriculumId;
     }
 
-    public Date getBeginDate() {
+    public Timestamp getBeginDate() {
         return beginDate;
     }
 
-    public Date getEndDate() {
+    public Timestamp getEndDate() {
         return endDate;
     }
 

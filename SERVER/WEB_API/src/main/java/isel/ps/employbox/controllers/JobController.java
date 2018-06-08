@@ -2,8 +2,8 @@ package isel.ps.employbox.controllers;
 
 import isel.ps.employbox.ErrorMessages;
 import isel.ps.employbox.exceptions.BadRequestException;
-import isel.ps.employbox.model.binder.JobBinder;
-import isel.ps.employbox.model.binder.JobExperienceBinder;
+import isel.ps.employbox.model.binders.JobBinder;
+import isel.ps.employbox.model.binders.JobExperienceBinder;
 import isel.ps.employbox.model.entities.Job;
 import isel.ps.employbox.model.entities.JobExperience;
 import isel.ps.employbox.model.input.InJob;

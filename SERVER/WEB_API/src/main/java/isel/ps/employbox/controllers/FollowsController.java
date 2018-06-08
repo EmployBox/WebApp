@@ -1,6 +1,6 @@
 package isel.ps.employbox.controllers;
 
-import isel.ps.employbox.model.binder.AccountBinder;
+import isel.ps.employbox.model.binders.AccountBinder;
 import isel.ps.employbox.model.output.HalCollectionPage;
 import isel.ps.employbox.services.FollowService;
 import org.springframework.security.core.Authentication;

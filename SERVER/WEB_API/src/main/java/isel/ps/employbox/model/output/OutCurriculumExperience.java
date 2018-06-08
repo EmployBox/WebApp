@@ -1,7 +1,8 @@
 package isel.ps.employbox.model.output;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import isel.ps.employbox.controllers.CurriculumController;
+import isel.ps.employbox.controllers.curricula.CurriculumController;
+import isel.ps.employbox.controllers.curricula.CurriculumExperienceController;
 
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
@@ -57,7 +58,7 @@ public class OutCurriculumExperience implements OutputDto {
 
             private class Self {
                 @JsonProperty
-                final String href = HOSTNAME + linkTo( methodOn(CurriculumController.class).getCurriculumExperience(accountId, curriculumId, curriculumExperienceId)).withSelfRel().getHref();
+                final String href = HOSTNAME + linkTo( methodOn(CurriculumExperienceController.class).getCurriculumExperience(accountId, curriculumId, curriculumExperienceId)).withSelfRel().getHref();
             }
         }
     }
@@ -68,7 +69,7 @@ public class OutCurriculumExperience implements OutputDto {
 
         private class Self {
             @JsonProperty
-            final String href = HOSTNAME + linkTo( methodOn(CurriculumController.class).getCurriculumExperience(accountId, curriculumId, curriculumExperienceId)).withSelfRel().getHref();
+            final String href = HOSTNAME + linkTo( methodOn(CurriculumExperienceController.class).getCurriculumExperience(accountId, curriculumId, curriculumExperienceId)).withSelfRel().getHref();
         }
     }
 }

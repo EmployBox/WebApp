@@ -1,9 +1,13 @@
 package isel.ps.employbox.model.output;
 
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import isel.ps.employbox.controllers.CurriculumController;
+import isel.ps.employbox.controllers.curricula.AcademicBackgroundController;
+import isel.ps.employbox.controllers.curricula.CurriculumController;
+
+import java.sql.Timestamp;
 
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
@@ -26,10 +30,12 @@ public class OutAcademicBackground implements OutputDto {
     private final String studyArea;
 
     @JsonProperty
-    private final String beginDate;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
+    private final Timestamp beginDate;
 
     @JsonProperty
-    private final String endDate;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
+    private final Timestamp endDate;
 
     @JsonProperty
     private final _Links link = new _Links();
@@ -41,9 +47,9 @@ public class OutAcademicBackground implements OutputDto {
             String institution,
             String degree,
             String studyArea,
-            String beginDate,
-            String endDate)
-    {
+            Timestamp beginDate,
+            Timestamp endDate
+    ) {
         this.academicBackgroundId = academicBackgroundId;
         this.institution = institution;
         this.degree = degree;
@@ -81,7 +87,7 @@ public class OutAcademicBackground implements OutputDto {
 
             private class Self {
                 @JsonProperty
-                final String href = HOSTNAME +  linkTo( methodOn(CurriculumController.class).getAcademicBackground(accountId, curriculumId, 0)).slash(academicBackgroundId).withSelfRel().getHref();
+                final String href = HOSTNAME +  linkTo( methodOn(AcademicBackgroundController.class).getAcademicBackground(accountId, curriculumId, 0)).slash(academicBackgroundId).withSelfRel().getHref();
             }
         }
     }
@@ -91,7 +97,7 @@ public class OutAcademicBackground implements OutputDto {
         private Self self = new Self();
 
         private class Self{
-            String href = linkTo( methodOn(CurriculumController.class).getAcademicBackground(accountId, curriculumId, 0)).slash(academicBackgroundId).withSelfRel().getHref();
+            String href = linkTo( methodOn(AcademicBackgroundController.class).getAcademicBackground(accountId, curriculumId, 0)).slash(academicBackgroundId).withSelfRel().getHref();
         }
     }
 }

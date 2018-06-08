@@ -3,7 +3,7 @@ package isel.ps.employbox.model.output;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import isel.ps.employbox.model.binder.CollectionPage;
+import isel.ps.employbox.model.binders.CollectionPage;
 import org.springframework.hateoas.Link;
 
 import java.util.List;

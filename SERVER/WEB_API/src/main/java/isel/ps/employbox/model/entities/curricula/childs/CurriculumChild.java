@@ -1,4 +1,4 @@
-package isel.ps.employbox.model.entities.CurriculumChilds;
+package isel.ps.employbox.model.entities.curricula.childs;
 
 import org.springframework.stereotype.Component;
 

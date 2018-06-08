@@ -5,14 +5,13 @@ import com.github.jayield.rapper.utils.Pair;
 import isel.ps.employbox.ErrorMessages;
 import isel.ps.employbox.exceptions.ConflictException;
 import isel.ps.employbox.exceptions.ResourceNotFoundException;
-import isel.ps.employbox.model.binder.CollectionPage;
+import isel.ps.employbox.model.binders.CollectionPage;
 import isel.ps.employbox.model.entities.Curriculum;
-import isel.ps.employbox.model.entities.CurriculumChilds.AcademicBackground;
+import isel.ps.employbox.model.entities.curricula.childs.AcademicBackground;
 import isel.ps.employbox.services.ServiceUtils;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
-import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 @Service
@@ -28,27 +27,23 @@ public class AcademicBackgroundService {
         this.academicBackgroundRepo = academicBackgroundRepo;
     }
 
-    public CompletableFuture<CollectionPage<AcademicBackground>> getCurriculumAcademicBackgrounds(long curriculumId, int pageSize, int page) {
-        List[] list = new List[1];
-        CollectionPage[] ret = new CollectionPage[1];
-
+    public CompletableFuture<CollectionPage<AcademicBackground>> getCurriculumAcademicBackgrounds(long curriculumId, int page, int pageSize) {
         return curriculumRepo.findById(curriculumId)
-                .thenApply(ocurriculum -> ocurriculum.orElseThrow(() -> new ResourceNotFoundException(ErrorMessages.RESOURCE_NOTFOUND_CURRICULUM)))
-                .thenCompose(__ -> ServiceUtils.getCollectionPageFuture(academicBackgroundRepo, page, pageSize, new Pair<>("curriculumId", curriculumId)));
+                .thenApply(optional -> optional.orElseThrow(() -> new ResourceNotFoundException(ErrorMessages.RESOURCE_NOTFOUND_CURRICULUM)))
+                .thenCompose(curriculum -> ServiceUtils.getCollectionPageFuture(academicBackgroundRepo, page, pageSize, new Pair<>("curriculumId", curriculumId)));
     }
 
     public CompletableFuture<AcademicBackground> addAcademicBackgroundToCurriculum (
-            long academicBackgroundId,
             long accountId,
             long curriculumId,
             AcademicBackground academicBackground,
             String email
     ) {
-        if(academicBackground.getAccountId() != accountId || academicBackground.getCurriculumId() != curriculumId || academicBackgroundId != academicBackground.getAccountId())
+        if(academicBackground.getAccountId() != accountId || academicBackground.getCurriculumId() != curriculumId)
             throw new ConflictException(ErrorMessages.BAD_REQUEST_IDS_MISMATCH);
 
         return curriculumService.getCurriculum(accountId, curriculumId, email)
-                .thenCompose(curriculum -> academicBackgroundRepo.create( academicBackground))
+                .thenCompose(curriculum -> academicBackgroundRepo.create(academicBackground))
                 .thenApply(res -> academicBackground);
     }
 

@@ -2,8 +2,8 @@ package isel.ps.employbox.controllers;
 
 import isel.ps.employbox.ErrorMessages;
 import isel.ps.employbox.exceptions.BadRequestException;
-import isel.ps.employbox.model.binder.ChatBinder;
-import isel.ps.employbox.model.binder.MessageBinder;
+import isel.ps.employbox.model.binders.ChatBinder;
+import isel.ps.employbox.model.binders.MessageBinder;
 import isel.ps.employbox.model.entities.Chat;
 import isel.ps.employbox.model.input.InChat;
 import isel.ps.employbox.model.input.InMessage;

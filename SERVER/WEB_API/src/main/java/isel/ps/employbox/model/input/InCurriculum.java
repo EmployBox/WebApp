@@ -1,9 +1,9 @@
 package isel.ps.employbox.model.input;
 
-import isel.ps.employbox.model.entities.CurriculumChilds.AcademicBackground;
-import isel.ps.employbox.model.entities.CurriculumChilds.CurriculumExperience;
-import isel.ps.employbox.model.entities.CurriculumChilds.PreviousJobs;
-import isel.ps.employbox.model.entities.CurriculumChilds.Project;
+import isel.ps.employbox.model.entities.curricula.childs.AcademicBackground;
+import isel.ps.employbox.model.entities.curricula.childs.CurriculumExperience;
+import isel.ps.employbox.model.entities.curricula.childs.PreviousJobs;
+import isel.ps.employbox.model.entities.curricula.childs.Project;
 
 import java.util.Collections;
 import java.util.List;

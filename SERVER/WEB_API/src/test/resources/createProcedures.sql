@@ -1,7 +1,7 @@
 CREATE PROCEDURE populateDB()
   MODIFIES SQL DATA
   begin atomic
-    declare account_id1, account_id2, company_id1, company_id2, job_id bigint;
+    declare account_id1, account_id2, company_id1, company_id2, job_id, curriculum_id bigint;
     /*Insert Users*/
     insert into ACCOUNT(NAME, EMAIL, PASSWORD, ACCOUNTTYPE) values ('Bruno', 'teste@gmail.com', 'password', 'USR');
     set account_id1 = IDENTITY();
@@ -13,6 +13,10 @@ CREATE PROCEDURE populateDB()
 
     /*Insert Curricula*/
     insert into CURRICULUM(ACCOUNTID, TITLE) values (account_id1, 'Engenharia Civil');
+    set curriculum_id = IDENTITY();
+
+    /*Insert AcademicBackground*/
+    insert into ACADEMICBACKGROUND(ACCOUNTID, CURRICULUMID, INSTITUTION) values (account_id1, curriculum_id, 'ISEL');
 
     /*Insert Companies*/
     insert into ACCOUNT(NAME, EMAIL, PASSWORD, ACCOUNTTYPE) values ('company1', 'company1@gmail.com', '741', 'CMP');

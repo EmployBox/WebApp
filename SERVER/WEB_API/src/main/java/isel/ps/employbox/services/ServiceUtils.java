@@ -4,7 +4,7 @@ import com.github.jayield.rapper.DataRepository;
 import com.github.jayield.rapper.DomainObject;
 import com.github.jayield.rapper.Transaction;
 import com.github.jayield.rapper.utils.Pair;
-import isel.ps.employbox.model.binder.CollectionPage;
+import isel.ps.employbox.model.binders.CollectionPage;
 
 import java.sql.Connection;
 import java.util.List;
