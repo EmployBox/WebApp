@@ -4,7 +4,7 @@ import com.github.jayield.rapper.DataRepository;
 import isel.ps.employbox.exceptions.BadRequestException;
 import isel.ps.employbox.model.binders.curricula.AcademicBackgroundBinder;
 import isel.ps.employbox.model.entities.curricula.childs.AcademicBackground;
-import isel.ps.employbox.model.input.InAcademicBackground;
+import isel.ps.employbox.model.input.curricula.childs.InAcademicBackground;
 import isel.ps.employbox.model.output.HalCollectionPage;
 import isel.ps.employbox.model.output.OutAcademicBackground;
 import isel.ps.employbox.services.curricula.AcademicBackgroundService;
@@ -43,10 +43,10 @@ public class AcademicBackgroundController {
             @PathVariable long id,
             @PathVariable long cid,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "5") int numberOfItems
+            @RequestParam(defaultValue = "5") int pageSize
     ) {
         return academicBackgroundBinder.bindOutput(
-                academicBackgroundService.getCurriculumAcademicBackgrounds(cid, page, numberOfItems),
+                academicBackgroundService.getCurriculumAcademicBackgrounds(cid, page, pageSize),
                 this.getClass(),
                 id,
                 cid

@@ -1,5 +1,6 @@
 package isel.ps.employbox.model.output;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import isel.ps.employbox.controllers.UserAccountController;
@@ -12,21 +13,26 @@ import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 public class OutApplication implements OutputDto {
 
     @JsonProperty
-    private long accountId;
+    private final long applicationId;
 
     @JsonProperty
-    private long jobId;
+    private final long accountId;
 
     @JsonProperty
-    private Long curriculumId;
+    private final long jobId;
 
     @JsonProperty
-    private Timestamp date;
+    private final Long curriculumId;
+
+    @JsonProperty
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy hh:mm:ss")
+    private final Timestamp date;
 
     @JsonProperty
     private final _Links _links;
 
-    public OutApplication(long accountId, long jobId, Long curriculumId, Timestamp date){
+    public OutApplication(long applicationId, long accountId, long jobId, Long curriculumId, Timestamp date){
+        this.applicationId = applicationId;
         this.accountId = accountId;
         this.jobId = jobId;
         this.curriculumId = curriculumId;
@@ -50,7 +56,7 @@ public class OutApplication implements OutputDto {
 
             private class Self {
                 @JsonProperty
-                final String href = HOSTNAME + linkTo( methodOn(UserAccountController.class).getApplication(accountId, jobId)).withSelfRel().getHref();
+                final String href = HOSTNAME + linkTo( methodOn(UserAccountController.class).getApplication(accountId, jobId, applicationId)).withSelfRel().getHref();
             }
         }
     }
@@ -61,7 +67,7 @@ public class OutApplication implements OutputDto {
 
         private class Self {
             @JsonProperty
-            final String href = HOSTNAME + linkTo( methodOn(UserAccountController.class).getApplication(accountId, jobId)).withSelfRel().getHref();
+            final String href = HOSTNAME + linkTo( methodOn(UserAccountController.class).getApplication(accountId, jobId, applicationId)).withSelfRel().getHref();
         }
     }
 

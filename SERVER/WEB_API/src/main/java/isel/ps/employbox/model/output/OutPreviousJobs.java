@@ -68,15 +68,9 @@ public class OutPreviousJobs implements OutputDto {
 
     class PreviousItemOutput {
 
-        private class _Links {
-            @JsonProperty
-            private _Links.Self self = new _Links.Self();
+        @JsonProperty
+        private final _Links _links = new _Links();
 
-            private class Self {
-                @JsonProperty
-                final String href = HOSTNAME + linkTo( methodOn(PreviousJobsController.class).getPreviousJobs(accountId, curriculumId, 0,0)).slash(previousJobId).withSelfRel().getHref();
-            }
-        }
     }
 
     private class _Links {
@@ -85,7 +79,7 @@ public class OutPreviousJobs implements OutputDto {
 
         private class Self {
             @JsonProperty
-            final String href = HOSTNAME +   linkTo( methodOn(PreviousJobsController.class).getPreviousJobs(accountId, curriculumId, 0,0)).slash(previousJobId).withSelfRel().getHref();
+            final String href = HOSTNAME +   linkTo( methodOn(PreviousJobsController.class).getPreviousJobs(accountId, curriculumId, 0,5)).slash(previousJobId).withSelfRel().getHref();
         }
     }
 }

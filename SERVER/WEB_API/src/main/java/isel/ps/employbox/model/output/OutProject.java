@@ -2,7 +2,6 @@ package isel.ps.employbox.model.output;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import isel.ps.employbox.controllers.curricula.CurriculumController;
 import isel.ps.employbox.controllers.curricula.ProjectsController;
 
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
@@ -64,7 +63,7 @@ public class OutProject implements OutputDto {
 
             private class Self {
                 @JsonProperty
-                final String href = HOSTNAME +  linkTo( methodOn(ProjectsController.class).getProjects(accountId, curriculumId, 0)).slash(projectId).withSelfRel().getHref();
+                final String href = HOSTNAME +  linkTo( ProjectsController.class,accountId, curriculumId, projectId).withSelfRel().getHref();
             }
         }
     }
@@ -75,7 +74,7 @@ public class OutProject implements OutputDto {
 
         private class Self {
             @JsonProperty
-            final String href = HOSTNAME +  linkTo( methodOn(ProjectsController.class).getProjects(accountId, curriculumId, 0)).slash(projectId).withSelfRel().getHref();
+            final String href = HOSTNAME +  linkTo( ProjectsController.class,accountId, curriculumId, projectId).withSelfRel().getHref();
         }
     }
 }

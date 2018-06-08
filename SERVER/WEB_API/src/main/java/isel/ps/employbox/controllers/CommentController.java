@@ -27,10 +27,10 @@ public class CommentController {
     public Mono<HalCollectionPage> getAllComments(
             @PathVariable long id,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "5") int numberOfItems
+            @RequestParam(defaultValue = "5") int pageSize
     ) {
         return commentBinder.bindOutput(
-                commentService.getComments(id, page, numberOfItems),
+                commentService.getComments(id, page, pageSize),
                 this.getClass(),
                 id
         );

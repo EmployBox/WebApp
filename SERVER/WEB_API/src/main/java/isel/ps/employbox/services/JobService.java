@@ -46,9 +46,9 @@ public class JobService {
                 .thenApply(ojob -> ojob.orElseThrow(()-> new ResourceNotFoundException(ErrorMessages.RESOURCE_NOTFOUND_JOB)));
     }
 
-    public CompletableFuture<CollectionPage<JobExperience>> getJobExperiences(long jid, int page, int numberOfItems) {
+    public CompletableFuture<CollectionPage<JobExperience>> getJobExperiences(long jid, int page, int pageSize) {
         return getJob(jid)
-                .thenCompose(__ -> ServiceUtils.getCollectionPageFuture(jobExperienceRepo, page, numberOfItems, new Pair<>("jobId", jid)));
+                .thenCompose(__ -> ServiceUtils.getCollectionPageFuture(jobExperienceRepo, page, pageSize, new Pair<>("jobId", jid)));
     }
 
     public CompletableFuture<JobExperience> getJobExperience(long id, long cid) {
@@ -75,7 +75,10 @@ public class JobService {
                     experienceList.forEach(curr -> curr.setJobId(job.getIdentityKey()));
                     return jobExperienceRepo.createAll(experienceList);
                 })
-                .thenApply(aVoid -> job);
+                .thenApply(aVoid -> job)
+                .exceptionally( e -> {
+                    throw new BadRequestException(e.getMessage());
+                });
     }
 
     public CompletableFuture<Void> addJobExperienceToJob(long jobId, List<JobExperience> jobExperience, String username){

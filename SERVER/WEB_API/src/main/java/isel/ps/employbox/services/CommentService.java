@@ -26,7 +26,7 @@ public class CommentService {
         this.accountService = accountService;
     }
 
-    public CompletableFuture<CollectionPage<Comment>> getComments(long accountFromId,int pageSize, int page) {
+    public CompletableFuture<CollectionPage<Comment>> getComments(long accountFromId, int page, int pageSize) {
         return accountService.getAccount(accountFromId)
                 .thenCompose(__-> ServiceUtils.getCollectionPageFuture(commentRepo, page, pageSize, new Pair<>("accountIdFrom", accountFromId)));
     }

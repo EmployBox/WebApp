@@ -23,7 +23,7 @@ public class RatingService {
         this.accountService = accountService;
     }
 
-    public CompletableFuture<CollectionPage<Rating>> getRatings(long accountId, int pageSize, int page) {
+    public CompletableFuture<CollectionPage<Rating>> getRatings(long accountId, int page, int pageSize) {
         return ServiceUtils.getCollectionPageFuture(ratingRepo, page, pageSize, new Pair<>("accountId", accountId));
     }
 

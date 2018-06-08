@@ -24,8 +24,8 @@ public class AccountController {
     @GetMapping()
     public Mono<CollectionPage<Account>> getAccounts(
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "5") int numberOfItems
+            @RequestParam(defaultValue = "5") int pageSize
     ){
-        return Mono.fromFuture( accountService.getAllAccounts(page, numberOfItems) );
+        return Mono.fromFuture( accountService.getAllAccounts(page, pageSize) );
     }
 }

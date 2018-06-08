@@ -58,14 +58,17 @@ public class CurriculumService {
             throw new BadRequestException(ErrorMessages.BAD_REQUEST_IDS_MISMATCH);
 
         return userAccountService.getUser(userId, email)
-                .thenCompose(userAccount -> curriculumRepo.create(curriculum))
-                .thenApply(res -> curriculum)
-                .thenCompose(curriculum1 -> {
-                    List<CompletableFuture<Void>> list = new ArrayList<>();
-                    populateChildList(list, curriculum, userId);
-                    return CompletableFuture.allOf(list.toArray(new CompletableFuture[list.size()]));
-                })
-                .thenApply(res -> curriculum);
+                .thenCompose(userAccount -> new Transaction(Connection.TRANSACTION_SERIALIZABLE)
+                        .andDo(() -> curriculumRepo.create(curriculum)
+                                .thenApply(res -> curriculum)
+                                .thenCompose(curriculum1 -> {
+                                    List<CompletableFuture<Void>> list = new ArrayList<>();
+                                    populateChildList(list, curriculum, userId);
+                                    return CompletableFuture.allOf(list.toArray(new CompletableFuture[list.size()]));
+                                })
+                                .thenApply(res -> curriculum)
+                        ).commit()
+                        .thenApply(__ -> curriculum));
     }
 
     private <T extends CurriculumChild & DomainObject<K>, K> CompletableFuture<Void> addChildFutureFunction(

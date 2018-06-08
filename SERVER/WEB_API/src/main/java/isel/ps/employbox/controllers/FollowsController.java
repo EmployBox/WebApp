@@ -23,10 +23,10 @@ public class FollowsController {
     public Mono<HalCollectionPage> getFollowers(
             @PathVariable long id,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "5") int numberOfItems
+            @RequestParam(defaultValue = "5") int pageSize
     ){
         return accountBinder.bindOutput(
-                followService.getAccountFollowers(id, page, numberOfItems),
+                followService.getAccountFollowers(id, page, pageSize),
                 this.getClass(),
                 id
         );

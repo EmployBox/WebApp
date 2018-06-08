@@ -6,7 +6,7 @@ import com.github.jayield.rapper.utils.Pair;
 import isel.ps.employbox.model.entities.Curriculum;
 import isel.ps.employbox.model.entities.UserAccount;
 import isel.ps.employbox.model.entities.curricula.childs.AcademicBackground;
-import isel.ps.employbox.model.input.InAcademicBackground;
+import isel.ps.employbox.model.input.curricula.childs.InAcademicBackground;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;

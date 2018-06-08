@@ -29,10 +29,10 @@ public class RatingController {
     public Mono<HalCollectionPage> getRatings(
             @PathVariable long id,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "5") int numberOfItems
+            @RequestParam(defaultValue = "5") int pageSize
     ){
             return ratingBinder.bindOutput(
-                    ratingService.getRatings(id, page, numberOfItems),
+                    ratingService.getRatings(id, page, pageSize),
                     this.getClass(),
                     id
             );

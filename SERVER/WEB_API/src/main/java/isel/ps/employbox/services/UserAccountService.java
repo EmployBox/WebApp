@@ -21,6 +21,8 @@ import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
+import static isel.ps.employbox.ErrorMessages.BAD_REQUEST_IDS_MISMATCH;
+import static isel.ps.employbox.ErrorMessages.RESOURCE_NOTFOUND_APPLICATION;
 import static isel.ps.employbox.ErrorMessages.RESOURCE_NOTFOUND_USER;
 
 @Service
@@ -73,24 +75,24 @@ public class UserAccountService {
                 );
     }
 
-    public CompletableFuture<Application> getApplication(long userId, long jobId) {
+    public CompletableFuture<Application> getApplication(long userId, long jobId, long apId) {
         return getUser(userId)
-                .thenCompose(UserAccount::getApplications)
-                .thenApply(applications -> {
-                    Optional<Application> application = applications.stream().filter(curr -> curr.getAccountId() == userId && curr.getJobId() == jobId).findFirst();
-                    if (applications.isEmpty() || !application.isPresent())
-                        throw new ResourceNotFoundException(ErrorMessages.RESOURCE_NOTFOUND_APPLICATION);
-                    return application.get();
+                .thenCompose(__ -> applicationRepo.findById( apId))
+                .thenApply( oapplication -> oapplication.orElseThrow( () -> new ResourceNotFoundException( RESOURCE_NOTFOUND_APPLICATION)))
+                .thenApply( application -> {
+                    if(application.getJobId() != jobId)
+                        throw new BadRequestException(BAD_REQUEST_IDS_MISMATCH);
+                    return application;
                 });
     }
 
-    public CompletableFuture<CollectionPage<Application>> getAllApplications(long accountId, int page, int numberOfItems) {
+    public CompletableFuture<CollectionPage<Application>> getAllApplications(long accountId, int page, int pageSize) {
         List[] list = new List[1];
         CollectionPage[] ret = new CollectionPage[1];
 
         return userRepo.findById(accountId)
                 .thenApply(ouser -> ouser.orElseThrow(() -> new ResourceNotFoundException(ErrorMessages.RESOURCE_NOTFOUND_USER)))
-                .thenCompose(__ -> applicationRepo.findWhere(page, numberOfItems, new Pair<>("accountId", accountId))
+                .thenCompose(__ -> applicationRepo.findWhere(page, pageSize, new Pair<>("accountId", accountId))
                         .thenCompose(listRes -> {
                             list[0] = listRes;
                             return applicationRepo.getNumberOfEntries(new Pair<>("accountId", accountId));
@@ -98,7 +100,7 @@ public class UserAccountService {
                         .thenApply(collectionSize ->
                                 ret[0] = new CollectionPage(
                                         collectionSize,
-                                        numberOfItems,
+                                        pageSize,
                                         page,
                                         list[0])
                         ));
@@ -128,10 +130,12 @@ public class UserAccountService {
         );
     }
 
-    public Mono<Void> updateApplication(Application application, String email) {
+    public Mono<Void> updateApplication(Application application, String email, long apId) {
+        if(apId != application.getIdentityKey())
+            throw new BadRequestException(BAD_REQUEST_IDS_MISMATCH);
         return Mono.fromFuture(
                 getUser(application.getAccountId(), email)
-                        .thenCompose(userAccount -> getApplication(application.getAccountId(), application.getJobId()))
+                        .thenCompose(userAccount -> getApplication(application.getAccountId(), application.getJobId(), application.getIdentityKey()))
                         .thenCompose(application1 -> applicationRepo.update(application))
         );
     }
@@ -151,10 +155,10 @@ public class UserAccountService {
         );
     }
 
-    public Mono<Void> deleteApplication(long userId, long jobId, String email) {
+    public Mono<Void> deleteApplication(long userId, long jobId,long apId, String email) {
         return Mono.fromFuture(
                 getUser(userId, email)
-                        .thenCompose(userAccount -> getApplication(userId, jobId))
+                        .thenCompose(userAccount -> getApplication(userId, jobId, apId))
                         .thenCompose(applicationRepo::delete)
         );
     }

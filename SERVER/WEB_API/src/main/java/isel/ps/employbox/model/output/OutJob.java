@@ -91,11 +91,12 @@ public class OutJob implements OutputDto {
         private final String description;
 
         @JsonProperty
-        private final _Links _links = new _Links();
+        private final _Links _links;
 
         private JobItemOutput(String title, String description){
             this.title = title;
             this.description = description;
+            this._links = new _Links();
         }
 
         class _Links {
@@ -132,12 +133,12 @@ public class OutJob implements OutputDto {
 
         private class Experiences {
             @JsonProperty
-            final String href = HOSTNAME + linkTo ( methodOn(JobController.class).getJobExperiences(jobId, 0,0)).withRel("experiences").getHref();
+            final String href = HOSTNAME + linkTo ( methodOn(JobController.class).getJobExperiences(jobId, 0,5)).withRel("experiences").getHref();
         }
 
         private class Applications {
             @JsonProperty
-            final String href = HOSTNAME + linkTo ( methodOn(UserAccountController.class).getAllApplications(_account.getAccountId(), 0,0)).withRel("applications").getHref();
+            final String href = HOSTNAME + linkTo ( methodOn(UserAccountController.class).getAllApplications(_account.getAccountId(), 0,5)).withRel("applications").getHref();
         }
     }
 }

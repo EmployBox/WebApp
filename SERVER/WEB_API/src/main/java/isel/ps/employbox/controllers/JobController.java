@@ -36,9 +36,9 @@ public class JobController {
 
 
     @GetMapping
-    public Mono<HalCollectionPage> getAllJobs(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "5") int numberOfItems){
+    public Mono<HalCollectionPage> getAllJobs(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "5") int pageSize){
         return jobBinder.bindOutput(
-                jobService.getAllJobs(page, numberOfItems),
+                jobService.getAllJobs(page, pageSize),
                 this.getClass()
         );
     }
@@ -51,9 +51,13 @@ public class JobController {
     }
 
     @GetMapping("/{jid}/experiences")
-    public Mono<HalCollectionPage> getJobExperiences(@PathVariable long jid, @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "5") int numberOfItems){
+    public Mono<HalCollectionPage> getJobExperiences(
+            @PathVariable long jid,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "5") int pageSize)
+    {
         return jobExperienceBinder.bindOutput(
-                jobService.getJobExperiences(jid, page, numberOfItems),
+                jobService.getJobExperiences(jid, page, pageSize),
                 this.getClass(),
                 jid
         );
