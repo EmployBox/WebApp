@@ -1,8 +1,13 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
+import URI from 'urijs'
+import URITemplate from 'urijs/src/URITemplate'
+
+const getURI = (active, searchText) => new URITemplate('/{type}/search?{query}={value}')
+  .expand({ type: URI.decode(active.name.toLowerCase()), query: active.queryParam, value: searchText })
 
 export default class extends React.Component {
-  // ({Searchable Array: options})
+  // ({Option Array: options})
   constructor (props) {
     super(props)
     this.state = {
@@ -21,12 +26,13 @@ export default class extends React.Component {
 
   render () {
     const { options } = this.props
+    const { active, searchText } = this.state
 
     const listItems = Object.keys(options).map(property => {
       const option = options[property]
 
       let itemClass
-      if (option.name === this.state.active.name) itemClass = 'nav-link active'
+      if (option.name === active.name) itemClass = 'nav-link active'
       else itemClass = 'nav-link'
       return (
         <li class='nav-item' key={option.name}>
@@ -34,8 +40,6 @@ export default class extends React.Component {
         </li>
       )
     })
-
-    const { active, searchText } = this.state
 
     return (
       <div class='container py-5'>
@@ -50,7 +54,7 @@ export default class extends React.Component {
             value={searchText}
             placeholder={active.placeholder}
             onChange={this.handleChange} />
-          <Link class='btn btn-primary' to={`/${active.name.toLowerCase()}/search?${options.queryParam}=${searchText}`}>Search</Link>
+          <Link class='btn btn-primary' to={getURI(active, searchText)}>Search</Link>
         </form>
       </div>
     )

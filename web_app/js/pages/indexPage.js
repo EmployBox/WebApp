@@ -17,7 +17,6 @@ const options = {
   users: new Option('Users', 'User\'s name', 'name')
 }
 
-// ({Searchable Array: options})
 export default (props) => (
   <div>
     <Carousel />

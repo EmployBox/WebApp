@@ -1,4 +1,5 @@
 import React from 'react'
+import URI from 'urijs'
 
 import Job from '../searchables/job'
 import Company from '../searchables/company'
@@ -11,19 +12,24 @@ const options = {
   users: User
 }
 
-const numberOfItems = '?numberOfItems=10'
-
 export default (props) => {
   const type = props.match.params.type
+
+  const query = URI.parseQuery(props.location.search)
+  query.numberOfItems = 10
+
   const entity = options[type]
-  const url = `${props.hostname}/${type}${numberOfItems}`
+  const url = props.url
+    .directory(type)
+    .query(query)
+
   return (
     <div class='container'>
       <div class='row'>
         <div class='col col-lg-3'>
           <h3 class='text-center text-white border bg-dark'>Filters</h3>
           <div class='container'>
-            {entity.renderFilters()}
+            {entity.renderFilters(query)}
           </div>
         </div>
         <div class='col'>
