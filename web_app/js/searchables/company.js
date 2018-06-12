@@ -2,14 +2,9 @@ import React from 'react'
 import { Link } from 'react-router-dom'
 
 import HttpRequest from '../components/httpRequest'
-import Searchable from './searchable'
 
-export default class extends Searchable {
-  constructor (numberOfItems) {
-    super('Companies', 'Company\'s name', `/accounts/companies${numberOfItems}`)
-  }
-
-  renderTable (companies) {
+export default {
+  renderTable: (companies) => {
     const tableRows = companies._embedded.items.map(item => {
       return (
         <HttpRequest

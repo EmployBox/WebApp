@@ -1,12 +1,22 @@
 import React from 'react'
 
+import Job from '../searchables/job'
+import Company from '../searchables/company'
+import User from '../searchables/user'
 import HttpRequest from '../components/httpRequest'
-import Configuration from '../configuration'
 
-const config = new Configuration()
+const options = {
+  jobs: Job,
+  companies: Company,
+  users: User
+}
+
+const numberOfItems = '?numberOfItems=10'
 
 export default (props) => {
-  const entity = config.searchableEntities[props.match.params.type]
+  const type = props.match.params.type
+  const entity = options[type]
+  const url = `${props.hostname}/${type}${numberOfItems}`
   return (
     <div class='container'>
       <div class='row'>
@@ -19,7 +29,7 @@ export default (props) => {
         <div class='col'>
           <h3 class='text-center text-white border bg-dark'>Results</h3>
           <HttpRequest
-            url={`${config.hostname}${entity.url}`}
+            url={url}
             onResult={data => entity.renderTable(data)} />
         </div>
       </div>

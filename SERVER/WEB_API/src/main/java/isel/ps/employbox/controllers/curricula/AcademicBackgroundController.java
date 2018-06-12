@@ -78,11 +78,12 @@ public class AcademicBackgroundController {
     public Mono<Void> updateAcademicBackground(
             @PathVariable long id,
             @PathVariable long cid,
-            @RequestBody AcademicBackground academicBackground,
+            @RequestBody InAcademicBackground inAcademicBackground,
             Authentication authentication
     ) {
-        if(academicBackground.getAccountId() != id || academicBackground.getCurriculumId() != cid)
+        if(inAcademicBackground.getAccountId() != id || inAcademicBackground.getCurriculumId() != cid)
             throw new BadRequestException(BAD_REQUEST_IDS_MISMATCH);
+        AcademicBackground academicBackground = academicBackgroundBinder.bindInput(inAcademicBackground);
         return academicBackgroundService.updateAcademicBackground(id, cid, academicBackground, authentication.getName() );
     }
 
@@ -91,8 +92,8 @@ public class AcademicBackgroundController {
             @PathVariable long abkId,
             @PathVariable long id,
             @PathVariable long cid,
-            Authentication authentication)
-    {
+            Authentication authentication
+    ) {
         return academicBackgroundService.deleteAcademicBackground(abkId, id, cid, authentication.getName());
     }
 }

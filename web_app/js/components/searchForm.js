@@ -50,7 +50,7 @@ export default class extends React.Component {
             value={searchText}
             placeholder={active.placeholder}
             onChange={this.handleChange} />
-          <Link class='btn btn-primary' to={`/${active.name.toLowerCase()}/search?q=${searchText}`}>Search</Link>
+          <Link class='btn btn-primary' to={`/${active.name.toLowerCase()}/search?${options.queryParam}=${searchText}`}>Search</Link>
         </form>
       </div>
     )

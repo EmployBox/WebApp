@@ -11,6 +11,10 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 public class ServiceUtils {
+
+    private ServiceUtils() {
+    }
+
     public static <T extends DomainObject<K>, K> CompletableFuture<CollectionPage<T>> getCollectionPageFuture(
             DataRepository<T, K> repo,
             int page,
@@ -33,7 +37,8 @@ public class ServiceUtils {
                                         page,
                                         list[0]
                                 ))
-                ).commit()
-                .thenApply(__ -> ret[0]);
+                )
+                .commit()
+                .thenApply(aVoid -> ret[0]);
     }
 }

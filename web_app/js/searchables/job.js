@@ -2,14 +2,9 @@ import React from 'react'
 import { Link } from 'react-router-dom'
 
 import HttpRequest from '../components/httpRequest'
-import Searchable from './searchable'
 
-export default class extends Searchable {
-  constructor (numberOfItems) {
-    super('Jobs', 'Job\'s title', `/jobs${numberOfItems}`)
-  }
-
-  renderFilters () {
+export default {
+  renderFilters: () => {
     return (
       <div class='row'>
         <div class='form-check'>
@@ -20,9 +15,9 @@ export default class extends Searchable {
         </div>
       </div>
     )
-  }
+  },
 
-  renderTable (jobs) {
+  renderTable: (jobs) => {
     let tableRows = <tr><td>Empty</td></tr>
     if (jobs._embedded) {
       tableRows = jobs._embedded.items.map(item => {

@@ -65,7 +65,7 @@ create table AcademicBackground (
   FOREIGN KEY (accountId) REFERENCES Account,
   FOREIGN KEY (curriculumId) REFERENCES curriculum(curriculumId),
   check (endDate < beginDate),
-  check (degreeObtained in ('basic level 1', 'basic level 2', 'basic level 3', 'secundary', 'bachelor', 'master', 'PHD')
+  check (degreeObtained in ('basic level 1', 'basic level 2', 'basic level 3', 'secundary', 'bachelor', 'master', 'PHD'))
 );
 
 create table PreviousJobs (
