@@ -54,7 +54,9 @@ export default class extends React.Component {
             value={searchText}
             placeholder={active.placeholder}
             onChange={this.handleChange} />
-          <Link class='btn btn-primary' to={getURI(active, searchText)}>Search</Link>
+          <Link to={getURI(active, searchText)}>
+            <button class='btn btn-primary'>Search</button>
+          </Link>
         </form>
       </div>
     )

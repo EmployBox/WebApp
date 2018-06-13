@@ -20,6 +20,6 @@ const options = {
 export default (props) => (
   <div>
     <Carousel />
-    <SearchForm options={options} />
+    <SearchForm options={options} {...props} />
   </div>
 )
