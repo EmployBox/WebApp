@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import isel.ps.employbox.controllers.JobController;
 import isel.ps.employbox.controllers.UserAccountController;
+import isel.ps.employbox.model.output.OutAccount.AccountItemOutput;
 
 import java.sql.Timestamp;
 
@@ -80,22 +81,33 @@ public class OutJob implements OutputDto {
     @JsonIgnore
     @Override
     public Object getCollectionItemOutput() {
-        return new JobItemOutput(title, description);
+        return new JobItemOutput(jobId, (AccountItemOutput) _account.getCollectionItemOutput(), title, offerBeginDate, address, offerType);
     }
 
     class JobItemOutput {
         @JsonProperty
-        private String title;
-
+        private final long jobId;
         @JsonProperty
-        private final String description;
-
+        private final AccountItemOutput account;
+        @JsonProperty
+        private final String title;
+        @JsonProperty
+        @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy hh:mm:ss")
+        private final Timestamp offerBeginDate;
+        @JsonProperty
+        private final String address;
+        @JsonProperty
+        private final String offerType;
         @JsonProperty
         private final _Links _links;
 
-        private JobItemOutput(String title, String description){
+        private JobItemOutput(long jobId, AccountItemOutput account, String title, Timestamp offerBeginDate, String address, String offerType){
+            this.jobId = jobId;
+            this.account = account;
             this.title = title;
-            this.description = description;
+            this.offerBeginDate = offerBeginDate;
+            this.address = address;
+            this.offerType = offerType;
             this._links = new _Links();
         }
 
