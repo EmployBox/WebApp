@@ -36,9 +36,18 @@ public class JobController {
 
 
     @GetMapping
-    public Mono<HalCollectionPage> getAllJobs(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "5") int pageSize){
+    public Mono<HalCollectionPage> getAllJobs(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "5") int pageSize,
+            @RequestParam(required = false) String address,
+            @RequestParam(required = false) String location,
+            @RequestParam(required = false) String title,
+            @RequestParam(required = false) int wage,
+            @RequestParam(required = false) String type,
+            @RequestParam(required = false) int ratingLow,
+            @RequestParam(required = false) int ratingHigh){
         return jobBinder.bindOutput(
-                jobService.getAllJobs(page, pageSize),
+                jobService.getAllJobs(page, pageSize, address, location, title, wage, type, ratingLow, ratingHigh),
                 this.getClass()
         );
     }
@@ -54,7 +63,8 @@ public class JobController {
     public Mono<HalCollectionPage> getJobExperiences(
             @PathVariable long jid,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "5") int pageSize)
+            @RequestParam(defaultValue = "5") int pageSize
+    )
     {
         return jobExperienceBinder.bindOutput(
                 jobService.getJobExperiences(jid, page, pageSize),

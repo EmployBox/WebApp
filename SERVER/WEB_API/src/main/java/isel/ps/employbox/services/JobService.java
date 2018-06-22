@@ -37,8 +37,19 @@ public class JobService {
         this.accountService = userService;
     }
 
-    public CompletableFuture<CollectionPage<Job>> getAllJobs(int page, int pageSize) {
-        return ServiceUtils.getCollectionPageFuture(jobRepo, page, pageSize);
+    public CompletableFuture getAllJobs(int page, int pageSize,String address, String location, String title, int wage, String offerType, int ratingLow, int ratingHigh) {
+        return ServiceUtils.getCollectionPageFuture(
+                jobRepo,
+                page,
+                pageSize,
+                new Pair("address",address),
+                new Pair("location",location),
+                new Pair("title",title),
+                new Pair("wage", Integer.valueOf(wage)),
+                new Pair("offerType",offerType),
+                new Pair("wage", Integer.valueOf(ratingLow)),
+                new Pair("wage", Integer.valueOf(ratingHigh))
+        );
     }
 
     public CompletableFuture<Job> getJob(long jid) {
