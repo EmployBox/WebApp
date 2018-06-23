@@ -43,26 +43,27 @@ public class OutUser implements OutputDto {
     @JsonIgnore
     @Override
     public Object getCollectionItemOutput() {
-        return new UserItemOutput(name, email, rating);
+        return new UserItemOutput(id, name, rating, summary);
     }
 
     class UserItemOutput {
         @JsonProperty
-        private final String name;
-
+        private final long id;
         @JsonProperty
-        private final String email;
-
+        private final String name;
         @JsonProperty
         private final double rating;
-
         @JsonProperty
-        private _Links _links = new _Links();
+        private final String summary;
+        @JsonProperty
+        private _Links _links;
 
-        UserItemOutput(String name, String email, double rating) {
+        UserItemOutput(long id, String name, double rating, String summary) {
+            this.id = id;
             this.name = name;
-            this.email = email;
             this.rating = rating;
+            this.summary = summary;
+            _links = new _Links();
         }
 
         private class _Links {
