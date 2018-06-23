@@ -42,10 +42,11 @@ public class OutCurriculum implements OutputDto {
         private String title;
 
         @JsonProperty
-        private final _Links _links = new _Links();
+        private final _Links _links;
 
         private CurriculumItemOutput(String title){
             this.title = title;
+            this._links = new _Links();
         }
 
         class _Links {
@@ -83,22 +84,22 @@ public class OutCurriculum implements OutputDto {
 
         private class Projects {
             @JsonProperty
-            final String href = HOSTNAME + linkTo ( methodOn(ProjectsController.class).getProjects(userId,curriculumId, 0)).withRel("projects").getHref();
+            final String href = HOSTNAME + linkTo (ProjectsController.class, userId, curriculumId).withSelfRel().getHref();
         }
 
         private class AcademicBackgrounds {
             @JsonProperty
-            final String href = HOSTNAME + linkTo ( methodOn(AcademicBackgroundController.class).getAcademicBackground(userId,curriculumId, 0)).withRel("academicBackground").getHref();
+            final String href = HOSTNAME + linkTo ( AcademicBackgroundController.class, userId, curriculumId).withSelfRel().getHref();
         }
 
         private class PreviousJobs {
             @JsonProperty
-            final String href = HOSTNAME +  linkTo ( methodOn(PreviousJobsController.class).getPreviousJobs(userId,curriculumId, 0,0)).withRel("previousJobs").getHref();
+            final String href = HOSTNAME +  linkTo ( PreviousJobsController.class, userId, curriculumId).withSelfRel().getHref();
         }
 
         private class CurriculumExperiences {
             @JsonProperty
-            final String href = HOSTNAME +  linkTo ( methodOn(CurriculumExperienceController.class).getCurriculumExperiences(userId,curriculumId, 0,0)).withRel("curriculumExperience").getHref();
+            final String href = HOSTNAME +  linkTo ( CurriculumExperienceController.class, userId, curriculumId).withSelfRel().getHref();
         }
     }
 }

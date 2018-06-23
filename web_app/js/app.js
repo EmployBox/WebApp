@@ -1,9 +1,10 @@
 import React, {Component} from 'react'
 import {BrowserRouter, Route, Switch} from 'react-router-dom'
+
 import Navigation from './components/navigation'
 import Footer from './components/footer'
-import SignUp from './pages/signup'
 
+import SignUp from './pages/signup'
 import IndexPage from './pages/indexPage'
 import SearchPage from './pages/searchPage'
 import URI from 'urijs'
@@ -15,11 +16,9 @@ const urls = {
   signUp: new URITemplate('/signup/{url}').expand({url: 'http://localhost:8080/accounts/users'})
 }
 
-export default class extends Component {
-  constructor (props) {
-    super(props)
-  }
+const apiURI = 'http://localhost:8080'
 
+export default class extends Component {
   render () {
     return (
       <div>
@@ -30,7 +29,7 @@ export default class extends Component {
               <Route exact path='/' component={IndexPage} />
               <Route exact path='/signup/:url' render={({history, match}) => <SignUp ToLogin={() => history.push(urls.logIn)} url={match.params.url} />} />
               <Route exact path='/login/:url' render={({history, match}) => <LogIn />} />
-              <Route exact path='/:type/search' component={SearchPage} />
+              <Route exact path='/:type/search' render={(props) => <SearchPage url={apiURI} />} />
               <Route path='/' render={({history}) =>
                 <center class='py-5'>
                   <h2>Page not found</h2>

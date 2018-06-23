@@ -53,8 +53,9 @@ public class AcademicBackgroundService {
             AcademicBackground academicBackground,
             String email
     ) {
-        return Mono.fromFuture(curriculumService.getCurriculum(accountId, curriculumId, email)
-                .thenCompose(curriculum -> academicBackgroundRepo.update(academicBackground))
+        return Mono.fromFuture(
+                curriculumService.getCurriculum(accountId, curriculumId, email)
+                        .thenCompose(curriculum -> academicBackgroundRepo.update(academicBackground))
         );
     }
 

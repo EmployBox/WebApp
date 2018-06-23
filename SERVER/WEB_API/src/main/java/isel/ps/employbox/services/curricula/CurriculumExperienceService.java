@@ -28,10 +28,7 @@ public class CurriculumExperienceService {
         this.curriculumService = curriculumService;
     }
 
-    public CompletableFuture<CollectionPage<CurriculumExperience>> getCurriculumExperiences(long curriculumId, int pageSize, int page) {
-        List[] list = new List[1];
-        CollectionPage[] ret = new CollectionPage[1];
-
+    public CompletableFuture<CollectionPage<CurriculumExperience>> getCurriculumExperiences(long curriculumId, int page, int pageSize) {
         return curriculumRepo.findById(curriculumId)
                 .thenApply(ocurriculum -> ocurriculum.orElseThrow(() -> new ResourceNotFoundException(ErrorMessages.RESOURCE_NOTFOUND_CURRICULUM)))
                 .thenCompose(__ -> ServiceUtils.getCollectionPageFuture( curriculumExperienceRepo, page, pageSize, new Pair<>("curriculumId", curriculumId)));

@@ -4,19 +4,13 @@ import com.github.jayield.rapper.DataRepository;
 import isel.ps.employbox.exceptions.BadRequestException;
 import isel.ps.employbox.model.binders.curricula.*;
 import isel.ps.employbox.model.entities.*;
-import isel.ps.employbox.model.entities.curricula.childs.AcademicBackground;
 import isel.ps.employbox.model.entities.curricula.childs.CurriculumExperience;
-import isel.ps.employbox.model.entities.curricula.childs.PreviousJobs;
-import isel.ps.employbox.model.entities.curricula.childs.Project;
-import isel.ps.employbox.model.input.InAcademicBackground;
-import isel.ps.employbox.model.input.InCurriculum;
+import isel.ps.employbox.model.input.curricula.childs.InCurriculum;
 import isel.ps.employbox.model.output.*;
 import isel.ps.employbox.services.curricula.*;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
-
-import java.util.concurrent.CompletableFuture;
 
 import static isel.ps.employbox.ErrorMessages.BAD_REQUEST_IDS_MISMATCH;
 
@@ -47,10 +41,10 @@ public class CurriculumController {
     public Mono<HalCollectionPage> getCurricula(
             @PathVariable long id,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "5") int numberOfItems
+            @RequestParam(defaultValue = "5") int pageSize
     ){
         return curriculumBinder.bindOutput(
-                curriculumService.getCurricula(id, page, numberOfItems),
+                curriculumService.getCurricula(id, page, pageSize),
                 this.getClass(),
                 id
         );

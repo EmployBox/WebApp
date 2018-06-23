@@ -4,6 +4,7 @@ import com.github.jayield.rapper.DataRepository;
 import isel.ps.employbox.exceptions.BadRequestException;
 import isel.ps.employbox.model.binders.curricula.CurriculumExperienceBinder;
 import isel.ps.employbox.model.entities.curricula.childs.CurriculumExperience;
+import isel.ps.employbox.model.input.curricula.childs.InCurriculumExperience;
 import isel.ps.employbox.model.output.HalCollectionPage;
 import isel.ps.employbox.model.output.OutCurriculumExperience;
 import isel.ps.employbox.services.curricula.CurriculumExperienceService;
@@ -43,12 +44,13 @@ public class CurriculumExperienceController {
             @PathVariable long id,
             @PathVariable long cid,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "5") int numberOfItems
+            @RequestParam(defaultValue = "5") int pageSize
     ){
         return curriculumExperienceBinder.bindOutput(
-                curriculumExperienceService.getCurriculumExperiences(cid, page, numberOfItems),
+                curriculumExperienceService.getCurriculumExperiences(cid, page, pageSize),
                 this.getClass(),
-                id
+                id,
+                cid
         );
     }
 
@@ -56,9 +58,10 @@ public class CurriculumExperienceController {
     public Mono<CurriculumExperience> addCurriculumExperienceToJob(
             @PathVariable long id,
             @PathVariable long cid,
-            @RequestBody CurriculumExperience curriculumExperience,
+            @RequestBody InCurriculumExperience inCurriculumExperience,
             Authentication authentication)
     {
+        CurriculumExperience curriculumExperience = curriculumExperienceBinder.bindInput(inCurriculumExperience);
         return Mono.fromFuture( curriculumExperienceService.addCurriculumExperience(id,cid, curriculumExperience,authentication.getName()));
     }
 

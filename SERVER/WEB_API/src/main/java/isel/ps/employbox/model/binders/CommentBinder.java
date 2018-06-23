@@ -21,7 +21,7 @@ public class CommentBinder implements ModelBinder<Comment,OutComment,InComment> 
                                 comment.getAccountIdDest(),
                                 comment.getIdentityKey(),
                                 comment.getMainCommendID(),
-                                comment.getDate().toString(),
+                                comment.getDatetime().toString(),
                                 comment.getText())
                 )
         );

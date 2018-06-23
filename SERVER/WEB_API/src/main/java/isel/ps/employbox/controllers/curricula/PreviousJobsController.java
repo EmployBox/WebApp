@@ -4,6 +4,7 @@ import com.github.jayield.rapper.DataRepository;
 import isel.ps.employbox.exceptions.BadRequestException;
 import isel.ps.employbox.model.binders.curricula.PreviousJobsBinder;
 import isel.ps.employbox.model.entities.curricula.childs.PreviousJobs;
+import isel.ps.employbox.model.input.curricula.childs.InPreviousJobs;
 import isel.ps.employbox.model.output.HalCollectionPage;
 import isel.ps.employbox.model.output.OutPreviousJobs;
 import isel.ps.employbox.services.curricula.CurriculumService;
@@ -43,10 +44,10 @@ public class PreviousJobsController {
             @PathVariable long id,
             @PathVariable long cid,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "5") int numberOfItems
+            @RequestParam(defaultValue = "5") int pageSize
     ){
         return previousJobsBinder.bindOutput(
-                previousJobService.getCurriculumPreviousJobs( cid, page, numberOfItems ),
+                previousJobService.getCurriculumPreviousJobs( cid, page, pageSize ),
                 this.getClass(),
                 id,
                 cid );
@@ -56,9 +57,10 @@ public class PreviousJobsController {
     public Mono<PreviousJobs> addPreviousJob (
             @PathVariable long id,
             @PathVariable long cid,
-            @RequestBody PreviousJobs previousJobs,
+            @RequestBody InPreviousJobs inPreviousJobs,
             Authentication authentication)
     {
+        PreviousJobs previousJobs = previousJobsBinder.bindInput(inPreviousJobs);
         return Mono.fromFuture( previousJobService.addPreviousJobToCurriculum(id,cid, previousJobs,authentication.getName()));
     }
 
@@ -67,9 +69,10 @@ public class PreviousJobsController {
             @PathVariable long pvjId,
             @PathVariable long id,
             @PathVariable long cid,
-            @RequestBody PreviousJobs previousJobs,
+            @RequestBody InPreviousJobs inPreviousJobs,
             Authentication authentication)
     {
+        PreviousJobs previousJobs = previousJobsBinder.bindInput(inPreviousJobs);
         if(previousJobs.getAccountId() != id || previousJobs.getCurriculumId() != cid)
             throw new BadRequestException(BAD_REQUEST_IDS_MISMATCH);
         return previousJobService.updatePreviousJob(pvjId, id, cid, previousJobs,authentication.getName() );

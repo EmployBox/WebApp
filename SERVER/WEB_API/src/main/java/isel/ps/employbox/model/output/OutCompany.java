@@ -54,31 +54,39 @@ public class OutCompany implements OutputDto {
     @JsonIgnore
     @Override
     public Object getCollectionItemOutput() {
-        return new CompanyItemOutput(rating, name);
+        return new CompanyItemOutput(accountId, rating, name, specialization, yearFounded);
     }
 
     class CompanyItemOutput {
         @JsonProperty
+        private final Long accountId;
+        @JsonProperty
         private final String name;
-
         @JsonProperty
         private final double rating;
-
         @JsonProperty
-        private final _Links _links = new _Links();
+        private final String specialization;
+        @JsonProperty
+        private final Short yearFounded;
+        @JsonProperty
+        private final _Links _links;
 
-        private CompanyItemOutput(double rating, String name){
+        private CompanyItemOutput(Long accountId, double rating, String name, String specialization, Short yearFounded){
+            this.accountId = accountId;
             this.rating = rating;
             this.name = name;
+            this.specialization = specialization;
+            this.yearFounded = yearFounded;
+            _links = new _Links();
         }
 
         class _Links {
             @JsonProperty
-            private _Links.Self self = new _Links.Self();
+            private Self self = new Self();
 
             private class Self{
                 @JsonProperty
-                final String href = HOSTNAME + linkTo(CompanyController.class).slash(accountId).withSelfRel().withSelfRel().getHref();
+                final String href = HOSTNAME + linkTo(CompanyController.class).slash(accountId).withSelfRel().getHref();
             }
         }
     }
@@ -89,7 +97,7 @@ public class OutCompany implements OutputDto {
 
         private class Self {
             @JsonProperty
-            final String href = HOSTNAME + linkTo(CompanyController.class).slash(accountId).withSelfRel().withSelfRel().getHref();
+            final String href = HOSTNAME + linkTo(CompanyController.class).slash(accountId).withSelfRel().getHref();
         }
     }
 }

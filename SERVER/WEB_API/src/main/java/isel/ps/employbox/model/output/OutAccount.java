@@ -2,17 +2,12 @@ package isel.ps.employbox.model.output;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import isel.ps.employbox.controllers.AccountController;
 import isel.ps.employbox.controllers.CompanyController;
-import isel.ps.employbox.controllers.JobController;
 import isel.ps.employbox.controllers.UserAccountController;
-import isel.ps.employbox.model.entities.Company;
-import org.springframework.hateoas.Link;
 
 import java.util.HashMap;
 
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
-import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 
 public class OutAccount implements OutputDto {
     @JsonProperty
@@ -68,7 +63,38 @@ public class OutAccount implements OutputDto {
     @JsonIgnore
     @Override
     public Object getCollectionItemOutput() {
-        return null;
+        return new AccountItemOutput(accountId, rating, name, accountType);
+    }
+
+    class AccountItemOutput {
+        @JsonProperty
+        private final long accountId;
+        @JsonProperty
+        private final String name;
+        @JsonProperty
+        private final double rating;
+        @JsonProperty
+        private final String accountType;
+        @JsonProperty
+        private final _Links _links;
+
+        AccountItemOutput(long accountId, double rating, String name, String accountType) {
+            this.accountId = accountId;
+            this.rating = rating;
+            this.name = name;
+            this.accountType = accountType;
+            _links = new _Links();
+        }
+
+        private class _Links {
+            @JsonProperty
+            private Self self = new Self();
+
+            private class Self {
+                @JsonProperty
+                final String href = HOSTNAME + accountLinks.get(accountType);
+            }
+        }
     }
 
     private class _Links {

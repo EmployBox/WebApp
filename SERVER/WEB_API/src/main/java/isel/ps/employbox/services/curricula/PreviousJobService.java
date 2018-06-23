@@ -28,7 +28,7 @@ public class PreviousJobService {
         this.curriculumService = curriculumService;
     }
 
-    public CompletableFuture<CollectionPage<PreviousJobs>> getCurriculumPreviousJobs(long curriculumId, int pageSize, int page) {
+    public CompletableFuture<CollectionPage<PreviousJobs>> getCurriculumPreviousJobs(long curriculumId, int page, int pageSize) {
         List[] list = new List[1];
         CollectionPage[] ret = new CollectionPage[1];
 

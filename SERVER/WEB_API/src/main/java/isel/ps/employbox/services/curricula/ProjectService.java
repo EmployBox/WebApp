@@ -1,6 +1,7 @@
 package isel.ps.employbox.services.curricula;
 
 import com.github.jayield.rapper.DataRepository;
+import com.github.jayield.rapper.DomainObject;
 import com.github.jayield.rapper.utils.Pair;
 import isel.ps.employbox.ErrorMessages;
 import isel.ps.employbox.exceptions.BadRequestException;
@@ -9,6 +10,7 @@ import isel.ps.employbox.exceptions.ResourceNotFoundException;
 import isel.ps.employbox.model.binders.CollectionPage;
 import isel.ps.employbox.model.entities.Curriculum;
 import isel.ps.employbox.model.entities.curricula.childs.Project;
+import isel.ps.employbox.model.input.curricula.childs.InProject;
 import isel.ps.employbox.services.ServiceUtils;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
@@ -27,7 +29,7 @@ public class ProjectService {
         this.curriculumRepo = curriculumRepo;
     }
 
-    public CompletableFuture<CollectionPage<Project>> getCurriculumProjects(long curriculumId, int pageSize, int page) {
+    public CompletableFuture<CollectionPage<Project>> getCurriculumProjects(long curriculumId, int page, int pageSize) {
         return curriculumRepo.findById(curriculumId)
                 .thenApply(ocurriculum -> ocurriculum.orElseThrow(() -> new ResourceNotFoundException(ErrorMessages.RESOURCE_NOTFOUND_CURRICULUM)))
                 .thenCompose(__ -> ServiceUtils.getCollectionPageFuture(projectRepo, page, pageSize, new Pair<>("curriculumId", curriculumId)));

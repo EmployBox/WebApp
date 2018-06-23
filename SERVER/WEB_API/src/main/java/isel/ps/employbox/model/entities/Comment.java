@@ -5,7 +5,7 @@ import com.github.jayield.rapper.DomainObject;
 import com.github.jayield.rapper.Id;
 import com.github.jayield.rapper.Version;
 
-import java.sql.Date;
+import java.sql.Timestamp;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
@@ -16,7 +16,7 @@ public class Comment implements DomainObject<Long> {
     private final long accountIdFrom;
     private final long accountIdDest;
     private final long mainCommentId;
-    private final Date date;
+    private final Timestamp datetime;
     private final String text;
     private final boolean status; //moderated or not
     @Version
@@ -29,19 +29,29 @@ public class Comment implements DomainObject<Long> {
         accountIdFrom = 0;
         accountIdDest = 0;
         mainCommentId = 0;
-        date = null;
+        datetime = null;
         text = null;
         status = false;
         replies = null;
         version = 0;
     }
 
-    public Comment(long commentID, long accountIdFrom, long accountIdTo, long parentCommendID, Date date, String text, boolean status, CompletableFuture<List<Comment>> replies, long version){
+    public Comment(
+            long commentID,
+            long accountIdFrom,
+            long accountIdTo,
+            long parentCommendID,
+            Timestamp date,
+            String text,
+            boolean status,
+            CompletableFuture<List<Comment>> replies,
+            long version)
+    {
         this.commentId = commentID;
         this.accountIdFrom = accountIdFrom;
         this.accountIdDest = accountIdTo;
         this.mainCommentId = parentCommendID;
-        this.date = date;
+        this.datetime = date;
         this.text = text;
         this.status = status;
         this.replies = replies;
@@ -73,8 +83,8 @@ public class Comment implements DomainObject<Long> {
         return mainCommentId;
     }
 
-    public Date getDate() {
-        return date;
+    public Timestamp getDatetime() {
+        return datetime;
     }
 
     public String getText() {

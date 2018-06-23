@@ -151,7 +151,7 @@ CREATE TABLE [Application](
 	accountId BIGINT,
 	curriculumId BIGINT,
 	jobId BIGINT,
-	[date] datetime default(GETDATE()),
+	[datetime] datetime default(GETDATE()),
 	[version] rowversion,
 
 	FOREIGN KEY (accountId) REFERENCES Account,
@@ -194,7 +194,7 @@ CREATE TABLE [Message](
 	messageId BIGINT IDENTITY primary key,
 	chatId BIGINT,
 	[text] NVARCHAR(200),
-	[date] datetime default(getdate()),
+	[datetime] datetime default(getdate()),
 	[version] rowversion,
 
 	FOREIGN KEY (chatId) REFERENCES Chat(chatId) ON DELETE CASCADE,
@@ -205,7 +205,7 @@ CREATE TABLE [Comment] (
 	commentId BIGINT identity primary key,
 	accountIdFrom BIGINT,
 	accountIdDest BIGINT,
-	[date] DATETIME default(getdate()),
+	[datetime] DATETIME default(getdate()),
 	[text] NVARCHAR(300),
 	mainCommentId BIGINT,
 	[status] bit,

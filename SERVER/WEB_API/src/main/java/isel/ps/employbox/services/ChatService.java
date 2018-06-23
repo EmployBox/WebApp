@@ -30,12 +30,12 @@ public class ChatService {
     }
 
     //todo endpoint
-    public CompletableFuture<CollectionPage<Chat>> getAccountChats(long accountId, int pageSize, int page) {
+    public CompletableFuture<CollectionPage<Chat>> getAccountChats(long accountId, int page, int pageSize) {
         return accountService.getAccount(accountId)
                 .thenCompose(__ -> ServiceUtils.getCollectionPageFuture( chatRepo, page, pageSize, new Pair<>("accountId", accountId)));
     }
 
-    public CompletableFuture<CollectionPage<Message>> getAccountChatsMessages(long accountId, String email, int pageSize, int page) {
+    public CompletableFuture<CollectionPage<Message>> getAccountChatsMessages(long accountId, String email, int page, int pageSize) {
         return accountService.getAccount(accountId, email)
                 .thenCompose(__ -> ServiceUtils.getCollectionPageFuture( msgRepo, page, pageSize, new Pair<>("accountId", accountId)));
     }

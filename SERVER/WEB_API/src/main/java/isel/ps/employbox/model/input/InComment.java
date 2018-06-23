@@ -1,5 +1,6 @@
 package isel.ps.employbox.model.input;
 
+import java.sql.Timestamp;
 import java.util.List;
 
 public class InComment {
@@ -7,7 +8,7 @@ public class InComment {
     private long accountIdTo;
     private long commmentId;
     private long mainCommentId;
-    private String datetime;
+    private Timestamp datetime;
     private String text;
     private List<InComment> replies;
 
@@ -43,11 +44,11 @@ public class InComment {
         this.mainCommentId = mainCommentId;
     }
 
-    public String getDatetime() {
+    public Timestamp getDatetime() {
         return datetime;
     }
 
-    public void setDatetime(String datetime) {
+    public void setDatetime(Timestamp datetime) {
         this.datetime = datetime;
     }
 

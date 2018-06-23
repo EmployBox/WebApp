@@ -34,10 +34,13 @@ public class UserAccountController {
     @GetMapping
     public Mono<HalCollectionPage> getAllUsers(
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "5") int pageSize
+            @RequestParam(defaultValue = "5") int pageSize,
+            @RequestParam(required = false) String name,
+            @RequestParam(required = false) int ratingLow,
+            @RequestParam(required = false) int ratingHigh
     ){
         return userBinder.bindOutput(
-                userAccountService.getAllUsers(page, pageSize),
+                userAccountService.getAllUsers(page, pageSize, name, ratingLow, ratingHigh),
                 this.getClass()
         );
     }
@@ -51,19 +54,23 @@ public class UserAccountController {
     public Mono<HalCollectionPage> getAllApplications(
             @PathVariable long id,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "5") int numberOfItems
+            @RequestParam(defaultValue = "5") int pageSize
 
     ){
         return applicationBinder.bindOutput(
-                userAccountService.getAllApplications(id, page, numberOfItems),
+                userAccountService.getAllApplications(id, page, pageSize),
                 this.getClass(),
                 id
         );
     }
 
-    @GetMapping("/{id}/applications/{jid}")
-    public Mono<OutApplication> getApplication(@PathVariable long id, @PathVariable long jid){
-        return applicationBinder.bindOutput( userAccountService.getApplication(id, jid) );
+    @GetMapping("/{id}/jobs/{jid}/applications/{apId}")
+    public Mono<OutApplication> getApplication(
+            @PathVariable long id,
+            @PathVariable long jid,
+            @PathVariable long apId
+    ){
+        return applicationBinder.bindOutput( userAccountService.getApplication(id, jid, apId) );
     }
 
     @PostMapping
@@ -72,7 +79,7 @@ public class UserAccountController {
         return userBinder.bindOutput( userAccountService.createUser(userAccount) );
     }
 
-    @PostMapping("/{id}/applications/{jid}")
+    @PostMapping("/{id}/jobs/{jid}/applications")
     public Mono<OutApplication> createApplication(@PathVariable long id, @PathVariable long jid,  @RequestBody InApplication inApplication, Authentication authentication){
         if(id != inApplication.getAccountId() || jid != inApplication.getJobId())
             throw new BadRequestException(BAD_REQUEST_IDS_MISMATCH);
@@ -91,17 +98,18 @@ public class UserAccountController {
         return userAccountService.updateUser(userAccount, authentication.getName());
     }
 
-    @PutMapping("/{id}/applications/{jid}")
+    @PutMapping("/{id}/jobs/{jid}/applications/{apId}")
     public Mono<Void> updateApplication(
             @PathVariable long id,
             @PathVariable long jid,
+            @PathVariable long apId,
             @RequestBody InApplication inApplication,
             Authentication authentication
     ) {
         if(inApplication.getAccountId() != id || inApplication.getJobId() != jid)
             throw new BadRequestException(BAD_REQUEST_IDS_MISMATCH);
         Application application = applicationBinder.bindInput(inApplication);
-        return userAccountService.updateApplication(application, authentication.getName());
+        return userAccountService.updateApplication(application, authentication.getName(), apId);
     }
 
     @DeleteMapping("/{id}")
@@ -109,8 +117,12 @@ public class UserAccountController {
         return userAccountService.deleteUser(id, authentication.getName());
     }
 
-    @DeleteMapping("/{id}/applications/{jid}")
-    public Mono<Void> deleteApplication( @PathVariable long id, @PathVariable long jid, Authentication authentication){
-        return userAccountService.deleteApplication(id, jid, authentication.getName());
+    @DeleteMapping("/{id}/jobs/{jid}/applications")
+    public Mono<Void> deleteApplication(
+            @PathVariable long id,
+            @PathVariable long jid,
+            @PathVariable long apId,
+            Authentication authentication){
+        return userAccountService.deleteApplication(id, jid,apId, authentication.getName());
     }
 }

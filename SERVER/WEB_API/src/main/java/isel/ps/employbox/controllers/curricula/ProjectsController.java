@@ -4,6 +4,7 @@ import com.github.jayield.rapper.DataRepository;
 import isel.ps.employbox.exceptions.BadRequestException;
 import isel.ps.employbox.model.binders.curricula.ProjectBinder;
 import isel.ps.employbox.model.entities.curricula.childs.Project;
+import isel.ps.employbox.model.input.curricula.childs.InProject;
 import isel.ps.employbox.model.output.HalCollectionPage;
 import isel.ps.employbox.model.output.OutProject;
 import isel.ps.employbox.services.curricula.CurriculumService;
@@ -31,7 +32,7 @@ public class ProjectsController {
     }
 
     @GetMapping("/{projectId}")
-    public Mono<OutProject> getProjects (
+    public Mono<OutProject> getProject(
             @PathVariable long id,
             @PathVariable long cid,
             @PathVariable long projectId){
@@ -39,14 +40,14 @@ public class ProjectsController {
     }
 
     @GetMapping
-    public Mono<HalCollectionPage> getProjects(
+    public Mono<HalCollectionPage> getProject(
             @PathVariable long id,
             @PathVariable long cid,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "5") int numberOfItems
+            @RequestParam(defaultValue = "5") int pageSize
     ) {
         return projectBinder.bindOutput(
-                projectService.getCurriculumProjects(cid, page, numberOfItems),
+                projectService.getCurriculumProjects(cid, page, pageSize),
                 this.getClass(),
                 id,
                 cid
@@ -57,10 +58,11 @@ public class ProjectsController {
     public Mono<Project> addProject(
             @PathVariable long id,
             @PathVariable long cid,
-            @RequestBody Project project,
+            @RequestBody InProject inProject,
             Authentication authentication)
     {
-        return Mono.fromFuture( projectService.addProjectToCurriculum(id,cid, project,authentication.getName()));
+        Project project = projectBinder.bindInput(inProject);
+        return Mono.fromFuture(projectService.addProjectToCurriculum(id,cid, project,authentication.getName()));
     }
 
     @PutMapping("/{ceId}")

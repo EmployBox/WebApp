@@ -35,10 +35,10 @@ public class ChatController {
             @PathVariable long id,
             @PathVariable long cid,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "5") int numberOfItems,
+            @RequestParam(defaultValue = "5") int pageSize,
             Authentication authentication) {
         return messageBinder.bindOutput(
-                chatService.getAccountChatsMessages(id, authentication.getName(), page, numberOfItems),
+                chatService.getAccountChatsMessages(id, authentication.getName(), page, pageSize),
                 this.getClass(),
                 id,
                 cid

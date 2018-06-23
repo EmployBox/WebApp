@@ -1,5 +1,6 @@
 package isel.ps.employbox.model.output;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import isel.ps.employbox.controllers.curricula.CurriculumController;
 import isel.ps.employbox.controllers.curricula.CurriculumExperienceController;
@@ -46,10 +47,12 @@ public class OutCurriculumExperience implements OutputDto {
         private final long curriculumId;
 
         @JsonProperty
-        private _Links _links = new _Links();
+        private final _Links _links;
 
+        @JsonIgnore
         CurriculumExperienceItemOutput(long curriculumId) {
             this.curriculumId = curriculumId;
+            _links = new _Links();
         }
 
         private class _Links {

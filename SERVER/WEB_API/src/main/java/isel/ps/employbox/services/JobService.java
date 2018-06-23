@@ -37,8 +37,19 @@ public class JobService {
         this.accountService = userService;
     }
 
-    public CompletableFuture<CollectionPage<Job>> getAllJobs(int page, int pageSize) {
-        return ServiceUtils.getCollectionPageFuture(jobRepo, page, pageSize);
+    public CompletableFuture getAllJobs(int page, int pageSize,String address, String location, String title, int wage, String offerType, int ratingLow, int ratingHigh) {
+        return ServiceUtils.getCollectionPageFuture(
+                jobRepo,
+                page,
+                pageSize,
+                new Pair("address",address),
+                new Pair("location",location),
+                new Pair("title",title),
+                new Pair("wage", Integer.valueOf(wage)),
+                new Pair("offerType",offerType),
+                new Pair("wage", Integer.valueOf(ratingLow)),
+                new Pair("wage", Integer.valueOf(ratingHigh))
+        );
     }
 
     public CompletableFuture<Job> getJob(long jid) {
@@ -46,9 +57,9 @@ public class JobService {
                 .thenApply(ojob -> ojob.orElseThrow(()-> new ResourceNotFoundException(ErrorMessages.RESOURCE_NOTFOUND_JOB)));
     }
 
-    public CompletableFuture<CollectionPage<JobExperience>> getJobExperiences(long jid, int page, int numberOfItems) {
+    public CompletableFuture<CollectionPage<JobExperience>> getJobExperiences(long jid, int page, int pageSize) {
         return getJob(jid)
-                .thenCompose(__ -> ServiceUtils.getCollectionPageFuture(jobExperienceRepo, page, numberOfItems, new Pair<>("jobId", jid)));
+                .thenCompose(__ -> ServiceUtils.getCollectionPageFuture(jobExperienceRepo, page, pageSize, new Pair<>("jobId", jid)));
     }
 
     public CompletableFuture<JobExperience> getJobExperience(long id, long cid) {
@@ -75,7 +86,10 @@ public class JobService {
                     experienceList.forEach(curr -> curr.setJobId(job.getIdentityKey()));
                     return jobExperienceRepo.createAll(experienceList);
                 })
-                .thenApply(aVoid -> job);
+                .thenApply(aVoid -> job)
+                .exceptionally( e -> {
+                    throw new BadRequestException(e.getMessage());
+                });
     }
 
     public CompletableFuture<Void> addJobExperienceToJob(long jobId, List<JobExperience> jobExperience, String username){

@@ -65,7 +65,7 @@ create table AcademicBackground (
   FOREIGN KEY (accountId) REFERENCES Account,
   FOREIGN KEY (curriculumId) REFERENCES curriculum(curriculumId),
   check (endDate < beginDate),
-  check (degreeObtained in ('basic level 1', 'basic level 2', 'basic level 3', 'secundary', 'bachelor', 'master', 'PHD')
+  check (degreeObtained in ('basic level 1', 'basic level 2', 'basic level 3', 'secundary', 'bachelor', 'master', 'PHD'))
 );
 
 create table PreviousJobs (
@@ -137,7 +137,7 @@ CREATE TABLE Application(
   accountId BIGINT,
   curriculumId BIGINT,
   jobId BIGINT,
-  date datetime default CURRENT_DATE,
+  datetime datetime default CURRENT_DATE,
   version bigint default 1,
 
   FOREIGN KEY (accountId) REFERENCES Account,
@@ -180,7 +180,7 @@ CREATE TABLE Message(
   messageId BIGINT IDENTITY primary key,
   chatId BIGINT,
   text VARCHAR(200),
-  date datetime default CURRENT_DATE,
+  datetime datetime default CURRENT_DATE,
   version bigint default 1,
 
   FOREIGN KEY (chatId) REFERENCES Chat(chatId) ON DELETE CASCADE,
@@ -191,7 +191,7 @@ CREATE TABLE Comment (
   commentId BIGINT identity primary key,
   accountIdFrom BIGINT,
   accountIdDest BIGINT,
-  date DATETIME default CURRENT_DATE,
+  datetime DATETIME default CURRENT_DATE,
   text VARCHAR(300),
   mainCommentId BIGINT,
   status bit,

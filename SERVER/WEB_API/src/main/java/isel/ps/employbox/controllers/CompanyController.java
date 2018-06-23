@@ -24,9 +24,9 @@ public class CompanyController {
     }
 
     @GetMapping
-    public Mono<HalCollectionPage> getCompanies( @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "5") int numberOfItems){
+    public Mono<HalCollectionPage> getCompanies( @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "5") int pageSize){
         return companyBinder.bindOutput(
-                companyService.getCompanies(page, numberOfItems),
+                companyService.getCompanies(page, pageSize),
                 this.getClass()
         );
     }

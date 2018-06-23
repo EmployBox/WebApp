@@ -1,4 +1,4 @@
-package isel.ps.employbox.model.input;
+package isel.ps.employbox.model.input.curricula.childs;
 
 import java.sql.Timestamp;
 

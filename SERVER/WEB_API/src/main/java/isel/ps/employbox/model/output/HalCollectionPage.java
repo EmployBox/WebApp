@@ -104,7 +104,6 @@ public class HalCollectionPage<T> {
             final String href = HOSTNAME + linkTo(selfController, parameters).slash(getPageQueryString(current_page)).withSelfRel().getHref();
         }
 
-
         private class Next{
             @JsonProperty
             final String href = HOSTNAME + linkTo(selfController, parameters).slash(getPageQueryString(current_page + 1)).withRel(Link.REL_NEXT).getHref();
