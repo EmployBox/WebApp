@@ -1,7 +1,7 @@
 import React from 'react'
 import { Link, withRouter } from 'react-router-dom'
 
-export default withRouter((props) => (
+export default withRouter(({about, logIn, signUp}) => (
   <nav class='navbar navbar-expand-lg navbar-dark bg-dark navbar-fixed-top'>
     <div class='container'>
       <Link class='navbar-brand' to='/'>EmployBox</Link>
@@ -12,13 +12,13 @@ export default withRouter((props) => (
       <div class='collapse navbar-collapse' id='navbarResponsive'>
         <ul class='navbar-nav ml-auto'>
           <li class='nav-item'>
-            <Link class='nav-link' to='/about'>About</Link>
+            <Link class='nav-link' to={about}>About</Link>
           </li>
           <li class='nav-item'>
-            <Link class='nav-link' to='/logIn'>Log in</Link>
+            <Link class='nav-link' to={logIn}>Log in</Link>
           </li>
           <li class='nav-item'>
-            <Link class='btn btn-outline-primary' to='/signUp'>Sign up</Link>
+            <Link class='btn btn-outline-primary' to={signUp}>Sign up</Link>
           </li>
         </ul>
       </div>

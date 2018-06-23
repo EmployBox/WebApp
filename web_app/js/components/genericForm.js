@@ -1,6 +1,7 @@
 import React, {Component} from 'react'
 
 export default class extends Component {
+  // { [{type, name, label, id}, ...]: inputData, string: klass, function: onSubmitHandler(inputs)}
   constructor (props) {
     super(props)
     this.state = {
@@ -30,13 +31,15 @@ export default class extends Component {
   }
 
   internalRender (data) {
-    return data.map(({type, name}, key) => (
+    return data.map(({type, name, label, id}, key) => (
       <div class={this.props.klass}>
+        <label for={id}>{label}</label>
         <input
           type={type}
           name={name}
           placeholder={name}
           onChange={this.onChangeHandler}
+          id={id}
           key={key}
           class='form-control form-control-lg col'
         />
