@@ -34,10 +34,13 @@ public class UserAccountController {
     @GetMapping
     public Mono<HalCollectionPage> getAllUsers(
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "5") int pageSize
+            @RequestParam(defaultValue = "5") int pageSize,
+            @RequestParam(required = false) String name,
+            @RequestParam(required = false) int ratingLow,
+            @RequestParam(required = false) int ratingHigh
     ){
         return userBinder.bindOutput(
-                userAccountService.getAllUsers(page, pageSize),
+                userAccountService.getAllUsers(page, pageSize, name, ratingLow, ratingHigh),
                 this.getClass()
         );
     }

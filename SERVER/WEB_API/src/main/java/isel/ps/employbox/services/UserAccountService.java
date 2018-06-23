@@ -39,25 +39,16 @@ public class UserAccountService {
         this.applicationRepo = applicationRepo;
     }
 
-    public CompletableFuture<CollectionPage<UserAccount>> getAllUsers(int page, int pageSize) {
+    public CompletableFuture<CollectionPage<UserAccount>> getAllUsers(int page, int pageSize, String name, int ratingLow, int ratingHigh) {
         List[] list = new List[1];
         CollectionPage[] ret = new CollectionPage[1];
 
-        return new Transaction(Connection.TRANSACTION_SERIALIZABLE)
-                .andDo(() ->
-                        userRepo.findAll(page, pageSize)
-                                .thenCompose(listRes -> {
-                                    list[0] = listRes;
-                                    return userRepo.getNumberOfEntries();
-                                })
-                                .thenAccept(numberOfEntries -> ret[0] = new CollectionPage(
-                                        numberOfEntries,
-                                        pageSize,
-                                        page,
-                                        list[0]
-                                ))
-                ).commit()
-                .thenApply(__ -> ret[0]);
+        return ServiceUtils.getCollectionPageFuture(
+                userRepo,
+                page,
+                pageSize,
+                new Pair("name", name)
+        );
     }
 
     public CompletableFuture<UserAccount> getUser(long id, String... email) {
