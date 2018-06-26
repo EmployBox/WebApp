@@ -1,8 +1,8 @@
 import React from 'react'
 import {withRouter} from 'react-router-dom'
 import URI from 'urijs'
-import URITemplate from 'urijs/src/URITemplate'
 
+import Options from '../searchFormOptions'
 import SearchForm from '../components/searchForm'
 import JobFilters from '../components/jobFilters'
 import JobTable from '../components/jobTable'
@@ -27,28 +27,27 @@ const options = {
   }
 }
 
-const searchPageTemplate = new URITemplate('/{entityType}/search{?query*}')
+function getFormOptions (type) {
+  const formOptions = Object.assign({}, Options)
+  delete formOptions[type]
+  return formOptions
+}
 
 class SearchPage extends React.Component {
+  // String type, URITemplate uri
   constructor (props) {
     super(props)
-    const type = props.match.params.type
-
+    console.log('search construct')
     const query = URI.parseQuery(props.location.search)
-    if (!query.pageSize) query.pageSize = '10'
+    // if (!query.pageSize) query.pageSize = '10'
 
-    const apiURITemplate = type !== 'jobs'
-      ? new URITemplate(`${props.url}/accounts/{type}{?query*}`)
-      : new URITemplate(`${props.url}/{type}{?query*}`)
-
-    const formOptions = getFormOptions(type)
+    const formOptions = getFormOptions(props.type)
 
     this.state = {
       currentQuery: Object.assign({}, query),
       query: query,
-      entity: options[type],
-      apiURITemplate: apiURITemplate,
-      apiURI: apiURITemplate.expand({type: type, query: query}),
+      entity: options[props.type],
+      uri: props.uriTemplate.expand({query: query}),
       formOptions: formOptions
     }
 
@@ -57,34 +56,29 @@ class SearchPage extends React.Component {
 
   static getDerivedStateFromProps (nextProps, prevState) {
     const nextQuery = URI.parseQuery(nextProps.location.search)
-    const type = nextProps.match.params.type
-    const nextApiURITemplate = type !== 'jobs'
-      ? new URITemplate(`${nextProps.url}/accounts/{type}{?query*}`)
-      : new URITemplate(`${nextProps.url}/{type}{?query*}`)
-    const nextapiURI = nextApiURITemplate.expand({type: type, query: nextQuery})
+    const nextURI = nextProps.uriTemplate.expand({query: nextQuery})
 
-    if (nextapiURI === prevState.apiURI) return null
-    const formOptions = getFormOptions(type)
+    if (nextURI === prevState.uri) return null
+    const formOptions = getFormOptions(nextProps.type)
 
     return {
       currentQuery: Object.assign({}, nextQuery),
       query: nextQuery,
-      entity: options[type],
-      apiURITemplate: nextApiURITemplate,
-      apiURI: nextapiURI,
+      entity: options[nextProps.type],
+      uri: nextURI,
       formOptions: formOptions
     }
   }
 
   handleClick () {
-    const { currentQuery, query, apiURITemplate } = this.state
+    const { currentQuery, query } = this.state
     if (JSON.stringify(currentQuery) !== JSON.stringify(query)) {
       const type = this.props.match.params.type
 
-      const newAPIURI = apiURITemplate.expand({type: type, query: query})
-      this.setState({currentQuery: Object.assign({}, query), apiURI: newAPIURI})
+      const newURI = this.props.uriTemplate.expand({type: type, query: query})
+      this.setState({currentQuery: Object.assign({}, query), uri: newURI})
 
-      const newUrl = searchPageTemplate.expand({entityType: type, query: query})
+      const newUrl = this.props.uriTemplate.expand({entityType: type, query: query})
       this.props.history.push(newUrl)
     }
   }
@@ -94,7 +88,7 @@ class SearchPage extends React.Component {
   }
 
   render () {
-    const { entity, apiURI, currentQuery, query } = this.state
+    const { entity, uri, currentQuery, query } = this.state
 
     let buttonClass = 'btn btn-success'
     if (JSON.stringify(currentQuery) === JSON.stringify(query)) buttonClass = buttonClass + ' disabled'
@@ -125,7 +119,7 @@ class SearchPage extends React.Component {
           <div class='col'>
             <h3 class='text-center text-white border bg-dark'>Results</h3>
             <HttpRequest
-              url={apiURI}
+              url={`${this.props.apiURI}${uri}`}
               onResult={data => entity.renderTable(data)} />
           </div>
         </div>
@@ -135,21 +129,3 @@ class SearchPage extends React.Component {
 }
 
 export default withRouter(SearchPage)
-
-class Option {
-  constructor (name, placeholder, queryParam) {
-    this.name = name
-    this.placeholder = placeholder
-    this.queryParam = queryParam
-  }
-}
-
-function getFormOptions (type) {
-  const formOptions = {
-    jobs: new Option('Jobs', 'Job\'s title', 'title'),
-    companies: new Option('Companies', 'Company\'s name', 'name'),
-    users: new Option('Users', 'User\'s name', 'name')
-  }
-  delete formOptions[type]
-  return formOptions
-}

@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
 import java.sql.Connection;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
@@ -37,18 +38,25 @@ public class JobService {
         this.accountService = userService;
     }
 
-    public CompletableFuture getAllJobs(int page, int pageSize,String address, String location, String title, int wage, String offerType, int ratingLow, int ratingHigh) {
+    public CompletableFuture getAllJobs(int page, int pageSize,String address, String location, String title, Integer wage, String offerType, Integer ratingLow, Integer ratingHigh) {
+        List<Pair<String, ?>> pairs = new ArrayList<>();
+        pairs.add(new Pair<>("address", address));
+        //pairs.add(new Pair<>("location",location));
+        pairs.add(new Pair<>("title",title));
+        pairs.add(new Pair<>("wage", wage));
+        pairs.add(new Pair<>("offerType", offerType));
+        /*pairs.add(new Pair<>("wage", ratingLow));
+        pairs.add(new Pair<>("wage", ratingHigh));*/
+
+        Pair[] query = pairs.stream()
+                .filter(stringPair -> stringPair.getValue() != null)
+                .toArray(Pair[]::new);
+
         return ServiceUtils.getCollectionPageFuture(
                 jobRepo,
                 page,
                 pageSize,
-                new Pair("address",address),
-                new Pair("location",location),
-                new Pair("title",title),
-                new Pair("wage", Integer.valueOf(wage)),
-                new Pair("offerType",offerType),
-                new Pair("wage", Integer.valueOf(ratingLow)),
-                new Pair("wage", Integer.valueOf(ratingHigh))
+                query
         );
     }
 

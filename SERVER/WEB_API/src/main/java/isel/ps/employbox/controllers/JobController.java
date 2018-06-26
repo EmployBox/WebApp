@@ -42,10 +42,10 @@ public class JobController {
             @RequestParam(required = false) String address,
             @RequestParam(required = false) String location,
             @RequestParam(required = false) String title,
-            @RequestParam(required = false) int wage,
+            @RequestParam(required = false) Integer wage,
             @RequestParam(required = false) String type,
-            @RequestParam(required = false) int ratingLow,
-            @RequestParam(required = false) int ratingHigh){
+            @RequestParam(required = false) Integer ratingLow,
+            @RequestParam(required = false) Integer ratingHigh){
         return jobBinder.bindOutput(
                 jobService.getAllJobs(page, pageSize, address, location, title, wage, type, ratingLow, ratingHigh),
                 this.getClass()

@@ -29,11 +29,11 @@ export default (query, onQueryChange) => {
     <form>
       <div class='form-group'>
         <label>Title</label>
-        <input type='text' class='form-control' placeholder='Job Title' value={query.title} onChange={(event) => handleChange(event, 'title')} />
+        <input type='text' class='form-control' placeholder='Job Title' value={query.title || ''} onChange={(event) => handleChange(event, 'title')} />
       </div>
       <div class='form-group'>
         <label>Location</label>
-        <input type='text' class='form-control' placeholder='Address' value={query.location} onChange={(event) => handleChange(event, 'location')} />
+        <input type='text' class='form-control' placeholder='Address' value={query.location || ''} onChange={(event) => handleChange(event, 'location')} />
       </div>
       <div class='form-check'>
         <input
@@ -55,11 +55,11 @@ export default (query, onQueryChange) => {
         <label>Account rating from</label>
         <div class='row'>
           <div class='col'>
-            <input type='number' class='form-control' value={query.ratingLow} onChange={(event) => handleChange(event, 'ratingLow')} />
+            <input type='number' class='form-control' value={query.ratingLow || ''} onChange={(event) => handleChange(event, 'ratingLow')} />
           </div>
           <label>to</label>
           <div class='col'>
-            <input type='number' class='form-control' value={query.ratingHigh} onChange={(event) => handleChange(event, 'ratingHigh')} />
+            <input type='number' class='form-control' value={query.ratingHigh || ''} onChange={(event) => handleChange(event, 'ratingHigh')} />
           </div>
         </div>
       </div>

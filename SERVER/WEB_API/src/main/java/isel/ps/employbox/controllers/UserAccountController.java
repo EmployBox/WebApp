@@ -36,8 +36,8 @@ public class UserAccountController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "5") int pageSize,
             @RequestParam(required = false) String name,
-            @RequestParam(required = false) int ratingLow,
-            @RequestParam(required = false) int ratingHigh
+            @RequestParam(required = false) Integer ratingLow,
+            @RequestParam(required = false) Integer ratingHigh
     ){
         return userBinder.bindOutput(
                 userAccountService.getAllUsers(page, pageSize, name, ratingLow, ratingHigh),

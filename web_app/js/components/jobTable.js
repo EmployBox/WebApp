@@ -2,9 +2,8 @@ import React from 'react'
 import { Link, withRouter } from 'react-router-dom'
 
 export default withRouter((props) => {
-  let tableRows = <tr><td>Empty</td></tr>
   if (props._embedded) {
-    tableRows = props._embedded.items.map(item => {
+    const tableRows = props._embedded.items.map(item => {
       const { account } = item
 
       let link
@@ -27,23 +26,25 @@ export default withRouter((props) => {
         </tr>
       )
     })
+
+    return (
+      <table class='table table-hover'>
+        <thead>
+          <tr>
+            <th>Account</th>
+            <th>☆</th>
+            <th>Title</th>
+            <th>Opens</th>
+            <th>Location</th>
+            <th>Type</th>
+          </tr>
+        </thead>
+        <tbody>
+          {tableRows}
+        </tbody>
+      </table>
+    )
   }
 
-  return (
-    <table class='table table-hover'>
-      <thead>
-        <tr>
-          <th>Account</th>
-          <th>☆</th>
-          <th>Title</th>
-          <th>Opens</th>
-          <th>Location</th>
-          <th>Type</th>
-        </tr>
-      </thead>
-      <tbody>
-        {tableRows}
-      </tbody>
-    </table>
-  )
+  return <p>No items found for this criteria</p>
 })

@@ -16,6 +16,7 @@ import reactor.core.publisher.Mono;
 
 import java.security.InvalidParameterException;
 import java.sql.Connection;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
@@ -39,15 +40,18 @@ public class UserAccountService {
         this.applicationRepo = applicationRepo;
     }
 
-    public CompletableFuture<CollectionPage<UserAccount>> getAllUsers(int page, int pageSize, String name, int ratingLow, int ratingHigh) {
-        List[] list = new List[1];
-        CollectionPage[] ret = new CollectionPage[1];
+    public CompletableFuture<CollectionPage<UserAccount>> getAllUsers(int page, int pageSize, String name, Integer ratingLow, Integer ratingHigh) {
+        List<Pair<String, String>> pairs = new ArrayList<>();
+        pairs.add(new Pair<>("name", name));
 
+        Pair[] query = pairs.stream()
+                .filter(stringStringPair -> stringStringPair.getValue() != null)
+                .toArray(Pair[]::new);
         return ServiceUtils.getCollectionPageFuture(
                 userRepo,
                 page,
                 pageSize,
-                new Pair("name", name)
+                query
         );
     }
 
