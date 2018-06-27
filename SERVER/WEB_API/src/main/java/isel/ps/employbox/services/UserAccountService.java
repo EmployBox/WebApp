@@ -43,7 +43,6 @@ public class UserAccountService {
     public CompletableFuture<CollectionPage<UserAccount>> getAllUsers(int page, int pageSize, String name, Integer ratingLow, Integer ratingHigh) {
         List<Pair<String, String>> pairs = new ArrayList<>();
         pairs.add(new Pair<>("name", name));
-
         Pair[] query = pairs.stream()
                 .filter(stringStringPair -> stringStringPair.getValue() != null)
                 .toArray(Pair[]::new);

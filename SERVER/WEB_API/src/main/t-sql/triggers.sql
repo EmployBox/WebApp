@@ -42,7 +42,7 @@ GO
 CREATE TRIGGER  Apidatabase.deleteCascadeJob
 	ON Apidatabase.[Job]
 	INSTEAD OF DELETE 
-	AS 
+	AS
 	BEGIN
 		DELETE Apidatabase.[Job_Experience] WHERE Apidatabase.[Job_Experience].jobId IN (select deleted.jobId FROM deleted)
 		DELETE Apidatabase.[Application] WHERE Apidatabase.[Application].JobId IN (select deleted.jobId FROM deleted)

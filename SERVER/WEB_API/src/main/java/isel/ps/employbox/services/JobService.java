@@ -66,8 +66,12 @@ public class JobService {
     }
 
     public CompletableFuture<CollectionPage<JobExperience>> getJobExperiences(long jid, int page, int pageSize) {
-        return getJob(jid)
-                .thenCompose(__ -> ServiceUtils.getCollectionPageFuture(jobExperienceRepo, page, pageSize, new Pair<>("jobId", jid)));
+        List<Pair<String, String>> pairs = new ArrayList<>();
+        pairs.add(new Pair("jobId", jid));
+        Pair[] query = pairs.stream()
+                .filter(stringStringPair -> stringStringPair.getValue() != null)
+                .toArray(Pair[]::new);
+        return getJob(jid).thenCompose(__ -> ServiceUtils.getCollectionPageFuture(jobExperienceRepo, page, pageSize, query));
     }
 
     public CompletableFuture<JobExperience> getJobExperience(long id, long cid) {

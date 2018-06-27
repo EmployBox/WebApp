@@ -11,7 +11,6 @@ public class CollectionPage<T>{
     private final List<T> pageList;
 
     public CollectionPage(long totalElements,int pageSize, int currentPage, List<T> pageList) {
-
         this.pageSize = pageSize;
         if(currentPage < 0 || currentPage > totalElements / this.pageSize)
             throw new InvalidParameterException("Current page number provided is invalid");

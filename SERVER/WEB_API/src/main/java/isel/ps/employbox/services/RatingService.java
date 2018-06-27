@@ -9,6 +9,8 @@ import isel.ps.employbox.model.entities.Rating;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 @Service
@@ -24,7 +26,13 @@ public class RatingService {
     }
 
     public CompletableFuture<CollectionPage<Rating>> getRatings(long accountId, int page, int pageSize) {
-        return ServiceUtils.getCollectionPageFuture(ratingRepo, page, pageSize, new Pair<>("accountId", accountId));
+        List<Pair<String, String>> pairs = new ArrayList<>();
+        pairs.add( new Pair("accountId", accountId));
+        Pair[] query = pairs.stream()
+                .filter(stringStringPair -> stringStringPair.getValue() != null)
+                .toArray(Pair[]::new);
+        return ServiceUtils.getCollectionPageFuture(
+                ratingRepo, page, pageSize, query);
     }
 
     public CompletableFuture<Rating> getRating(long accountFrom, long accountTo) {

@@ -19,7 +19,7 @@ public class ServiceUtils {
             DataRepository<T, K> repo,
             int page,
             int pageSize,
-            Pair<String, Long>... query
+            Pair ... query
     ) {
         List[] list = new List[1];
         CollectionPage[] ret = new CollectionPage[1];
@@ -28,11 +28,11 @@ public class ServiceUtils {
                 .andDo(() ->
                         repo.findWhere(page, pageSize, query)
                                 .thenCompose(listRes -> {
-                                    list[0] = listRes;
+                                    list[0] = (List) listRes;
                                     return repo.getNumberOfEntries(query);
                                 })
                                 .thenAccept(numberOfEntries -> ret[0] = new CollectionPage(
-                                        numberOfEntries,
+                                        (Long) numberOfEntries,
                                         pageSize,
                                         page,
                                         list[0]
