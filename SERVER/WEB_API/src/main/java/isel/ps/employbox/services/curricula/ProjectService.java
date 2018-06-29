@@ -3,6 +3,7 @@ package isel.ps.employbox.services.curricula;
 import com.github.jayield.rapper.DataRepository;
 import com.github.jayield.rapper.DomainObject;
 import com.github.jayield.rapper.utils.Pair;
+import com.github.jayield.rapper.utils.UnitOfWork;
 import isel.ps.employbox.ErrorMessages;
 import isel.ps.employbox.exceptions.BadRequestException;
 import isel.ps.employbox.exceptions.ConflictException;
@@ -30,7 +31,9 @@ public class ProjectService {
     }
 
     public CompletableFuture<CollectionPage<Project>> getCurriculumProjects(long curriculumId, int page, int pageSize) {
-        return curriculumRepo.findById(curriculumId)
+        UnitOfWork unitOfWork = new UnitOfWork();
+        return curriculumRepo.findById(unitOfWork, curriculumId)
+                .thenCompose( res -> unitOfWork.commit().thenApply( aVoid -> res))
                 .thenApply(ocurriculum -> ocurriculum.orElseThrow(() -> new ResourceNotFoundException(ErrorMessages.RESOURCE_NOTFOUND_CURRICULUM)))
                 .thenCompose(__ -> ServiceUtils.getCollectionPageFuture(projectRepo, page, pageSize, new Pair<>("curriculumId", curriculumId)));
     }
@@ -43,9 +46,10 @@ public class ProjectService {
     ) {
         if(project.getAccountId() != accountId || project.getCurriculumId() != curriculumId)
             throw new ConflictException(ErrorMessages.BAD_REQUEST_IDS_MISMATCH);
+        UnitOfWork unitOfWork = new UnitOfWork();
         return curriculumService.getCurriculum(accountId, curriculumId,email)
-                .thenCompose(curriculum -> projectRepo.create( project))
-                .thenApply(res -> project);
+                .thenCompose(curriculum -> projectRepo.create(unitOfWork, project))
+                .thenCompose( res -> unitOfWork.commit().thenApply( aVoid -> project));
     }
 
     public Mono<Void> updateProject(
@@ -57,8 +61,10 @@ public class ProjectService {
     ) {
         if(project.getIdentityKey() != projectId)
             throw new BadRequestException(ErrorMessages.BAD_REQUEST_IDS_MISMATCH);
+        UnitOfWork unitOfWork = new UnitOfWork();
         return Mono.fromFuture(curriculumService.getCurriculum(accountId, curriculumId, email)
-                .thenCompose(curriculum -> projectRepo.update(project))
+                .thenCompose(curriculum -> projectRepo.update(unitOfWork, project))
+                .thenCompose( res -> unitOfWork.commit())
         );
     }
 
@@ -68,9 +74,11 @@ public class ProjectService {
             long curriculumId,
             String email
     ) {
+        UnitOfWork unitOfWork = new UnitOfWork();
         return Mono.fromFuture(
                 curriculumService.getCurriculum(accountId, curriculumId, email)
-                        .thenCompose(curriculum -> projectRepo.deleteById(projectId))
+                        .thenCompose(curriculum -> projectRepo.deleteById(unitOfWork, projectId))
+                        .thenCompose( res -> unitOfWork.commit())
         );
     }
 }

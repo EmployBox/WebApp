@@ -1,6 +1,7 @@
 package isel.ps.employbox.services;
 
 import com.github.jayield.rapper.DataRepository;
+import com.github.jayield.rapper.utils.UnitOfWork;
 import isel.ps.employbox.ErrorMessages;
 import isel.ps.employbox.exceptions.ResourceNotFoundException;
 import isel.ps.employbox.exceptions.UnauthorizedException;
@@ -28,8 +29,9 @@ public final class AccountService {
     public CompletableFuture<Account> getAccount(long id, String... email) {
         if (email.length > 1)
             throw new InvalidParameterException("Only 1 or 2 parameters are allowed for this method");
-
-        return accountRepo.findById(id)
+        UnitOfWork unitOfWork = new UnitOfWork();
+        return accountRepo.findById(unitOfWork, id)
+                .thenCompose( res -> unitOfWork.commit().thenApply( aVoid -> res))
                 .thenApply(oacc -> oacc.orElseThrow(() -> new ResourceNotFoundException(RESOURCE_NOTFOUND_ACCOUNT)))
                 .thenApply(account -> {
                     if (email.length == 1 && !account.getEmail().equals(email[0]))

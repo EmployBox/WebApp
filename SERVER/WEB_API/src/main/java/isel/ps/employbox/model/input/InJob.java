@@ -18,6 +18,10 @@ public class InJob {
     private Timestamp offerBeginDate;
     private Timestamp offerEndDate;
     private String offerType;
+    private String country;
+    private String district;
+    private double longitude;
+    private double latitude;
     private long version;
 
     public String getTitle() {

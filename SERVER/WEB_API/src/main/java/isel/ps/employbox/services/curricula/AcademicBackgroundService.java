@@ -2,6 +2,7 @@ package isel.ps.employbox.services.curricula;
 
 import com.github.jayield.rapper.DataRepository;
 import com.github.jayield.rapper.utils.Pair;
+import com.github.jayield.rapper.utils.UnitOfWork;
 import isel.ps.employbox.ErrorMessages;
 import isel.ps.employbox.exceptions.ConflictException;
 import isel.ps.employbox.exceptions.ResourceNotFoundException;
@@ -28,7 +29,9 @@ public class AcademicBackgroundService {
     }
 
     public CompletableFuture<CollectionPage<AcademicBackground>> getCurriculumAcademicBackgrounds(long curriculumId, int page, int pageSize) {
-        return curriculumRepo.findById(curriculumId)
+        UnitOfWork unitOfWork = new UnitOfWork();
+        return curriculumRepo.findById(unitOfWork, curriculumId)
+                .thenCompose(res -> unitOfWork.commit().thenApply(aVoid -> res))
                 .thenApply(optional -> optional.orElseThrow(() -> new ResourceNotFoundException(ErrorMessages.RESOURCE_NOTFOUND_CURRICULUM)))
                 .thenCompose(curriculum -> ServiceUtils.getCollectionPageFuture(academicBackgroundRepo, page, pageSize, new Pair<>("curriculumId", curriculumId)));
     }
@@ -41,10 +44,10 @@ public class AcademicBackgroundService {
     ) {
         if(academicBackground.getAccountId() != accountId || academicBackground.getCurriculumId() != curriculumId)
             throw new ConflictException(ErrorMessages.BAD_REQUEST_IDS_MISMATCH);
-
+        UnitOfWork unitOfWork = new UnitOfWork();
         return curriculumService.getCurriculum(accountId, curriculumId, email)
-                .thenCompose(curriculum -> academicBackgroundRepo.create(academicBackground))
-                .thenApply(res -> academicBackground);
+                .thenCompose(curriculum -> academicBackgroundRepo.create(unitOfWork, academicBackground))
+                .thenCompose(res -> unitOfWork.commit().thenApply(aVoid -> academicBackground));
     }
 
     public Mono<Void> updateAcademicBackground(
@@ -53,9 +56,11 @@ public class AcademicBackgroundService {
             AcademicBackground academicBackground,
             String email
     ) {
+        UnitOfWork unitOfWork = new UnitOfWork();
         return Mono.fromFuture(
                 curriculumService.getCurriculum(accountId, curriculumId, email)
-                        .thenCompose(curriculum -> academicBackgroundRepo.update(academicBackground))
+                        .thenCompose(curriculum -> academicBackgroundRepo.update(unitOfWork, academicBackground))
+                        .thenCompose(res -> unitOfWork.commit())
         );
     }
 
@@ -65,8 +70,10 @@ public class AcademicBackgroundService {
             long curriculumId,
             String email
     ) {
+        UnitOfWork unitOfWork = new UnitOfWork();
         return Mono.fromFuture(curriculumService.getCurriculum(accountId, curriculumId, email)
-                .thenCompose(curriculum -> academicBackgroundRepo.deleteById(academicBackgroundId))
+                .thenCompose(curriculum -> academicBackgroundRepo.deleteById(unitOfWork, academicBackgroundId))
+                .thenCompose(res -> unitOfWork.commit())
         );
     }
 }

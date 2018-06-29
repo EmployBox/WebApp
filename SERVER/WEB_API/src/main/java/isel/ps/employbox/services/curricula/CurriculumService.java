@@ -2,11 +2,11 @@ package isel.ps.employbox.services.curricula;
 
 import com.github.jayield.rapper.DataRepository;
 import com.github.jayield.rapper.DomainObject;
-import com.github.jayield.rapper.Transaction;
 import com.github.jayield.rapper.utils.ConnectionManager;
 import com.github.jayield.rapper.utils.Pair;
 import com.github.jayield.rapper.utils.SqlSupplier;
 import com.github.jayield.rapper.utils.UnitOfWork;
+import io.vertx.ext.sql.TransactionIsolation;
 import isel.ps.employbox.ErrorMessages;
 import isel.ps.employbox.exceptions.BadRequestException;
 import isel.ps.employbox.exceptions.ConflictException;
@@ -56,19 +56,16 @@ public class CurriculumService {
     public CompletableFuture<Curriculum> createCurriculum(long userId, Curriculum curriculum, String email) {
         if (curriculum.getAccountId() != userId)
             throw new BadRequestException(ErrorMessages.BAD_REQUEST_IDS_MISMATCH);
-
+        UnitOfWork unitOfWork = new UnitOfWork(TransactionIsolation.SERIALIZABLE);
         return userAccountService.getUser(userId, email)
-                .thenCompose(userAccount -> new Transaction(Connection.TRANSACTION_SERIALIZABLE)
-                        .andDo(() -> curriculumRepo.create(curriculum)
-                                .thenApply(res -> curriculum)
-                                .thenCompose(curriculum1 -> {
-                                    List<CompletableFuture<Void>> list = new ArrayList<>();
-                                    populateChildList(list, curriculum, userId);
-                                    return CompletableFuture.allOf(list.toArray(new CompletableFuture[list.size()]));
-                                })
-                                .thenApply(res -> curriculum)
-                        ).commit()
-                        .thenApply(__ -> curriculum));
+                .thenCompose(userAccount -> curriculumRepo.create(unitOfWork, curriculum)
+                        .thenApply(res -> curriculum)
+                        .thenCompose(curriculum1 -> {
+                            List<CompletableFuture<Void>> list = new ArrayList<>();
+                            populateChildList(list, curriculum, userId);
+                            return CompletableFuture.allOf(list.toArray(new CompletableFuture[list.size()]));
+                        })
+                        .thenCompose(res -> unitOfWork.commit().thenApply(aVoid -> curriculum)));
     }
 
     private <T extends CurriculumChild & DomainObject<K>, K> CompletableFuture<Void> addChildFutureFunction(
@@ -76,18 +73,17 @@ public class CurriculumService {
             DataRepository<T, K> repo,
             Curriculum curriculum,
             long userId) {
-
+        UnitOfWork unitOfWork = new UnitOfWork();
         return future.thenApply(list -> {
-            list.forEach(curr -> {
-                curr.setAccountId(userId);
-                curr.setCurriculumId(curriculum.getIdentityKey());
-            });
-            return list;
-        })
-                .thenCompose(list -> {
+                    list.forEach(curr -> {
+                        curr.setAccountId(userId);
+                        curr.setCurriculumId(curriculum.getIdentityKey());
+                    });
+                    return list;
+                }).thenCompose(list -> {
                     if (list.isEmpty()) return CompletableFuture.completedFuture(null);
-                    return repo.createAll(list);
-                });
+                    return repo.createAll(unitOfWork, list);
+                }).thenCompose( aVoid -> unitOfWork.commit());
     }
 
     private void populateChildList(List<CompletableFuture<Void>> creationList, Curriculum curriculum, long userId) {
@@ -114,44 +110,42 @@ public class CurriculumService {
     }
 
     public Mono<Void> updateCurriculum(Curriculum curriculum, String email) {
+        UnitOfWork unitOfWork = new UnitOfWork();
         return Mono.fromFuture(
                 userAccountService.getUser(curriculum.getAccountId(), email)
                         .thenCompose(userAccount -> getCurriculum(curriculum.getAccountId(), curriculum.getIdentityKey(), email))
-                        .thenCompose(curriculum1 -> curriculumRepo.update(curriculum))
+                        .thenCompose(curriculum1 -> curriculumRepo.update(unitOfWork, curriculum))
+                        .thenCompose( aVoid -> unitOfWork.commit())
         );
     }
 
     public Mono<Void> deleteCurriculum(long userId, long cid, String email) {
         List<Curriculum> curriculum = new ArrayList<>(1);
-
+        UnitOfWork unitOfWork = new UnitOfWork();
         return Mono.fromFuture(
-                new Transaction(Connection.TRANSACTION_READ_COMMITTED)
-                        .andDo(() ->
-                                getCurriculum(userId, cid, email)
-                                        .thenAccept(curriculum1 -> curriculum.add(0, curriculum1))
-                        )
-                        .andDo(() ->
+                getCurriculum(userId, cid, email)
+                        .thenAccept(curriculum1 -> curriculum.add(0, curriculum1))
+                        .thenCompose(aVoid ->
                                 curriculum.get(0).getAcademicBackground()
                                         .thenApply(academicBackgrounds -> academicBackgrounds.stream().map(AcademicBackground::getIdentityKey).collect(Collectors.toList()))
-                                        .thenCompose(academicBackgroundRepo::deleteAll)
-                        )
-                        .andDo(() ->
+                                        .thenCompose(keys -> academicBackgroundRepo.deleteAll(unitOfWork, keys))
+
+                        ).thenCompose(aVoid ->
                                 curriculum.get(0).getProjects()
                                         .thenApply(projects -> projects.stream().map(Project::getIdentityKey).collect(Collectors.toList()))
-                                        .thenCompose(projectRepo::deleteAll)
-                        )
-                        .andDo(() ->
+                                        .thenCompose(keys -> projectRepo.deleteAll(unitOfWork, keys)))
+                        .thenCompose(aVoid ->
                                 curriculum.get(0).getPreviousJobs()
                                         .thenApply(previousJobs -> previousJobs.stream().map(PreviousJobs::getIdentityKey).collect(Collectors.toList()))
-                                        .thenCompose(previousJobsRepo::deleteAll)
+                                        .thenCompose(keys -> previousJobsRepo.deleteAll(unitOfWork, keys))
                         )
-                        .andDo(() ->
+                        .thenCompose(aVoid ->
                                 curriculum.get(0).getExperiences()
                                         .thenApply(curriculumExperiences -> curriculumExperiences.stream().map(CurriculumExperience::getIdentityKey).collect(Collectors.toList()))
-                                        .thenCompose(curriculumExperienceRepo::deleteAll)
+                                        .thenCompose(keys -> curriculumExperienceRepo.deleteAll(unitOfWork, keys))
                         )
-                        .andDo(() -> curriculumRepo.deleteById(cid))
-                        .commit()
+                        .thenCompose(aVoid -> curriculumRepo.deleteById(unitOfWork, cid))
+                        .thenCompose(aVoid -> unitOfWork.commit())
         );
     }
 
@@ -161,7 +155,9 @@ public class CurriculumService {
             long curriculumId,
             long jexpId
     ) {
-        return repo.findById(jexpId)
+        UnitOfWork unitOfWork = new UnitOfWork();
+        return repo.findById(unitOfWork, jexpId)
+                .thenCompose( res -> unitOfWork.commit().thenApply( aVoid -> res))
                 .thenApply(oChild -> oChild.orElseThrow(() -> new ResourceNotFoundException(ErrorMessages.RESOURCE_NOTFOUND)))
                 .thenApply(child -> {
                     if (child.getCurriculumId() != curriculumId || child.getAccountId() != accountId)

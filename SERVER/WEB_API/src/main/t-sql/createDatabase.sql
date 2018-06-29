@@ -96,20 +96,9 @@ CREATE TABLE [PreviousJobs](
 	CHECK([workLoad] = 'partial' OR [workLoad] = 'total')
 )
 
-CREATE TABLE [Local] (
-	[Address] NVARCHAR(50) primary key,
-	country NVARCHAR(15),
-	zipCode NVARCHAR(40),
-    district NVARCHAR(40),
-    longitude real,
-    latitude real,
-	[version] rowversion
-)
-
-
 CREATE TABLE [Job](
 	jobId BIGINT identity primary key,
-  title nvarchar(50) not null,
+	title nvarchar(50) not null,
 	accountId BIGINT ,
 	schedule NVARCHAR(20),
 	wage INT check(wage > 0),
@@ -117,7 +106,11 @@ CREATE TABLE [Job](
 	offerBeginDate DATETIME DEFAULT(GETDATE()),
 	offerEndDate DATETIME,
 	offerType NVARCHAR(30) NOT NULL,
+	country NVARCHAR(15),
 	[Address] NVARCHAR(50),
+	district NVARCHAR(40),
+	longitude real,
+	latitude real,
 	[version] rowversion,
 
 	FOREIGN KEY (accountID) REFERENCES Account,

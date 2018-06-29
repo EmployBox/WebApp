@@ -2,8 +2,9 @@ package isel.ps.employbox.services;
 
 import com.github.jayield.rapper.DataRepository;
 import com.github.jayield.rapper.DomainObject;
-import com.github.jayield.rapper.Transaction;
 import com.github.jayield.rapper.utils.Pair;
+import com.github.jayield.rapper.utils.UnitOfWork;
+import io.vertx.ext.sql.TransactionIsolation;
 import isel.ps.employbox.model.binders.CollectionPage;
 
 import java.sql.Connection;
@@ -23,22 +24,17 @@ public class ServiceUtils {
     ) {
         List[] list = new List[1];
         CollectionPage[] ret = new CollectionPage[1];
-
-        return new Transaction(Connection.TRANSACTION_SERIALIZABLE)
-                .andDo(() ->
-                        repo.findWhere(page, pageSize, query)
-                                .thenCompose(listRes -> {
-                                    list[0] = (List) listRes;
-                                    return repo.getNumberOfEntries(query);
-                                })
-                                .thenAccept(numberOfEntries -> ret[0] = new CollectionPage(
-                                        (Long) numberOfEntries,
-                                        pageSize,
-                                        page,
-                                        list[0]
-                                ))
-                )
-                .commit()
-                .thenApply(aVoid -> ret[0]);
+        UnitOfWork unitOfWork = new UnitOfWork(TransactionIsolation.SERIALIZABLE);
+        return repo.findWhere(unitOfWork, page, pageSize, query)
+                .thenCompose(listRes -> {
+                    list[0] = (List) listRes;
+                    return repo.getNumberOfEntries(unitOfWork, query);
+                })
+                .thenAccept(numberOfEntries -> ret[0] = new CollectionPage(
+                        (Long) numberOfEntries,
+                        pageSize,
+                        page,
+                        list[0]
+                )).thenCompose( __ -> unitOfWork.commit().thenApply(aVoid -> ret[0]));
     }
 }

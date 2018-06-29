@@ -2,6 +2,7 @@ package isel.ps.employbox.security;
 
 import com.github.jayield.rapper.DataRepository;
 import com.github.jayield.rapper.utils.Pair;
+import com.github.jayield.rapper.utils.UnitOfWork;
 import isel.ps.employbox.model.entities.Account;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.ReactiveUserDetailsService;
@@ -23,9 +24,11 @@ public class RepositoryReactiveUserDetailsService implements ReactiveUserDetails
 
     @Override
     public Mono<UserDetails> findByUsername(String username) {
+        UnitOfWork unitOfWork = new UnitOfWork();
         return Mono.fromFuture(
                 accountRepo
-                        .findWhere(new Pair<>("email", username))
+                        .findWhere(unitOfWork, new Pair<>("email", username))
+                        .thenCompose( res -> unitOfWork.commit().thenApply( aVoid -> res))
                         .thenApply(accounts -> {
                             if (!accounts.isEmpty())
                                 return new CustomUserDetails(accounts.get(0));

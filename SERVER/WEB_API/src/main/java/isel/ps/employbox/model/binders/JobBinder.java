@@ -13,11 +13,9 @@ import java.util.concurrent.CompletableFuture;
 
 @Component
 public class JobBinder implements ModelBinder<Job, OutJob, InJob> {
-    private final DataRepository<Account, Long> accountRepo;
     private final AccountBinder accountBinder;
 
-    public JobBinder(DataRepository<Account, Long> accountRepo, AccountBinder accountBinder) {
-        this.accountRepo = accountRepo;
+    public JobBinder(AccountBinder accountBinder) {
         this.accountBinder = accountBinder;
     }
 
@@ -45,11 +43,8 @@ public class JobBinder implements ModelBinder<Job, OutJob, InJob> {
 
     @Override
     public Job bindInput(InJob inJob) {
-        CompletableFuture<Account> accountCF = accountRepo.findById(inJob.getAccountId())
-                .thenApply(account -> account.orElseThrow(() -> new ResourceNotFoundException("Account not found")));
-
         return new Job(
-                accountCF,
+                inJob.getAccountId(),
                 inJob.getJobID(),
                 inJob.getTitle(),
                 inJob.getAddress(),

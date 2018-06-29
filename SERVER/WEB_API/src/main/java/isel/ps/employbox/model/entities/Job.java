@@ -1,15 +1,21 @@
 package isel.ps.employbox.model.entities;
 
-import com.github.jayield.rapper.ColumnName;
-import com.github.jayield.rapper.DomainObject;
-import com.github.jayield.rapper.Id;
-import com.github.jayield.rapper.Version;
+import com.github.jayield.rapper.*;
+import com.github.jayield.rapper.utils.UnitOfWork;
+import isel.ps.employbox.exceptions.ResourceNotFoundException;
+import isel.ps.employbox.model.binders.AccountBinder;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.sql.Timestamp;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 public class Job implements DomainObject<Long> {
+
+
+    @Autowired
+    private DataRepository<Account, Long> accountRepo;
+
     @Id(isIdentity =  true)
     private final long jobId;
     private final String title;
@@ -76,7 +82,7 @@ public class Job implements DomainObject<Long> {
     }
 
     public Job(
-            CompletableFuture<Account> account,
+            long accountId,
             long jobId,
             String title,
             String address,
@@ -89,8 +95,12 @@ public class Job implements DomainObject<Long> {
             List<JobExperience> experiences,
             long version
     ) {
+        UnitOfWork unitOfWork = new UnitOfWork();
+        this.account = accountRepo.findById(unitOfWork, accountId)
+                .thenCompose(res -> unitOfWork.commit().thenApply(aVoid -> res))
+                .thenApply(res -> res.orElseThrow(() -> new ResourceNotFoundException("Account not found")));
+
         this.jobId = jobId;
-        this.account = account;
         this.title = title;
         this.address = address;
         this.wage = wage;

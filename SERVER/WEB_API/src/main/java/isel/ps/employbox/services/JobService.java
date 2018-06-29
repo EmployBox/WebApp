@@ -1,8 +1,8 @@
 package isel.ps.employbox.services;
 
 import com.github.jayield.rapper.DataRepository;
-import com.github.jayield.rapper.Transaction;
 import com.github.jayield.rapper.utils.Pair;
+import com.github.jayield.rapper.utils.UnitOfWork;
 import isel.ps.employbox.ErrorMessages;
 import isel.ps.employbox.exceptions.BadRequestException;
 import isel.ps.employbox.exceptions.ConflictException;
@@ -61,7 +61,10 @@ public class JobService {
     }
 
     public CompletableFuture<Job> getJob(long jid) {
-        return jobRepo.findById(jid)
+        UnitOfWork unitOfWork = new UnitOfWork();
+
+        return jobRepo.findById(unitOfWork, jid)
+                .thenCompose(res -> unitOfWork.commit().thenApply( aVoid -> res))
                 .thenApply(ojob -> ojob.orElseThrow(()-> new ResourceNotFoundException(ErrorMessages.RESOURCE_NOTFOUND_JOB)));
     }
 
@@ -75,7 +78,10 @@ public class JobService {
     }
 
     public CompletableFuture<JobExperience> getJobExperience(long id, long cid) {
-        return jobExperienceRepo.findById(cid)
+        UnitOfWork unitOfWork = new UnitOfWork();
+
+        return jobExperienceRepo.findById(unitOfWork, cid)
+                .thenCompose( res -> unitOfWork.commit().thenApply( aVoid -> res))
                 .thenApply( oJobExperience -> oJobExperience.orElseThrow( ()-> new ResourceNotFoundException(ErrorMessages.RESOURCE_NOTFOUND)))
                 .thenApply( jobExperience -> {
                     if(jobExperience.getJobId() != id)
@@ -85,26 +91,30 @@ public class JobService {
     }
 
     public CompletableFuture<Job> createJob(Job job, String email) {
+        UnitOfWork unitOfWork = new UnitOfWork();
+
         return job.getAccount()
                 .thenApply(account -> {
                     if (!account.getEmail().equals(email))
                         throw new UnauthorizedException(ErrorMessages.UN_AUTHORIZED_ID_AND_EMAIL_MISMATCH);
                     return account;
                 })
-                .thenCompose(account -> jobRepo.create(job))
+                .thenCompose(account -> jobRepo.create(unitOfWork, job))
                 .thenCompose(aVoid -> job.getExperiences())
                 .thenCompose(experienceList -> {
                     if (experienceList.isEmpty()) return CompletableFuture.completedFuture(null);
                     experienceList.forEach(curr -> curr.setJobId(job.getIdentityKey()));
-                    return jobExperienceRepo.createAll(experienceList);
+                    return jobExperienceRepo.createAll(unitOfWork, experienceList);
                 })
-                .thenApply(aVoid -> job)
+                .thenCompose( aVoid_ -> unitOfWork.commit().thenApply( aVoid -> job))
                 .exceptionally( e -> {
                     throw new BadRequestException(e.getMessage());
                 });
     }
 
     public CompletableFuture<Void> addJobExperienceToJob(long jobId, List<JobExperience> jobExperience, String username){
+        UnitOfWork unitOfWork = new UnitOfWork();
+
         return getJob(jobId)
                 .thenCompose(job -> job.getAccount()
                         .thenApply(account -> {
@@ -112,10 +122,12 @@ public class JobService {
                                 throw new UnauthorizedException(ErrorMessages.UN_AUTHORIZED_ID_AND_EMAIL_MISMATCH);
                             return account;
                         }))
-                .thenCompose(account -> jobExperienceRepo.createAll(jobExperience));
+                .thenCompose(account -> jobExperienceRepo.createAll(unitOfWork, jobExperience))
+                .thenCompose(aVoid -> unitOfWork.commit());
     }
 
     public Mono<Void> updateJob(Job job, String email) {
+        UnitOfWork unitOfWork = new UnitOfWork();
         return Mono.fromFuture(
                 CompletableFuture.allOf(
                         getJob(job.getIdentityKey()),
@@ -126,11 +138,13 @@ public class JobService {
                                     return account;
                                 })
                 )
-                        .thenCompose(aVoid -> jobRepo.update(job))
+                        .thenCompose(aVoid -> jobRepo.update(unitOfWork, job))
+                        .thenCompose(aVoid -> unitOfWork.commit())
         );
     }
 
     public Mono<Void> updateJobExperience(JobExperience jobExperience, String username) {
+        UnitOfWork unitOfWork = new UnitOfWork();
         return Mono.fromFuture(
                 getJob(jobExperience.getJobId())
                         .thenCompose(job -> job.getAccount()
@@ -139,13 +153,16 @@ public class JobService {
                                         throw new UnauthorizedException(ErrorMessages.UN_AUTHORIZED_ID_AND_EMAIL_MISMATCH);
                                     return account;
                                 }))
-                        .thenCompose(account -> jobExperienceRepo.update(jobExperience))
+                        .thenCompose(account -> jobExperienceRepo.update(unitOfWork, jobExperience))
+                        .thenCompose(aVoid -> unitOfWork.commit())
         );
     }
 
     public Mono<Void> deleteJob(long jobId, String email) {
+        UnitOfWork unitOfWork = new UnitOfWork();
         return Mono.fromFuture(
-                accountRepo.findWhere(new Pair<>("email", email))
+                accountRepo.findWhere(unitOfWork, new Pair<>("email", email))
+                        .thenCompose( res -> unitOfWork.commit().thenApply( aVoid -> res))
                         .thenApply(accounts -> {
                             if (accounts.isEmpty())
                                 throw new UnauthorizedException(ErrorMessages.UN_AUTHORIZED);
@@ -165,22 +182,24 @@ public class JobService {
     }
 
     private CompletableFuture<Void> executeDeleteTransaction(Job job) {
-        return new Transaction(Connection.TRANSACTION_READ_UNCOMMITTED)
-                .andDo(() -> job.getApplications()
-                        .thenCompose(applications -> {
-                            List<Long> applicationIds = applications.stream().map(Application::getIdentityKey).collect(Collectors.toList());
-                            return applicationRepo.deleteAll(applicationIds);
-                        }))
-                .andDo(() -> job.getExperiences()
-                        .thenCompose(jobExperiences -> {
-                            List<Long> jobExpIds = jobExperiences.stream().map(JobExperience::getIdentityKey).collect(Collectors.toList());
-                            return jobExperienceRepo.deleteAll(jobExpIds);
-                        }))
-                .andDo(() -> jobRepo.delete(job))
-                .commit();
+        UnitOfWork unitOfWork = new UnitOfWork();
+
+        return job.getApplications()
+                .thenCompose(applications -> {
+                    List<Long> applicationIds = applications.stream().map(Application::getIdentityKey).collect(Collectors.toList());
+                    return applicationRepo.deleteAll(unitOfWork, applicationIds);
+                })
+                .thenCompose(aVoid -> job.getExperiences().thenCompose(jobExperiences -> {
+                    List<Long> jobExpIds = jobExperiences.stream().map(JobExperience::getIdentityKey).collect(Collectors.toList());
+                    return jobExperienceRepo.deleteAll(unitOfWork, jobExpIds);
+                }))
+                .thenAccept(aVoid -> jobRepo.delete(unitOfWork, job))
+                .thenCompose(aVoid -> unitOfWork.commit());
     }
 
     public Mono<Void> deleteJobExperience(long jxpId, long jobId, String email) {
+        UnitOfWork unitOfWork = new UnitOfWork();
+
         return Mono.fromFuture(
                 getJob(jobId)
                         .thenCompose(job-> job.getAccount()
@@ -189,7 +208,8 @@ public class JobService {
                                         throw new UnauthorizedException(ErrorMessages.UN_AUTHORIZED_ID_AND_EMAIL_MISMATCH);
                                     return account;
                                 }))
-                        .thenCompose(account -> jobExperienceRepo.deleteById(jxpId))
+                        .thenCompose(account -> jobExperienceRepo.deleteById(unitOfWork, jxpId))
+                        .thenCompose( aVoid -> unitOfWork.commit())
         );
     }
 }

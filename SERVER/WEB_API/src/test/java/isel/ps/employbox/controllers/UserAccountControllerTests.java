@@ -30,13 +30,12 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.List;
 
-import static isel.ps.employbox.DataBaseUtils.prepareDB;
 import static junit.framework.TestCase.*;
 import static org.springframework.restdocs.webtestclient.WebTestClientRestDocumentation.document;
 import static org.springframework.restdocs.webtestclient.WebTestClientRestDocumentation.documentationConfiguration;
 import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.springSecurity;
 import static org.springframework.web.reactive.function.client.ExchangeFilterFunctions.basicAuthentication;
-
+/*
 @RunWith(SpringRunner.class)
 @SpringBootTest
 public class UserAccountControllerTests {
@@ -336,4 +335,4 @@ public class UserAccountControllerTests {
 
         assertTrue(applicationRepo.findWhere(new Pair<>("accountId", userAccount.getIdentityKey()), new Pair<>("jobId", jobId)).join().isEmpty());
     }
-}
+}*/

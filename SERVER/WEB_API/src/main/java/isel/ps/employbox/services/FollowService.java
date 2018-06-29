@@ -2,6 +2,7 @@ package isel.ps.employbox.services;
 
 import com.github.jayield.rapper.DataRepository;
 import com.github.jayield.rapper.utils.Pair;
+import com.github.jayield.rapper.utils.UnitOfWork;
 import isel.ps.employbox.model.entities.Account;
 import isel.ps.employbox.model.entities.Follow;
 import org.springframework.stereotype.Service;
@@ -31,12 +32,14 @@ public class FollowService {
         return getAccountFromFollowAux(followerAccountId, "accountIdFollowing", page, pageSize);
     }
 
-    private CompletableFuture getAccountFromFollowAux(long followId, String collumn, int page, int pageSize){
-        return followsRepo.findWhere(new Pair(collumn, followId))
-                .thenCompose( follow -> {
+    private CompletableFuture getAccountFromFollowAux(long followId, String collumn, int page, int pageSize) {
+        UnitOfWork unitOfWork = new UnitOfWork();
 
+        return followsRepo.findWhere(unitOfWork, new Pair(collumn, followId))
+                .thenCompose( res -> unitOfWork.commit().thenApply( aVoid -> res))
+                .thenCompose(follow -> {
                     List<Pair<String, String>> pairs = new ArrayList<>();
-                    ((List<Follow>) follow).forEach( curr -> pairs.add(new Pair("accountId", curr.getAccountIdFollowed())));
+                    ((List<Follow>) follow).forEach(curr -> pairs.add(new Pair("accountId", curr.getAccountIdFollowed())));
                     Pair[] query = pairs.stream()
                             .filter(stringStringPair -> stringStringPair.getValue() != null)
                             .toArray(Pair[]::new);
@@ -45,16 +48,22 @@ public class FollowService {
     }
 
     public Mono<Void> createFollower(long accountToBeFollowedId, long accountToFollowId, String username) {
+        UnitOfWork unitOfWork = new UnitOfWork();
+
         return Mono.fromFuture(
                 accountService.getAccount(accountToFollowId, username)
-                        .thenCompose(account -> followsRepo.create(new Follow(accountToBeFollowedId, accountToFollowId)))
+                        .thenCompose(account -> followsRepo.create(unitOfWork, new Follow(accountToBeFollowedId, accountToFollowId)))
+                        .thenCompose(aVoid -> unitOfWork.commit())
         );
     }
 
     public Mono<Void> deleteFollower(long id, long fid, String username) {
+        UnitOfWork unitOfWork = new UnitOfWork();
+
         return Mono.fromFuture(
                 accountService.getAccount(id, username)
-                        .thenCompose(account -> followsRepo.deleteById(new Follow.FollowKey(id, fid)))
+                        .thenCompose(account -> followsRepo.deleteById(unitOfWork, new Follow.FollowKey(id, fid)))
+                        .thenCompose( aVoid -> unitOfWork.commit() )
         );
     }
 }
