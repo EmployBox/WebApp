@@ -1,5 +1,4 @@
 import React from 'react'
-import GenericForm from '../components/genericForm'
 import HttpRequest from '../components/httpRequest'
 
 export default class extends React.Component {
@@ -8,11 +7,11 @@ export default class extends React.Component {
     this.state = {
       inputs: undefined
     }
-    this.onSubmit = this.onSubmit.bind(this)
-    console.log(this.props.url)
+    this.onSignUp = this.onSignUp.bind(this)
+    console.log(props.url)
   }
 
-  onSubmit (inputs) {
+  onSignUp (inputs) {
     this.setState({inputs: inputs})
   }
 
@@ -23,15 +22,8 @@ export default class extends React.Component {
           <div class='row'>
             <div class='col' />
             <div class='col-xl-7 col-lg-5 col-md-4 col-sm-auto'>
-              <h2 class='text-center'>LogIn</h2>
-              <GenericForm
-                inputData={[
-                  {type: 'text', name: 'email', label: 'Email address', id: 'emailID'},
-                  {type: 'password', name: 'password', label: 'Password', id: 'passID'}
-                ]}
-                klass='form-group'
-                onSubmitHandler={this.onSubmit}
-              />
+              <h2 class='text-center'>SignUp</h2>
+              {this.props.form(this.onSignUp)}
               {this.state.inputs
                 ? <HttpRequest
                   method='POST'

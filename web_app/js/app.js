@@ -8,14 +8,20 @@ import SignUp from './pages/signup'
 import LogIn from './pages/loginPage'
 import IndexPage from './pages/indexPage'
 import SearchPage from './pages/searchPage'
+import SignUpUser from './pages/signupUser'
+import SignUpCompany from './pages/signupCompany'
+
 import URI from 'urijs'
 import URITemplate from 'urijs/src/URITemplate'
 
 const urls = {
   about: '/about',
   logIn: new URITemplate('/logIn/{url}').expand({url: 'http://localhost:8080/'}), // TODO endpoint to verify credentials
-  signUp: new URITemplate('/signup/{url}').expand({url: 'http://localhost:8080/accounts/users'})
+  signUp: new URITemplate('/signup/{urlUser}/{urlCompany}').expand({urlUser: 'http://localhost:8080/accounts/users', urlCompany: 'http://localhost:8080/accounts/companies'})
 }
+
+const signUpUserTempl = new URITemplate('/signup/user/{url}')
+const signUpCompanyTempl = new URITemplate('/signup/company/{url}')
 
 const apiURI = 'http://localhost:8080'
 
@@ -28,8 +34,12 @@ export default class extends Component {
             <Navigation about={urls.about} logIn={urls.logIn} signUp={urls.signUp} />
             <Switch>
               <Route exact path='/' component={IndexPage} />
-              <Route exact path='/signup/:url' render={({history, match}) => <SignUp ToLogin={() => history.push(urls.logIn)} url={match.params.url} />} />
-              <Route exact path='/login/:url' render={({history, match}) => <LogIn />} />
+              <Route exact path='/signup/user/:url' render={({history, match}) => <SignUpUser url={URI.decode(match.params.url)} />} />
+              <Route exact path='/signup/company/:url' render={({history, match}) => <SignUpCompany url={URI.decode(match.params.url)} />} />
+              <Route exact path='/signup/:urlUser/:urlCompany' render={({history, match}) =>
+                <SignUp signUpUser={() => history.push(signUpUserTempl.expand({ url: match.params.urlUser }))}
+                  signUpCompany={() => history.push(signUpCompanyTempl.expand({ url: match.params.urlCompany }))} />} />
+              <Route exact path='/login/:url' render={({history, match}) => <LogIn url={URI.decode(match.params.url)} />} />
               <Route exact path='/jobs' render={(props) => (
                 <SearchPage
                   apiURI={apiURI}
