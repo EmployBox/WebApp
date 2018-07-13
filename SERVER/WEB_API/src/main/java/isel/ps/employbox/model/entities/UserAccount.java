@@ -2,10 +2,12 @@ package isel.ps.employbox.model.entities;
 
 import com.github.jayield.rapper.ColumnName;
 import com.github.jayield.rapper.Version;
+import com.github.jayield.rapper.utils.UnitOfWork;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.function.Function;
 
 public class UserAccount extends Account {
     private final String summary;
@@ -14,15 +16,15 @@ public class UserAccount extends Account {
     private final long version;
 
     @ColumnName(foreignName = "accountId")
-    private final CompletableFuture<List<Curriculum>> curricula;
+    private final Function<UnitOfWork, CompletableFuture<List<Curriculum>>> curricula;
     @ColumnName(foreignName = "accountId")
-    private final CompletableFuture<List<Application>> applications;
+    private final Function<UnitOfWork, CompletableFuture<List<Application>>> applications;
 
     public UserAccount(){
         summary = null;
         photoUrl = null;
-        curricula = CompletableFuture.completedFuture(Collections.emptyList());
-        applications = CompletableFuture.completedFuture(Collections.emptyList());
+        curricula = null;
+        applications = null;
         version = 0;
     }
 
@@ -35,21 +37,21 @@ public class UserAccount extends Account {
             String name,
             String summary,
             String photoUrl,
-            CompletableFuture<List<Job>> offeredJobs,
-            CompletableFuture<List<Curriculum>> curricula,
-            CompletableFuture<List<Application>> applications,
-            CompletableFuture<List<Chat>> chats,
-            CompletableFuture<List<Comment>> comments,
-            CompletableFuture<List<Rating>> ratings,
-            CompletableFuture<List<Account>> following,
-            CompletableFuture<List<Account>> followers,
+            List<Job> offeredJobs,
+            List<Curriculum> curricula,
+            List<Application> applications,
+            List<Chat> chats,
+            List<Comment> comments,
+            List<Rating> ratings,
+            List<Account> following,
+            List<Account> followers,
             long version
     ) {
         super(accountID, name, email, password, "USR", rating, accountVersion, offeredJobs, comments, chats, ratings,following, followers);
         this.summary = summary;
         this.photoUrl = photoUrl;
-        this.curricula = curricula;
-        this.applications = applications;
+        this.curricula = (__) -> CompletableFuture.completedFuture(curricula);
+        this.applications = (__) -> CompletableFuture.completedFuture(applications);
         this.version = version;
     }
 
@@ -68,8 +70,8 @@ public class UserAccount extends Account {
         this.summary = summary;
         this.photoUrl = photoUrl;
         this.version = version;
-        this.curricula = CompletableFuture.completedFuture(Collections.emptyList());
-        this.applications = CompletableFuture.completedFuture(Collections.emptyList());
+        this.curricula = null;
+        this.applications = null;
     }
 
     public String getName() {
@@ -84,13 +86,6 @@ public class UserAccount extends Account {
         return photoUrl;
     }
 
-    public CompletableFuture<List<Application>> getApplications() {
-        return applications;
-    }
-
-    public CompletableFuture<List<Curriculum>> getCurricula() {
-        return curricula;
-    }
 
     @Override
     public long getVersion() {
@@ -99,5 +94,13 @@ public class UserAccount extends Account {
 
     public long getAccountVersion() {
         return super.getVersion();
+    }
+
+    public Function<UnitOfWork, CompletableFuture<List<Curriculum>>> getCurricula() {
+        return curricula;
+    }
+
+    public Function<UnitOfWork, CompletableFuture<List<Application>>> getApplications() {
+        return applications;
     }
 }

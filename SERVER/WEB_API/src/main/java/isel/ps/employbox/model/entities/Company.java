@@ -35,12 +35,12 @@ public class Company extends Account {
             String logoUrl,
             String webPageUrl,
             String description,
-            CompletableFuture<List<Job>> offeredJobs,
-            CompletableFuture<List<Chat>> chats,
-            CompletableFuture<List<Comment>> comments,
-            CompletableFuture<List<Rating>> ratings,
-            CompletableFuture<List<Account>> following,
-            CompletableFuture<List<Account>> followers)
+            List<Job> offeredJobs,
+            List<Chat> chats,
+            List<Comment> comments,
+            List<Rating> ratings,
+            List<Account> following,
+            List<Account> followers)
     {
         super(accountID, name, email, password, "CMP", rating, version, offeredJobs,comments, chats, ratings, following, followers);
         this.specialization = specialization;

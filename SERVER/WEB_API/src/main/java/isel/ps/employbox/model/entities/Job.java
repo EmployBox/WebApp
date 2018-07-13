@@ -1,26 +1,26 @@
 package isel.ps.employbox.model.entities;
 
+
 import com.github.jayield.rapper.*;
+import com.github.jayield.rapper.utils.Foreign;
 import com.github.jayield.rapper.utils.UnitOfWork;
 import isel.ps.employbox.exceptions.ResourceNotFoundException;
 import isel.ps.employbox.model.binders.AccountBinder;
+import isel.ps.employbox.model.output.OutAccount;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.sql.Timestamp;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.function.Function;
 
 public class Job implements DomainObject<Long> {
-
-
-    @Autowired
-    private DataRepository<Account, Long> accountRepo;
 
     @Id(isIdentity =  true)
     private final long jobId;
     private final String title;
     @ColumnName(name = "accountId")
-    private final CompletableFuture<Account> account;
+    private Foreign<Account,Long> account;
     private final String address;
     private final int wage;
     private final String description;
@@ -31,9 +31,9 @@ public class Job implements DomainObject<Long> {
     @Version
     private final long version;
     @ColumnName(foreignName = "jobId")
-    private final CompletableFuture<List<Application>> applications;
+    private Function<UnitOfWork, CompletableFuture<List<Application>>> applications;
     @ColumnName(foreignName = "jobId")
-    private final CompletableFuture<List<JobExperience>> experiences;
+    private Function<UnitOfWork, CompletableFuture<List<JobExperience>>> experiences;
 
     public Job(){
         title = null;
@@ -54,7 +54,6 @@ public class Job implements DomainObject<Long> {
     public Job(
             long id,
             String title,
-            CompletableFuture<Account> accountID,
             String address,
             int wage,
             String description,
@@ -62,13 +61,10 @@ public class Job implements DomainObject<Long> {
             Timestamp offerBeginDate,
             Timestamp offerEndDate,
             String offerType,
-            long version,
-            CompletableFuture<List<Application>> applications,
-            CompletableFuture<List<JobExperience>> experiences
+            long version
     ) {
         this.jobId = id;
         this.title = title;
-        this.account = accountID;
         this.address = address;
         this.wage = wage;
         this.description = description;
@@ -77,12 +73,9 @@ public class Job implements DomainObject<Long> {
         this.offerEndDate = offerEndDate;
         this.offerType = offerType;
         this.version = version;
-        this.applications = applications;
-        this.experiences = experiences;
     }
 
     public Job(
-            long accountId,
             long jobId,
             String title,
             String address,
@@ -92,14 +85,10 @@ public class Job implements DomainObject<Long> {
             Timestamp offerBeginDate,
             Timestamp offerEndDate,
             String offerType,
+            List<Application> applications,
             List<JobExperience> experiences,
             long version
     ) {
-        UnitOfWork unitOfWork = new UnitOfWork();
-        this.account = accountRepo.findById(unitOfWork, accountId)
-                .thenCompose(res -> unitOfWork.commit().thenApply(aVoid -> res))
-                .thenApply(res -> res.orElseThrow(() -> new ResourceNotFoundException("Account not found")));
-
         this.jobId = jobId;
         this.title = title;
         this.address = address;
@@ -109,8 +98,8 @@ public class Job implements DomainObject<Long> {
         this.offerBeginDate = offerBeginDate;
         this.offerEndDate = offerEndDate;
         this.offerType = offerType;
-        this.applications = CompletableFuture.completedFuture(null);
-        this.experiences = CompletableFuture.completedFuture(experiences);
+        this.applications = (__)-> CompletableFuture.completedFuture(applications);
+        this.experiences = (__)-> CompletableFuture.completedFuture(experiences);
         this.version = version;
     }
 
@@ -121,10 +110,6 @@ public class Job implements DomainObject<Long> {
 
     public long getVersion() {
         return version;
-    }
-
-    public CompletableFuture<Account> getAccount() {
-        return account;
     }
 
     public int getWage() {
@@ -155,15 +140,26 @@ public class Job implements DomainObject<Long> {
         return address;
     }
 
+    public CompletableFuture<OutAccount> getAccountToOutput() {
+        UnitOfWork unitOfWork = new UnitOfWork();
+        AccountBinder accountBinder = new AccountBinder();
+
+        return accountBinder.bindOutput(account.getForeignObject(unitOfWork)).toFuture();
+    }
+
     public String getTitle() {
         return title;
     }
 
-    public CompletableFuture<List<Application>> getApplications() {
+    public Function<UnitOfWork, CompletableFuture<List<JobExperience>>> getExperiences() {
+        return experiences;
+    }
+
+    public Function<UnitOfWork, CompletableFuture<List<Application>>> getApplications() {
         return applications;
     }
 
-    public CompletableFuture<List<JobExperience>> getExperiences() {
-        return experiences;
+    public Foreign<Account, Long> getAccount() {
+        return account;
     }
 }

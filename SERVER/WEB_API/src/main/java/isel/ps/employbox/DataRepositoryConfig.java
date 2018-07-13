@@ -1,5 +1,6 @@
 package isel.ps.employbox;
 
+
 import com.github.jayield.rapper.DataRepository;
 import com.github.jayield.rapper.utils.MapperRegistry;
 import isel.ps.employbox.model.entities.*;

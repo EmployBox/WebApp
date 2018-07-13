@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.jayield.rapper.DataRepository;
 import com.github.jayield.rapper.utils.Pair;
+import com.github.jayield.rapper.utils.UnitOfWork;
 import isel.ps.employbox.exceptions.ResourceNotFoundException;
 import isel.ps.employbox.model.entities.Job;
 import isel.ps.employbox.model.entities.JobExperience;
@@ -24,6 +25,7 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
+import java.math.BigInteger;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -44,11 +46,11 @@ public class JobControllerTests {
     @Autowired
     private ApplicationContext context;
     @Autowired
-    private DataRepository<Job, Long> jobRepo;
+    private DataRepository<T, K> jobRepo;
     @Autowired
     private DataRepository<JobExperience, Long> jobExperienceRepo;
     private WebTestClient webTestClient;
-    private long accountId;
+    private BigInteger accountId;
     private Job job;
     private JobExperience jobExperience;
 
@@ -61,16 +63,18 @@ public class JobControllerTests {
                 .filter(basicAuthentication())
                 .filter(documentationConfiguration(restDocumentation))
                 .build();
-
-        List<Job> jobs = jobRepo.findWhere(new Pair<>("title", "Great Job")).join();
+        UnitOfWork unitOfWork = new UnitOfWork();
+        List<Job> jobs = jobRepo.findWhere(unitOfWork, new Pair<>("title", "Great Job")).join();
         assertEquals(1, jobs.size());
         job = jobs.get(0);
 
-        List<JobExperience> jobExperiences = jobExperienceRepo.findWhere(new Pair<>("JOBID", job.getIdentityKey())).join();
+        List<JobExperience> jobExperiences = jobExperienceRepo.findWhere(unitOfWork, new Pair<>("JOBID", job.getIdentityKey())).join();
         assertEquals(1, jobExperiences.size());
         jobExperience = jobExperiences.get(0);
 
         accountId = job.getAccount().join().getIdentityKey();
+
+        unitOfWork.commit().join();
     }
 
     @Test
@@ -129,7 +133,7 @@ public class JobControllerTests {
 
         ObjectMapper objectMapper = new ObjectMapper();
         String json = objectMapper.writeValueAsString(inJob);
-
+        UnitOfWork unitOfWork = new UnitOfWork();
         webTestClient
                 .post()
                 .uri("/jobs")
@@ -140,7 +144,7 @@ public class JobControllerTests {
                 .expectBody()
                 .consumeWith(document("createJob"));
 
-        assertTrue(jobRepo.findWhere(new Pair<>("title", "Verrryyy gud job, come come")).join().size() != 0);
+        assertTrue(jobRepo.findWhere(unitOfWork, new Pair<>("title", "Verrryyy gud job, come come")).join().size() != 0);
     }
 
     @Test
@@ -156,7 +160,7 @@ public class JobControllerTests {
 
         ObjectMapper objectMapper = new ObjectMapper();
         String json = objectMapper.writeValueAsString(list);
-
+        UnitOfWork unitOfWork = new UnitOfWork();
         webTestClient
                 .post()
                 .uri("/jobs/" + job.getIdentityKey() + "/experiences")
@@ -167,7 +171,8 @@ public class JobControllerTests {
                 .expectBody()
                 .consumeWith(document("createJobExperience"));
 
-        assertEquals(1, jobExperienceRepo.findWhere(new Pair<>("jobId", job.getIdentityKey()), new Pair<>("COMPETENCES", "C#")).join().size());
+        assertEquals(1, jobExperienceRepo.findWhere(unitOfWork, new Pair<>("jobId", job.getIdentityKey()), new Pair<>("COMPETENCES", "C#")).join().size());
+        unitOfWork.commit().join();
     }
 
     @Test
@@ -231,6 +236,7 @@ public class JobControllerTests {
 
         ObjectMapper objectMapper = new ObjectMapper();
         String json = objectMapper.writeValueAsString(inJob);
+        UnitOfWork unitOfWork = new UnitOfWork();
 
         webTestClient
                 .put()
@@ -242,7 +248,7 @@ public class JobControllerTests {
                 .expectBody()
                 .consumeWith(document("updateJob"));
 
-        Job updatedJob = jobRepo.findById(job.getIdentityKey()).join().orElseThrow(() -> new ResourceNotFoundException("Job not found"));
+        Job updatedJob = jobRepo.findById(unitOfWork, job.getIdentityKey()).join().orElseThrow(() -> new ResourceNotFoundException("Job not found"));
 
         assertEquals("Looking for Worker", updatedJob.getOfferType());
         assertEquals("Sou uma empresa simpatica", updatedJob.getDescription());
@@ -262,7 +268,7 @@ public class JobControllerTests {
 
         ObjectMapper objectMapper = new ObjectMapper();
         String json = objectMapper.writeValueAsString(inJobExperience);
-
+        UnitOfWork unitOfWork = new UnitOfWork();
         webTestClient
                 .put()
                 .uri("/jobs/" + job.getIdentityKey() + "/experiences/" + jobExperience.getIdentityKey())
@@ -273,7 +279,7 @@ public class JobControllerTests {
                 .expectBody()
                 .consumeWith(document("updateJobExperience"));
 
-        JobExperience updatedJobExperience = jobExperienceRepo.findById(jobExperience.getIdentityKey()).join().orElseThrow(() -> new ResourceNotFoundException("JobExperience not found"));
+        JobExperience updatedJobExperience = jobExperienceRepo.findById(unitOfWork, jobExperience.getIdentityKey()).join().orElseThrow(() -> new ResourceNotFoundException("JobExperience not found"));
 
         assertEquals((short) 2, updatedJobExperience.getYears());
         assertEquals("C#", updatedJobExperience.getCompetences());
@@ -313,7 +319,7 @@ public class JobControllerTests {
                 .expectStatus().isOk()
                 .expectBody()
                 .consumeWith(document("deleteJob"));
-
-        assertFalse(jobRepo.findById(job.getIdentityKey()).join().isPresent());
+        UnitOfWork unitOfWork = new UnitOfWork();
+        assertFalse(jobRepo.findById(unitOfWork, job.getIdentityKey()).join().isPresent());
     }
 }

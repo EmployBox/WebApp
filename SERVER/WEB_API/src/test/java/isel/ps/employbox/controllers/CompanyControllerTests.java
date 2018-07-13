@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.jayield.rapper.DataRepository;
 import com.github.jayield.rapper.utils.Pair;
+import com.github.jayield.rapper.utils.UnitOfWork;
 import isel.ps.employbox.exceptions.ResourceNotFoundException;
 import isel.ps.employbox.model.entities.Company;
 import isel.ps.employbox.model.input.InCompany;
@@ -41,7 +42,7 @@ public class CompanyControllerTests {
     @Autowired
     private ApplicationContext context;
     @Autowired
-    private DataRepository<Company, Long> companyRepo;
+    private DataRepository<T, K> companyRepo;
     private WebTestClient webTestClient;
     private Company company;
 
@@ -54,9 +55,11 @@ public class CompanyControllerTests {
                 .filter(basicAuthentication())
                 .filter(documentationConfiguration(restDocumentation))
                 .build();
-        List<Company> companies = companyRepo.findWhere(new Pair<>("email", "company2@gmail.com")).join();
+        UnitOfWork unitOfWork = new UnitOfWork();
+        List<Company> companies = companyRepo.findWhere(unitOfWork, new Pair<>("email", "company2@gmail.com")).join();
         assertEquals(1, companies.size());
         company = companies.get(0);
+        unitOfWork.commit().join();
     }
 
     @Test
@@ -91,7 +94,7 @@ public class CompanyControllerTests {
 
         ObjectMapper objectMapper = new ObjectMapper();
         String json = objectMapper.writeValueAsString(inCompany);
-
+        UnitOfWork unitOfWork = new UnitOfWork();
         webTestClient
                 .post()
                 .uri("/accounts/companies")
@@ -102,7 +105,8 @@ public class CompanyControllerTests {
                 .expectBody()
                 .consumeWith(document("createCompany"));
 
-        assertTrue(companyRepo.findWhere(new Pair<>("email", "someEmail@hotmail.com")).join().size() != 0);
+        assertTrue(companyRepo.findWhere(unitOfWork, new Pair<>("email", "someEmail@hotmail.com")).join().size() != 0);
+        unitOfWork.commit().join();
     }
 
     @Test
@@ -143,7 +147,7 @@ public class CompanyControllerTests {
 
         ObjectMapper objectMapper = new ObjectMapper();
         String json = objectMapper.writeValueAsString(inCompany);
-
+        UnitOfWork unitOfWork = new UnitOfWork();
         webTestClient
                 .put()
                 .uri("/accounts/companies/" + company.getIdentityKey())
@@ -154,7 +158,7 @@ public class CompanyControllerTests {
                 .expectBody()
                 .consumeWith(document("updateCompany"));
 
-        Company updatedCompany = companyRepo.findById(company.getIdentityKey()).join().orElseThrow(() -> new ResourceNotFoundException("Company not found"));
+        Company updatedCompany = companyRepo.findById(unitOfWork, company.getIdentityKey()).join().orElseThrow(() -> new ResourceNotFoundException("Company not found"));
 
         assertEquals("Microsoft", updatedCompany.getName());
         assertEquals("Sou uma empresa simpatica", updatedCompany.getDescription());
@@ -195,7 +199,8 @@ public class CompanyControllerTests {
                 .expectStatus().isOk()
                 .expectBody()
                 .consumeWith(document("deleteCompany"));
-
-        assertFalse(companyRepo.findById(company.getIdentityKey()).join().isPresent());
+        UnitOfWork unitOfWork = new UnitOfWork();
+        assertFalse(companyRepo.findById(unitOfWork, company.getIdentityKey()).join().isPresent());
+        unitOfWork.commit().join();
     }
 }

@@ -4,9 +4,11 @@ import com.github.jayield.rapper.ColumnName;
 import com.github.jayield.rapper.DomainObject;
 import com.github.jayield.rapper.Id;
 import com.github.jayield.rapper.Version;
+import com.github.jayield.rapper.utils.UnitOfWork;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.function.Function;
 
 public class Chat implements DomainObject<Long> {
     @Id(isIdentity = true)
@@ -17,7 +19,7 @@ public class Chat implements DomainObject<Long> {
     private long version;
 
     @ColumnName(foreignName = "chatId")
-    private CompletableFuture<List<Message>> messages;
+    private Function<UnitOfWork, CompletableFuture<List<Message>>> messages;
 
     public Chat(){
         accountIdFirst = 0;
@@ -26,12 +28,12 @@ public class Chat implements DomainObject<Long> {
         messages = null;
     }
 
-    public Chat(long chatId, long accountIdFirst, long accountIdSecond, long version, CompletableFuture<List<Message>> messages) {
+    public Chat(long chatId, long accountIdFirst, long accountIdSecond, long version, List<Message> messages) {
         this.chatId = chatId;
         this.accountIdFirst = accountIdFirst;
         this.accountIdSecond = accountIdSecond;
         this.version = version;
-        this.messages = messages;
+        this.messages = (__)-> CompletableFuture.completedFuture(messages);
     }
 
     public Chat(long accountIdFirst, long accountIdSecond){
@@ -56,8 +58,7 @@ public class Chat implements DomainObject<Long> {
         return accountIdSecond;
     }
 
-    public CompletableFuture<List<Message>> getMessages() {
+    public Function<UnitOfWork, CompletableFuture<List<Message>>> getMessages() {
         return messages;
     }
-
 }

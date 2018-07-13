@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
@@ -69,12 +70,13 @@ public class CurriculumService {
     }
 
     private <T extends CurriculumChild & DomainObject<K>, K> CompletableFuture<Void> addChildFutureFunction(
-            CompletableFuture<List<T>> future,
+            Function<UnitOfWork, CompletableFuture<List<T>>> future,
             DataRepository<T, K> repo,
             Curriculum curriculum,
             long userId) {
         UnitOfWork unitOfWork = new UnitOfWork();
-        return future.thenApply(list -> {
+
+        return future.apply(unitOfWork).thenApply(list -> {
                     list.forEach(curr -> {
                         curr.setAccountId(userId);
                         curr.setCurriculumId(curriculum.getIdentityKey());
@@ -99,8 +101,10 @@ public class CurriculumService {
     }
 
     public CompletableFuture<Curriculum> getCurriculum(long userId, long cid, String... email) {
+        UnitOfWork unitOfWork = new UnitOfWork();
         return userAccountService.getUser(userId, email)
-                .thenCompose(UserAccount::getCurricula)
+                .thenCompose((userAccount) -> userAccount.getCurricula().apply(unitOfWork))
+                .thenCompose( res -> unitOfWork.commit().thenApply((__) -> res))
                 .thenApply(curricula -> {
                     Optional<Curriculum> optionalCurriculum = curricula.stream().filter(curr -> curr.getIdentityKey() == cid).findFirst();
                     if (curricula.isEmpty() || !optionalCurriculum.isPresent())
@@ -126,21 +130,21 @@ public class CurriculumService {
                 getCurriculum(userId, cid, email)
                         .thenAccept(curriculum1 -> curriculum.add(0, curriculum1))
                         .thenCompose(aVoid ->
-                                curriculum.get(0).getAcademicBackground()
+                                curriculum.get(0).getAcademicBackground().apply(unitOfWork)
                                         .thenApply(academicBackgrounds -> academicBackgrounds.stream().map(AcademicBackground::getIdentityKey).collect(Collectors.toList()))
                                         .thenCompose(keys -> academicBackgroundRepo.deleteAll(unitOfWork, keys))
 
                         ).thenCompose(aVoid ->
-                                curriculum.get(0).getProjects()
+                                curriculum.get(0).getProjects().apply(unitOfWork)
                                         .thenApply(projects -> projects.stream().map(Project::getIdentityKey).collect(Collectors.toList()))
                                         .thenCompose(keys -> projectRepo.deleteAll(unitOfWork, keys)))
                         .thenCompose(aVoid ->
-                                curriculum.get(0).getPreviousJobs()
+                                curriculum.get(0).getPreviousJobs().apply(unitOfWork)
                                         .thenApply(previousJobs -> previousJobs.stream().map(PreviousJobs::getIdentityKey).collect(Collectors.toList()))
                                         .thenCompose(keys -> previousJobsRepo.deleteAll(unitOfWork, keys))
                         )
                         .thenCompose(aVoid ->
-                                curriculum.get(0).getExperiences()
+                                curriculum.get(0).getExperiences().apply(unitOfWork)
                                         .thenApply(curriculumExperiences -> curriculumExperiences.stream().map(CurriculumExperience::getIdentityKey).collect(Collectors.toList()))
                                         .thenCompose(keys -> curriculumExperienceRepo.deleteAll(unitOfWork, keys))
                         )

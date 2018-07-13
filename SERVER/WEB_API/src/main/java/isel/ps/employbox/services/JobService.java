@@ -93,17 +93,19 @@ public class JobService {
     public CompletableFuture<Job> createJob(Job job, String email) {
         UnitOfWork unitOfWork = new UnitOfWork();
 
-        return job.getAccount()
+        return job.getAccount().getForeignObject(unitOfWork)
                 .thenApply(account -> {
                     if (!account.getEmail().equals(email))
                         throw new UnauthorizedException(ErrorMessages.UN_AUTHORIZED_ID_AND_EMAIL_MISMATCH);
                     return account;
                 })
                 .thenCompose(account -> jobRepo.create(unitOfWork, job))
-                .thenCompose(aVoid -> job.getExperiences())
+                .thenCompose(aVoid -> job.getExperiences().apply(unitOfWork))
                 .thenCompose(experienceList -> {
                     if (experienceList.isEmpty()) return CompletableFuture.completedFuture(null);
+
                     experienceList.forEach(curr -> curr.setJobId(job.getIdentityKey()));
+
                     return jobExperienceRepo.createAll(unitOfWork, experienceList);
                 })
                 .thenCompose( aVoid_ -> unitOfWork.commit().thenApply( aVoid -> job))
@@ -116,12 +118,13 @@ public class JobService {
         UnitOfWork unitOfWork = new UnitOfWork();
 
         return getJob(jobId)
-                .thenCompose(job -> job.getAccount()
-                        .thenApply(account -> {
+                .thenCompose(job -> job.getAccount().getForeignObject(unitOfWork))
+                .thenApply(
+                        account -> {
                             if (!account.getEmail().equals(username))
                                 throw new UnauthorizedException(ErrorMessages.UN_AUTHORIZED_ID_AND_EMAIL_MISMATCH);
                             return account;
-                        }))
+                        })
                 .thenCompose(account -> jobExperienceRepo.createAll(unitOfWork, jobExperience))
                 .thenCompose(aVoid -> unitOfWork.commit());
     }
@@ -131,7 +134,7 @@ public class JobService {
         return Mono.fromFuture(
                 CompletableFuture.allOf(
                         getJob(job.getIdentityKey()),
-                        job.getAccount()
+                        job.getAccount().getForeignObject(unitOfWork)
                                 .thenApply(account -> {
                                     if (!account.getEmail().equals(email))
                                         throw new UnauthorizedException(ErrorMessages.UN_AUTHORIZED_ID_AND_EMAIL_MISMATCH);
@@ -147,7 +150,7 @@ public class JobService {
         UnitOfWork unitOfWork = new UnitOfWork();
         return Mono.fromFuture(
                 getJob(jobExperience.getJobId())
-                        .thenCompose(job -> job.getAccount()
+                        .thenCompose(job -> job.getAccount().getForeignObject(unitOfWork)
                                 .thenApply(account -> {
                                     if (!account.getEmail().equals(username))
                                         throw new UnauthorizedException(ErrorMessages.UN_AUTHORIZED_ID_AND_EMAIL_MISMATCH);
@@ -171,28 +174,37 @@ public class JobService {
                         .thenCompose(account -> deleteJobAux(jobId, account))
         );
     }
-
+    //todo commit
     private CompletableFuture<Void> deleteJobAux(long jobId, Account account) {
+        UnitOfWork unitOfWork = new UnitOfWork();
         return getJob(jobId)
-                .thenCompose(job -> job.getAccount().thenCompose(account1 -> {
-                    if (!account1.getIdentityKey().equals(account.getIdentityKey()))
-                        throw new BadRequestException(ErrorMessages.UN_AUTHORIZED_ID_AND_EMAIL_MISMATCH);
-                    return executeDeleteTransaction(job);
-                }));
+                .thenCompose(
+                        job -> job.getAccount()
+                                .getForeignObject(unitOfWork)
+                                .thenCompose(acc -> {
+                                    if (!acc.getIdentityKey().equals(account.getIdentityKey()))
+                                        throw new BadRequestException(ErrorMessages.UN_AUTHORIZED_ID_AND_EMAIL_MISMATCH);
+                                    return executeDeleteTransaction(job);
+                                })
+                );
     }
 
     private CompletableFuture<Void> executeDeleteTransaction(Job job) {
         UnitOfWork unitOfWork = new UnitOfWork();
 
-        return job.getApplications()
+        return job.getApplications().apply(unitOfWork)
                 .thenCompose(applications -> {
                     List<Long> applicationIds = applications.stream().map(Application::getIdentityKey).collect(Collectors.toList());
                     return applicationRepo.deleteAll(unitOfWork, applicationIds);
                 })
-                .thenCompose(aVoid -> job.getExperiences().thenCompose(jobExperiences -> {
-                    List<Long> jobExpIds = jobExperiences.stream().map(JobExperience::getIdentityKey).collect(Collectors.toList());
-                    return jobExperienceRepo.deleteAll(unitOfWork, jobExpIds);
-                }))
+                .thenCompose(aVoid ->
+                        job.getExperiences()
+                                .apply(unitOfWork)
+                                .thenCompose(jobExperiences -> {
+                                    List<Long> jobExpIds = jobExperiences.stream().map(JobExperience::getIdentityKey).collect(Collectors.toList());
+                                    return jobExperienceRepo.deleteAll(unitOfWork, jobExpIds);
+                                })
+                )
                 .thenAccept(aVoid -> jobRepo.delete(unitOfWork, job))
                 .thenCompose(aVoid -> unitOfWork.commit());
     }
@@ -202,7 +214,7 @@ public class JobService {
 
         return Mono.fromFuture(
                 getJob(jobId)
-                        .thenCompose(job-> job.getAccount()
+                        .thenCompose(job-> job.getAccount().getForeignObject(unitOfWork)
                                 .thenApply(account -> {
                                     if (!account.getEmail().equals(email))
                                         throw new UnauthorizedException(ErrorMessages.UN_AUTHORIZED_ID_AND_EMAIL_MISMATCH);
