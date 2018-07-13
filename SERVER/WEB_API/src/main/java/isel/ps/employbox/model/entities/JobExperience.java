@@ -9,10 +9,9 @@ public class JobExperience implements DomainObject<Long> {
 
     @Id( isIdentity = true)
     private final long jobExperienceId;
-
     private long jobId;
     private final String competences;
-    private final short years;
+    private final int years;
     @Version
     private final long version;
 
@@ -59,7 +58,7 @@ public class JobExperience implements DomainObject<Long> {
         return version;
     }
 
-    public short getYears() {
+    public int getYears() {
         return years;
     }
 

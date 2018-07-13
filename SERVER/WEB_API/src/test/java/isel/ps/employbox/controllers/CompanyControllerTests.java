@@ -42,7 +42,7 @@ public class CompanyControllerTests {
     @Autowired
     private ApplicationContext context;
     @Autowired
-    private DataRepository<T, K> companyRepo;
+    private DataRepository<Company, Long> companyRepo;
     private WebTestClient webTestClient;
     private Company company;
 

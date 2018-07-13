@@ -1,18 +1,22 @@
 package isel.ps.employbox.model.entities;
 
 
-import com.github.jayield.rapper.*;
+import com.github.jayield.rapper.ColumnName;
+import com.github.jayield.rapper.DomainObject;
+import com.github.jayield.rapper.Id;
+import com.github.jayield.rapper.Version;
+import com.github.jayield.rapper.exceptions.DataMapperException;
 import com.github.jayield.rapper.utils.Foreign;
 import com.github.jayield.rapper.utils.UnitOfWork;
-import isel.ps.employbox.exceptions.ResourceNotFoundException;
 import isel.ps.employbox.model.binders.AccountBinder;
 import isel.ps.employbox.model.output.OutAccount;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.sql.Timestamp;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
+
+import static com.github.jayield.rapper.utils.MapperRegistry.getRepository;
 
 public class Job implements DomainObject<Long> {
 
@@ -76,6 +80,7 @@ public class Job implements DomainObject<Long> {
     }
 
     public Job(
+            long accountId,
             long jobId,
             String title,
             String address,
@@ -89,6 +94,8 @@ public class Job implements DomainObject<Long> {
             List<JobExperience> experiences,
             long version
     ) {
+        this.account = new Foreign<>(accountId, unit -> getRepository(Account.class).findById(unit, accountId)
+                .thenApply(account1 -> account1.orElseThrow(() -> new DataMapperException("Account not Found"))));
         this.jobId = jobId;
         this.title = title;
         this.address = address;
@@ -144,7 +151,7 @@ public class Job implements DomainObject<Long> {
         UnitOfWork unitOfWork = new UnitOfWork();
         AccountBinder accountBinder = new AccountBinder();
 
-        return accountBinder.bindOutput(account.getForeignObject(unitOfWork)).toFuture();
+        return accountBinder.bindOutput(account.getForeignObject(unitOfWork).thenCompose(account1 -> unitOfWork.commit().thenApply(aVoid -> account1))).toFuture();
     }
 
     public String getTitle() {

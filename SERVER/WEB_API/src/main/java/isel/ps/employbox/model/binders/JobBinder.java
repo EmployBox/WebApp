@@ -43,6 +43,7 @@ public class JobBinder implements ModelBinder<Job, OutJob, InJob> {
     @Override
     public Job bindInput(InJob inJob) {
         return new Job(
+                inJob.getAccountId(),
                 inJob.getJobID(),
                 inJob.getTitle(),
                 inJob.getAddress(),

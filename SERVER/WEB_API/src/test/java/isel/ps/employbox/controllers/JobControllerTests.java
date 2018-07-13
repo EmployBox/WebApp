@@ -10,7 +10,6 @@ import isel.ps.employbox.model.entities.Job;
 import isel.ps.employbox.model.entities.JobExperience;
 import isel.ps.employbox.model.input.InJob;
 import isel.ps.employbox.model.input.InJobExperience;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -25,8 +24,6 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
-import java.math.BigInteger;
-import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -46,16 +43,16 @@ public class JobControllerTests {
     @Autowired
     private ApplicationContext context;
     @Autowired
-    private DataRepository<T, K> jobRepo;
+    private DataRepository<Job, Long> jobRepo;
     @Autowired
     private DataRepository<JobExperience, Long> jobExperienceRepo;
     private WebTestClient webTestClient;
-    private BigInteger accountId;
+    private Long accountId;
     private Job job;
     private JobExperience jobExperience;
 
     @Before
-    public void setUp() throws SQLException {
+    public void setUp() {
         prepareDB();
         webTestClient = WebTestClient.bindToApplicationContext(context)
                 .apply(springSecurity())
@@ -72,7 +69,7 @@ public class JobControllerTests {
         assertEquals(1, jobExperiences.size());
         jobExperience = jobExperiences.get(0);
 
-        accountId = job.getAccount().join().getIdentityKey();
+        accountId = job.getAccount().getForeignKey();
 
         unitOfWork.commit().join();
     }

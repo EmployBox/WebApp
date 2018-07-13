@@ -44,13 +44,13 @@ public class CurriculumControllerTests {
     @Autowired
     private DataRepository<UserAccount, Long> userAccountRepo;
     @Autowired
-    private DataRepository<T, K> curriculumRepo;
+    private DataRepository<Curriculum, Long> curriculumRepo;
     private WebTestClient webTestClient;
     private UserAccount userAccount;
     private Curriculum curriculum;
 
     @Before
-    public void setUp() throws SQLException {
+    public void setUp() {
         prepareDB();
         webTestClient = WebTestClient.bindToApplicationContext(context)
                 .apply(springSecurity())
