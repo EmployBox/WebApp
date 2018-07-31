@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import isel.ps.employbox.controllers.JobController;
 import isel.ps.employbox.controllers.UserAccountController;
 import isel.ps.employbox.model.output.OutAccount.AccountItemOutput;
+import org.springframework.scheduling.annotation.Async;
 
 import java.sql.Timestamp;
 
@@ -51,6 +52,7 @@ public class OutJob implements OutputDto {
 
     @JsonProperty
     private final _Embedded _embedded;
+
 
     public OutJob(
             OutAccount account,

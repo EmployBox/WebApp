@@ -39,8 +39,20 @@ public class RepositoryReactiveUserDetailsService implements ReactiveUserDetails
 
     static class CustomUserDetails extends Account implements UserDetails {
         CustomUserDetails(Account account) {
-            super(account.getIdentityKey(), account.getName(), account.getEmail(), account.getPassword(), account.getAccountType(), account.getRating(), account.getVersion(), account.getOfferedJobs(),
-                    account.getComments(), account.getChats(), account.getRatings(), account.getFollowing(), account.getFollowers());
+            super(account.getIdentityKey(),
+                    account.getName(),
+                    account.getEmail(),
+                    account.getPassword(),
+                    account.getAccountType(),
+                    account.getRating(),
+                    account.getVersion(),
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null
+            );
         }
 
         @Override

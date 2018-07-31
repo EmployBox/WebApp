@@ -145,7 +145,7 @@ public class UserAccountService {
         return Mono.fromFuture(
                 getUser(id, email)
                         //TODO remove entries from other tables where user has foreign key
-                        .thenCompose(userAccount -> userAccount.getApplications()
+                        .thenCompose(userAccount -> userAccount.getApplications().apply(unit)
                                 .thenCompose(applications -> {
                                     List<Long> applicationIds = applications.stream().map(Application::getIdentityKey).collect(Collectors.toList());
                                     return applicationRepo.deleteAll(unit, applicationIds);

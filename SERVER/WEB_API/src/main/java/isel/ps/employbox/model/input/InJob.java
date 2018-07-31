@@ -1,5 +1,6 @@
 package isel.ps.employbox.model.input;
 
+import isel.ps.employbox.model.entities.Application;
 import isel.ps.employbox.model.entities.JobExperience;
 
 import java.sql.Timestamp;
@@ -11,6 +12,7 @@ public class InJob {
     private String title;
     private long accountId;
     private List<JobExperience> experiences = Collections.emptyList();
+    private List<Application> applications = Collections.emptyList();
     private String address;
     private int wage;
     private String description;
@@ -118,4 +120,11 @@ public class InJob {
         this.version = version;
     }
 
+    public List<Application> getApplications() {
+        return applications;
+    }
+
+    public void setApplications(List<Application> applications) {
+        this.applications = applications;
+    }
 }

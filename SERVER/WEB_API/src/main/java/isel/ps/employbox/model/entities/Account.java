@@ -4,10 +4,12 @@ import com.github.jayield.rapper.ColumnName;
 import com.github.jayield.rapper.DomainObject;
 import com.github.jayield.rapper.Id;
 import com.github.jayield.rapper.Version;
+import com.github.jayield.rapper.utils.UnitOfWork;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.function.Function;
 
 import static isel.ps.employbox.model.entities.Role.DEFAULT;
 
@@ -25,22 +27,22 @@ public class Account implements DomainObject<Long> {
     private final long version;
 
     @ColumnName(foreignName = "accountId")
-    protected final CompletableFuture<List<Job>> offeredJobs;
+    protected final Function<UnitOfWork,CompletableFuture<List<Job>>> offeredJobs;
 
     @ColumnName(foreignName = "accountIdFrom")
-    protected final CompletableFuture<List<Comment>> comments;
+    protected final Function<UnitOfWork, CompletableFuture<List<Comment>>> comments;
 
     @ColumnName(table = "Follows", foreignName = "accountIdFollowed", externalName = "accountIdFollower")
-    protected final CompletableFuture<List<Account>> following;
+    protected final Function<UnitOfWork, CompletableFuture<List<Account>>> following;
 
     @ColumnName(table = "Follows", foreignName = "accountIdFollower", externalName = "accountIdFollowed")
-    protected final CompletableFuture<List<Account>> followers;
+    protected final Function<UnitOfWork, CompletableFuture<List<Account>>> followers;
 
     @ColumnName( foreignName = "accountIdFirst")
-    protected final CompletableFuture<List<Chat>> chats;
+    protected final Function<UnitOfWork, CompletableFuture<List<Chat>>> chats;
 
     @ColumnName(foreignName = "accountIdTo")
-    protected final CompletableFuture<List<Rating>> ratings;
+    protected final Function<UnitOfWork, CompletableFuture<List<Rating>>> ratings;
 
 
     public Account(){
@@ -51,12 +53,12 @@ public class Account implements DomainObject<Long> {
         rating = 0;
         accountType = null;
         version = 0;
-        offeredJobs = CompletableFuture.completedFuture(Collections.emptyList());
-        comments = CompletableFuture.completedFuture(Collections.emptyList());
-        following = CompletableFuture.completedFuture(Collections.emptyList());
-        followers = CompletableFuture.completedFuture(Collections.emptyList());
-        chats = CompletableFuture.completedFuture(Collections.emptyList());
-        ratings = CompletableFuture.completedFuture(Collections.emptyList());
+        offeredJobs = null;
+        comments = null;
+        following = null;
+        followers = null;
+        chats = null;
+        ratings = null;
     }
 
     protected Account(
@@ -65,12 +67,12 @@ public class Account implements DomainObject<Long> {
             String password,
             String accountType, double rating,
             long version,
-            CompletableFuture<List<Job>> offeredJobs,
-            CompletableFuture<List<Comment>> comments,
-            CompletableFuture<List<Chat>> chats,
-            CompletableFuture<List<Rating>> ratings,
-            CompletableFuture<List<Account>> following,
-            CompletableFuture<List<Account>> follower) {
+            List<Job> offeredJobs,
+            List<Comment> comments,
+            List<Chat> chats,
+            List<Rating> ratings,
+            List<Account> following,
+            List<Account> follower) {
         this.accountId = accountID;
         this.name = name;
         this.email = email;
@@ -78,12 +80,12 @@ public class Account implements DomainObject<Long> {
         this.accountType = accountType;
         this.rating = rating;
         this.version = version;
-        this.offeredJobs = offeredJobs;
-        this.chats = chats;
-        this.ratings = ratings;
-        this.comments = comments;
-        this.following = following;
-        this.followers = follower;
+        this.offeredJobs = (__) -> CompletableFuture.completedFuture(offeredJobs);
+        this.chats = (__) -> CompletableFuture.completedFuture(chats);
+        this.ratings = (__) -> CompletableFuture.completedFuture(ratings);
+        this.comments = (__) -> CompletableFuture.completedFuture(comments);
+        this.following = (__) -> CompletableFuture.completedFuture(following);
+        this.followers = (__) -> CompletableFuture.completedFuture(follower);
     }
 
     protected Account(long accountId, String name, String email, String password, String accountType, double rating, long version){
@@ -94,12 +96,12 @@ public class Account implements DomainObject<Long> {
         this.email = email;
         this.password = password;
         this.rating = rating;
-        this.offeredJobs = CompletableFuture.completedFuture(Collections.emptyList());
-        this.chats = CompletableFuture.completedFuture(Collections.emptyList());
-        this.ratings = CompletableFuture.completedFuture(Collections.emptyList());
-        this.comments = CompletableFuture.completedFuture(Collections.emptyList());
-        this.following = CompletableFuture.completedFuture(Collections.emptyList());
-        this.followers = CompletableFuture.completedFuture(Collections.emptyList());
+        this.offeredJobs =  null;
+        this.chats =        null;
+        this.ratings =      null;
+        this.comments =     null;
+        this.following =    null;
+        this.followers =    null;
     }
 
     @Override
@@ -127,27 +129,27 @@ public class Account implements DomainObject<Long> {
         return accountType;
     }
 
-    public CompletableFuture<List<Job>> getOfferedJobs() {
+    public Function<UnitOfWork, CompletableFuture<List<Job>>> getOfferedJobs() {
         return offeredJobs;
     }
 
-    public CompletableFuture<List<Account>> getFollowing() {
-        return following;
-    }
-
-    public CompletableFuture<List<Account>> getFollowers() {
-        return followers;
-    }
-
-    public CompletableFuture<List<Comment>> getComments() {
+    public Function<UnitOfWork, CompletableFuture<List<Comment>>> getComments() {
         return comments;
     }
 
-    public CompletableFuture<List<Chat>> getChats() {
+    public Function<UnitOfWork, CompletableFuture<List<Account>>> getFollowing() {
+        return following;
+    }
+
+    public Function<UnitOfWork, CompletableFuture<List<Account>>> getFollowers() {
+        return followers;
+    }
+
+    public Function<UnitOfWork, CompletableFuture<List<Chat>>> getChats() {
         return chats;
     }
 
-    public CompletableFuture<List<Rating>> getRatings() {
+    public Function<UnitOfWork, CompletableFuture<List<Rating>>> getRatings() {
         return ratings;
     }
 
@@ -156,7 +158,4 @@ public class Account implements DomainObject<Long> {
         return version;
     }
 
-    public Role getRole() {
-        return role;
-    }
 }

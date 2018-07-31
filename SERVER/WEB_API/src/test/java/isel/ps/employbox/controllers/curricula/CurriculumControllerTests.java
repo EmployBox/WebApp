@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.jayield.rapper.DataRepository;
 import com.github.jayield.rapper.utils.Pair;
+import com.github.jayield.rapper.utils.UnitOfWork;
 import isel.ps.employbox.exceptions.ResourceNotFoundException;
 import isel.ps.employbox.model.entities.Curriculum;
 import isel.ps.employbox.model.entities.UserAccount;
@@ -49,7 +50,7 @@ public class CurriculumControllerTests {
     private Curriculum curriculum;
 
     @Before
-    public void setUp() throws SQLException {
+    public void setUp() {
         prepareDB();
         webTestClient = WebTestClient.bindToApplicationContext(context)
                 .apply(springSecurity())
@@ -57,14 +58,16 @@ public class CurriculumControllerTests {
                 .filter(basicAuthentication())
                 .filter(documentationConfiguration(restDocumentation))
                 .build();
-
-        List<UserAccount> userAccounts = userAccountRepo.findWhere(new Pair<>("name", "Bruno")).join();
+        UnitOfWork unitOfWork = new UnitOfWork();
+        List<UserAccount> userAccounts = userAccountRepo.findWhere(unitOfWork, new Pair<>("name", "Bruno")).join();
         assertEquals(1, userAccounts.size());
         userAccount = userAccounts.get(0);
 
-        List<Curriculum> curricula = curriculumRepo.findWhere(new Pair<>("title", "Engenharia Civil")).join();
+        List<Curriculum> curricula = curriculumRepo.findWhere(unitOfWork, new Pair<>("title", "Engenharia Civil")).join();
         assertEquals(1, curricula.size());
         curriculum = curricula.get(0);
+
+        unitOfWork.commit().join();
     }
 
     @Test
@@ -98,7 +101,7 @@ public class CurriculumControllerTests {
 
         ObjectMapper objectMapper = new ObjectMapper();
         String json = objectMapper.writeValueAsString(inCurriculum);
-
+        UnitOfWork unitOfWork = new UnitOfWork();
         webTestClient
                 .post()
                 .uri("/accounts/users/" + userAccount.getIdentityKey() + "/curricula")
@@ -109,7 +112,8 @@ public class CurriculumControllerTests {
                 .expectBody()
                 .consumeWith(document("createCurriculum"));
 
-        assertEquals(1, curriculumRepo.findWhere(new Pair<>("title", "Verrryyy gud curriculum")).join().size());
+        assertEquals(1, curriculumRepo.findWhere(unitOfWork, new Pair<>("title", "Verrryyy gud curriculum")).join().size());
+        unitOfWork.commit().join();
     }
 
     @Test
@@ -145,7 +149,7 @@ public class CurriculumControllerTests {
 
         ObjectMapper objectMapper = new ObjectMapper();
         String json = objectMapper.writeValueAsString(inCurriculum);
-
+        UnitOfWork unitOfWork = new UnitOfWork();
         webTestClient
                 .put()
                 .uri("/accounts/users/" + userAccount.getIdentityKey() + "/curricula/" + curriculum.getIdentityKey())
@@ -156,7 +160,7 @@ public class CurriculumControllerTests {
                 .expectBody()
                 .consumeWith(document("updateCurriculum"));
 
-        Curriculum updatedCurriculum = curriculumRepo.findById(curriculum.getIdentityKey()).join().orElseThrow(() -> new ResourceNotFoundException("Curriculum not found"));
+        Curriculum updatedCurriculum = curriculumRepo.findById(unitOfWork, curriculum.getIdentityKey()).join().orElseThrow(() -> new ResourceNotFoundException("Curriculum not found"));
 
         assertEquals("Qualquer coisa", updatedCurriculum.getTitle());
     }
@@ -183,7 +187,7 @@ public class CurriculumControllerTests {
                 .expectStatus().isOk()
                 .expectBody()
                 .consumeWith(document("deleteCurriculum"));
-
-        assertFalse(curriculumRepo.findById(curriculum.getIdentityKey()).join().isPresent());
+        UnitOfWork unitOfWork = new UnitOfWork();
+        assertFalse(curriculumRepo.findById(unitOfWork, curriculum.getIdentityKey()).join().isPresent());
     }
 }

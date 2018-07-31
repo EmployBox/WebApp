@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.jayield.rapper.DataRepository;
 import com.github.jayield.rapper.utils.Pair;
+import com.github.jayield.rapper.utils.UnitOfWork;
 import isel.ps.employbox.exceptions.ResourceNotFoundException;
 import isel.ps.employbox.model.entities.Application;
 import isel.ps.employbox.model.entities.Job;
@@ -30,12 +31,12 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.List;
 
+import static isel.ps.employbox.DataBaseUtils.prepareDB;
 import static junit.framework.TestCase.*;
 import static org.springframework.restdocs.webtestclient.WebTestClientRestDocumentation.document;
 import static org.springframework.restdocs.webtestclient.WebTestClientRestDocumentation.documentationConfiguration;
 import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.springSecurity;
 import static org.springframework.web.reactive.function.client.ExchangeFilterFunctions.basicAuthentication;
-/*
 @RunWith(SpringRunner.class)
 @SpringBootTest
 public class UserAccountControllerTests {
@@ -56,7 +57,7 @@ public class UserAccountControllerTests {
     private Application application;
 
     @Before
-    public void setUp() throws SQLException {
+    public void setUp() {
         prepareDB();
         webTestClient = WebTestClient.bindToApplicationContext(context)
                 .apply(springSecurity())
@@ -64,17 +65,21 @@ public class UserAccountControllerTests {
                 .filter(basicAuthentication())
                 .filter(documentationConfiguration(restDocumentation))
                 .build();
-        List<UserAccount> userAccounts = userAccountRepo.findWhere(new Pair<>("email", "lol@hotmail.com")).join();
+
+        UnitOfWork unitOfWork = new UnitOfWork();
+        List<UserAccount> userAccounts = userAccountRepo.findWhere(unitOfWork, new Pair<>("email", "lol@hotmail.com")).join();
         assertEquals(1, userAccounts.size());
         userAccount = userAccounts.get(0);
 
-        List<Job> jobs = jobRepo.findWhere(new Pair<>("title", "Great Job")).join();
+        List<Job> jobs = jobRepo.findWhere(unitOfWork, new Pair<>("title", "Great Job")).join();
         assertEquals(1, jobs.size());
         jobId = jobs.get(0).getIdentityKey();
 
-        List<Application> applications = applicationRepo.findWhere(new Pair<>("accountId", userAccount.getIdentityKey()), new Pair<>("jobId", jobId)).join();
+        List<Application> applications = applicationRepo.findWhere(unitOfWork, new Pair<>("accountId", userAccount.getIdentityKey()), new Pair<>("jobId", jobId)).join();
         assertEquals(1, applications.size());
         application = applications.get(0);
+
+        unitOfWork.commit().join();
     }
 
     @Test
@@ -142,7 +147,9 @@ public class UserAccountControllerTests {
                 .expectBody()
                 .consumeWith(document("createUserAccount"));
 
-        assertEquals(1, userAccountRepo.findWhere(new Pair<>("email", "someEmail@hotmail.com")).join().size());
+        UnitOfWork unit = new UnitOfWork();
+        assertEquals(1, userAccountRepo.findWhere(unit, new Pair<>("email", "someEmail@hotmail.com")).join().size());
+        unit.commit().join();
     }
 
     @Test
@@ -165,7 +172,9 @@ public class UserAccountControllerTests {
                 .expectBody()
                 .consumeWith(document("createApplication"));
 
-        assertEquals(2, applicationRepo.findWhere(new Pair<>("accountId", userAccount.getIdentityKey()), new Pair<>("jobId", jobId)).join().size());
+        UnitOfWork unit = new UnitOfWork();
+        assertEquals(2, applicationRepo.findWhere(unit, new Pair<>("accountId", userAccount.getIdentityKey()), new Pair<>("jobId", jobId)).join().size());
+        unit.commit().join();
     }
 
     @Test
@@ -239,7 +248,9 @@ public class UserAccountControllerTests {
                 .expectBody()
                 .consumeWith(document("updateUserAccount"));
 
-        UserAccount userAccount = userAccountRepo.findById(this.userAccount.getIdentityKey()).join().orElseThrow(() -> new ResourceNotFoundException("UserAccount not found"));
+        UnitOfWork unit = new UnitOfWork();
+        UserAccount userAccount = userAccountRepo.findById(unit, this.userAccount.getIdentityKey()).join().orElseThrow(() -> new ResourceNotFoundException("UserAccount not found"));
+        unit.commit().join();
         assertEquals("Sou um tipo simpatico", userAccount.getSummary());
         assertEquals("Manuel", userAccount.getName());
         assertEquals("someEmail@hotmail.com", userAccount.getEmail());
@@ -268,7 +279,9 @@ public class UserAccountControllerTests {
                 .expectBody()
                 .consumeWith(document("updateApplication"));
 
-        Application updatedApplication = applicationRepo.findById(application.getIdentityKey()).join().orElseThrow(() -> new ResourceNotFoundException("Application not found"));
+        UnitOfWork unit = new UnitOfWork();
+        Application updatedApplication = applicationRepo.findById(unit, application.getIdentityKey()).join().orElseThrow(() -> new ResourceNotFoundException("Application not found"));
+        unit.commit().join();
         assertTrue(updatedApplication.getVersion() != application.getVersion());
     }
 
@@ -307,7 +320,9 @@ public class UserAccountControllerTests {
                 .expectBody()
                 .consumeWith(document("deleteUserAccount"));
 
-        assertFalse(userAccountRepo.findById(userAccount.getIdentityKey()).join().isPresent());
+        UnitOfWork unit = new UnitOfWork();
+        assertFalse(userAccountRepo.findById(unit, userAccount.getIdentityKey()).join().isPresent());
+        unit.commit().join();
     }
 
     @Test
@@ -333,6 +348,8 @@ public class UserAccountControllerTests {
                 .expectBody()
                 .consumeWith(document("deleteApplication"));
 
-        assertTrue(applicationRepo.findWhere(new Pair<>("accountId", userAccount.getIdentityKey()), new Pair<>("jobId", jobId)).join().isEmpty());
+        UnitOfWork unit = new UnitOfWork();
+        assertTrue(applicationRepo.findWhere(unit, new Pair<>("accountId", userAccount.getIdentityKey()), new Pair<>("jobId", jobId)).join().isEmpty());
+        unit.commit().join();
     }
-}*/
+}

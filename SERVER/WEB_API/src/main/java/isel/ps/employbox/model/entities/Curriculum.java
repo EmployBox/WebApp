@@ -4,6 +4,7 @@ import com.github.jayield.rapper.ColumnName;
 import com.github.jayield.rapper.DomainObject;
 import com.github.jayield.rapper.Id;
 import com.github.jayield.rapper.Version;
+import com.github.jayield.rapper.utils.UnitOfWork;
 import isel.ps.employbox.model.entities.curricula.childs.AcademicBackground;
 import isel.ps.employbox.model.entities.curricula.childs.CurriculumExperience;
 import isel.ps.employbox.model.entities.curricula.childs.PreviousJobs;
@@ -11,6 +12,7 @@ import isel.ps.employbox.model.entities.curricula.childs.Project;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.function.Function;
 
 public class Curriculum implements DomainObject<Long> {
     @Id(isIdentity = true)
@@ -20,13 +22,14 @@ public class Curriculum implements DomainObject<Long> {
     @Version
     private final long version;
     @ColumnName(foreignName = "curriculumId" )
-    private final CompletableFuture<List<PreviousJobs>> previousJobs;
+    private final Function<UnitOfWork, CompletableFuture<List<PreviousJobs>>> previousJobs;
+
     @ColumnName(foreignName = "curriculumId" )
-    private final CompletableFuture<List<AcademicBackground>> academicBackground;
+    private final Function<UnitOfWork, CompletableFuture<List<AcademicBackground>>> academicBackground;
     @ColumnName(foreignName = "curriculumId" )
-    private final CompletableFuture<List<Project>> projects;
+    private final Function<UnitOfWork, CompletableFuture<List<Project>>> projects;
     @ColumnName(foreignName = "curriculumId" )
-    private final CompletableFuture<List<CurriculumExperience>> experiences;
+    private final Function<UnitOfWork, CompletableFuture<List<CurriculumExperience>>> experiences;
 
     public Curriculum(){
         accountId = 0;
@@ -62,10 +65,10 @@ public class Curriculum implements DomainObject<Long> {
         this.accountId = accountId;
         this.curriculumId = curriculumId;
         this.title = title;
-        this.previousJobs =  CompletableFuture.completedFuture(previousJobsList);
-        this.academicBackground = CompletableFuture.completedFuture( academicBackgroundList);
-        this.experiences = CompletableFuture.completedFuture(experiencesList);
-        this.projects = CompletableFuture.completedFuture(projectsList);
+        this.previousJobs =          null;
+        this.academicBackground =    null;
+        this.experiences =           null;
+        this.projects =              null;
         this.version = version;
     }
 
@@ -86,21 +89,20 @@ public class Curriculum implements DomainObject<Long> {
         return title;
     }
 
-    public CompletableFuture<List<PreviousJobs>> getPreviousJobs() {
+    public Function<UnitOfWork, CompletableFuture<List<PreviousJobs>>> getPreviousJobs() {
         return previousJobs;
     }
 
-    public CompletableFuture<List<AcademicBackground>> getAcademicBackground() {
+    public Function<UnitOfWork, CompletableFuture<List<AcademicBackground>>> getAcademicBackground() {
         return academicBackground;
     }
 
-    public CompletableFuture<List<Project>> getProjects() {
+    public Function<UnitOfWork, CompletableFuture<List<Project>>> getProjects() {
         return projects;
     }
 
-    public CompletableFuture<List<CurriculumExperience>> getExperiences() {
+    public Function<UnitOfWork, CompletableFuture<List<CurriculumExperience>>> getExperiences() {
         return experiences;
     }
-
 
 }

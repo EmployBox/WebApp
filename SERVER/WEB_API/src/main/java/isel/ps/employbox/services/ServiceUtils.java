@@ -7,7 +7,6 @@ import com.github.jayield.rapper.utils.UnitOfWork;
 import io.vertx.ext.sql.TransactionIsolation;
 import isel.ps.employbox.model.binders.CollectionPage;
 
-import java.sql.Connection;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
@@ -35,6 +34,7 @@ public class ServiceUtils {
                         pageSize,
                         page,
                         list[0]
-                )).thenCompose( __ -> unitOfWork.commit().thenApply(aVoid -> ret[0]));
+                ))
+                .thenCompose(__ -> unitOfWork.commit().thenApply(aVoid -> ret[0]));
     }
 }

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.jayield.rapper.DataRepository;
 import com.github.jayield.rapper.utils.Pair;
+import com.github.jayield.rapper.utils.UnitOfWork;
 import isel.ps.employbox.exceptions.ResourceNotFoundException;
 import isel.ps.employbox.model.entities.Curriculum;
 import isel.ps.employbox.model.entities.UserAccount;
@@ -60,18 +61,19 @@ public class AcademicBackgroundControllerTests {
                 .filter(basicAuthentication())
                 .filter(documentationConfiguration(restDocumentation))
                 .build();
-
-        List<UserAccount> userAccounts = userAccountRepo.findWhere(new Pair<>("name", "Bruno")).join();
+        UnitOfWork unitOfWork = new UnitOfWork();
+        List<UserAccount> userAccounts = userAccountRepo.findWhere(unitOfWork, new Pair<>("name", "Bruno")).join();
         assertEquals(1, userAccounts.size());
         userAccount = userAccounts.get(0);
 
-        List<Curriculum> curricula = curriculumRepo.findWhere(new Pair<>("title", "Engenharia Civil")).join();
+        List<Curriculum> curricula = curriculumRepo.findWhere(unitOfWork, new Pair<>("title", "Engenharia Civil")).join();
         assertEquals(1, curricula.size());
         curriculum = curricula.get(0);
 
-        List<AcademicBackground> academicBackgrounds = academicBackgroundRepo.findWhere(new Pair<>("institution", "ISEL")).join();
+        List<AcademicBackground> academicBackgrounds = academicBackgroundRepo.findWhere(unitOfWork, new Pair<>("institution", "ISEL")).join();
         assertEquals(1, academicBackgrounds.size());
         academicBackground = academicBackgrounds.get(0);
+        unitOfWork.commit().join();
     }
 
     @Test
@@ -106,7 +108,7 @@ public class AcademicBackgroundControllerTests {
 
         ObjectMapper objectMapper = new ObjectMapper();
         String json = objectMapper.writeValueAsString(inAcademicBackground);
-
+        UnitOfWork unitOfWork = new UnitOfWork();
         webTestClient
                 .post()
                 .uri("/accounts/users/" + userAccount.getIdentityKey() + "/curricula/" + curriculum.getIdentityKey() + "/academic")
@@ -117,7 +119,7 @@ public class AcademicBackgroundControllerTests {
                 .expectBody()
                 .consumeWith(document("createAcademicBackground"));
 
-        assertEquals(1, academicBackgroundRepo.findWhere(new Pair<>("degreeObtained", "bachelor")).join().size());
+        assertEquals(1, academicBackgroundRepo.findWhere(unitOfWork, new Pair<>("degreeObtained", "bachelor")).join().size());
     }
 
     @Test
@@ -165,9 +167,9 @@ public class AcademicBackgroundControllerTests {
                 .expectStatus().isOk()
                 .expectBody()
                 .consumeWith(document("updateAcademicBackground"));
-
+        UnitOfWork unitOfWork = new UnitOfWork();
         AcademicBackground updatedAcademicBackground = academicBackgroundRepo
-                .findById(academicBackground.getIdentityKey()).join().orElseThrow(() -> new ResourceNotFoundException("AcademicBackground not found"));
+                .findById(unitOfWork, academicBackground.getIdentityKey()).join().orElseThrow(() -> new ResourceNotFoundException("AcademicBackground not found"));
 
         assertEquals("ISEL 2.0", updatedAcademicBackground.getInstitution());
     }
@@ -194,7 +196,8 @@ public class AcademicBackgroundControllerTests {
                 .expectStatus().isOk()
                 .expectBody()
                 .consumeWith(document("deleteAcademicBackground"));
-
-        assertFalse(academicBackgroundRepo.findById(academicBackground.getIdentityKey()).join().isPresent());
+        UnitOfWork unitOfWork = new UnitOfWork();
+        assertFalse(academicBackgroundRepo.findById(unitOfWork, academicBackground.getIdentityKey()).join().isPresent());
+        unitOfWork.commit().join();
     }
 }
