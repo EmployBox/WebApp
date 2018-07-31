@@ -111,10 +111,7 @@ public class JobService {
 
                     return jobExperienceRepo.createAll(unitOfWork, experienceList);
                 })
-                .thenCompose(ignored -> unitOfWork.commit().thenApply(aVoid -> job))
-                .exceptionally(e -> {
-                    throw new BadRequestException(e.getMessage());
-                });
+                .thenCompose(ignored -> unitOfWork.commit().thenApply(aVoid -> job));
         return handleExceptions(future, unitOfWork);
     }
 

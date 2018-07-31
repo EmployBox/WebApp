@@ -62,8 +62,7 @@ public class CurriculumService {
         UnitOfWork unitOfWork = new UnitOfWork(TransactionIsolation.SERIALIZABLE);
         CompletableFuture<Curriculum> future = userAccountService.getUser(userId, email)
                 .thenCompose(userAccount -> curriculumRepo.create(unitOfWork, curriculum)
-                        .thenApply(res -> curriculum)
-                        .thenCompose(curriculum1 -> {
+                        .thenCompose(aVoid -> {
                             List<CompletableFuture<Void>> list = new ArrayList<>();
                             populateChildList(list, curriculum, userId);
                             return CompletableFuture.allOf(list.toArray(new CompletableFuture[list.size()]));
@@ -73,22 +72,27 @@ public class CurriculumService {
     }
 
     private <T extends CurriculumChild & DomainObject<K>, K> CompletableFuture<Void> addChildFutureFunction(
-            Function<UnitOfWork, CompletableFuture<List<T>>> future,
+            Function<UnitOfWork, CompletableFuture<List<T>>> function,
             DataRepository<T, K> repo,
             Curriculum curriculum,
-            long userId) {
+            long userId
+    ) {
         UnitOfWork unitOfWork = new UnitOfWork();
 
-        CompletableFuture<Void> future1 = future.apply(unitOfWork).thenApply(list -> {
-            list.forEach(curr -> {
-                curr.setAccountId(userId);
-                curr.setCurriculumId(curriculum.getIdentityKey());
-            });
-            return list;
-        }).thenCompose(list -> {
-            if (list.isEmpty()) return CompletableFuture.completedFuture(null);
-            return repo.createAll(unitOfWork, list);
-        }).thenCompose(aVoid -> unitOfWork.commit());
+        CompletableFuture<Void> future1 = function.apply(unitOfWork)
+                .thenApply(tList -> {
+                    tList.forEach(t -> {
+                        t.setAccountId(userId);
+                        t.setCurriculumId(curriculum.getIdentityKey());
+                    });
+                    return tList;
+                })
+                .thenCompose(list -> {
+                    if (list.isEmpty()) return CompletableFuture.completedFuture(null);
+                    return repo.createAll(unitOfWork, list);
+                })
+                .thenCompose(aVoid -> unitOfWork.commit());
+
         return handleExceptions(future1, unitOfWork);
     }
 

@@ -43,12 +43,7 @@ public class UserAccountService {
         Pair[] query = pairs.stream()
                 .filter(stringStringPair -> stringStringPair.getValue() != null)
                 .toArray(Pair[]::new);
-        return ServiceUtils.getCollectionPageFuture(
-                userRepo,
-                page,
-                pageSize,
-                query
-        );
+        return ServiceUtils.getCollectionPageFuture(userRepo, page, pageSize, query);
     }
 
     public CompletableFuture<UserAccount> getUser(long id, String... email) {
@@ -70,7 +65,7 @@ public class UserAccountService {
     public CompletableFuture<Application> getApplication(long userId, long jobId, long apId) {
         UnitOfWork unit = new UnitOfWork();
         CompletableFuture<Application> future = getUser(userId)
-                .thenCompose(__ -> applicationRepo.findById(unit, apId))
+                .thenCompose(ignored -> applicationRepo.findById(unit, apId))
                 .thenCompose(application1 -> unit.commit().thenApply(aVoid -> application1))
                 .thenApply(oapplication -> oapplication.orElseThrow(() -> new ResourceNotFoundException(RESOURCE_NOTFOUND_APPLICATION)))
                 .thenApply(application -> {

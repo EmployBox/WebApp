@@ -23,7 +23,6 @@ public class Curriculum implements DomainObject<Long> {
     private final long version;
     @ColumnName(foreignName = "curriculumId" )
     private final Function<UnitOfWork, CompletableFuture<List<PreviousJobs>>> previousJobs;
-
     @ColumnName(foreignName = "curriculumId" )
     private final Function<UnitOfWork, CompletableFuture<List<AcademicBackground>>> academicBackground;
     @ColumnName(foreignName = "curriculumId" )
@@ -65,10 +64,10 @@ public class Curriculum implements DomainObject<Long> {
         this.accountId = accountId;
         this.curriculumId = curriculumId;
         this.title = title;
-        this.previousJobs =          null;
-        this.academicBackground =    null;
-        this.experiences =           null;
-        this.projects =              null;
+        this.previousJobs = unit -> CompletableFuture.completedFuture(previousJobsList);
+        this.academicBackground = unit -> CompletableFuture.completedFuture(academicBackgroundList);
+        this.experiences = unit -> CompletableFuture.completedFuture(experiencesList);
+        this.projects = unit -> CompletableFuture.completedFuture(projectsList);
         this.version = version;
     }
 

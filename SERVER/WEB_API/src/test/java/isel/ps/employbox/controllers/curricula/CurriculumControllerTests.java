@@ -172,6 +172,7 @@ public class CurriculumControllerTests {
                 .consumeWith(document("updateCurriculum"));
 
         Curriculum updatedCurriculum = curriculumRepo.findById(unitOfWork, curriculum.getIdentityKey()).join().orElseThrow(() -> new ResourceNotFoundException("Curriculum not found"));
+        unitOfWork.commit().join();
 
         assertEquals("Qualquer coisa", updatedCurriculum.getTitle());
     }
@@ -200,5 +201,6 @@ public class CurriculumControllerTests {
                 .consumeWith(document("deleteCurriculum"));
         UnitOfWork unitOfWork = new UnitOfWork();
         assertFalse(curriculumRepo.findById(unitOfWork, curriculum.getIdentityKey()).join().isPresent());
+        unitOfWork.commit().join();
     }
 }

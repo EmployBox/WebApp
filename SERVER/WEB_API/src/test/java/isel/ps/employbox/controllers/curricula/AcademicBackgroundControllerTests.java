@@ -131,6 +131,7 @@ public class AcademicBackgroundControllerTests {
                 .consumeWith(document("createAcademicBackground"));
 
         assertEquals(1, academicBackgroundRepo.findWhere(unitOfWork, new Pair<>("degreeObtained", "bachelor")).join().size());
+        unitOfWork.commit().join();
     }
 
     @Test
@@ -181,6 +182,7 @@ public class AcademicBackgroundControllerTests {
         UnitOfWork unitOfWork = new UnitOfWork();
         AcademicBackground updatedAcademicBackground = academicBackgroundRepo
                 .findById(unitOfWork, academicBackground.getIdentityKey()).join().orElseThrow(() -> new ResourceNotFoundException("AcademicBackground not found"));
+        unitOfWork.commit().join();
 
         assertEquals("ISEL 2.0", updatedAcademicBackground.getInstitution());
     }
@@ -195,8 +197,6 @@ public class AcademicBackgroundControllerTests {
                 .expectStatus().isUnauthorized()
                 .expectBody()
                 .consumeWith(document("deleteWrongAcademicBackground"));
-        Logger logger = LoggerFactory.getLogger(AcademicBackgroundControllerTests.class);
-        logger.info("OPENED CONNECTIONS - {}", UnitOfWork.numberOfOpenConnections.get());
     }
 
     @Test
