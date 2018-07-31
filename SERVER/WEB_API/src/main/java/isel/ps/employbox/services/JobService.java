@@ -38,8 +38,8 @@ public class JobService {
         this.accountService = userService;
     }
 
-    public CompletableFuture getAllJobs(int page, int pageSize,String address, String location, String title, Integer wage, String offerType, Integer ratingLow, Integer ratingHigh) {
-        List<Pair<String, ?>> pairs = new ArrayList<>();
+    public CompletableFuture<CollectionPage<Job>> getAllJobs(int page, int pageSize,String address, String location, String title, Integer wage, String offerType, Integer ratingLow, Integer ratingHigh) {
+        List<Pair<String, Object>> pairs = new ArrayList<>();
         pairs.add(new Pair<>("address", address));
         //pairs.add(new Pair<>("location",location));
         pairs.add(new Pair<>("title",title));
@@ -48,15 +48,15 @@ public class JobService {
         /*pairs.add(new Pair<>("wage", ratingLow));
         pairs.add(new Pair<>("wage", ratingHigh));*/
 
-        Pair[] query = pairs.stream()
+        pairs = pairs.stream()
                 .filter(stringPair -> stringPair.getValue() != null)
-                .toArray(Pair[]::new);
+                .collect(Collectors.toList());
 
         return ServiceUtils.getCollectionPageFuture(
                 jobRepo,
                 page,
                 pageSize,
-                query
+                pairs.toArray(new Pair[pairs.size()])
         );
     }
 
@@ -69,12 +69,12 @@ public class JobService {
     }
 
     public CompletableFuture<CollectionPage<JobExperience>> getJobExperiences(long jid, int page, int pageSize) {
-        List<Pair<String, String>> pairs = new ArrayList<>();
-        pairs.add(new Pair("jobId", jid));
+        List<Pair<String, Object>> pairs = new ArrayList<>();
+        pairs.add(new Pair<>("jobId", jid));
         Pair[] query = pairs.stream()
                 .filter(stringStringPair -> stringStringPair.getValue() != null)
                 .toArray(Pair[]::new);
-        return getJob(jid).thenCompose(__ -> ServiceUtils.getCollectionPageFuture(jobExperienceRepo, page, pageSize, query));
+        return getJob(jid).thenCompose(ignored -> ServiceUtils.getCollectionPageFuture(jobExperienceRepo, page, pageSize, query));
     }
 
     public CompletableFuture<JobExperience> getJobExperience(long id, long cid) {
@@ -108,7 +108,7 @@ public class JobService {
 
                     return jobExperienceRepo.createAll(unitOfWork, experienceList);
                 })
-                .thenCompose( aVoid_ -> unitOfWork.commit().thenApply( aVoid -> job))
+                .thenCompose(ignored -> unitOfWork.commit().thenApply(aVoid -> job))
                 .exceptionally( e -> {
                     throw new BadRequestException(e.getMessage());
                 });

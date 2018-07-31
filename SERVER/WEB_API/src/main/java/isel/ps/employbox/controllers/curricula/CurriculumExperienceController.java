@@ -13,6 +13,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
+import java.util.concurrent.CompletableFuture;
+
 import static isel.ps.employbox.ErrorMessages.BAD_REQUEST_IDS_MISMATCH;
 
 @RestController
@@ -36,22 +38,21 @@ public class CurriculumExperienceController {
             @PathVariable long id,
             @PathVariable long cid,
             @PathVariable long expId){
-        return curriculumExperienceBinder.bindOutput(curriculumService.getCurriculumChild(currExpRepo, id, cid, expId));
+        CompletableFuture<OutCurriculumExperience> future = curriculumService.getCurriculumChild(currExpRepo, id, cid, expId)
+                .thenApply(curriculumExperienceBinder::bindOutput);
+        return Mono.fromFuture(future);
     }
 
     @GetMapping
-    public Mono<HalCollectionPage> getCurriculumExperiences (
+    public Mono<HalCollectionPage<CurriculumExperience>> getCurriculumExperiences (
             @PathVariable long id,
             @PathVariable long cid,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "5") int pageSize
     ){
-        return curriculumExperienceBinder.bindOutput(
-                curriculumExperienceService.getCurriculumExperiences(cid, page, pageSize),
-                this.getClass(),
-                id,
-                cid
-        );
+        CompletableFuture<HalCollectionPage<CurriculumExperience>> future = curriculumExperienceService.getCurriculumExperiences(cid, page, pageSize)
+                .thenApply(curriculumExperienceCollectionPage -> curriculumExperienceBinder.bindOutput(curriculumExperienceCollectionPage, this.getClass(), id, cid));
+        return Mono.fromFuture(future);
     }
 
     @PostMapping

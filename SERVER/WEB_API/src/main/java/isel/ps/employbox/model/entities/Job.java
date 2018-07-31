@@ -23,8 +23,6 @@ public class Job implements DomainObject<Long> {
     @Id(isIdentity =  true)
     private final long jobId;
     private final String title;
-    @ColumnName(name = "accountId")
-    private Foreign<Account,Long> account;
     private final String address;
     private final int wage;
     private final String description;
@@ -34,6 +32,8 @@ public class Job implements DomainObject<Long> {
     private final String offerType;
     @Version
     private final long version;
+    @ColumnName(name = "accountId")
+    private Foreign<Account,Long> account;
     @ColumnName(foreignName = "jobId")
     private Function<UnitOfWork, CompletableFuture<List<Application>>> applications;
     @ColumnName(foreignName = "jobId")
@@ -145,13 +145,6 @@ public class Job implements DomainObject<Long> {
 
     public String getAddress() {
         return address;
-    }
-
-    public CompletableFuture<OutAccount> getAccountToOutput() {
-        UnitOfWork unitOfWork = new UnitOfWork();
-        AccountBinder accountBinder = new AccountBinder();
-
-        return accountBinder.bindOutput(account.getForeignObject(unitOfWork).thenCompose(account1 -> unitOfWork.commit().thenApply(aVoid -> account1))).toFuture();
     }
 
     public String getTitle() {

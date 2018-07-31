@@ -39,18 +39,15 @@ public class AcademicBackgroundController {
     }
 
     @GetMapping
-    public Mono<HalCollectionPage> getAllAcademicBackground(
+    public Mono<HalCollectionPage<AcademicBackground>> getAllAcademicBackground(
             @PathVariable long id,
             @PathVariable long cid,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "5") int pageSize
     ) {
-        return academicBackgroundBinder.bindOutput(
-                academicBackgroundService.getCurriculumAcademicBackgrounds(cid, page, pageSize),
-                this.getClass(),
-                id,
-                cid
-        );
+        CompletableFuture<HalCollectionPage<AcademicBackground>> future = academicBackgroundService.getCurriculumAcademicBackgrounds(cid, page, pageSize)
+                .thenApply(academicBackgroundCollectionPage -> academicBackgroundBinder.bindOutput(academicBackgroundCollectionPage, this.getClass(), id, cid));
+        return Mono.fromFuture(future);
     }
 
     @GetMapping("/{academicId}")
@@ -59,7 +56,8 @@ public class AcademicBackgroundController {
             @PathVariable long cid,
             @PathVariable long academicId
     ){
-        return academicBackgroundBinder.bindOutput(curriculumService.getCurriculumChild(backgroundRepo, id, cid, academicId));
+        CompletableFuture<OutAcademicBackground> future = curriculumService.getCurriculumChild(backgroundRepo, id, cid, academicId).thenApply(academicBackgroundBinder::bindOutput);
+        return Mono.fromFuture(future);
     }
 
     @PostMapping
@@ -70,8 +68,9 @@ public class AcademicBackgroundController {
             Authentication authentication
     ) {
         AcademicBackground academicBackground = academicBackgroundBinder.bindInput(inAcademicBackground);
-        CompletableFuture<AcademicBackground> future = academicBackgroundService.addAcademicBackgroundToCurriculum(id, cid, academicBackground, authentication.getName());
-        return academicBackgroundBinder.bindOutput(future);
+        CompletableFuture<OutAcademicBackground> future = academicBackgroundService.addAcademicBackgroundToCurriculum(id, cid, academicBackground, authentication.getName())
+                .thenApply(academicBackgroundBinder::bindOutput);
+        return Mono.fromFuture(future);
     }
 
     @PutMapping("/{abkId}")

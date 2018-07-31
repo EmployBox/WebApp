@@ -12,6 +12,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
+import java.util.concurrent.CompletableFuture;
+
 import static isel.ps.employbox.ErrorMessages.BAD_REQUEST_IDS_MISMATCH;
 
 @RestController
@@ -38,27 +40,28 @@ public class CurriculumController {
     }
 
     @GetMapping
-    public Mono<HalCollectionPage> getCurricula(
+    public Mono<HalCollectionPage<Curriculum>> getCurricula(
             @PathVariable long id,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "5") int pageSize
     ){
-        return curriculumBinder.bindOutput(
-                curriculumService.getCurricula(id, page, pageSize),
-                this.getClass(),
-                id
-        );
+        CompletableFuture<HalCollectionPage<Curriculum>> future = curriculumService.getCurricula(id, page, pageSize)
+                .thenApply(curriculumCollectionPage -> curriculumBinder.bindOutput(curriculumCollectionPage, this.getClass(), id));
+        return Mono.fromFuture(future);
     }
 
     @GetMapping("/{cid}")
     public Mono<OutCurriculum> getCurriculum(@PathVariable long id, @PathVariable long cid){
-        return curriculumBinder.bindOutput(
-                curriculumService.getCurriculum(id, cid));
+        CompletableFuture<OutCurriculum> future = curriculumService.getCurriculum(id, cid)
+                .thenApply(curriculumBinder::bindOutput);
+        return Mono.fromFuture(future);
     }
 
     @PostMapping
     public Mono<OutCurriculum> createCurriculum( @PathVariable long id, @RequestBody InCurriculum inCurriculum, Authentication authentication){
-        return curriculumBinder.bindOutput(curriculumService.createCurriculum(id, curriculumBinder.bindInput(inCurriculum), authentication.getName()));
+        CompletableFuture<OutCurriculum> future = curriculumService.createCurriculum(id, curriculumBinder.bindInput(inCurriculum), authentication.getName())
+                .thenApply(curriculumBinder::bindOutput);
+        return Mono.fromFuture(future);
     }
 
     @PutMapping("/{cid}")

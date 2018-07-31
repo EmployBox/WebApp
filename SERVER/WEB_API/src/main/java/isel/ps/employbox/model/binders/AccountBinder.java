@@ -11,22 +11,15 @@ import java.util.concurrent.CompletableFuture;
 
 @Component
 public class AccountBinder implements ModelBinder<Account,OutAccount,InAccount> {
-
-
     @Override
-    public Mono<OutAccount> bindOutput(CompletableFuture<Account> accountCompletableFuture) {
-        return Mono.fromFuture(
-                    accountCompletableFuture.thenApply(
-                            account ->
-                                    new OutAccount(
-                                            account.getIdentityKey(),
-                                            account.getName(),
-                                            account.getEmail(),
-                                            account.getRating(),
-                                            account.getAccountType(),
-                                            account.getVersion())
-                    )
-        );
+    public OutAccount bindOutput(Account account) {
+        return new OutAccount(
+                account.getIdentityKey(),
+                account.getName(),
+                account.getEmail(),
+                account.getRating(),
+                account.getAccountType(),
+                account.getVersion());
     }
 
     @Override

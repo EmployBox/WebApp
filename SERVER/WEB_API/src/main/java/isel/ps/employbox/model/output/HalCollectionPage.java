@@ -12,28 +12,20 @@ import static isel.ps.employbox.model.output.OutputDto.HOSTNAME;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 
 public class HalCollectionPage<T> {
-
     @JsonIgnore
     private final Class selfController;
-
     @JsonIgnore
     private final Object [] parameters;
-
     @JsonIgnore
     private final CollectionPage<T> elementsPage;
-
     @JsonProperty
     private final long size;
-
     @JsonProperty
     private final int current_page;
-
     @JsonProperty
     private final long last_page;
-
     @JsonProperty
     private final _Links _links;
-
     @JsonProperty
     private _Embedded _embedded = null;
 

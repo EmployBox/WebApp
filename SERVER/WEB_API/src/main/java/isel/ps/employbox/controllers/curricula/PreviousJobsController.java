@@ -13,6 +13,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
+import java.util.concurrent.CompletableFuture;
+
 import static isel.ps.employbox.ErrorMessages.BAD_REQUEST_IDS_MISMATCH;
 
 @RestController
@@ -35,22 +37,23 @@ public class PreviousJobsController {
     public Mono<OutPreviousJobs> getPreviousJob (
             @PathVariable long id,
             @PathVariable long cid,
-            @PathVariable long prvJbId){
-        return previousJobsBinder.bindOutput(curriculumService.getCurriculumChild(prevJobRepo, id, cid, prvJbId));
+            @PathVariable long prvJbId
+    ){
+        CompletableFuture<OutPreviousJobs> future = curriculumService.getCurriculumChild(prevJobRepo, id, cid, prvJbId)
+                .thenApply(previousJobsBinder::bindOutput);
+        return Mono.fromFuture(future);
     }
 
     @GetMapping
-    public Mono<HalCollectionPage> getPreviousJobs(
+    public Mono<HalCollectionPage<PreviousJobs>> getPreviousJobs(
             @PathVariable long id,
             @PathVariable long cid,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "5") int pageSize
     ){
-        return previousJobsBinder.bindOutput(
-                previousJobService.getCurriculumPreviousJobs( cid, page, pageSize ),
-                this.getClass(),
-                id,
-                cid );
+        CompletableFuture<HalCollectionPage<PreviousJobs>> future = previousJobService.getCurriculumPreviousJobs(cid, page, pageSize)
+                .thenApply(previousJobsCollectionPage -> previousJobsBinder.bindOutput(previousJobsCollectionPage, this.getClass(), id, cid));
+        return Mono.fromFuture(future);
     }
 
     @PostMapping

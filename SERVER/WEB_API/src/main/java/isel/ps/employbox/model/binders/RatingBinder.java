@@ -12,21 +12,18 @@ import java.util.concurrent.CompletableFuture;
 public class RatingBinder implements ModelBinder<Rating,OutRating,InRating> {
 
     @Override
-    public Mono<OutRating> bindOutput(CompletableFuture<Rating> ratingCompletableFuture) {
-        return Mono.fromFuture(
-                ratingCompletableFuture.thenApply(
-                        rating -> new OutRating(
-                                rating.getAccountIdFrom(),
-                                rating.getAccountIdTo(),
-                                rating.getWorkLoad(),
-                                rating.getWage(),
-                                rating.getWorkEnviroment(),
-                                rating.getCompetences(),
-                                rating.getPonctuality(),
-                                rating.getAssiduity(),
-                                rating.getDemeanor())
-                )
-        );
+    public CompletableFuture<OutRating> bindOutput(Rating rating) {
+        return CompletableFuture.completedFuture(new OutRating(
+                rating.getAccountIdFrom(),
+                rating.getAccountIdTo(),
+                rating.getWorkLoad(),
+                rating.getWage(),
+                rating.getWorkEnviroment(),
+                rating.getCompetences(),
+                rating.getPonctuality(),
+                rating.getAssiduity(),
+                rating.getDemeanor()
+        ));
     }
 
     @Override

@@ -2,6 +2,7 @@ package isel.ps.employbox.controllers;
 
 import isel.ps.employbox.exceptions.BadRequestException;
 import isel.ps.employbox.model.binders.CommentBinder;
+import isel.ps.employbox.model.entities.Comment;
 import isel.ps.employbox.model.input.InComment;
 import isel.ps.employbox.model.output.HalCollectionPage;
 import isel.ps.employbox.model.output.OutComment;
@@ -9,6 +10,8 @@ import isel.ps.employbox.services.CommentService;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
+
+import java.util.concurrent.CompletableFuture;
 
 import static isel.ps.employbox.ErrorMessages.BAD_REQUEST_IDS_MISMATCH;
 
@@ -24,23 +27,21 @@ public class CommentController {
     }
 
     @GetMapping
-    public Mono<HalCollectionPage> getAllComments(
+    public Mono<HalCollectionPage<Comment>> getAllComments(
             @PathVariable long id,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "5") int pageSize
     ) {
-        return commentBinder.bindOutput(
-                commentService.getComments(id, page, pageSize),
-                this.getClass(),
-                id
-        );
+        CompletableFuture<HalCollectionPage<Comment>> future = commentService.getComments(id, page, pageSize)
+                .thenApply(commentCollectionPage -> commentBinder.bindOutput(commentCollectionPage, this.getClass(), id));
+        return Mono.fromFuture(future);
     }
 
     @GetMapping("{commentId}")
     public Mono<OutComment> getComment(@PathVariable long accountId, @RequestBody long accountTo, @PathVariable long commentId, Authentication authentication){
-        return commentBinder.bindOutput(
-                commentService.getComment(accountId, accountTo, commentId,  authentication.getName())
-        );
+        CompletableFuture<OutComment> future = commentService.getComment(accountId, accountTo, commentId, authentication.getName())
+                .thenApply(commentBinder::bindOutput);
+        return Mono.fromFuture(future);
     }
 
     @PutMapping
@@ -62,7 +63,8 @@ public class CommentController {
             Authentication authentication
     ){
         if(accountFromId != comment.getAccountIdFrom() || accountTo != comment.getAccountIdTo()) throw new BadRequestException(BAD_REQUEST_IDS_MISMATCH);
-        return commentBinder.bindOutput( commentService.createComment(commentBinder.bindInput(comment), authentication.getName()));
+        CompletableFuture<OutComment> future = commentService.createComment(commentBinder.bindInput(comment), authentication.getName()).thenApply(commentBinder::bindOutput);
+        return Mono.fromFuture(future);
     }
 
     @DeleteMapping("{commentId}")

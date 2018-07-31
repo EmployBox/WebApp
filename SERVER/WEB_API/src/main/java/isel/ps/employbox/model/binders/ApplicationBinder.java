@@ -11,18 +11,14 @@ import java.util.concurrent.CompletableFuture;
 @Component
 public class ApplicationBinder implements ModelBinder<Application,OutApplication,InApplication> {
 
-
-    public Mono<OutApplication> bindOutput(CompletableFuture<Application> applicationCompletableFuture) {
-        return Mono.fromFuture(
-                applicationCompletableFuture.thenApply(
-                        application ->
-                                new OutApplication(
-                                        application.getIdentityKey(),
-                                        application.getAccountId(),
-                                        application.getJobId(),
-                                        application.getCurriculumId(),
-                                        application.getDate())
-                )
+    @Override
+    public OutApplication bindOutput(Application application) {
+        return new OutApplication(
+                application.getIdentityKey(),
+                application.getAccountId(),
+                application.getJobId(),
+                application.getCurriculumId(),
+                application.getDate()
         );
     }
 

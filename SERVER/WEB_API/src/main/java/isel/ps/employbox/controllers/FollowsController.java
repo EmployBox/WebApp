@@ -1,11 +1,14 @@
 package isel.ps.employbox.controllers;
 
 import isel.ps.employbox.model.binders.AccountBinder;
+import isel.ps.employbox.model.entities.Account;
 import isel.ps.employbox.model.output.HalCollectionPage;
 import isel.ps.employbox.services.FollowService;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
+
+import java.util.concurrent.CompletableFuture;
 
 @RestController
 @RequestMapping("/accounts/{id}")
@@ -20,30 +23,26 @@ public class FollowsController {
     }
 
     @GetMapping("/followers")
-    public Mono<HalCollectionPage> getFollowers(
+    public Mono<HalCollectionPage<Account>> getFollowers(
             @PathVariable long id,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "5") int pageSize
     ){
-        return accountBinder.bindOutput(
-                followService.getAccountFollowers(id, page, pageSize),
-                this.getClass(),
-                id
-        );
+        CompletableFuture<HalCollectionPage<Account>> future = followService.getAccountFollowers(id, page, pageSize)
+                .thenApply(accountCollectionPage -> accountBinder.bindOutput(accountCollectionPage, this.getClass(), id));
+        return Mono.fromFuture(future);
     }
 
     @GetMapping("/following")
-    public Mono<HalCollectionPage> getFollowing(
+    public Mono<HalCollectionPage<Account>> getFollowing(
             @PathVariable long id,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "5") int numberOfItems
 
     ){
-        return accountBinder.bindOutput(
-                followService.getAccountFollowing(id, page, numberOfItems),
-                this.getClass(),
-                id
-        );
+        CompletableFuture<HalCollectionPage<Account>> future = followService.getAccountFollowing(id, page, numberOfItems)
+                .thenApply(accountCollectionPage -> accountBinder.bindOutput(accountCollectionPage, this.getClass(), id));
+        return Mono.fromFuture(future);
     }
 
     @PutMapping("/followers/{fid}")

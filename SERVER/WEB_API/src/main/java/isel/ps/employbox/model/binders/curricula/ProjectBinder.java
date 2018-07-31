@@ -6,7 +6,6 @@ import isel.ps.employbox.model.input.curricula.childs.InProject;
 import isel.ps.employbox.model.output.OutProject;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.util.concurrent.CompletableFuture;
 
@@ -14,17 +13,13 @@ import java.util.concurrent.CompletableFuture;
 public class ProjectBinder implements ModelBinder<Project, OutProject, InProject> {
 
     @Override
-    public Mono<OutProject> bindOutput(CompletableFuture<Project> object) {
-        return Mono.fromFuture(
-                object.thenApply(
-                        curr -> new OutProject(
-                                curr.getIdentityKey(),
-                                curr.getAccountId(),
-                                curr.getCurriculumId(),
-                                curr.getName(),
-                                curr.getDescription()
-                                )
-                )
+    public OutProject bindOutput(Project project) {
+        return new OutProject(
+                project.getIdentityKey(),
+                project.getAccountId(),
+                project.getCurriculumId(),
+                project.getName(),
+                project.getDescription()
         );
     }
 

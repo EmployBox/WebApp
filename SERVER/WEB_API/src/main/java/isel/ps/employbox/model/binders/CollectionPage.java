@@ -5,7 +5,7 @@ import java.util.List;
 
 public class CollectionPage<T>{
     public  final int pageSize;
-    private final long totalElements ;
+    private final long totalElements;
     private final int currentPage;
     private final int lastPageNumber;
     private final List<T> pageList;

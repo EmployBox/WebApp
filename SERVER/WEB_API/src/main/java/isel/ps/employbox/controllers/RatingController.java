@@ -11,6 +11,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
+import java.util.concurrent.CompletableFuture;
+
 import static isel.ps.employbox.ErrorMessages.BAD_REQUEST_IDS_MISMATCH;
 
 @RestController
@@ -26,21 +28,22 @@ public class RatingController {
     }
 
     @GetMapping
-    public Mono<HalCollectionPage> getRatings(
+    public Mono<HalCollectionPage<Rating>> getRatings(
             @PathVariable long id,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "5") int pageSize
     ){
-            return ratingBinder.bindOutput(
-                    ratingService.getRatings(id, page, pageSize),
-                    this.getClass(),
-                    id
-            );
+        CompletableFuture<HalCollectionPage<Rating>> future = ratingService.getRatings(id, page, pageSize)
+                .thenApply(ratingCollectionPage -> ratingBinder.bindOutput(ratingCollectionPage, this.getClass(), id));
+        return Mono.fromFuture(future);
     }
 
     @GetMapping("/single")
     public Mono<OutRating> getRating(@PathVariable long id, @RequestBody long accountTo){
-        return ratingBinder.bindOutput(ratingService.getRating(id, accountTo));
+        CompletableFuture<OutRating> future = ratingService.getRating(id, accountTo)
+                .thenApply(ratingBinder::bindOutput);
+
+        return Mono.fromFuture(future);
     }
 
     @PutMapping

@@ -19,22 +19,19 @@ public class ServiceUtils {
             DataRepository<T, K> repo,
             int page,
             int pageSize,
-            Pair ... query
+            Pair<String, Object>... query
     ) {
-        List[] list = new List[1];
-        CollectionPage[] ret = new CollectionPage[1];
         UnitOfWork unitOfWork = new UnitOfWork(TransactionIsolation.SERIALIZABLE);
         return repo.findWhere(unitOfWork, page, pageSize, query)
-                .thenCompose(listRes -> {
-                    list[0] = (List) listRes;
-                    return repo.getNumberOfEntries(unitOfWork, query);
-                })
-                .thenAccept(numberOfEntries -> ret[0] = new CollectionPage(
-                        (Long) numberOfEntries,
-                        pageSize,
-                        page,
-                        list[0]
-                ))
-                .thenCompose(__ -> unitOfWork.commit().thenApply(aVoid -> ret[0]));
+                .thenCompose(tList -> getCollectionPageCF(repo, page, pageSize, unitOfWork, tList, query));
+    }
+
+    private static <T extends DomainObject<K>, K> CompletableFuture<CollectionPage<T>> getCollectionPageCF(DataRepository<T, K> repo, int page, int pageSize,
+                                                                                                           UnitOfWork unitOfWork, List<T> tList, Pair<String, Object>[] query) {
+        return repo.getNumberOfEntries(unitOfWork, query)
+                .thenCompose(aLong -> {
+                    CollectionPage<T> collectionPage = new CollectionPage<>(aLong, pageSize, page, tList);
+                    return unitOfWork.commit().thenApply(aVoid -> collectionPage);
+                });
     }
 }

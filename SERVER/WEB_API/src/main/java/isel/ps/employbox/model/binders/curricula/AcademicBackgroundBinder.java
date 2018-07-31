@@ -12,20 +12,17 @@ import java.util.concurrent.CompletableFuture;
 @Component
 public class AcademicBackgroundBinder implements ModelBinder<AcademicBackground, OutAcademicBackground, InAcademicBackground> {
     @Override
-    public Mono<OutAcademicBackground> bindOutput(CompletableFuture<AcademicBackground> academicBackgroundCompletableFuture) {
-        return Mono.fromFuture(
-                academicBackgroundCompletableFuture.thenApply(
-                        academicBackground -> new OutAcademicBackground(
-                                academicBackground.getIdentityKey(),
-                                academicBackground.getAccountId(),
-                                academicBackground.getCurriculumId(),
-                                academicBackground.getInstitution(),
-                                academicBackground.getDegreeObtained(),
-                                academicBackground.getStudyArea(),
-                                academicBackground.getBeginDate(),
-                                academicBackground.getEndDate()
-                        )
-                ));
+    public OutAcademicBackground bindOutput(AcademicBackground academicBackground) {
+        return new OutAcademicBackground(
+                academicBackground.getIdentityKey(),
+                academicBackground.getAccountId(),
+                academicBackground.getCurriculumId(),
+                academicBackground.getInstitution(),
+                academicBackground.getDegreeObtained(),
+                academicBackground.getStudyArea(),
+                academicBackground.getBeginDate(),
+                academicBackground.getEndDate()
+        );
     }
 
     @Override

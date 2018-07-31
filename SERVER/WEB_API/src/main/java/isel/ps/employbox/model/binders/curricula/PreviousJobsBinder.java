@@ -15,20 +15,16 @@ import java.util.concurrent.CompletableFuture;
 @Component
 public class PreviousJobsBinder implements ModelBinder<PreviousJobs, OutPreviousJobs, InPreviousJobs> {
     @Override
-    public Mono<OutPreviousJobs> bindOutput(CompletableFuture<PreviousJobs> outPreviousJobsCompletableFuture) {
-        return Mono.fromFuture(
-                outPreviousJobsCompletableFuture.thenApply(
-                        previousJob -> new OutPreviousJobs(
-                                previousJob.getIdentityKey(),
-                                previousJob.getAccountId(),
-                                previousJob.getCurriculumId(),
-                                previousJob.getCompanyName(),
-                                previousJob.getBeginDate().toString(),
-                                previousJob.getEndDate().toString(),
-                                previousJob.getWorkLoad(),
-                                previousJob.getRole())
-                )
-        );
+    public OutPreviousJobs bindOutput(PreviousJobs previousJob) {
+        return new OutPreviousJobs(
+                previousJob.getIdentityKey(),
+                previousJob.getAccountId(),
+                previousJob.getCurriculumId(),
+                previousJob.getCompanyName(),
+                previousJob.getBeginDate().toString(),
+                previousJob.getEndDate().toString(),
+                previousJob.getWorkLoad(),
+                previousJob.getRole());
     }
 
     @Override

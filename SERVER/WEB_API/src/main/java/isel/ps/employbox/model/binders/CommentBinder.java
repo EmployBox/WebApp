@@ -11,19 +11,15 @@ import java.util.concurrent.CompletableFuture;
 @Component
 public class CommentBinder implements ModelBinder<Comment,OutComment,InComment> {
 
-
     @Override
-    public Mono<OutComment> bindOutput(CompletableFuture<Comment> commentCompletableFuture) {
-        return Mono.fromFuture(
-                commentCompletableFuture.thenApply(
-                        comment -> new OutComment(
-                                comment.getAccountIdFrom(),
-                                comment.getAccountIdDest(),
-                                comment.getIdentityKey(),
-                                comment.getMainCommendID(),
-                                comment.getDatetime().toString(),
-                                comment.getText())
-                )
+    public OutComment bindOutput(Comment comment) {
+        return new OutComment(
+                comment.getAccountIdFrom(),
+                comment.getAccountIdDest(),
+                comment.getIdentityKey(),
+                comment.getMainCommendID(),
+                comment.getDatetime().toString(),
+                comment.getText()
         );
     }
 

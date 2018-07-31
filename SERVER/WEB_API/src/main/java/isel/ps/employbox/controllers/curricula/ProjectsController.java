@@ -13,6 +13,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
+import java.util.concurrent.CompletableFuture;
+
 import static isel.ps.employbox.ErrorMessages.BAD_REQUEST_IDS_MISMATCH;
 
 @RestController
@@ -35,23 +37,23 @@ public class ProjectsController {
     public Mono<OutProject> getProject(
             @PathVariable long id,
             @PathVariable long cid,
-            @PathVariable long projectId){
-        return projectBinder.bindOutput(curriculumService.getCurriculumChild(projectRepo, id, cid, projectId));
+            @PathVariable long projectId
+    ){
+        CompletableFuture<OutProject> future = curriculumService.getCurriculumChild(projectRepo, id, cid, projectId)
+                .thenApply(projectBinder::bindOutput);
+        return Mono.fromFuture(future);
     }
 
     @GetMapping
-    public Mono<HalCollectionPage> getProject(
+    public Mono<HalCollectionPage<Project>> getProject(
             @PathVariable long id,
             @PathVariable long cid,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "5") int pageSize
     ) {
-        return projectBinder.bindOutput(
-                projectService.getCurriculumProjects(cid, page, pageSize),
-                this.getClass(),
-                id,
-                cid
-        );
+        CompletableFuture<HalCollectionPage<Project>> future = projectService.getCurriculumProjects(cid, page, pageSize)
+                .thenApply(projectCollectionPage -> projectBinder.bindOutput(projectCollectionPage, this.getClass(), id, cid));
+        return Mono.fromFuture(future);
     }
 
     @PostMapping

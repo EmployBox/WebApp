@@ -6,7 +6,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import isel.ps.employbox.controllers.JobController;
 import isel.ps.employbox.controllers.UserAccountController;
 import isel.ps.employbox.model.output.OutAccount.AccountItemOutput;
-import org.springframework.scheduling.annotation.Async;
 
 import java.sql.Timestamp;
 
@@ -14,7 +13,7 @@ import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 
 //todo embedded
-public class OutJob implements OutputDto {
+public class OutJob implements OutputDto<OutJob.JobItemOutput> {
 
     private final OutAccount _account;
 
@@ -82,7 +81,7 @@ public class OutJob implements OutputDto {
 
     @JsonIgnore
     @Override
-    public Object getCollectionItemOutput() {
+    public JobItemOutput getCollectionItemOutput() {
         return new JobItemOutput(jobId, (AccountItemOutput) _account.getCollectionItemOutput(), title, offerBeginDate, address, offerType);
     }
 

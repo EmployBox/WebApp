@@ -12,17 +12,14 @@ import java.util.concurrent.CompletableFuture;
 public class MessageBinder implements ModelBinder<Message,OutMessage,InMessage> {
 
     @Override
-    public Mono<OutMessage> bindOutput(CompletableFuture<Message> messageCompletableFuture) {
-        return Mono.fromFuture(
-                messageCompletableFuture.thenApply(
-                        message -> new OutMessage(
-                                message.getAccountId(),
-                                message.getMessageId(),
-                                message.getChatId() ,
-                                message.getDate(),
-                                message.getText())
-                        )
-                );
+    public OutMessage bindOutput(Message message) {
+        return new OutMessage(
+                message.getAccountId(),
+                message.getMessageId(),
+                message.getChatId() ,
+                message.getDate(),
+                message.getText()
+        );
     }
 
     @Override

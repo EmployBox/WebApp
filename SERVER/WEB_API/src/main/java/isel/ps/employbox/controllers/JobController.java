@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 import static isel.ps.employbox.ErrorMessages.BAD_REQUEST_IDS_MISMATCH;
@@ -36,7 +37,7 @@ public class JobController {
 
 
     @GetMapping
-    public Mono<HalCollectionPage> getAllJobs(
+    public Mono<HalCollectionPage<Job>> getAllJobs(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "5") int pageSize,
             @RequestParam(required = false) String address,
@@ -45,32 +46,30 @@ public class JobController {
             @RequestParam(required = false) Integer wage,
             @RequestParam(required = false) String type,
             @RequestParam(required = false) Integer ratingLow,
-            @RequestParam(required = false) Integer ratingHigh){
-        return jobBinder.bindOutput(
-                jobService.getAllJobs(page, pageSize, address, location, title, wage, type, ratingLow, ratingHigh),
-                this.getClass()
-        );
+            @RequestParam(required = false) Integer ratingHigh
+    ){
+        CompletableFuture<HalCollectionPage<Job>> future = jobService.getAllJobs(page, pageSize, address, location, title, wage, type, ratingLow, ratingHigh)
+                .thenApply(jobCollectionPage -> jobBinder.bindOutput(jobCollectionPage, this.getClass()));
+        return Mono.fromFuture(future);
     }
 
     @GetMapping("/{jid}")
     public Mono<OutJob> getJob(@PathVariable long jid){
-        return jobBinder.bindOutput(
-                jobService.getJob(jid)
-        );
+        CompletableFuture<OutJob> future = jobService.getJob(jid)
+                .thenApply(jobBinder::bindOutput);
+
+        return Mono.fromFuture(future);
     }
 
     @GetMapping("/{jid}/experiences")
-    public Mono<HalCollectionPage> getJobExperiences(
+    public Mono<HalCollectionPage<JobExperience>> getJobExperiences(
             @PathVariable long jid,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "5") int pageSize
-    )
-    {
-        return jobExperienceBinder.bindOutput(
-                jobService.getJobExperiences(jid, page, pageSize),
-                this.getClass(),
-                jid
-        );
+    ) {
+        CompletableFuture<HalCollectionPage<JobExperience>> future = jobService.getJobExperiences(jid, page, pageSize)
+                .thenApply(jobExperienceCollectionPage -> jobExperienceBinder.bindOutput(jobExperienceCollectionPage, this.getClass(), jid));
+        return Mono.fromFuture(future);
     }
 
     @GetMapping("/{jid}/experiences/{expId}")
@@ -78,13 +77,19 @@ public class JobController {
             @PathVariable long jid,
             @PathVariable long expId
     ){
-        return jobExperienceBinder.bindOutput(jobService.getJobExperience(jid, expId));
+        CompletableFuture<OutJobExperience> future = jobService.getJobExperience(jid, expId)
+                .thenApply(jobExperienceBinder::bindOutput);
+
+        return Mono.fromFuture(future);
     }
 
     @PostMapping
     public Mono<OutJob> createJob(@RequestBody InJob job, Authentication authentication){
         Job newJob = jobBinder.bindInput(job);
-        return jobBinder.bindOutput(jobService.createJob(newJob, authentication.getName()));
+        CompletableFuture<OutJob> future = jobService.createJob(newJob, authentication.getName())
+                .thenApply(jobBinder::bindOutput);
+
+        return Mono.fromFuture(future);
     }
 
     @PostMapping("/{jid}/experiences")

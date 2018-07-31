@@ -3,12 +3,14 @@ package isel.ps.employbox.services;
 import com.github.jayield.rapper.DataRepository;
 import com.github.jayield.rapper.utils.Pair;
 import com.github.jayield.rapper.utils.UnitOfWork;
+import isel.ps.employbox.model.binders.CollectionPage;
 import isel.ps.employbox.model.entities.Account;
 import isel.ps.employbox.model.entities.Follow;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
@@ -24,15 +26,15 @@ public class FollowService {
         this.accountService = accountRepo;
     }
 
-    public CompletableFuture getAccountFollowers(long followedAccountId, int page, int pageSize) {
+    public CompletableFuture<CollectionPage<Account>> getAccountFollowers(long followedAccountId, int page, int pageSize) {
         return getAccountFromFollowAux(followedAccountId, "accountIdFollower", page, pageSize);
     }
 
-    public CompletableFuture getAccountFollowing(long followerAccountId, int page, int pageSize) {
+    public CompletableFuture<CollectionPage<Account>> getAccountFollowing(long followerAccountId, int page, int pageSize) {
         return getAccountFromFollowAux(followerAccountId, "accountIdFollowing", page, pageSize);
     }
 
-    private CompletableFuture getAccountFromFollowAux(long followId, String collumn, int page, int pageSize) {
+    private CompletableFuture<CollectionPage<Account>> getAccountFromFollowAux(long followId, String collumn, int page, int pageSize) {
         UnitOfWork unitOfWork = new UnitOfWork();
 
         return followsRepo.findWhere(unitOfWork, new Pair(collumn, followId))

@@ -5,6 +5,7 @@ import isel.ps.employbox.exceptions.BadRequestException;
 import isel.ps.employbox.model.binders.ChatBinder;
 import isel.ps.employbox.model.binders.MessageBinder;
 import isel.ps.employbox.model.entities.Chat;
+import isel.ps.employbox.model.entities.Message;
 import isel.ps.employbox.model.input.InChat;
 import isel.ps.employbox.model.input.InMessage;
 import isel.ps.employbox.model.output.HalCollectionPage;
@@ -13,6 +14,8 @@ import isel.ps.employbox.services.ChatService;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
+
+import java.util.concurrent.CompletableFuture;
 
 import static isel.ps.employbox.ErrorMessages.BAD_REQUEST_IDS_MISMATCH;
 
@@ -31,18 +34,16 @@ public class ChatController {
 
 
     @GetMapping("/{cid}/messages")
-    public Mono<HalCollectionPage> getChatsMessages (
+    public Mono<HalCollectionPage<Message>> getChatsMessages (
             @PathVariable long id,
             @PathVariable long cid,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "5") int pageSize,
-            Authentication authentication) {
-        return messageBinder.bindOutput(
-                chatService.getAccountChatsMessages(id, authentication.getName(), page, pageSize),
-                this.getClass(),
-                id,
-                cid
-        );
+            Authentication authentication
+    ) {
+        CompletableFuture<HalCollectionPage<Message>> future = chatService.getAccountChatsMessages(id, authentication.getName(), page, pageSize)
+                .thenApply(messageCollectionPage -> messageBinder.bindOutput(messageCollectionPage, this.getClass(), id, cid));
+        return Mono.fromFuture(future);
     }
 
     @PostMapping
@@ -59,11 +60,14 @@ public class ChatController {
     public Mono<OutMessage> createMessage(@PathVariable long id, @PathVariable long cid, @RequestBody InMessage msg, Authentication authentication) {
         if (cid != msg.getChatId())
             throw new BadRequestException(ErrorMessages.BAD_REQUEST_IDS_MISMATCH);
-        return messageBinder.bindOutput(chatService.createNewChatMessage(id, cid, messageBinder.bindInput(msg), authentication.getName()));
+        CompletableFuture<OutMessage> future = chatService.createNewChatMessage(id, cid, messageBinder.bindInput(msg), authentication.getName())
+                .thenApply(messageBinder::bindOutput);
+        return Mono.fromFuture(future);
     }
 
     @GetMapping("/{cid}/messages/{mid}")
     public Mono<OutMessage> getChatMessage(@PathVariable long cid, @PathVariable long mid, Authentication authentication) {
-        return messageBinder.bindOutput( chatService.getAccountChatsMessage(cid, mid, authentication.getName()));
+        CompletableFuture<OutMessage> future = chatService.getAccountChatsMessage(cid, mid, authentication.getName()).thenApply(messageBinder::bindOutput);
+        return Mono.fromFuture(future);
     }
 }

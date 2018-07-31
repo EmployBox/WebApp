@@ -15,6 +15,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
+import java.util.concurrent.CompletableFuture;
+
 import static isel.ps.employbox.ErrorMessages.BAD_REQUEST_IDS_MISMATCH;
 
 @RestController
@@ -32,36 +34,35 @@ public class UserAccountController {
     }
 
     @GetMapping
-    public Mono<HalCollectionPage> getAllUsers(
+    public Mono<HalCollectionPage<UserAccount>> getAllUsers(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "5") int pageSize,
             @RequestParam(required = false) String name,
             @RequestParam(required = false) Integer ratingLow,
             @RequestParam(required = false) Integer ratingHigh
     ){
-        return userBinder.bindOutput(
-                userAccountService.getAllUsers(page, pageSize, name, ratingLow, ratingHigh),
-                this.getClass()
-        );
+        CompletableFuture<HalCollectionPage<UserAccount>> future = userAccountService.getAllUsers(page, pageSize, name, ratingLow, ratingHigh)
+                .thenApply(userAccountCollectionPage -> userBinder.bindOutput(userAccountCollectionPage, this.getClass()));
+        return Mono.fromFuture(future);
     }
 
     @GetMapping("/{id}")
     public Mono<OutUser> getUser(@PathVariable long id){
-        return userBinder.bindOutput( userAccountService.getUser(id));
+        CompletableFuture<OutUser> future = userAccountService.getUser(id)
+                .thenApply(userBinder::bindOutput);
+        return Mono.fromFuture(future);
     }
 
     @GetMapping("/{id}/applications")
-    public Mono<HalCollectionPage> getAllApplications(
+    public Mono<HalCollectionPage<Application>> getAllApplications(
             @PathVariable long id,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "5") int pageSize
 
     ){
-        return applicationBinder.bindOutput(
-                userAccountService.getAllApplications(id, page, pageSize),
-                this.getClass(),
-                id
-        );
+        CompletableFuture<HalCollectionPage<Application>> future = userAccountService.getAllApplications(id, page, pageSize)
+                .thenApply(applicationCollectionPage -> applicationBinder.bindOutput(applicationCollectionPage, this.getClass(), id));
+        return Mono.fromFuture(future);
     }
 
     @GetMapping("/{id}/jobs/{jid}/applications/{apId}")
@@ -70,13 +71,16 @@ public class UserAccountController {
             @PathVariable long jid,
             @PathVariable long apId
     ){
-        return applicationBinder.bindOutput( userAccountService.getApplication(id, jid, apId) );
+        CompletableFuture<OutApplication> future = userAccountService.getApplication(id, jid, apId).thenApply(applicationBinder::bindOutput);
+        return Mono.fromFuture(future);
     }
 
     @PostMapping
     public Mono<OutUser> createUser( @RequestBody InUserAccount inUserAccount){
         UserAccount userAccount = userBinder.bindInput(inUserAccount);
-        return userBinder.bindOutput( userAccountService.createUser(userAccount) );
+        CompletableFuture<OutUser> future = userAccountService.createUser(userAccount)
+                .thenApply(userBinder::bindOutput);
+        return Mono.fromFuture(future);
     }
 
     @PostMapping("/{id}/jobs/{jid}/applications")
@@ -84,7 +88,10 @@ public class UserAccountController {
         if(id != inApplication.getAccountId() || jid != inApplication.getJobId())
             throw new BadRequestException(BAD_REQUEST_IDS_MISMATCH);
         Application application = applicationBinder.bindInput(inApplication);
-        return applicationBinder.bindOutput( userAccountService.createApplication(id, application, authentication.getName()));
+
+        CompletableFuture<OutApplication> future = userAccountService.createApplication(id, application, authentication.getName())
+                .thenApply(applicationBinder::bindOutput);
+        return Mono.fromFuture(future);
     }
 
     @PutMapping("/{id}")

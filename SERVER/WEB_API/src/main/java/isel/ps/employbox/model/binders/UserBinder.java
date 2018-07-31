@@ -19,17 +19,14 @@ public class UserBinder implements ModelBinder<UserAccount,OutUser,InUserAccount
     }
 
     @Override
-    public Mono<OutUser> bindOutput(CompletableFuture<UserAccount> userCompletableFuture) {
-        return Mono.fromFuture(
-                userCompletableFuture.thenApply(
-                        user -> new OutUser(
-                                user.getIdentityKey(),
-                                user.getName(),
-                                user.getEmail(),
-                                user.getPhotoUrl(),
-                                user.getSummary(),
-                                user.getRating())
-                )
+    public OutUser bindOutput(UserAccount userAccount) {
+        return new OutUser(
+                userAccount.getIdentityKey(),
+                userAccount.getName(),
+                userAccount.getEmail(),
+                userAccount.getPhotoUrl(),
+                userAccount.getSummary(),
+                userAccount.getRating()
         );
     }
 
