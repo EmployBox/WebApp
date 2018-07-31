@@ -21,6 +21,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 import static isel.ps.employbox.ErrorMessages.*;
+import static isel.ps.employbox.services.ServiceUtils.handleExceptions;
 
 @Service
 public class UserAccountService {
@@ -55,48 +56,45 @@ public class UserAccountService {
             throw new InvalidParameterException("Only 1 or 2 parameters are allowed for this method");
 
         UnitOfWork unit = new UnitOfWork();
-        return userRepo.findById(unit, id)
+        CompletableFuture<UserAccount> future = userRepo.findById(unit, id)
                 .thenApply(res -> {
                     if (!res.isPresent()) throw new ResourceNotFoundException(RESOURCE_NOTFOUND_USER);
-                    if (email.length == 1 && !res.get().getEmail().equals(email[0])) throw new UnauthorizedException(ErrorMessages.UN_AUTHORIZED_ID_AND_EMAIL_MISMATCH);
+                    if (email.length == 1 && !res.get().getEmail().equals(email[0]))
+                        throw new UnauthorizedException(ErrorMessages.UN_AUTHORIZED_ID_AND_EMAIL_MISMATCH);
                     return res.get();
                 })
                 .thenCompose(userAccount -> unit.commit().thenApply(aVoid -> userAccount));
+        return handleExceptions(future, unit);
     }
 
     public CompletableFuture<Application> getApplication(long userId, long jobId, long apId) {
         UnitOfWork unit = new UnitOfWork();
-        return getUser(userId)
+        CompletableFuture<Application> future = getUser(userId)
                 .thenCompose(__ -> applicationRepo.findById(unit, apId))
                 .thenCompose(application1 -> unit.commit().thenApply(aVoid -> application1))
-                .thenApply( oapplication -> oapplication.orElseThrow( () -> new ResourceNotFoundException( RESOURCE_NOTFOUND_APPLICATION)))
-                .thenApply( application -> {
-                    if(application.getJobId() != jobId)
+                .thenApply(oapplication -> oapplication.orElseThrow(() -> new ResourceNotFoundException(RESOURCE_NOTFOUND_APPLICATION)))
+                .thenApply(application -> {
+                    if (application.getJobId() != jobId)
                         throw new BadRequestException(BAD_REQUEST_IDS_MISMATCH);
                     return application;
                 });
+        return handleExceptions(future, unit);
     }
 
     public CompletableFuture<CollectionPage<Application>> getAllApplications(long accountId, int page, int pageSize) {
-        List[] list = new List[1];
-        CollectionPage[] ret = new CollectionPage[1];
         UnitOfWork unit = new UnitOfWork();
 
         return userRepo.findById(unit, accountId)
                 .thenApply(ouser -> ouser.orElseThrow(() -> new ResourceNotFoundException(ErrorMessages.RESOURCE_NOTFOUND_USER)))
-                .thenCompose(__ -> applicationRepo.findWhere(unit, page, pageSize, new Pair<>("accountId", accountId))
-                        .thenCompose(listRes -> {
-                            list[0] = listRes;
-                            return applicationRepo.getNumberOfEntries(unit, new Pair<>("accountId", accountId));
-                        })
-                        .thenCompose(aLong -> unit.commit().thenApply(aVoid -> aLong))
-                        .thenApply(collectionSize ->
-                                ret[0] = new CollectionPage(
+                .thenCompose(ignored -> applicationRepo.findWhere(unit, page, pageSize, new Pair<>("accountId", accountId))
+                        .thenCompose(listRes -> applicationRepo.getNumberOfEntries(unit, new Pair<>("accountId", accountId))
+                                .thenCompose(aLong -> unit.commit().thenApply(aVoid -> aLong))
+                                .thenApply(collectionSize -> new CollectionPage<>(
                                         collectionSize,
                                         pageSize,
                                         page,
-                                        list[0])
-                        ));
+                                        listRes
+                                ))));
     }
 
     public CompletableFuture<UserAccount> createUser(UserAccount userAccount) {

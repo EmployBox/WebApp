@@ -10,6 +10,7 @@ import isel.ps.employbox.model.entities.Curriculum;
 import isel.ps.employbox.model.entities.UserAccount;
 import isel.ps.employbox.model.entities.curricula.childs.AcademicBackground;
 import isel.ps.employbox.model.input.curricula.childs.InAcademicBackground;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -39,6 +40,7 @@ import static org.springframework.web.reactive.function.client.ExchangeFilterFun
 @RunWith(SpringRunner.class)
 @SpringBootTest
 public class AcademicBackgroundControllerTests {
+    private static final Logger logger = LoggerFactory.getLogger(AcademicBackgroundControllerTests.class);
     @Rule
     public JUnitRestDocumentation restDocumentation = new JUnitRestDocumentation();
     @Autowired
@@ -76,6 +78,13 @@ public class AcademicBackgroundControllerTests {
         assertEquals(1, academicBackgrounds.size());
         academicBackground = academicBackgrounds.get(0);
         unitOfWork.commit().join();
+    }
+
+    @After
+    public void after() {
+        int openedConnections = UnitOfWork.numberOfOpenConnections.get();
+        logger.info("OPENED CONNECTIONS - {}", openedConnections);
+        assertEquals(0, openedConnections);
     }
 
     @Test

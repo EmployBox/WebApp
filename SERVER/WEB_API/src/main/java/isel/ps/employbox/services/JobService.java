@@ -16,11 +16,12 @@ import isel.ps.employbox.model.entities.JobExperience;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
-import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
+
+import static isel.ps.employbox.services.ServiceUtils.handleExceptions;
 
 @Service
 public class JobService {
@@ -117,7 +118,7 @@ public class JobService {
     public CompletableFuture<Void> addJobExperienceToJob(long jobId, List<JobExperience> jobExperience, String username){
         UnitOfWork unitOfWork = new UnitOfWork();
 
-        return getJob(jobId)
+        CompletableFuture<Void> future = getJob(jobId)
                 .thenCompose(job -> job.getAccount().getForeignObject(unitOfWork))
                 .thenApply(
                         account -> {
@@ -127,56 +128,63 @@ public class JobService {
                         })
                 .thenCompose(account -> jobExperienceRepo.createAll(unitOfWork, jobExperience))
                 .thenCompose(aVoid -> unitOfWork.commit());
+
+        return handleExceptions(future, unitOfWork);
     }
 
     public Mono<Void> updateJob(Job job, String email) {
         UnitOfWork unitOfWork = new UnitOfWork();
-        return Mono.fromFuture(
-                CompletableFuture.allOf(
-                        getJob(job.getIdentityKey()),
-                        job.getAccount().getForeignObject(unitOfWork)
-                                .thenApply(account -> {
-                                    if (!account.getEmail().equals(email))
-                                        throw new UnauthorizedException(ErrorMessages.UN_AUTHORIZED_ID_AND_EMAIL_MISMATCH);
-                                    return account;
-                                })
-                )
-                        .thenCompose(aVoid -> jobRepo.update(unitOfWork, job))
-                        .thenCompose(aVoid -> unitOfWork.commit())
-        );
+        CompletableFuture<Void> future = CompletableFuture.allOf(
+                getJob(job.getIdentityKey()),
+                job.getAccount().getForeignObject(unitOfWork)
+                        .thenApply(account -> {
+                            if (!account.getEmail().equals(email))
+                                throw new UnauthorizedException(ErrorMessages.UN_AUTHORIZED_ID_AND_EMAIL_MISMATCH);
+                            return account;
+                        })
+        )
+                .thenCompose(aVoid -> jobRepo.update(unitOfWork, job))
+                .thenCompose(aVoid -> unitOfWork.commit());
+
+        future = handleExceptions(future, unitOfWork);
+
+        return Mono.fromFuture(future);
     }
 
     public Mono<Void> updateJobExperience(JobExperience jobExperience, String username) {
         UnitOfWork unitOfWork = new UnitOfWork();
-        return Mono.fromFuture(
-                getJob(jobExperience.getJobId())
-                        .thenCompose(job -> job.getAccount().getForeignObject(unitOfWork)
-                                .thenApply(account -> {
-                                    if (!account.getEmail().equals(username))
-                                        throw new UnauthorizedException(ErrorMessages.UN_AUTHORIZED_ID_AND_EMAIL_MISMATCH);
-                                    return account;
-                                }))
-                        .thenCompose(account -> jobExperienceRepo.update(unitOfWork, jobExperience))
-                        .thenCompose(aVoid -> unitOfWork.commit())
-        );
+        CompletableFuture<Void> future = getJob(jobExperience.getJobId())
+                .thenCompose(job -> job.getAccount().getForeignObject(unitOfWork)
+                        .thenApply(account -> {
+                            if (!account.getEmail().equals(username))
+                                throw new UnauthorizedException(ErrorMessages.UN_AUTHORIZED_ID_AND_EMAIL_MISMATCH);
+                            return account;
+                        }))
+                .thenCompose(account -> jobExperienceRepo.update(unitOfWork, jobExperience))
+                .thenCompose(aVoid -> unitOfWork.commit());
+
+        future = handleExceptions(future, unitOfWork);
+
+        return Mono.fromFuture(future);
     }
 
     public Mono<Void> deleteJob(long jobId, String email) {
         UnitOfWork unitOfWork = new UnitOfWork();
-        return Mono.fromFuture(
-                accountRepo.findWhere(unitOfWork, new Pair<>("email", email))
-                        .thenCompose( res -> unitOfWork.commit().thenApply( aVoid -> res))
-                        .thenApply(accounts -> {
-                            if (accounts.isEmpty())
-                                throw new UnauthorizedException(ErrorMessages.UN_AUTHORIZED);
-                            return accounts.get(0);
-                        })
-                        .thenCompose(account -> deleteJobAux(jobId, account))
-        );
+        CompletableFuture<Void> future = accountRepo.findWhere(unitOfWork, new Pair<>("email", email))
+                .thenApply(accounts -> {
+                    if (accounts.isEmpty())
+                        throw new UnauthorizedException(ErrorMessages.UN_AUTHORIZED);
+                    return accounts.get(0);
+                })
+                .thenCompose(account -> deleteJobAux(unitOfWork, jobId, account))
+                .thenCompose(res -> unitOfWork.commit());
+
+        future = handleExceptions(future, unitOfWork);
+
+        return Mono.fromFuture(future);
     }
     //todo commit
-    private CompletableFuture<Void> deleteJobAux(long jobId, Account account) {
-        UnitOfWork unitOfWork = new UnitOfWork();
+    private CompletableFuture<Void> deleteJobAux(UnitOfWork unitOfWork, long jobId, Account account) {
         return getJob(jobId)
                 .thenCompose(
                         job -> job.getAccount()

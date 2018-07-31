@@ -9,10 +9,13 @@ import isel.ps.employbox.exceptions.ResourceNotFoundException;
 import isel.ps.employbox.model.entities.Curriculum;
 import isel.ps.employbox.model.entities.UserAccount;
 import isel.ps.employbox.model.input.curricula.childs.InCurriculum;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.ApplicationContext;
@@ -37,6 +40,7 @@ import static org.springframework.web.reactive.function.client.ExchangeFilterFun
 @RunWith(SpringRunner.class)
 @SpringBootTest
 public class CurriculumControllerTests {
+    private static final Logger logger = LoggerFactory.getLogger(CurriculumControllerTests.class);
     @Rule
     public JUnitRestDocumentation restDocumentation = new JUnitRestDocumentation();
     @Autowired
@@ -68,6 +72,13 @@ public class CurriculumControllerTests {
         curriculum = curricula.get(0);
 
         unitOfWork.commit().join();
+    }
+
+    @After
+    public void after() {
+        int openedConnections = UnitOfWork.numberOfOpenConnections.get();
+        logger.info("OPENED CONNECTIONS - {}", openedConnections);
+        assertEquals(0, openedConnections);
     }
 
     @Test

@@ -34,4 +34,15 @@ public class ServiceUtils {
                     return unitOfWork.commit().thenApply(aVoid -> collectionPage);
                 });
     }
+
+    public static <T> CompletableFuture<T> handleExceptions(CompletableFuture<T> future, UnitOfWork unitOfWork) {
+        return future.handleAsync((t, throwable) -> {
+            if (throwable != null)
+                return unitOfWork.rollback()
+                        .thenApply(aVoid1 -> { throw (RuntimeException) throwable; })
+                        .thenApply(o -> t); //thenApply used to avoid cast
+            return CompletableFuture.completedFuture(t);
+        })
+                .thenCompose(voidCompletableFuture -> voidCompletableFuture);
+    }
 }

@@ -28,6 +28,8 @@ import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import static isel.ps.employbox.services.ServiceUtils.handleExceptions;
+
 @Service
 public class CurriculumService {
     private final UserAccountService userAccountService;
@@ -160,13 +162,14 @@ public class CurriculumService {
             long jexpId
     ) {
         UnitOfWork unitOfWork = new UnitOfWork();
-        return repo.findById(unitOfWork, jexpId)
-                .thenCompose( res -> unitOfWork.commit().thenApply( aVoid -> res))
+        CompletableFuture<T> future = repo.findById(unitOfWork, jexpId)
+                .thenCompose(res -> unitOfWork.commit().thenApply(aVoid -> res))
                 .thenApply(oChild -> oChild.orElseThrow(() -> new ResourceNotFoundException(ErrorMessages.RESOURCE_NOTFOUND)))
                 .thenApply(child -> {
                     if (child.getCurriculumId() != curriculumId || child.getAccountId() != accountId)
                         throw new ConflictException(ErrorMessages.BAD_REQUEST_IDS_MISMATCH);
                     return child;
                 });
+        return handleExceptions(future, unitOfWork);
     }
 }
