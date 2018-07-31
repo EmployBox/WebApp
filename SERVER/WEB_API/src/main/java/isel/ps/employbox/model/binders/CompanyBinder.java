@@ -6,6 +6,8 @@ import isel.ps.employbox.model.output.OutCompany;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
+import java.util.concurrent.CompletableFuture;
+
 @Component
 public class CompanyBinder implements ModelBinder<Company,OutCompany,InCompany> {
 
@@ -16,17 +18,19 @@ public class CompanyBinder implements ModelBinder<Company,OutCompany,InCompany> 
     }
 
     @Override
-    public OutCompany bindOutput(Company company) {
-        return new OutCompany(
-                company.getIdentityKey(),
-                company.getEmail(),
-                company.getRating(),
-                company.getName(),
-                company.getSpecialization(),
-                company.getYearFounded(),
-                company.getLogoUrl(),
-                company.getWebPageUrl(),
-                company.getDescription()
+    public CompletableFuture<OutCompany> bindOutput(Company company) {
+        return CompletableFuture.completedFuture(
+                new OutCompany(
+                        company.getIdentityKey(),
+                        company.getEmail(),
+                        company.getRating(),
+                        company.getName(),
+                        company.getSpecialization(),
+                        company.getYearFounded(),
+                        company.getLogoUrl(),
+                        company.getWebPageUrl(),
+                        company.getDescription()
+                )
         );
     }
 

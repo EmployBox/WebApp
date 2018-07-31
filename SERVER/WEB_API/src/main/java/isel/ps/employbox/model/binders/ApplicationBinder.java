@@ -12,13 +12,13 @@ import java.util.concurrent.CompletableFuture;
 public class ApplicationBinder implements ModelBinder<Application,OutApplication,InApplication> {
 
     @Override
-    public OutApplication bindOutput(Application application) {
-        return new OutApplication(
+    public CompletableFuture<OutApplication> bindOutput(Application application) {
+        return CompletableFuture.completedFuture(new OutApplication(
                 application.getIdentityKey(),
                 application.getAccountId(),
                 application.getJobId(),
                 application.getCurriculumId(),
-                application.getDate()
+                application.getDate())
         );
     }
 

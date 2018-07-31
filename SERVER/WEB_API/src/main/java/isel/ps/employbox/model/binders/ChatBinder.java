@@ -6,11 +6,13 @@ import isel.ps.employbox.model.input.InChat;
 import isel.ps.employbox.model.output.OutputDto;
 import org.springframework.stereotype.Component;
 
+import java.util.concurrent.CompletableFuture;
+
 @Component
 public class ChatBinder implements ModelBinder<Chat, OutputDto, InChat> {
 
     @Override
-    public OutputDto bindOutput(Chat object) {
+    public CompletableFuture<OutputDto> bindOutput(Chat object) {
         throw new BadRequestException("Method bindOutput cannot be called for chats");
     }
 

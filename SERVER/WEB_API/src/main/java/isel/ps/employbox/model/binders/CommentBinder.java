@@ -12,15 +12,16 @@ import java.util.concurrent.CompletableFuture;
 public class CommentBinder implements ModelBinder<Comment,OutComment,InComment> {
 
     @Override
-    public OutComment bindOutput(Comment comment) {
-        return new OutComment(
-                comment.getAccountIdFrom(),
-                comment.getAccountIdDest(),
-                comment.getIdentityKey(),
-                comment.getMainCommendID(),
-                comment.getDatetime().toString(),
-                comment.getText()
-        );
+    public CompletableFuture<OutComment> bindOutput(Comment comment) {
+        return CompletableFuture.completedFuture(
+                new OutComment(
+                        comment.getAccountIdFrom(),
+                        comment.getAccountIdDest(),
+                        comment.getIdentityKey(),
+                        comment.getMainCommendID(),
+                        comment.getDatetime().toString(),
+                        comment.getText()
+                ));
     }
 
     @Override
