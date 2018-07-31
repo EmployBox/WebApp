@@ -13,6 +13,8 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.ApplicationContext;
@@ -43,6 +45,7 @@ public class CompanyControllerTests {
     private ApplicationContext context;
     @Autowired
     private DataRepository<Company, Long> companyRepo;
+    private static final Logger logger = LoggerFactory.getLogger(CompanyControllerTests.class);
     private WebTestClient webTestClient;
     private Company company;
 
@@ -60,6 +63,13 @@ public class CompanyControllerTests {
         assertEquals(1, companies.size());
         company = companies.get(0);
         unitOfWork.commit().join();
+    }
+
+    @After
+    public void after() {
+        int openedConnections = UnitOfWork.numberOfOpenConnections.get();
+        logger.info("OPENED CONNECTIONS - {}", openedConnections);
+        assertEquals(0, openedConnections);
     }
 
     @Test
@@ -159,10 +169,14 @@ public class CompanyControllerTests {
                 .consumeWith(document("updateCompany"));
 
         Company updatedCompany = companyRepo.findById(unitOfWork, company.getIdentityKey()).join().orElseThrow(() -> new ResourceNotFoundException("Company not found"));
+        unitOfWork.commit().join();
 
         assertEquals("Microsoft", updatedCompany.getName());
         assertEquals("Sou uma empresa simpatica", updatedCompany.getDescription());
         assertEquals("someEmail@hotmail.com", updatedCompany.getEmail());
+
+        Logger logger = LoggerFactory.getLogger(CompanyControllerTests.class);
+        logger.info("OPENED CONNECTIONS - {}", UnitOfWork.numberOfOpenConnections.get());
     }
 
     @Test

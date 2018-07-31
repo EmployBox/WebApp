@@ -49,14 +49,14 @@ public class JobController {
             @RequestParam(required = false) Integer ratingHigh
     ){
         CompletableFuture<HalCollectionPage<Job>> future = jobService.getAllJobs(page, pageSize, address, location, title, wage, type, ratingLow, ratingHigh)
-                .thenApply(jobCollectionPage -> jobBinder.bindOutput(jobCollectionPage, this.getClass()));
+                .thenCompose(jobCollectionPage -> jobBinder.bindOutput(jobCollectionPage, this.getClass()));
         return Mono.fromFuture(future);
     }
 
     @GetMapping("/{jid}")
     public Mono<OutJob> getJob(@PathVariable long jid){
         CompletableFuture<OutJob> future = jobService.getJob(jid)
-                .thenApply(jobBinder::bindOutput);
+                .thenCompose(jobBinder::bindOutput);
 
         return Mono.fromFuture(future);
     }
@@ -68,7 +68,7 @@ public class JobController {
             @RequestParam(defaultValue = "5") int pageSize
     ) {
         CompletableFuture<HalCollectionPage<JobExperience>> future = jobService.getJobExperiences(jid, page, pageSize)
-                .thenApply(jobExperienceCollectionPage -> jobExperienceBinder.bindOutput(jobExperienceCollectionPage, this.getClass(), jid));
+                .thenCompose(jobExperienceCollectionPage -> jobExperienceBinder.bindOutput(jobExperienceCollectionPage, this.getClass(), jid));
         return Mono.fromFuture(future);
     }
 
@@ -78,7 +78,7 @@ public class JobController {
             @PathVariable long expId
     ){
         CompletableFuture<OutJobExperience> future = jobService.getJobExperience(jid, expId)
-                .thenApply(jobExperienceBinder::bindOutput);
+                .thenCompose(jobExperienceBinder::bindOutput);
 
         return Mono.fromFuture(future);
     }
@@ -87,7 +87,7 @@ public class JobController {
     public Mono<OutJob> createJob(@RequestBody InJob job, Authentication authentication){
         Job newJob = jobBinder.bindInput(job);
         CompletableFuture<OutJob> future = jobService.createJob(newJob, authentication.getName())
-                .thenApply(jobBinder::bindOutput);
+                .thenCompose(jobBinder::bindOutput);
 
         return Mono.fromFuture(future);
     }

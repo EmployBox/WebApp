@@ -10,10 +10,13 @@ import isel.ps.employbox.model.entities.Job;
 import isel.ps.employbox.model.entities.JobExperience;
 import isel.ps.employbox.model.input.InJob;
 import isel.ps.employbox.model.input.InJobExperience;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.ApplicationContext;
@@ -46,6 +49,7 @@ public class JobControllerTests {
     private DataRepository<Job, Long> jobRepo;
     @Autowired
     private DataRepository<JobExperience, Long> jobExperienceRepo;
+    private static final Logger logger = LoggerFactory.getLogger(JobControllerTests.class);
     private WebTestClient webTestClient;
     private Long accountId;
     private Job job;
@@ -72,6 +76,13 @@ public class JobControllerTests {
         accountId = job.getAccount().getForeignKey();
 
         unitOfWork.commit().join();
+    }
+
+    @After
+    public void after() {
+        int openedConnections = UnitOfWork.numberOfOpenConnections.get();
+        logger.info("OPENED CONNECTIONS - {}", openedConnections);
+        assertEquals(0, openedConnections);
     }
 
     @Test
@@ -142,6 +153,7 @@ public class JobControllerTests {
                 .consumeWith(document("createJob"));
 
         assertTrue(jobRepo.findWhere(unitOfWork, new Pair<>("title", "Verrryyy gud job, come come")).join().size() != 0);
+        unitOfWork.commit().join();
     }
 
     @Test
@@ -246,6 +258,7 @@ public class JobControllerTests {
                 .consumeWith(document("updateJob"));
 
         Job updatedJob = jobRepo.findById(unitOfWork, job.getIdentityKey()).join().orElseThrow(() -> new ResourceNotFoundException("Job not found"));
+        unitOfWork.commit().join();
 
         assertEquals("Looking for Worker", updatedJob.getOfferType());
         assertEquals("Sou uma empresa simpatica", updatedJob.getDescription());
@@ -277,6 +290,7 @@ public class JobControllerTests {
                 .consumeWith(document("updateJobExperience"));
 
         JobExperience updatedJobExperience = jobExperienceRepo.findById(unitOfWork, jobExperience.getIdentityKey()).join().orElseThrow(() -> new ResourceNotFoundException("JobExperience not found"));
+        unitOfWork.commit().join();
 
         assertEquals((short) 2, updatedJobExperience.getYears());
         assertEquals("C#", updatedJobExperience.getCompetences());
@@ -318,5 +332,6 @@ public class JobControllerTests {
                 .consumeWith(document("deleteJob"));
         UnitOfWork unitOfWork = new UnitOfWork();
         assertFalse(jobRepo.findById(unitOfWork, job.getIdentityKey()).join().isPresent());
+        unitOfWork.commit().join();
     }
 }

@@ -5,7 +5,6 @@ import isel.ps.employbox.model.entities.curricula.childs.CurriculumExperience;
 import isel.ps.employbox.model.input.curricula.childs.InCurriculumExperience;
 import isel.ps.employbox.model.output.OutCurriculumExperience;
 import org.springframework.stereotype.Component;
-import reactor.core.publisher.Mono;
 
 import java.util.concurrent.CompletableFuture;
 
@@ -13,14 +12,14 @@ import java.util.concurrent.CompletableFuture;
 public class CurriculumExperienceBinder implements ModelBinder<CurriculumExperience, OutCurriculumExperience, InCurriculumExperience> {
 
     @Override
-    public OutCurriculumExperience bindOutput(CurriculumExperience curriculumExperience) {
-        return new OutCurriculumExperience(
+    public CompletableFuture<OutCurriculumExperience> bindOutput(CurriculumExperience curriculumExperience) {
+        return CompletableFuture.completedFuture(new OutCurriculumExperience(
                 curriculumExperience.getIdentityKey(),
                 curriculumExperience.getAccountId(),
                 curriculumExperience.getCurriculumId(),
                 curriculumExperience.getCompetences(),
                 curriculumExperience.getYears()
-        );
+        ));
     }
 
     @Override

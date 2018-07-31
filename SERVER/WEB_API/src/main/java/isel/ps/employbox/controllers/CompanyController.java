@@ -29,20 +29,22 @@ public class CompanyController {
     @GetMapping
     public Mono<HalCollectionPage<Company>> getCompanies(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "5") int pageSize){
         CompletableFuture<HalCollectionPage<Company>> future = companyService.getCompanies(page, pageSize)
-                .thenApply(companyCollectionPage -> companyBinder.bindOutput(companyCollectionPage, this.getClass()));
+                .thenCompose(companyCollectionPage -> companyBinder.bindOutput(companyCollectionPage, this.getClass()));
         return Mono.fromFuture(future);
     }
 
     @GetMapping("/{cid}")
     public Mono<OutCompany> getCompany(@PathVariable long cid){
-        CompletableFuture<OutCompany> future = companyService.getCompany(cid).thenApply(companyBinder::bindOutput);
+        CompletableFuture<OutCompany> future = companyService.getCompany(cid)
+                .thenCompose(companyBinder::bindOutput);
         return Mono.fromFuture(future);
 
     }
 
     @PostMapping
     public Mono<OutCompany> createCompany(@RequestBody InCompany inCompany){
-        CompletableFuture<OutCompany> future = companyService.createCompany(companyBinder.bindInput(inCompany)).thenApply(companyBinder::bindOutput);
+        CompletableFuture<OutCompany> future = companyService.createCompany(companyBinder.bindInput(inCompany))
+                .thenCompose(companyBinder::bindOutput);
         return Mono.fromFuture(future);
     }
 

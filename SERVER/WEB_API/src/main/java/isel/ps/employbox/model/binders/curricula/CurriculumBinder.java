@@ -13,12 +13,12 @@ import java.util.concurrent.CompletableFuture;
 public class CurriculumBinder implements ModelBinder<Curriculum,OutCurriculum,InCurriculum> {
 
     @Override
-    public OutCurriculum bindOutput(Curriculum curriculum) {
-        return new OutCurriculum(
+    public CompletableFuture<OutCurriculum> bindOutput(Curriculum curriculum) {
+        return CompletableFuture.completedFuture(new OutCurriculum(
                 curriculum.getAccountId(),
                 curriculum.getIdentityKey(),
                 curriculum.getTitle()
-        );
+        ));
     }
 
     @Override

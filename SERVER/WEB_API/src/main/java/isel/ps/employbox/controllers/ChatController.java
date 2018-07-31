@@ -42,7 +42,7 @@ public class ChatController {
             Authentication authentication
     ) {
         CompletableFuture<HalCollectionPage<Message>> future = chatService.getAccountChatsMessages(id, authentication.getName(), page, pageSize)
-                .thenApply(messageCollectionPage -> messageBinder.bindOutput(messageCollectionPage, this.getClass(), id, cid));
+                .thenCompose(messageCollectionPage -> messageBinder.bindOutput(messageCollectionPage, this.getClass(), id, cid));
         return Mono.fromFuture(future);
     }
 
@@ -61,13 +61,14 @@ public class ChatController {
         if (cid != msg.getChatId())
             throw new BadRequestException(ErrorMessages.BAD_REQUEST_IDS_MISMATCH);
         CompletableFuture<OutMessage> future = chatService.createNewChatMessage(id, cid, messageBinder.bindInput(msg), authentication.getName())
-                .thenApply(messageBinder::bindOutput);
+                .thenCompose(messageBinder::bindOutput);
         return Mono.fromFuture(future);
     }
 
     @GetMapping("/{cid}/messages/{mid}")
     public Mono<OutMessage> getChatMessage(@PathVariable long cid, @PathVariable long mid, Authentication authentication) {
-        CompletableFuture<OutMessage> future = chatService.getAccountChatsMessage(cid, mid, authentication.getName()).thenApply(messageBinder::bindOutput);
+        CompletableFuture<OutMessage> future = chatService.getAccountChatsMessage(cid, mid, authentication.getName())
+                .thenCompose(messageBinder::bindOutput);
         return Mono.fromFuture(future);
     }
 }

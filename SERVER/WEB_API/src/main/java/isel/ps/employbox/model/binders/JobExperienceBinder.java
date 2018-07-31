@@ -4,7 +4,6 @@ import isel.ps.employbox.model.entities.JobExperience;
 import isel.ps.employbox.model.input.InJobExperience;
 import isel.ps.employbox.model.output.OutJobExperience;
 import org.springframework.stereotype.Component;
-import reactor.core.publisher.Mono;
 
 import java.util.concurrent.CompletableFuture;
 
@@ -12,13 +11,13 @@ import java.util.concurrent.CompletableFuture;
 public class JobExperienceBinder implements ModelBinder<JobExperience,OutJobExperience,InJobExperience> {
 
     @Override
-    public OutJobExperience bindOutput(JobExperience jobExperience) {
-        return new OutJobExperience(
+    public CompletableFuture<OutJobExperience> bindOutput(JobExperience jobExperience) {
+        return CompletableFuture.completedFuture(new OutJobExperience(
                 jobExperience.getIdentityKey(),
                 jobExperience.getJobId(),
                 jobExperience.getCompetences(),
                 jobExperience.getYears()
-        );
+        ));
     }
 
     @Override

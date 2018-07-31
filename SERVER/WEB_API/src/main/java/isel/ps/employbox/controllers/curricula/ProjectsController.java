@@ -40,7 +40,7 @@ public class ProjectsController {
             @PathVariable long projectId
     ){
         CompletableFuture<OutProject> future = curriculumService.getCurriculumChild(projectRepo, id, cid, projectId)
-                .thenApply(projectBinder::bindOutput);
+                .thenCompose(projectBinder::bindOutput);
         return Mono.fromFuture(future);
     }
 
@@ -52,7 +52,7 @@ public class ProjectsController {
             @RequestParam(defaultValue = "5") int pageSize
     ) {
         CompletableFuture<HalCollectionPage<Project>> future = projectService.getCurriculumProjects(cid, page, pageSize)
-                .thenApply(projectCollectionPage -> projectBinder.bindOutput(projectCollectionPage, this.getClass(), id, cid));
+                .thenCompose(projectCollectionPage -> projectBinder.bindOutput(projectCollectionPage, this.getClass(), id, cid));
         return Mono.fromFuture(future);
     }
 

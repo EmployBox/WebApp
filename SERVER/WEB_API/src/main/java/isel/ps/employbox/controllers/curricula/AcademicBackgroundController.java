@@ -46,7 +46,7 @@ public class AcademicBackgroundController {
             @RequestParam(defaultValue = "5") int pageSize
     ) {
         CompletableFuture<HalCollectionPage<AcademicBackground>> future = academicBackgroundService.getCurriculumAcademicBackgrounds(cid, page, pageSize)
-                .thenApply(academicBackgroundCollectionPage -> academicBackgroundBinder.bindOutput(academicBackgroundCollectionPage, this.getClass(), id, cid));
+                .thenCompose(academicBackgroundCollectionPage -> academicBackgroundBinder.bindOutput(academicBackgroundCollectionPage, this.getClass(), id, cid));
         return Mono.fromFuture(future);
     }
 
@@ -56,7 +56,8 @@ public class AcademicBackgroundController {
             @PathVariable long cid,
             @PathVariable long academicId
     ){
-        CompletableFuture<OutAcademicBackground> future = curriculumService.getCurriculumChild(backgroundRepo, id, cid, academicId).thenApply(academicBackgroundBinder::bindOutput);
+        CompletableFuture<OutAcademicBackground> future = curriculumService.getCurriculumChild(backgroundRepo, id, cid, academicId)
+                .thenCompose(academicBackgroundBinder::bindOutput);
         return Mono.fromFuture(future);
     }
 
@@ -69,7 +70,7 @@ public class AcademicBackgroundController {
     ) {
         AcademicBackground academicBackground = academicBackgroundBinder.bindInput(inAcademicBackground);
         CompletableFuture<OutAcademicBackground> future = academicBackgroundService.addAcademicBackgroundToCurriculum(id, cid, academicBackground, authentication.getName())
-                .thenApply(academicBackgroundBinder::bindOutput);
+                .thenCompose(academicBackgroundBinder::bindOutput);
         return Mono.fromFuture(future);
     }
 

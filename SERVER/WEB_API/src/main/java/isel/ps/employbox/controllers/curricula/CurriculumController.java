@@ -46,21 +46,21 @@ public class CurriculumController {
             @RequestParam(defaultValue = "5") int pageSize
     ){
         CompletableFuture<HalCollectionPage<Curriculum>> future = curriculumService.getCurricula(id, page, pageSize)
-                .thenApply(curriculumCollectionPage -> curriculumBinder.bindOutput(curriculumCollectionPage, this.getClass(), id));
+                .thenCompose(curriculumCollectionPage -> curriculumBinder.bindOutput(curriculumCollectionPage, this.getClass(), id));
         return Mono.fromFuture(future);
     }
 
     @GetMapping("/{cid}")
     public Mono<OutCurriculum> getCurriculum(@PathVariable long id, @PathVariable long cid){
         CompletableFuture<OutCurriculum> future = curriculumService.getCurriculum(id, cid)
-                .thenApply(curriculumBinder::bindOutput);
+                .thenCompose(curriculumBinder::bindOutput);
         return Mono.fromFuture(future);
     }
 
     @PostMapping
     public Mono<OutCurriculum> createCurriculum( @PathVariable long id, @RequestBody InCurriculum inCurriculum, Authentication authentication){
         CompletableFuture<OutCurriculum> future = curriculumService.createCurriculum(id, curriculumBinder.bindInput(inCurriculum), authentication.getName())
-                .thenApply(curriculumBinder::bindOutput);
+                .thenCompose(curriculumBinder::bindOutput);
         return Mono.fromFuture(future);
     }
 

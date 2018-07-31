@@ -12,8 +12,8 @@ import java.util.concurrent.CompletableFuture;
 @Component
 public class AcademicBackgroundBinder implements ModelBinder<AcademicBackground, OutAcademicBackground, InAcademicBackground> {
     @Override
-    public OutAcademicBackground bindOutput(AcademicBackground academicBackground) {
-        return new OutAcademicBackground(
+    public CompletableFuture<OutAcademicBackground> bindOutput(AcademicBackground academicBackground) {
+        return CompletableFuture.completedFuture(new OutAcademicBackground(
                 academicBackground.getIdentityKey(),
                 academicBackground.getAccountId(),
                 academicBackground.getCurriculumId(),
@@ -22,7 +22,7 @@ public class AcademicBackgroundBinder implements ModelBinder<AcademicBackground,
                 academicBackground.getStudyArea(),
                 academicBackground.getBeginDate(),
                 academicBackground.getEndDate()
-        );
+        ));
     }
 
     @Override

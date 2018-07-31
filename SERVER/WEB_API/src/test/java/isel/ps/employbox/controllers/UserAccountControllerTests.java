@@ -16,6 +16,8 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.ApplicationContext;
@@ -50,8 +52,8 @@ public class UserAccountControllerTests {
     private DataRepository<Job, Long> jobRepo;
     @Autowired
     private DataRepository<Application, Long> applicationRepo;
+    private static final Logger logger = LoggerFactory.getLogger(UserAccountControllerTests.class);
     private WebTestClient webTestClient;
-    private Connection con;
     private UserAccount userAccount;
     private long jobId;
     private Application application;
@@ -80,6 +82,13 @@ public class UserAccountControllerTests {
         application = applications.get(0);
 
         unitOfWork.commit().join();
+    }
+
+    @After
+    public void after() {
+        int openedConnections = UnitOfWork.numberOfOpenConnections.get();
+        logger.info("OPENED CONNECTIONS - {}", openedConnections);
+        assertEquals(0, openedConnections);
     }
 
     @Test
@@ -117,9 +126,15 @@ public class UserAccountControllerTests {
 
     @Test
     public void testGetApplication() {
+        UnitOfWork unit = new UnitOfWork();
+        List<Application> applications = applicationRepo.findWhere(unit, new Pair<>("accountId", userAccount.getIdentityKey()), new Pair<>("jobId", jobId)).join();
+        assertEquals(1, applications.size());
+        Application application = applications.get(0);
+        unit.commit().join();
+
         webTestClient
                 .get()
-                .uri("/accounts/users/" + userAccount.getIdentityKey() + "/applications/" + jobId)
+                .uri("/accounts/users/" + userAccount.getIdentityKey() + "/jobs/" + jobId + "/applications/" + application.getIdentityKey())
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody()
@@ -150,6 +165,9 @@ public class UserAccountControllerTests {
         UnitOfWork unit = new UnitOfWork();
         assertEquals(1, userAccountRepo.findWhere(unit, new Pair<>("email", "someEmail@hotmail.com")).join().size());
         unit.commit().join();
+
+        Logger logger = LoggerFactory.getLogger(UserAccountControllerTests.class);
+        logger.info("OPENED CONNECTIONS - {}", UnitOfWork.numberOfOpenConnections.get());
     }
 
     @Test
@@ -164,7 +182,7 @@ public class UserAccountControllerTests {
 
         webTestClient
                 .post()
-                .uri("/accounts/users/" + userAccount.getIdentityKey() + "/applications/" + jobId)
+                .uri("/accounts/users/" + userAccount.getIdentityKey() + "/jobs/" + jobId + "/applications")
                 .contentType(MediaType.APPLICATION_JSON)
                 .syncBody(json)
                 .exchange()
@@ -205,6 +223,7 @@ public class UserAccountControllerTests {
     @WithMockUser(username = "teste@gmail.com")
     public void testUpdateWrongApplication() throws JsonProcessingException {
         InApplication inApplication = new InApplication();
+        inApplication.setApplicationId(application.getIdentityKey());
         inApplication.setAccountId(userAccount.getIdentityKey());
         inApplication.setJobId(jobId);
         inApplication.setDate(new Timestamp(2019, 2, 2, 2, 2, 2, 2));
@@ -214,7 +233,7 @@ public class UserAccountControllerTests {
 
         webTestClient
                 .put()
-                .uri("/accounts/users/" + userAccount.getIdentityKey() + "/applications/" + jobId)
+                .uri("/accounts/users/" + userAccount.getIdentityKey() + "/jobs/" + jobId + "/applications/" + application.getIdentityKey())
                 .contentType(MediaType.APPLICATION_JSON)
                 .syncBody(json)
                 .exchange()
@@ -271,7 +290,7 @@ public class UserAccountControllerTests {
 
         webTestClient
                 .put()
-                .uri("/accounts/users/" + userAccount.getIdentityKey() + "/applications/" + jobId)
+                .uri("/accounts/users/" + userAccount.getIdentityKey() + "/jobs/"+ jobId + "/applications/" + application.getIdentityKey())
                 .contentType(MediaType.APPLICATION_JSON)
                 .syncBody(json)
                 .exchange()
@@ -328,9 +347,15 @@ public class UserAccountControllerTests {
     @Test
     @WithMockUser
     public void testDeleteWrongApplication() {
+        UnitOfWork unit = new UnitOfWork();
+        List<Application> applications = applicationRepo.findWhere(unit, new Pair<>("accountId", userAccount.getIdentityKey()), new Pair<>("jobId", jobId)).join();
+        assertEquals(1, applications.size());
+        Application application = applications.get(0);
+        unit.commit().join();
+
         webTestClient
                 .delete()
-                .uri("/accounts/users/" + userAccount.getIdentityKey() + "/applications/" + jobId)
+                .uri("/accounts/users/" + userAccount.getIdentityKey() + "/jobs/" + jobId + "/applications/" + application.getIdentityKey())
                 .exchange()
                 .expectStatus().isUnauthorized()
                 .expectBody()
@@ -340,15 +365,21 @@ public class UserAccountControllerTests {
     @Test
     @WithMockUser(username = "lol@hotmail.com")
     public void testDeleteApplication(){
+        UnitOfWork unit = new UnitOfWork();
+        List<Application> applications = applicationRepo.findWhere(unit, new Pair<>("accountId", userAccount.getIdentityKey()), new Pair<>("jobId", jobId)).join();
+        assertEquals(1, applications.size());
+        Application application = applications.get(0);
+        unit.commit().join();
+
         webTestClient
                 .delete()
-                .uri("/accounts/users/" + userAccount.getIdentityKey() + "/applications/" + jobId)
+                .uri("/accounts/users/" + userAccount.getIdentityKey() + "/jobs/" + jobId + "/applications/" + application.getIdentityKey())
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody()
                 .consumeWith(document("deleteApplication"));
 
-        UnitOfWork unit = new UnitOfWork();
+        unit = new UnitOfWork();
         assertTrue(applicationRepo.findWhere(unit, new Pair<>("accountId", userAccount.getIdentityKey()), new Pair<>("jobId", jobId)).join().isEmpty());
         unit.commit().join();
     }

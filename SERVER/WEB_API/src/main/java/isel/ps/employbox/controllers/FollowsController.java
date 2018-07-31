@@ -29,7 +29,7 @@ public class FollowsController {
             @RequestParam(defaultValue = "5") int pageSize
     ){
         CompletableFuture<HalCollectionPage<Account>> future = followService.getAccountFollowers(id, page, pageSize)
-                .thenApply(accountCollectionPage -> accountBinder.bindOutput(accountCollectionPage, this.getClass(), id));
+                .thenCompose(accountCollectionPage -> accountBinder.bindOutput(accountCollectionPage, this.getClass(), id));
         return Mono.fromFuture(future);
     }
 
@@ -41,7 +41,7 @@ public class FollowsController {
 
     ){
         CompletableFuture<HalCollectionPage<Account>> future = followService.getAccountFollowing(id, page, numberOfItems)
-                .thenApply(accountCollectionPage -> accountBinder.bindOutput(accountCollectionPage, this.getClass(), id));
+                .thenCompose(accountCollectionPage -> accountBinder.bindOutput(accountCollectionPage, this.getClass(), id));
         return Mono.fromFuture(future);
     }
 

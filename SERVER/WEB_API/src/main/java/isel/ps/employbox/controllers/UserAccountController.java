@@ -42,14 +42,14 @@ public class UserAccountController {
             @RequestParam(required = false) Integer ratingHigh
     ){
         CompletableFuture<HalCollectionPage<UserAccount>> future = userAccountService.getAllUsers(page, pageSize, name, ratingLow, ratingHigh)
-                .thenApply(userAccountCollectionPage -> userBinder.bindOutput(userAccountCollectionPage, this.getClass()));
+                .thenCompose(userAccountCollectionPage -> userBinder.bindOutput(userAccountCollectionPage, this.getClass()));
         return Mono.fromFuture(future);
     }
 
     @GetMapping("/{id}")
     public Mono<OutUser> getUser(@PathVariable long id){
         CompletableFuture<OutUser> future = userAccountService.getUser(id)
-                .thenApply(userBinder::bindOutput);
+                .thenCompose(userBinder::bindOutput);
         return Mono.fromFuture(future);
     }
 
@@ -61,7 +61,7 @@ public class UserAccountController {
 
     ){
         CompletableFuture<HalCollectionPage<Application>> future = userAccountService.getAllApplications(id, page, pageSize)
-                .thenApply(applicationCollectionPage -> applicationBinder.bindOutput(applicationCollectionPage, this.getClass(), id));
+                .thenCompose(applicationCollectionPage -> applicationBinder.bindOutput(applicationCollectionPage, this.getClass(), id));
         return Mono.fromFuture(future);
     }
 
@@ -71,7 +71,8 @@ public class UserAccountController {
             @PathVariable long jid,
             @PathVariable long apId
     ){
-        CompletableFuture<OutApplication> future = userAccountService.getApplication(id, jid, apId).thenApply(applicationBinder::bindOutput);
+        CompletableFuture<OutApplication> future = userAccountService.getApplication(id, jid, apId)
+                .thenCompose(applicationBinder::bindOutput);
         return Mono.fromFuture(future);
     }
 
@@ -79,7 +80,7 @@ public class UserAccountController {
     public Mono<OutUser> createUser( @RequestBody InUserAccount inUserAccount){
         UserAccount userAccount = userBinder.bindInput(inUserAccount);
         CompletableFuture<OutUser> future = userAccountService.createUser(userAccount)
-                .thenApply(userBinder::bindOutput);
+                .thenCompose(userBinder::bindOutput);
         return Mono.fromFuture(future);
     }
 
@@ -90,7 +91,7 @@ public class UserAccountController {
         Application application = applicationBinder.bindInput(inApplication);
 
         CompletableFuture<OutApplication> future = userAccountService.createApplication(id, application, authentication.getName())
-                .thenApply(applicationBinder::bindOutput);
+                .thenCompose(applicationBinder::bindOutput);
         return Mono.fromFuture(future);
     }
 
@@ -124,12 +125,13 @@ public class UserAccountController {
         return userAccountService.deleteUser(id, authentication.getName());
     }
 
-    @DeleteMapping("/{id}/jobs/{jid}/applications")
+    @DeleteMapping("/{id}/jobs/{jid}/applications/{apId}")
     public Mono<Void> deleteApplication(
             @PathVariable long id,
             @PathVariable long jid,
             @PathVariable long apId,
-            Authentication authentication){
-        return userAccountService.deleteApplication(id, jid,apId, authentication.getName());
+            Authentication authentication
+    ){
+        return userAccountService.deleteApplication(id, jid, apId, authentication.getName());
     }
 }

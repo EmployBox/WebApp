@@ -15,8 +15,8 @@ import java.util.concurrent.CompletableFuture;
 @Component
 public class PreviousJobsBinder implements ModelBinder<PreviousJobs, OutPreviousJobs, InPreviousJobs> {
     @Override
-    public OutPreviousJobs bindOutput(PreviousJobs previousJob) {
-        return new OutPreviousJobs(
+    public CompletableFuture<OutPreviousJobs> bindOutput(PreviousJobs previousJob) {
+        return CompletableFuture.completedFuture(new OutPreviousJobs(
                 previousJob.getIdentityKey(),
                 previousJob.getAccountId(),
                 previousJob.getCurriculumId(),
@@ -24,7 +24,8 @@ public class PreviousJobsBinder implements ModelBinder<PreviousJobs, OutPrevious
                 previousJob.getBeginDate().toString(),
                 previousJob.getEndDate().toString(),
                 previousJob.getWorkLoad(),
-                previousJob.getRole());
+                previousJob.getRole()
+        ));
     }
 
     @Override

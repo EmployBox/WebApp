@@ -33,14 +33,14 @@ public class CommentController {
             @RequestParam(defaultValue = "5") int pageSize
     ) {
         CompletableFuture<HalCollectionPage<Comment>> future = commentService.getComments(id, page, pageSize)
-                .thenApply(commentCollectionPage -> commentBinder.bindOutput(commentCollectionPage, this.getClass(), id));
+                .thenCompose(commentCollectionPage -> commentBinder.bindOutput(commentCollectionPage, this.getClass(), id));
         return Mono.fromFuture(future);
     }
 
     @GetMapping("{commentId}")
     public Mono<OutComment> getComment(@PathVariable long accountId, @RequestBody long accountTo, @PathVariable long commentId, Authentication authentication){
         CompletableFuture<OutComment> future = commentService.getComment(accountId, accountTo, commentId, authentication.getName())
-                .thenApply(commentBinder::bindOutput);
+                .thenCompose(commentBinder::bindOutput);
         return Mono.fromFuture(future);
     }
 
@@ -63,7 +63,8 @@ public class CommentController {
             Authentication authentication
     ){
         if(accountFromId != comment.getAccountIdFrom() || accountTo != comment.getAccountIdTo()) throw new BadRequestException(BAD_REQUEST_IDS_MISMATCH);
-        CompletableFuture<OutComment> future = commentService.createComment(commentBinder.bindInput(comment), authentication.getName()).thenApply(commentBinder::bindOutput);
+        CompletableFuture<OutComment> future = commentService.createComment(commentBinder.bindInput(comment), authentication.getName())
+                .thenCompose(commentBinder::bindOutput);
         return Mono.fromFuture(future);
     }
 

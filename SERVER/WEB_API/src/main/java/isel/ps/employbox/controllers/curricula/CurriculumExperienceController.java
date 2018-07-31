@@ -39,7 +39,7 @@ public class CurriculumExperienceController {
             @PathVariable long cid,
             @PathVariable long expId){
         CompletableFuture<OutCurriculumExperience> future = curriculumService.getCurriculumChild(currExpRepo, id, cid, expId)
-                .thenApply(curriculumExperienceBinder::bindOutput);
+                .thenCompose(curriculumExperienceBinder::bindOutput);
         return Mono.fromFuture(future);
     }
 
@@ -51,7 +51,7 @@ public class CurriculumExperienceController {
             @RequestParam(defaultValue = "5") int pageSize
     ){
         CompletableFuture<HalCollectionPage<CurriculumExperience>> future = curriculumExperienceService.getCurriculumExperiences(cid, page, pageSize)
-                .thenApply(curriculumExperienceCollectionPage -> curriculumExperienceBinder.bindOutput(curriculumExperienceCollectionPage, this.getClass(), id, cid));
+                .thenCompose(curriculumExperienceCollectionPage -> curriculumExperienceBinder.bindOutput(curriculumExperienceCollectionPage, this.getClass(), id, cid));
         return Mono.fromFuture(future);
     }
 

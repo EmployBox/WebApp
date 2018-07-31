@@ -40,7 +40,7 @@ public class PreviousJobsController {
             @PathVariable long prvJbId
     ){
         CompletableFuture<OutPreviousJobs> future = curriculumService.getCurriculumChild(prevJobRepo, id, cid, prvJbId)
-                .thenApply(previousJobsBinder::bindOutput);
+                .thenCompose(previousJobsBinder::bindOutput);
         return Mono.fromFuture(future);
     }
 
@@ -52,7 +52,7 @@ public class PreviousJobsController {
             @RequestParam(defaultValue = "5") int pageSize
     ){
         CompletableFuture<HalCollectionPage<PreviousJobs>> future = previousJobService.getCurriculumPreviousJobs(cid, page, pageSize)
-                .thenApply(previousJobsCollectionPage -> previousJobsBinder.bindOutput(previousJobsCollectionPage, this.getClass(), id, cid));
+                .thenCompose(previousJobsCollectionPage -> previousJobsBinder.bindOutput(previousJobsCollectionPage, this.getClass(), id, cid));
         return Mono.fromFuture(future);
     }
 

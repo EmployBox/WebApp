@@ -12,14 +12,14 @@ import java.util.concurrent.CompletableFuture;
 public class MessageBinder implements ModelBinder<Message,OutMessage,InMessage> {
 
     @Override
-    public OutMessage bindOutput(Message message) {
-        return new OutMessage(
+    public CompletableFuture<OutMessage> bindOutput(Message message) {
+        return CompletableFuture.completedFuture(new OutMessage(
                 message.getAccountId(),
                 message.getMessageId(),
                 message.getChatId() ,
                 message.getDate(),
                 message.getText()
-        );
+        ));
     }
 
     @Override

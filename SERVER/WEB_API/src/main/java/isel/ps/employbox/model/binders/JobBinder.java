@@ -18,7 +18,7 @@ public class JobBinder implements ModelBinder<Job, OutJob, InJob> {
         return job.getAccount()
                 .getForeignObject(unitOfWork)
                 .thenCompose(account1 -> unitOfWork.commit().thenApply(aVoid -> account1))
-                .thenApply(accountBinder::bindOutput)
+                .thenCompose(accountBinder::bindOutput)
                 .thenApply(outAccount -> new OutJob(
                         outAccount,
                         job.getIdentityKey(),

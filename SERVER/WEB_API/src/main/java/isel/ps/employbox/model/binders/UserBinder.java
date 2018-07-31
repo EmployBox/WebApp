@@ -19,15 +19,15 @@ public class UserBinder implements ModelBinder<UserAccount,OutUser,InUserAccount
     }
 
     @Override
-    public OutUser bindOutput(UserAccount userAccount) {
-        return new OutUser(
+    public CompletableFuture<OutUser> bindOutput(UserAccount userAccount) {
+        return CompletableFuture.completedFuture(new OutUser(
                 userAccount.getIdentityKey(),
                 userAccount.getName(),
                 userAccount.getEmail(),
                 userAccount.getPhotoUrl(),
                 userAccount.getSummary(),
                 userAccount.getRating()
-        );
+        ));
     }
 
     @Override

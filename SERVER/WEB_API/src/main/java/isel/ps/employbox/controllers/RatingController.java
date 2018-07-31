@@ -34,14 +34,14 @@ public class RatingController {
             @RequestParam(defaultValue = "5") int pageSize
     ){
         CompletableFuture<HalCollectionPage<Rating>> future = ratingService.getRatings(id, page, pageSize)
-                .thenApply(ratingCollectionPage -> ratingBinder.bindOutput(ratingCollectionPage, this.getClass(), id));
+                .thenCompose(ratingCollectionPage -> ratingBinder.bindOutput(ratingCollectionPage, this.getClass(), id));
         return Mono.fromFuture(future);
     }
 
     @GetMapping("/single")
     public Mono<OutRating> getRating(@PathVariable long id, @RequestBody long accountTo){
         CompletableFuture<OutRating> future = ratingService.getRating(id, accountTo)
-                .thenApply(ratingBinder::bindOutput);
+                .thenCompose(ratingBinder::bindOutput);
 
         return Mono.fromFuture(future);
     }
