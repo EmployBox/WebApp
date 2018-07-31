@@ -13,6 +13,7 @@ import java.security.InvalidParameterException;
 import java.util.concurrent.CompletableFuture;
 
 import static isel.ps.employbox.ErrorMessages.RESOURCE_NOTFOUND_ACCOUNT;
+import static isel.ps.employbox.services.ServiceUtils.handleExceptions;
 
 @Service
 public final class AccountService {
@@ -30,13 +31,14 @@ public final class AccountService {
         if (email.length > 1)
             throw new InvalidParameterException("Only 1 or 2 parameters are allowed for this method");
         UnitOfWork unitOfWork = new UnitOfWork();
-        return accountRepo.findById(unitOfWork, id)
-                .thenCompose( res -> unitOfWork.commit().thenApply( aVoid -> res))
+        CompletableFuture<Account> future = accountRepo.findById(unitOfWork, id)
+                .thenCompose(res -> unitOfWork.commit().thenApply(aVoid -> res))
                 .thenApply(oacc -> oacc.orElseThrow(() -> new ResourceNotFoundException(RESOURCE_NOTFOUND_ACCOUNT)))
                 .thenApply(account -> {
                     if (email.length == 1 && !account.getEmail().equals(email[0]))
                         throw new UnauthorizedException(ErrorMessages.UN_AUTHORIZED_ID_AND_EMAIL_MISMATCH);
                     return account;
                 });
+        return handleExceptions(future, unitOfWork);
     }
 }

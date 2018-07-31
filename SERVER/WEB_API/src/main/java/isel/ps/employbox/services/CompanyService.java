@@ -11,6 +11,8 @@ import reactor.core.publisher.Mono;
 
 import java.util.concurrent.CompletableFuture;
 
+import static isel.ps.employbox.services.ServiceUtils.handleExceptions;
+
 @Service
 public class CompanyService {
     private DataRepository<Company, Long> companyRepo;
@@ -27,32 +29,36 @@ public class CompanyService {
 
     public CompletableFuture<Company> getCompany(long cid) {
         UnitOfWork unitOfWork = new UnitOfWork();
-        return companyRepo.findById(unitOfWork, cid)
-                .thenCompose( res -> unitOfWork.commit().thenApply( aVoid -> res))
+        CompletableFuture<Company> future = companyRepo.findById(unitOfWork, cid)
+                .thenCompose(res -> unitOfWork.commit().thenApply(aVoid -> res))
                 .thenApply(optionalCompany -> optionalCompany.orElseThrow(() -> new ResourceNotFoundException(ErrorMessages.RESOURCE_NOTFOUND_COMPANY)));
+        return handleExceptions(future, unitOfWork);
     }
 
     public CompletableFuture<Company> createCompany(Company company) {
         UnitOfWork unitOfWork = new UnitOfWork();
-        return companyRepo.create(unitOfWork, company)
-                .thenCompose( res -> unitOfWork.commit().thenApply( aVoid -> company));
+        CompletableFuture<Company> future = companyRepo.create(unitOfWork, company)
+                .thenCompose(res -> unitOfWork.commit().thenApply(aVoid -> company));
+        return handleExceptions(future, unitOfWork);
     }
 
     public Mono<Void> updateCompany(Company company, String email) {
         UnitOfWork unitOfWork = new UnitOfWork();
+        CompletableFuture<Void> future = accountService.getAccount(company.getIdentityKey(), email)
+                .thenCompose(account -> companyRepo.update(unitOfWork, company))
+                .thenCompose(res -> unitOfWork.commit());
         return Mono.fromFuture(
-                accountService.getAccount(company.getIdentityKey(), email)
-                        .thenCompose(account -> companyRepo.update(unitOfWork, company))
-                        .thenCompose( res -> unitOfWork.commit())
+                handleExceptions(future, unitOfWork)
         );
     }
 
     public Mono<Void> deleteCompany(long cid, String email) {
         UnitOfWork unitOfWork = new UnitOfWork();
+        CompletableFuture<Void> future = accountService.getAccount(cid, email)
+                .thenCompose(account -> companyRepo.deleteById(unitOfWork, cid))
+                .thenCompose(res -> unitOfWork.commit());
         return Mono.fromFuture(
-                accountService.getAccount(cid, email)
-                        .thenCompose(account -> companyRepo.deleteById(unitOfWork, cid))
-                        .thenCompose( res -> unitOfWork.commit())
+                handleExceptions(future, unitOfWork)
         );
     }
 }

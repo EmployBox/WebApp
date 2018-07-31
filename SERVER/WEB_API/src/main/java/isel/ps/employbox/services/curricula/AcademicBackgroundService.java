@@ -15,6 +15,8 @@ import reactor.core.publisher.Mono;
 
 import java.util.concurrent.CompletableFuture;
 
+import static isel.ps.employbox.services.ServiceUtils.handleExceptions;
+
 @Service
 public class AcademicBackgroundService {
 
@@ -30,10 +32,11 @@ public class AcademicBackgroundService {
 
     public CompletableFuture<CollectionPage<AcademicBackground>> getCurriculumAcademicBackgrounds(long curriculumId, int page, int pageSize) {
         UnitOfWork unitOfWork = new UnitOfWork();
-        return curriculumRepo.findById(unitOfWork, curriculumId)
+        CompletableFuture<CollectionPage<AcademicBackground>> future = curriculumRepo.findById(unitOfWork, curriculumId)
                 .thenCompose(res -> unitOfWork.commit().thenApply(aVoid -> res))
                 .thenApply(optional -> optional.orElseThrow(() -> new ResourceNotFoundException(ErrorMessages.RESOURCE_NOTFOUND_CURRICULUM)))
                 .thenCompose(curriculum -> ServiceUtils.getCollectionPageFuture(academicBackgroundRepo, page, pageSize, new Pair<>("curriculumId", curriculumId)));
+        return handleExceptions(future, unitOfWork);
     }
 
     public CompletableFuture<AcademicBackground> addAcademicBackgroundToCurriculum (
@@ -45,9 +48,10 @@ public class AcademicBackgroundService {
         if(academicBackground.getAccountId() != accountId || academicBackground.getCurriculumId() != curriculumId)
             throw new ConflictException(ErrorMessages.BAD_REQUEST_IDS_MISMATCH);
         UnitOfWork unitOfWork = new UnitOfWork();
-        return curriculumService.getCurriculum(accountId, curriculumId, email)
+        CompletableFuture<AcademicBackground> future = curriculumService.getCurriculum(accountId, curriculumId, email)
                 .thenCompose(curriculum -> academicBackgroundRepo.create(unitOfWork, academicBackground))
                 .thenCompose(res -> unitOfWork.commit().thenApply(aVoid -> academicBackground));
+        return handleExceptions(future, unitOfWork);
     }
 
     public Mono<Void> updateAcademicBackground(
@@ -57,10 +61,11 @@ public class AcademicBackgroundService {
             String email
     ) {
         UnitOfWork unitOfWork = new UnitOfWork();
+        CompletableFuture<Void> future = curriculumService.getCurriculum(accountId, curriculumId, email)
+                .thenCompose(curriculum -> academicBackgroundRepo.update(unitOfWork, academicBackground))
+                .thenCompose(res -> unitOfWork.commit());
         return Mono.fromFuture(
-                curriculumService.getCurriculum(accountId, curriculumId, email)
-                        .thenCompose(curriculum -> academicBackgroundRepo.update(unitOfWork, academicBackground))
-                        .thenCompose(res -> unitOfWork.commit())
+                handleExceptions(future, unitOfWork)
         );
     }
 
@@ -71,9 +76,9 @@ public class AcademicBackgroundService {
             String email
     ) {
         UnitOfWork unitOfWork = new UnitOfWork();
-        return Mono.fromFuture(curriculumService.getCurriculum(accountId, curriculumId, email)
+        CompletableFuture<Void> future = curriculumService.getCurriculum(accountId, curriculumId, email)
                 .thenCompose(curriculum -> academicBackgroundRepo.deleteById(unitOfWork, academicBackgroundId))
-                .thenCompose(res -> unitOfWork.commit())
-        );
+                .thenCompose(res -> unitOfWork.commit());
+        return Mono.fromFuture(handleExceptions(future, unitOfWork));
     }
 }

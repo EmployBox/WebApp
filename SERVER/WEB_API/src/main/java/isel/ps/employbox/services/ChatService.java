@@ -17,6 +17,7 @@ import java.util.concurrent.CompletableFuture;
 
 import static isel.ps.employbox.ErrorMessages.BAD_REQUEST_IDS_MISMATCH;
 import static isel.ps.employbox.ErrorMessages.RESOURCE_NOT_FOUND_MESSAGE;
+import static isel.ps.employbox.services.ServiceUtils.handleExceptions;
 
 @Service
 public class ChatService {
@@ -44,43 +45,47 @@ public class ChatService {
 
     public CompletableFuture<Message> getAccountChatsMessage(long cid, long mid, String email) {
         UnitOfWork unitOfWork = new UnitOfWork();
-        return msgRepo.findById(unitOfWork, mid)
+        CompletableFuture<Message> future = msgRepo.findById(unitOfWork, mid)
                 .thenApply(omsg -> omsg.orElseThrow(() -> new ResourceNotFoundException(RESOURCE_NOT_FOUND_MESSAGE)))
                 .thenCompose(msg -> {
                     if (msg.getChatId() != cid)
                         throw new BadRequestException(BAD_REQUEST_IDS_MISMATCH);
                     return accountService.getAccount(msg.getAccountId(), email)//throws exceptions
                             .thenApply(account -> msg);
-                }).thenCompose( res -> unitOfWork.commit().thenApply( aVoid -> res));
+                }).thenCompose(res -> unitOfWork.commit().thenApply(aVoid -> res));
+        return handleExceptions(future, unitOfWork);
     }
 
     public CompletableFuture<Message> createNewChatMessage(long accountId, long chatId, Message msg, String email) {
         UnitOfWork unitOfWork = new UnitOfWork();
-        return accountService.getAccount(accountId, email)
+        CompletableFuture<Message> future = accountService.getAccount(accountId, email)
                 .thenCompose(account -> getChat(chatId))
                 .thenCompose(chat -> {
                     if (chat.getAccountIdFirst() != accountId)
                         throw new UnauthorizedException(ErrorMessages.UN_AUTHORIZED_MESSAGE);
                     return msgRepo.create(unitOfWork, msg);
-                }).thenCompose( res -> unitOfWork.commit().thenApply( aVoid -> msg));
+                }).thenCompose(res -> unitOfWork.commit().thenApply(aVoid -> msg));
+        return handleExceptions(future, unitOfWork);
     }
 
     private CompletableFuture<Chat> getChat(long chatId){
         UnitOfWork unitOfWork = new UnitOfWork();
-        return chatRepo.findById(unitOfWork, chatId)
-                .thenCompose(res -> unitOfWork.commit().thenApply( aVoid -> res))
-                .thenApply(ochat -> ochat.orElseThrow( () -> new ResourceNotFoundException(ErrorMessages.RESOURCE_NOT_FOUND_CHAT)));
+        CompletableFuture<Chat> future = chatRepo.findById(unitOfWork, chatId)
+                .thenCompose(res -> unitOfWork.commit().thenApply(aVoid -> res))
+                .thenApply(ochat -> ochat.orElseThrow(() -> new ResourceNotFoundException(ErrorMessages.RESOURCE_NOT_FOUND_CHAT)));
+        return handleExceptions(future, unitOfWork);
     }
 
     public Mono<Chat> createNewChat(long accountIdFrom, Chat inChat, String username) {
         UnitOfWork unitOfWork = new UnitOfWork();
+        CompletableFuture<Chat> future = CompletableFuture.allOf(
+                accountService.getAccount(accountIdFrom, username),
+                accountService.getAccount(inChat.getAccountIdSecond())
+        )
+                .thenCompose(aVoid -> chatRepo.create(unitOfWork, inChat))
+                .thenCompose(res -> unitOfWork.commit().thenApply(aVoid -> inChat));
         return Mono.fromFuture(
-                CompletableFuture.allOf(
-                        accountService.getAccount(accountIdFrom, username),
-                        accountService.getAccount(inChat.getAccountIdSecond())
-                )
-                        .thenCompose(aVoid -> chatRepo.create(unitOfWork, inChat))
-                        .thenCompose( res -> unitOfWork.commit().thenApply( aVoid -> inChat))
+                handleExceptions(future, unitOfWork)
         );
     }
 }

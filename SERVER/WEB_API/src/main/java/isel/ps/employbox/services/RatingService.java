@@ -14,6 +14,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
+import static isel.ps.employbox.services.ServiceUtils.handleExceptions;
+
 @Service
 public class RatingService {
     private final DataRepository<Rating, Rating.RatingKey> ratingRepo;
@@ -39,45 +41,50 @@ public class RatingService {
     public CompletableFuture<Rating> getRating(long accountFrom, long accountTo) {
         UnitOfWork unitOfWork = new UnitOfWork();
 
-        return ratingRepo.findById(unitOfWork, new Rating.RatingKey(accountFrom, accountTo))
-                .thenApply( orating -> {
-                    if(!orating.isPresent())
+        CompletableFuture<Rating> future = ratingRepo.findById(unitOfWork, new Rating.RatingKey(accountFrom, accountTo))
+                .thenApply(orating -> {
+                    if (!orating.isPresent())
                         throw new ResourceNotFoundException(ErrorMessages.RESOURCE_NOTFOUND_RATING);
-                    return orating.get(); })
-                .thenCompose( rating -> unitOfWork.commit().thenApply( __ -> rating));
+                    return orating.get();
+                })
+                .thenCompose(rating -> unitOfWork.commit().thenApply(__ -> rating));
+        return handleExceptions(future, unitOfWork);
     }
 
     public Mono<Void> updateRating(Rating rating, String email) {
         UnitOfWork unitOfWork = new UnitOfWork();
+        CompletableFuture<Void> future = CompletableFuture.allOf(
+                userAccountService.getUser(rating.getAccountIdFrom(), email),//throws exceptions
+                getRating(rating.getAccountIdFrom(), rating.getAccountIdTo())
+        )
+                .thenCompose(aVoid -> ratingRepo.update(unitOfWork, rating))
+                .thenCompose(aVoid -> unitOfWork.commit());
         return Mono.fromFuture(
-                CompletableFuture.allOf(
-                        userAccountService.getUser(rating.getAccountIdFrom(), email),//throws exceptions
-                        getRating(rating.getAccountIdFrom(), rating.getAccountIdTo())
-                )
-                        .thenCompose(aVoid -> ratingRepo.update(unitOfWork, rating))
-                        .thenCompose(aVoid -> unitOfWork.commit())
+                handleExceptions(future, unitOfWork)
         );
     }
 
     public Mono<Rating> createRating(Rating rating, String email) {
         UnitOfWork unitOfWork = new UnitOfWork();
+        CompletableFuture<Rating> future = CompletableFuture.allOf(
+                userAccountService.getUser(rating.getAccountIdFrom(), email),
+                userAccountService.getUser(rating.getAccountIdTo())
+        )
+                .thenCompose(aVoid -> ratingRepo.create(unitOfWork, rating))
+                .thenCompose(res -> unitOfWork.commit().thenApply(aVoid -> rating));
         return Mono.fromFuture(
-                CompletableFuture.allOf(
-                        userAccountService.getUser(rating.getAccountIdFrom(), email),
-                        userAccountService.getUser(rating.getAccountIdTo())
-                )
-                        .thenCompose(aVoid -> ratingRepo.create(unitOfWork, rating))
-                        .thenCompose(res -> unitOfWork.commit().thenApply( aVoid -> rating))
+                handleExceptions(future, unitOfWork)
         );
     }
 
     public Mono<Void> deleteRating(long accountIDFrom, long accountIDTo, String email) {
         UnitOfWork unitOfWork = new UnitOfWork();
+        CompletableFuture<Void> future = userAccountService.getUser(accountIDFrom, email)
+                .thenCompose(userAccount -> getRating(accountIDFrom, accountIDTo))
+                .thenCompose(rating -> ratingRepo.delete(unitOfWork, rating))
+                .thenCompose(aVoid -> unitOfWork.commit());
         return Mono.fromFuture(
-                userAccountService.getUser(accountIDFrom, email)
-                        .thenCompose(userAccount-> getRating(accountIDFrom, accountIDTo))
-                        .thenCompose(rating -> ratingRepo.delete(unitOfWork, rating))
-                        .thenCompose(aVoid -> unitOfWork.commit() )
+                handleExceptions(future, unitOfWork)
         );
     }
 }

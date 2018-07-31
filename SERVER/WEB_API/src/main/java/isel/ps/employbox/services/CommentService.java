@@ -15,6 +15,8 @@ import reactor.core.publisher.Mono;
 
 import java.util.concurrent.CompletableFuture;
 
+import static isel.ps.employbox.services.ServiceUtils.handleExceptions;
+
 @Service
 public class CommentService {
     private final DataRepository<Account, Long> accountRepo;
@@ -34,9 +36,9 @@ public class CommentService {
 
     public CompletableFuture<Comment> getComment(long accountFromId, long accountToId, long commentId, String email) {
         UnitOfWork unitOfWork = new UnitOfWork();
-        return accountService.getAccount(accountFromId, email)
+        CompletableFuture<Comment> future = accountService.getAccount(accountFromId, email)
                 .thenCompose(account -> commentRepo.findById(unitOfWork, commentId))
-                .thenCompose( res -> unitOfWork.commit().thenApply( aVoid -> res))
+                .thenCompose(res -> unitOfWork.commit().thenApply(aVoid -> res))
                 .thenApply(ocomment -> {
                             Comment comment = ocomment.orElseThrow(() -> new ResourceNotFoundException(ErrorMessages.RESOURCE_NOTFOUND_COMMENT));
                             if (comment.getAccountIdFrom() != accountFromId && comment.getAccountIdDest() != accountToId)
@@ -44,40 +46,44 @@ public class CommentService {
                             return comment;
                         }
                 );
+        return handleExceptions(future, unitOfWork);
     }
 
     public Mono<Void> updateComment(Comment comment, String username) {
         UnitOfWork unitOfWork = new UnitOfWork();
+        CompletableFuture<Void> future = getComment(comment.getAccountIdFrom(), comment.getAccountIdDest(), comment.getIdentityKey(), username)
+                .thenCompose(__ -> commentRepo.update(unitOfWork, comment))
+                .thenCompose(res -> unitOfWork.commit());
         return Mono.fromFuture(
-                getComment(comment.getAccountIdFrom(), comment.getAccountIdDest(), comment.getIdentityKey(), username)
-                        .thenCompose(__ -> commentRepo.update(unitOfWork, comment))
-                        .thenCompose( res -> unitOfWork.commit())
+                handleExceptions(future, unitOfWork)
         );
     }
 
     public CompletableFuture<Comment> createComment(Comment comment, String email) {
         UnitOfWork unitOfWork = new UnitOfWork();
-        return CompletableFuture.allOf(
+        CompletableFuture<Comment> future = CompletableFuture.allOf(
                 accountService.getAccount(comment.getAccountIdFrom(), email),
                 accountService.getAccount(comment.getAccountIdDest())
         )
                 .thenCompose(aVoid -> commentRepo.create(unitOfWork, comment))
-                .thenCompose( res -> unitOfWork.commit().thenApply( aVoid -> comment));
+                .thenCompose(res -> unitOfWork.commit().thenApply(aVoid -> comment));
+        return handleExceptions(future, unitOfWork);
     }
 
     public Mono<Void> deleteComment(long commentId, String email) {
         UnitOfWork unitOfWork = new UnitOfWork();
+        CompletableFuture<Void> future = commentRepo.findById(unitOfWork, commentId)
+                .thenCompose(ocomment -> {
+                    Comment comment = ocomment.orElseThrow(() -> new ResourceNotFoundException(ErrorMessages.RESOURCE_NOTFOUND_COMMENT));
+                    return accountRepo.findWhere(unitOfWork, new Pair<>("email", email))
+                            .thenCompose(list -> {
+                                if (comment.getAccountIdFrom() != list.get(0).getIdentityKey())
+                                    throw new UnauthorizedException(ErrorMessages.UN_AUTHORIZED);
+                                return commentRepo.deleteById(unitOfWork, commentId);
+                            });
+                }).thenCompose(aVoid -> unitOfWork.commit());
         return Mono.fromFuture(
-                commentRepo.findById(unitOfWork, commentId)
-                        .thenCompose(ocomment -> {
-                            Comment comment = ocomment.orElseThrow(() -> new ResourceNotFoundException(ErrorMessages.RESOURCE_NOTFOUND_COMMENT));
-                            return accountRepo.findWhere(unitOfWork, new Pair<>("email", email))
-                                    .thenCompose(list -> {
-                                        if (comment.getAccountIdFrom() != list.get(0).getIdentityKey())
-                                            throw new UnauthorizedException(ErrorMessages.UN_AUTHORIZED);
-                                        return commentRepo.deleteById(unitOfWork, commentId);
-                                    });
-                        }).thenCompose(aVoid -> unitOfWork.commit())
+                handleExceptions(future, unitOfWork)
         );
     }
 }

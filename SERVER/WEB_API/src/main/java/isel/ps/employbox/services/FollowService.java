@@ -14,6 +14,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
+import static isel.ps.employbox.services.ServiceUtils.handleExceptions;
+
 @Service
 public class FollowService {
     private final DataRepository<Follow, Follow.FollowKey> followsRepo;
@@ -37,8 +39,8 @@ public class FollowService {
     private CompletableFuture<CollectionPage<Account>> getAccountFromFollowAux(long followId, String collumn, int page, int pageSize) {
         UnitOfWork unitOfWork = new UnitOfWork();
 
-        return followsRepo.findWhere(unitOfWork, new Pair(collumn, followId))
-                .thenCompose( res -> unitOfWork.commit().thenApply( aVoid -> res))
+        CompletableFuture future = followsRepo.findWhere(unitOfWork, new Pair(collumn, followId))
+                .thenCompose(res -> unitOfWork.commit().thenApply(aVoid -> res))
                 .thenCompose(follow -> {
                     List<Pair<String, String>> pairs = new ArrayList<>();
                     ((List<Follow>) follow).forEach(curr -> pairs.add(new Pair("accountId", curr.getAccountIdFollowed())));
@@ -47,25 +49,28 @@ public class FollowService {
                             .toArray(Pair[]::new);
                     return ServiceUtils.getCollectionPageFuture(accountRepo, page, pageSize, query);
                 });
+        return handleExceptions(future, unitOfWork);
     }
 
     public Mono<Void> createFollower(long accountToBeFollowedId, long accountToFollowId, String username) {
         UnitOfWork unitOfWork = new UnitOfWork();
 
+        CompletableFuture<Void> future = accountService.getAccount(accountToFollowId, username)
+                .thenCompose(account -> followsRepo.create(unitOfWork, new Follow(accountToBeFollowedId, accountToFollowId)))
+                .thenCompose(aVoid -> unitOfWork.commit());
         return Mono.fromFuture(
-                accountService.getAccount(accountToFollowId, username)
-                        .thenCompose(account -> followsRepo.create(unitOfWork, new Follow(accountToBeFollowedId, accountToFollowId)))
-                        .thenCompose(aVoid -> unitOfWork.commit())
+                handleExceptions(future, unitOfWork)
         );
     }
 
     public Mono<Void> deleteFollower(long id, long fid, String username) {
         UnitOfWork unitOfWork = new UnitOfWork();
 
+        CompletableFuture<Void> future = accountService.getAccount(id, username)
+                .thenCompose(account -> followsRepo.deleteById(unitOfWork, new Follow.FollowKey(id, fid)))
+                .thenCompose(aVoid -> unitOfWork.commit());
         return Mono.fromFuture(
-                accountService.getAccount(id, username)
-                        .thenCompose(account -> followsRepo.deleteById(unitOfWork, new Follow.FollowKey(id, fid)))
-                        .thenCompose( aVoid -> unitOfWork.commit() )
+                handleExceptions(future, unitOfWork)
         );
     }
 }

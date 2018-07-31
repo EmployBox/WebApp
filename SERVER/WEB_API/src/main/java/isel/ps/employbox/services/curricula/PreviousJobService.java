@@ -17,6 +17,8 @@ import reactor.core.publisher.Mono;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
+import static isel.ps.employbox.services.ServiceUtils.handleExceptions;
+
 @Service
 public class PreviousJobService {
     private final DataRepository<PreviousJobs, Long> previousJobsRepo;
@@ -31,10 +33,11 @@ public class PreviousJobService {
 
     public CompletableFuture<CollectionPage<PreviousJobs>> getCurriculumPreviousJobs(long curriculumId, int page, int pageSize) {
         UnitOfWork unitOfWork = new UnitOfWork();
-        return curriculumRepo.findById(unitOfWork, curriculumId)
-                .thenCompose( res -> unitOfWork.commit().thenApply( aVoid -> res))
+        CompletableFuture<CollectionPage<PreviousJobs>> future = curriculumRepo.findById(unitOfWork, curriculumId)
+                .thenCompose(res -> unitOfWork.commit().thenApply(aVoid -> res))
                 .thenApply(ocurriculum -> ocurriculum.orElseThrow(() -> new ResourceNotFoundException(ErrorMessages.RESOURCE_NOTFOUND_CURRICULUM)))
-                .thenCompose(__ -> ServiceUtils.getCollectionPageFuture( previousJobsRepo, page, pageSize, new Pair<>("curriculumId", curriculumId)));
+                .thenCompose(__ -> ServiceUtils.getCollectionPageFuture(previousJobsRepo, page, pageSize, new Pair<>("curriculumId", curriculumId)));
+        return handleExceptions(future, unitOfWork);
     }
 
     public CompletableFuture<PreviousJobs> addPreviousJobToCurriculum (
@@ -46,9 +49,10 @@ public class PreviousJobService {
         if(previousJobs.getAccountId() != accountId || previousJobs.getCurriculumId() != curriculumId)
             throw new ConflictException(ErrorMessages.BAD_REQUEST_IDS_MISMATCH);
         UnitOfWork unitOfWork = new UnitOfWork();
-        return curriculumService.getCurriculum(accountId, curriculumId,email)
+        CompletableFuture<PreviousJobs> future = curriculumService.getCurriculum(accountId, curriculumId, email)
                 .thenCompose(curriculum -> previousJobsRepo.create(unitOfWork, previousJobs))
-                .thenCompose( res -> unitOfWork.commit().thenApply( aVoid -> previousJobs));
+                .thenCompose(res -> unitOfWork.commit().thenApply(aVoid -> previousJobs));
+        return handleExceptions(future, unitOfWork);
     }
 
     public Mono<Void> updatePreviousJob(
@@ -61,10 +65,10 @@ public class PreviousJobService {
         if(previousJobs.getAccountId() != pvjId)
             throw new BadRequestException(ErrorMessages.BAD_REQUEST_IDS_MISMATCH);
         UnitOfWork unitOfWork = new UnitOfWork();
-        return Mono.fromFuture(curriculumService.getCurriculum(accountId, curriculumId, email)
+        CompletableFuture<Void> future = curriculumService.getCurriculum(accountId, curriculumId, email)
                 .thenCompose(curriculum -> previousJobsRepo.update(unitOfWork, previousJobs))
-                .thenCompose( res -> unitOfWork.commit())
-        );
+                .thenCompose(res -> unitOfWork.commit());
+        return Mono.fromFuture(handleExceptions(future, unitOfWork));
     }
 
     public Mono<Void> deletePreviousJob(
@@ -74,10 +78,11 @@ public class PreviousJobService {
             String email
     ) {
         UnitOfWork unitOfWork = new UnitOfWork();
+        CompletableFuture<Void> future = curriculumService.getCurriculum(accountId, curriculumId, email)
+                .thenCompose(curriculum -> previousJobsRepo.deleteById(unitOfWork, previousJobId))
+                .thenCompose(res -> unitOfWork.commit());
         return Mono.fromFuture(
-                curriculumService.getCurriculum(accountId, curriculumId, email)
-                        .thenCompose(curriculum -> previousJobsRepo.deleteById(unitOfWork, previousJobId))
-                        .thenCompose( res -> unitOfWork.commit())
+                handleExceptions(future, unitOfWork)
         );
     }
 

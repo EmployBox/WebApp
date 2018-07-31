@@ -18,6 +18,8 @@ import reactor.core.publisher.Mono;
 
 import java.util.concurrent.CompletableFuture;
 
+import static isel.ps.employbox.services.ServiceUtils.handleExceptions;
+
 @Service
 public class ProjectService {
     private final DataRepository<Project, Long> projectRepo;
@@ -32,10 +34,11 @@ public class ProjectService {
 
     public CompletableFuture<CollectionPage<Project>> getCurriculumProjects(long curriculumId, int page, int pageSize) {
         UnitOfWork unitOfWork = new UnitOfWork();
-        return curriculumRepo.findById(unitOfWork, curriculumId)
-                .thenCompose( res -> unitOfWork.commit().thenApply( aVoid -> res))
+        CompletableFuture<CollectionPage<Project>> future = curriculumRepo.findById(unitOfWork, curriculumId)
+                .thenCompose(res -> unitOfWork.commit().thenApply(aVoid -> res))
                 .thenApply(ocurriculum -> ocurriculum.orElseThrow(() -> new ResourceNotFoundException(ErrorMessages.RESOURCE_NOTFOUND_CURRICULUM)))
                 .thenCompose(__ -> ServiceUtils.getCollectionPageFuture(projectRepo, page, pageSize, new Pair<>("curriculumId", curriculumId)));
+        return handleExceptions(future, unitOfWork);
     }
 
     public CompletableFuture<Project> addProjectToCurriculum (
@@ -47,9 +50,10 @@ public class ProjectService {
         if(project.getAccountId() != accountId || project.getCurriculumId() != curriculumId)
             throw new ConflictException(ErrorMessages.BAD_REQUEST_IDS_MISMATCH);
         UnitOfWork unitOfWork = new UnitOfWork();
-        return curriculumService.getCurriculum(accountId, curriculumId,email)
+        CompletableFuture<Project> future = curriculumService.getCurriculum(accountId, curriculumId, email)
                 .thenCompose(curriculum -> projectRepo.create(unitOfWork, project))
-                .thenCompose( res -> unitOfWork.commit().thenApply( aVoid -> project));
+                .thenCompose(res -> unitOfWork.commit().thenApply(aVoid -> project));
+        return handleExceptions(future, unitOfWork);
     }
 
     public Mono<Void> updateProject(
@@ -62,10 +66,10 @@ public class ProjectService {
         if(project.getIdentityKey() != projectId)
             throw new BadRequestException(ErrorMessages.BAD_REQUEST_IDS_MISMATCH);
         UnitOfWork unitOfWork = new UnitOfWork();
-        return Mono.fromFuture(curriculumService.getCurriculum(accountId, curriculumId, email)
+        CompletableFuture<Void> future = curriculumService.getCurriculum(accountId, curriculumId, email)
                 .thenCompose(curriculum -> projectRepo.update(unitOfWork, project))
-                .thenCompose( res -> unitOfWork.commit())
-        );
+                .thenCompose(res -> unitOfWork.commit());
+        return Mono.fromFuture(handleExceptions(future, unitOfWork));
     }
 
     public Mono<Void> deleteProject(
@@ -75,10 +79,11 @@ public class ProjectService {
             String email
     ) {
         UnitOfWork unitOfWork = new UnitOfWork();
+        CompletableFuture<Void> future = curriculumService.getCurriculum(accountId, curriculumId, email)
+                .thenCompose(curriculum -> projectRepo.deleteById(unitOfWork, projectId))
+                .thenCompose(res -> unitOfWork.commit());
         return Mono.fromFuture(
-                curriculumService.getCurriculum(accountId, curriculumId, email)
-                        .thenCompose(curriculum -> projectRepo.deleteById(unitOfWork, projectId))
-                        .thenCompose( res -> unitOfWork.commit())
+                handleExceptions(future, unitOfWork)
         );
     }
 }

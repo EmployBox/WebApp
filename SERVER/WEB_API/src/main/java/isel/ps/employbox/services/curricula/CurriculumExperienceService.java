@@ -16,6 +16,8 @@ import reactor.core.publisher.Mono;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
+import static isel.ps.employbox.services.ServiceUtils.handleExceptions;
+
 @Service
 public class CurriculumExperienceService {
     private final DataRepository<Curriculum, Long> curriculumRepo;
@@ -31,10 +33,11 @@ public class CurriculumExperienceService {
 
     public CompletableFuture<CollectionPage<CurriculumExperience>> getCurriculumExperiences(long curriculumId, int page, int pageSize) {
         UnitOfWork unitOfWork = new UnitOfWork();
-        return curriculumRepo.findById(unitOfWork, curriculumId)
+        CompletableFuture<CollectionPage<CurriculumExperience>> future = curriculumRepo.findById(unitOfWork, curriculumId)
                 .thenCompose(res -> unitOfWork.commit().thenApply(aVoid -> res))
                 .thenApply(ocurriculum -> ocurriculum.orElseThrow(() -> new ResourceNotFoundException(ErrorMessages.RESOURCE_NOTFOUND_CURRICULUM)))
-                .thenCompose(__ -> ServiceUtils.getCollectionPageFuture( curriculumExperienceRepo, page, pageSize, new Pair<>("curriculumId", curriculumId)));
+                .thenCompose(__ -> ServiceUtils.getCollectionPageFuture(curriculumExperienceRepo, page, pageSize, new Pair<>("curriculumId", curriculumId)));
+        return handleExceptions(future, unitOfWork);
     }
 
     public CompletableFuture<CurriculumExperience> addCurriculumExperience(
@@ -46,10 +49,11 @@ public class CurriculumExperienceService {
         if (curriculumExperience.getAccountId() != accountId || curriculumExperience.getCurriculumId() != curriculumId)
             throw new ConflictException(ErrorMessages.BAD_REQUEST_IDS_MISMATCH);
         UnitOfWork unitOfWork = new UnitOfWork();
-        return curriculumService.getCurriculum(accountId, curriculumId, email)
+        CompletableFuture<CurriculumExperience> future = curriculumService.getCurriculum(accountId, curriculumId, email)
                 .thenCompose(res -> unitOfWork.commit().thenApply(aVoid -> res))
                 .thenCompose(curriculum -> curriculumExperienceRepo.create(unitOfWork, curriculumExperience))
                 .thenApply(res -> curriculumExperience);
+        return handleExceptions(future, unitOfWork);
     }
 
     public Mono<Void> updateCurriculumExperience(
@@ -59,10 +63,10 @@ public class CurriculumExperienceService {
             String email
     ) {
         UnitOfWork unitOfWork = new UnitOfWork();
-        return Mono.fromFuture(curriculumService.getCurriculum(accountId, curriculumId, email)
+        CompletableFuture<Void> future = curriculumService.getCurriculum(accountId, curriculumId, email)
                 .thenCompose(curriculum -> curriculumExperienceRepo.update(unitOfWork, curriculumExperience))
-                .thenCompose(res -> unitOfWork.commit())
-        );
+                .thenCompose(res -> unitOfWork.commit());
+        return Mono.fromFuture(handleExceptions(future, unitOfWork));
     }
 
     public Mono<Void> deleteCurriculumExperience(
@@ -72,10 +76,11 @@ public class CurriculumExperienceService {
             String email
     ) {
         UnitOfWork unitOfWork = new UnitOfWork();
+        CompletableFuture<Void> future = curriculumService.getCurriculum(accountId, curriculumId, email)
+                .thenCompose(curriculum -> curriculumExperienceRepo.deleteById(unitOfWork, curriculumExperienceId))
+                .thenCompose(res -> unitOfWork.commit());
         return Mono.fromFuture(
-                curriculumService.getCurriculum(accountId, curriculumId, email)
-                        .thenCompose(curriculum -> curriculumExperienceRepo.deleteById(unitOfWork, curriculumExperienceId))
-                        .thenCompose(res -> unitOfWork.commit())
+                handleExceptions(future, unitOfWork)
         );
     }
 }

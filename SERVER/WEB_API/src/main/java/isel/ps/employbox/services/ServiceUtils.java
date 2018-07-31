@@ -22,8 +22,8 @@ public class ServiceUtils {
             Pair<String, Object>... query
     ) {
         UnitOfWork unitOfWork = new UnitOfWork(TransactionIsolation.SERIALIZABLE);
-        return repo.findWhere(unitOfWork, page, pageSize, query)
-                .thenCompose(tList -> getCollectionPageCF(repo, page, pageSize, unitOfWork, tList, query));
+        return handleExceptions(repo.findWhere(unitOfWork, page, pageSize, query)
+                .thenCompose(tList -> getCollectionPageCF(repo, page, pageSize, unitOfWork, tList, query)), unitOfWork);
     }
 
     private static <T extends DomainObject<K>, K> CompletableFuture<CollectionPage<T>> getCollectionPageCF(DataRepository<T, K> repo, int page, int pageSize,

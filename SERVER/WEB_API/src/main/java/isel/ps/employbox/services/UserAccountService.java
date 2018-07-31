@@ -84,7 +84,7 @@ public class UserAccountService {
     public CompletableFuture<CollectionPage<Application>> getAllApplications(long accountId, int page, int pageSize) {
         UnitOfWork unit = new UnitOfWork();
 
-        return userRepo.findById(unit, accountId)
+        CompletableFuture<CollectionPage<Application>> future = userRepo.findById(unit, accountId)
                 .thenApply(ouser -> ouser.orElseThrow(() -> new ResourceNotFoundException(ErrorMessages.RESOURCE_NOTFOUND_USER)))
                 .thenCompose(ignored -> applicationRepo.findWhere(unit, page, pageSize, new Pair<>("accountId", accountId))
                         .thenCompose(listRes -> applicationRepo.getNumberOfEntries(unit, new Pair<>("accountId", accountId))
@@ -95,34 +95,40 @@ public class UserAccountService {
                                         page,
                                         listRes
                                 ))));
+        return handleExceptions(future, unit);
     }
 
     public CompletableFuture<UserAccount> createUser(UserAccount userAccount) {
         UnitOfWork unit = new UnitOfWork();
-        return userRepo.create(unit, userAccount)
+
+        CompletableFuture<UserAccount> future = userRepo.create(unit, userAccount)
                 .thenCompose(aVoid -> unit.commit())
                 .thenApply(res -> userAccount)
                 .exceptionally(throwable -> {
                     throw new ConflictException(ErrorMessages.CONFLIT_USERNAME_TAKEN);
                 });
+
+        return handleExceptions(future, unit);
     }
 
     public CompletableFuture<Application> createApplication(long userId, Application application, String email) {
         if (application.getAccountId() != userId) throw new BadRequestException(ErrorMessages.BAD_REQUEST_IDS_MISMATCH);
 
         UnitOfWork unit = new UnitOfWork();
-        return getUser(userId, email)
+        CompletableFuture<Application> future = getUser(userId, email)
                 .thenCompose(userAccount -> applicationRepo.create(unit, application))
                 .thenCompose(aVoid -> unit.commit())
                 .thenApply(res -> application);
+        return handleExceptions(future, unit);
     }
 
     public Mono<Void> updateUser(UserAccount userAccount, String email) {
         UnitOfWork unit = new UnitOfWork();
+        CompletableFuture<Void> future = getUser(userAccount.getIdentityKey(), email)
+                .thenCompose(userAccount1 -> userRepo.update(unit, userAccount)
+                        .thenCompose(aVoid -> unit.commit()));
         return Mono.fromFuture(
-                getUser(userAccount.getIdentityKey(), email)
-                        .thenCompose(userAccount1 -> userRepo.update(unit, userAccount)
-                        .thenCompose(aVoid -> unit.commit()))
+                handleExceptions(future, unit)
         );
     }
 
@@ -130,36 +136,39 @@ public class UserAccountService {
         if(apId != application.getIdentityKey())
             throw new BadRequestException(BAD_REQUEST_IDS_MISMATCH);
         UnitOfWork unit = new UnitOfWork();
+        CompletableFuture<Void> future = getUser(application.getAccountId(), email)
+                .thenCompose(userAccount -> getApplication(application.getAccountId(), application.getJobId(), application.getIdentityKey()))
+                .thenCompose(application1 -> applicationRepo.update(unit, application)
+                        .thenCompose(aVoid -> unit.commit()));
         return Mono.fromFuture(
-                getUser(application.getAccountId(), email)
-                        .thenCompose(userAccount -> getApplication(application.getAccountId(), application.getJobId(), application.getIdentityKey()))
-                        .thenCompose(application1 -> applicationRepo.update(unit, application)
-                        .thenCompose(aVoid -> unit.commit()))
+                handleExceptions(future, unit)
         );
     }
 
     public Mono<Void> deleteUser(long id, String email) {
         UnitOfWork unit = new UnitOfWork();
+        CompletableFuture<Void> future = getUser(id, email)
+                //TODO remove entries from other tables where user has foreign key
+                .thenCompose(userAccount -> userAccount.getApplications().apply(unit)
+                        .thenCompose(applications -> {
+                            List<Long> applicationIds = applications.stream().map(Application::getIdentityKey).collect(Collectors.toList());
+                            return applicationRepo.deleteAll(unit, applicationIds);
+                        })
+                        .thenCompose(aVoid -> userRepo.delete(unit, userAccount))
+                        .thenCompose(aVoid -> unit.commit()));
         return Mono.fromFuture(
-                getUser(id, email)
-                        //TODO remove entries from other tables where user has foreign key
-                        .thenCompose(userAccount -> userAccount.getApplications().apply(unit)
-                                .thenCompose(applications -> {
-                                    List<Long> applicationIds = applications.stream().map(Application::getIdentityKey).collect(Collectors.toList());
-                                    return applicationRepo.deleteAll(unit, applicationIds);
-                                })
-                                .thenCompose(aVoid -> userRepo.delete(unit, userAccount))
-                                .thenCompose(aVoid -> unit.commit()))
+                handleExceptions(future, unit)
         );
     }
 
     public Mono<Void> deleteApplication(long userId, long jobId,long apId, String email) {
         UnitOfWork unit = new UnitOfWork();
+        CompletableFuture<Void> future = getUser(userId, email)
+                .thenCompose(userAccount -> getApplication(userId, jobId, apId))
+                .thenCompose(application -> applicationRepo.delete(unit, application))
+                .thenCompose(aVoid -> unit.commit());
         return Mono.fromFuture(
-                getUser(userId, email)
-                        .thenCompose(userAccount -> getApplication(userId, jobId, apId))
-                        .thenCompose(application -> applicationRepo.delete(unit, application))
-                        .thenCompose(aVoid -> unit.commit())
+                handleExceptions(future, unit)
         );
     }
 }
