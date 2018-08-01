@@ -1,14 +1,16 @@
 package isel.ps.employbox.services;
 
-import com.github.jayield.rapper.DataRepository;
 import com.github.jayield.rapper.DomainObject;
+import com.github.jayield.rapper.mapper.DataMapper;
+import com.github.jayield.rapper.unitofwork.UnitOfWork;
 import com.github.jayield.rapper.utils.Pair;
-import com.github.jayield.rapper.utils.UnitOfWork;
 import io.vertx.ext.sql.TransactionIsolation;
 import isel.ps.employbox.model.binders.CollectionPage;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+
+import static com.github.jayield.rapper.mapper.MapperRegistry.getMapper;
 
 public class ServiceUtils {
 
@@ -16,19 +18,21 @@ public class ServiceUtils {
     }
 
     public static <T extends DomainObject<K>, K> CompletableFuture<CollectionPage<T>> getCollectionPageFuture(
-            DataRepository<T, K> repo,
+            Class<T> tClass,
             int page,
             int pageSize,
             Pair<String, Object>... query
     ) {
         UnitOfWork unitOfWork = new UnitOfWork(TransactionIsolation.SERIALIZABLE);
-        return handleExceptions(repo.findWhere(unitOfWork, page, pageSize, query)
-                .thenCompose(tList -> getCollectionPageCF(repo, page, pageSize, unitOfWork, tList, query)), unitOfWork);
+        DataMapper<T, K> mapper = getMapper(tClass, unitOfWork);
+
+        return handleExceptions(mapper.findWhere(page, pageSize, query)
+                .thenCompose(tList -> getCollectionPageCF(mapper, page, pageSize, unitOfWork, tList, query)), unitOfWork);
     }
 
-    private static <T extends DomainObject<K>, K> CompletableFuture<CollectionPage<T>> getCollectionPageCF(DataRepository<T, K> repo, int page, int pageSize,
+    private static <T extends DomainObject<K>, K> CompletableFuture<CollectionPage<T>> getCollectionPageCF(DataMapper<T, K> repo, int page, int pageSize,
                                                                                                            UnitOfWork unitOfWork, List<T> tList, Pair<String, Object>[] query) {
-        return repo.getNumberOfEntries(unitOfWork, query)
+        return repo.getNumberOfEntries(query)
                 .thenCompose(aLong -> {
                     CollectionPage<T> collectionPage = new CollectionPage<>(aLong, pageSize, page, tList);
                     return unitOfWork.commit().thenApply(aVoid -> collectionPage);

@@ -1,6 +1,5 @@
 package isel.ps.employbox.controllers.curricula;
 
-import com.github.jayield.rapper.DataRepository;
 import isel.ps.employbox.exceptions.BadRequestException;
 import isel.ps.employbox.model.binders.curricula.*;
 import isel.ps.employbox.model.entities.*;
@@ -19,20 +18,17 @@ import static isel.ps.employbox.ErrorMessages.BAD_REQUEST_IDS_MISMATCH;
 @RestController
 @RequestMapping("/accounts/users/{id}/curricula")
 public class CurriculumController {
-    private final DataRepository <CurriculumExperience, Long> currExpRepo;
     private final CurriculumBinder curriculumBinder;
     private final CurriculumExperienceBinder curriculumExperienceBinder;
     private final CurriculumService curriculumService;
     private final CurriculumExperienceService curriculumExperienceService;
 
     public CurriculumController(
-            DataRepository<CurriculumExperience, Long> curriculumExperienceLongDataRepository,
             CurriculumService userService,
             CurriculumBinder curriculumBinder,
             CurriculumExperienceBinder curriculumExperienceBinder,
             CurriculumExperienceService curriculumExperienceService
     ) {
-        this.currExpRepo = curriculumExperienceLongDataRepository;
         this.curriculumService = userService;
         this.curriculumBinder = curriculumBinder;
         this.curriculumExperienceBinder = curriculumExperienceBinder;

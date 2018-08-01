@@ -8,6 +8,8 @@ import org.springframework.stereotype.Component;
 
 import java.util.concurrent.CompletableFuture;
 
+import static isel.ps.employbox.services.ServiceUtils.handleExceptions;
+
 @Component
 public class JobBinder implements ModelBinder<Job, OutJob, InJob> {
     @Override
@@ -15,7 +17,7 @@ public class JobBinder implements ModelBinder<Job, OutJob, InJob> {
         UnitOfWork unitOfWork = new UnitOfWork();
         AccountBinder accountBinder = new AccountBinder();
 
-        return job.getAccount()
+        CompletableFuture<OutJob> future = job.getAccount()
                 .getForeignObject(unitOfWork)
                 .thenCompose(account1 -> unitOfWork.commit().thenApply(aVoid -> account1))
                 .thenCompose(accountBinder::bindOutput)
@@ -31,6 +33,8 @@ public class JobBinder implements ModelBinder<Job, OutJob, InJob> {
                         job.getOfferEndDate(),
                         job.getOfferType()
                 ));
+
+        return handleExceptions(future, unitOfWork);
     }
 
     @Override
