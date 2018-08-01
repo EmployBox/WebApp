@@ -1,22 +1,21 @@
 package isel.ps.employbox.model.entities;
 
 
-import com.github.jayield.rapper.ColumnName;
 import com.github.jayield.rapper.DomainObject;
-import com.github.jayield.rapper.Id;
-import com.github.jayield.rapper.Version;
+import com.github.jayield.rapper.annotations.ColumnName;
+import com.github.jayield.rapper.annotations.Id;
+import com.github.jayield.rapper.annotations.Version;
 import com.github.jayield.rapper.exceptions.DataMapperException;
-import com.github.jayield.rapper.utils.Foreign;
-import com.github.jayield.rapper.utils.UnitOfWork;
-import isel.ps.employbox.model.binders.AccountBinder;
-import isel.ps.employbox.model.output.OutAccount;
+import com.github.jayield.rapper.mapper.externals.Foreign;
+import com.github.jayield.rapper.unitofwork.UnitOfWork;
 
 import java.sql.Timestamp;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
 
-import static com.github.jayield.rapper.utils.MapperRegistry.getRepository;
+import static com.github.jayield.rapper.mapper.MapperRegistry.getMapper;
+
 
 public class Job implements DomainObject<Long> {
 
@@ -94,7 +93,9 @@ public class Job implements DomainObject<Long> {
             List<JobExperience> experiences,
             long version
     ) {
-        this.account = new Foreign<>(accountId, unit -> getRepository(Account.class).findById(unit, accountId)
+        UnitOfWork unitOfWork = new UnitOfWork();
+        //todo fix
+        this.account = new Foreign(accountId, unit -> getMapper(Account.class, unit).findById( accountId)
                 .thenApply(account1 -> account1.orElseThrow(() -> new DataMapperException("Account not Found"))));
         this.jobId = jobId;
         this.title = title;

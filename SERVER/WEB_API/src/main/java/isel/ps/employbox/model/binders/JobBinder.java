@@ -1,6 +1,6 @@
 package isel.ps.employbox.model.binders;
 
-import com.github.jayield.rapper.utils.UnitOfWork;
+import com.github.jayield.rapper.unitofwork.UnitOfWork;
 import isel.ps.employbox.model.entities.Job;
 import isel.ps.employbox.model.input.InJob;
 import isel.ps.employbox.model.output.OutJob;
@@ -18,7 +18,7 @@ public class JobBinder implements ModelBinder<Job, OutJob, InJob> {
         AccountBinder accountBinder = new AccountBinder();
 
         CompletableFuture<OutJob> future = job.getAccount()
-                .getForeignObject(unitOfWork)
+                .getForeignObject()
                 .thenCompose(account1 -> unitOfWork.commit().thenApply(aVoid -> account1))
                 .thenCompose(accountBinder::bindOutput)
                 .thenApply(outAccount -> new OutJob(

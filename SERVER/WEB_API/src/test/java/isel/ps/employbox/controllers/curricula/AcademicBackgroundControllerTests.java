@@ -2,9 +2,9 @@ package isel.ps.employbox.controllers.curricula;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.jayield.rapper.DataRepository;
+import com.github.jayield.rapper.mapper.DataMapper;
+import com.github.jayield.rapper.unitofwork.UnitOfWork;
 import com.github.jayield.rapper.utils.Pair;
-import com.github.jayield.rapper.utils.UnitOfWork;
 import isel.ps.employbox.exceptions.ResourceNotFoundException;
 import isel.ps.employbox.model.entities.Curriculum;
 import isel.ps.employbox.model.entities.UserAccount;
@@ -26,9 +26,9 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
-import java.sql.SQLException;
 import java.util.List;
 
+import static com.github.jayield.rapper.mapper.MapperRegistry.getMapper;
 import static isel.ps.employbox.DataBaseUtils.prepareDB;
 import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.assertFalse;
@@ -36,7 +36,7 @@ import static org.springframework.restdocs.webtestclient.WebTestClientRestDocume
 import static org.springframework.restdocs.webtestclient.WebTestClientRestDocumentation.documentationConfiguration;
 import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.springSecurity;
 import static org.springframework.web.reactive.function.client.ExchangeFilterFunctions.basicAuthentication;
-
+//todo fix commits
 @RunWith(SpringRunner.class)
 @SpringBootTest
 public class AcademicBackgroundControllerTests {
@@ -46,18 +46,18 @@ public class AcademicBackgroundControllerTests {
     @Autowired
     private ApplicationContext context;
     @Autowired
-    private DataRepository<UserAccount, Long> userAccountRepo;
+    private DataMapper<UserAccount, Long> userAccountRepo = getMapper(UserAccount.class, new UnitOfWork());
     @Autowired
-    private DataRepository<Curriculum, Long> curriculumRepo;
+    private DataMapper<Curriculum, Long> curriculumRepo = getMapper(Curriculum.class, new UnitOfWork());
     @Autowired
-    private DataRepository<AcademicBackground, Long> academicBackgroundRepo;
+    private DataMapper<AcademicBackground, Long> academicBackgroundRepo = getMapper(AcademicBackground.class, new UnitOfWork());
     private WebTestClient webTestClient;
     private UserAccount userAccount;
     private Curriculum curriculum;
     private AcademicBackground academicBackground;
 
     @Before
-    public void setUp() throws SQLException {
+    public void setUp() {
         prepareDB();
         webTestClient = WebTestClient.bindToApplicationContext(context)
                 .apply(springSecurity())
@@ -66,15 +66,15 @@ public class AcademicBackgroundControllerTests {
                 .filter(documentationConfiguration(restDocumentation))
                 .build();
         UnitOfWork unitOfWork = new UnitOfWork();
-        List<UserAccount> userAccounts = userAccountRepo.findWhere(unitOfWork, new Pair<>("name", "Bruno")).join();
+        List<UserAccount> userAccounts = userAccountRepo.findWhere( new Pair<>("name", "Bruno")).join();
         assertEquals(1, userAccounts.size());
         userAccount = userAccounts.get(0);
 
-        List<Curriculum> curricula = curriculumRepo.findWhere(unitOfWork, new Pair<>("title", "Engenharia Civil")).join();
+        List<Curriculum> curricula = curriculumRepo.findWhere(new Pair<>("title", "Engenharia Civil")).join();
         assertEquals(1, curricula.size());
         curriculum = curricula.get(0);
 
-        List<AcademicBackground> academicBackgrounds = academicBackgroundRepo.findWhere(unitOfWork, new Pair<>("institution", "ISEL")).join();
+        List<AcademicBackground> academicBackgrounds = academicBackgroundRepo.findWhere( new Pair<>("institution", "ISEL")).join();
         assertEquals(1, academicBackgrounds.size());
         academicBackground = academicBackgrounds.get(0);
         unitOfWork.commit().join();
@@ -130,7 +130,7 @@ public class AcademicBackgroundControllerTests {
                 .expectBody()
                 .consumeWith(document("createAcademicBackground"));
 
-        assertEquals(1, academicBackgroundRepo.findWhere(unitOfWork, new Pair<>("degreeObtained", "bachelor")).join().size());
+        assertEquals(1, academicBackgroundRepo.findWhere( new Pair<>("degreeObtained", "bachelor")).join().size());
         unitOfWork.commit().join();
     }
 
@@ -181,7 +181,7 @@ public class AcademicBackgroundControllerTests {
                 .consumeWith(document("updateAcademicBackground"));
         UnitOfWork unitOfWork = new UnitOfWork();
         AcademicBackground updatedAcademicBackground = academicBackgroundRepo
-                .findById(unitOfWork, academicBackground.getIdentityKey()).join().orElseThrow(() -> new ResourceNotFoundException("AcademicBackground not found"));
+                .findById(academicBackground.getIdentityKey()).join().orElseThrow(() -> new ResourceNotFoundException("AcademicBackground not found"));
         unitOfWork.commit().join();
 
         assertEquals("ISEL 2.0", updatedAcademicBackground.getInstitution());
@@ -210,7 +210,7 @@ public class AcademicBackgroundControllerTests {
                 .expectBody()
                 .consumeWith(document("deleteAcademicBackground"));
         UnitOfWork unitOfWork = new UnitOfWork();
-        assertFalse(academicBackgroundRepo.findById(unitOfWork, academicBackground.getIdentityKey()).join().isPresent());
+        assertFalse(academicBackgroundRepo.findById(academicBackground.getIdentityKey()).join().isPresent());
         unitOfWork.commit().join();
     }
 }

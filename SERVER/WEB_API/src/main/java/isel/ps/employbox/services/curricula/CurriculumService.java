@@ -2,7 +2,6 @@ package isel.ps.employbox.services.curricula;
 
 import com.github.jayield.rapper.DomainObject;
 import com.github.jayield.rapper.mapper.DataMapper;
-import com.github.jayield.rapper.mapper.MapperRegistry;
 import com.github.jayield.rapper.unitofwork.UnitOfWork;
 import com.github.jayield.rapper.utils.Pair;
 import io.vertx.ext.sql.TransactionIsolation;
@@ -123,6 +122,7 @@ public class CurriculumService {
         List<Curriculum> curriculum = new ArrayList<>(1);
 
         UnitOfWork unitOfWork = new UnitOfWork();
+
         DataMapper<AcademicBackground, Long> academicBackgroundMapper = getMapper(AcademicBackground.class, unitOfWork);
         DataMapper<Project, Long> projectMapper = getMapper(Project.class, unitOfWork);
         DataMapper<PreviousJobs, Long> previousJobsMapper = getMapper(PreviousJobs.class, unitOfWork);

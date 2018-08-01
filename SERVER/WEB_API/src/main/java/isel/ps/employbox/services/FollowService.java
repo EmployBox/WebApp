@@ -1,8 +1,9 @@
 package isel.ps.employbox.services;
 
-import com.github.jayield.rapper.DataRepository;
+
+import com.github.jayield.rapper.mapper.DataMapper;
+import com.github.jayield.rapper.unitofwork.UnitOfWork;
 import com.github.jayield.rapper.utils.Pair;
-import com.github.jayield.rapper.utils.UnitOfWork;
 import isel.ps.employbox.model.binders.CollectionPage;
 import isel.ps.employbox.model.entities.Account;
 import isel.ps.employbox.model.entities.Follow;
@@ -10,21 +11,17 @@ import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
+import static com.github.jayield.rapper.mapper.MapperRegistry.getMapper;
 import static isel.ps.employbox.services.ServiceUtils.handleExceptions;
 
 @Service
 public class FollowService {
-    private final DataRepository<Follow, Follow.FollowKey> followsRepo;
-    private final DataRepository<Account, Long> accountRepo;
     private final AccountService accountService;
 
-    public FollowService(DataRepository<Follow, Follow.FollowKey> followeRepo, DataRepository<Account, Long> accountRepo1, AccountService accountRepo) {
-        this.followsRepo = followeRepo;
-        this.accountRepo = accountRepo1;
+    public FollowService(AccountService accountRepo) {
         this.accountService = accountRepo;
     }
 
@@ -38,8 +35,8 @@ public class FollowService {
 
     private CompletableFuture<CollectionPage<Account>> getAccountFromFollowAux(long followId, String collumn, int page, int pageSize) {
         UnitOfWork unitOfWork = new UnitOfWork();
-
-        CompletableFuture future = followsRepo.findWhere(unitOfWork, new Pair(collumn, followId))
+        DataMapper<Follow, Follow.FollowKey> followMapper = getMapper(Follow.class, unitOfWork);
+        CompletableFuture future = followMapper.findWhere(new Pair(collumn, followId))
                 .thenCompose(res -> unitOfWork.commit().thenApply(aVoid -> res))
                 .thenCompose(follow -> {
                     List<Pair<String, String>> pairs = new ArrayList<>();
@@ -47,16 +44,16 @@ public class FollowService {
                     Pair[] query = pairs.stream()
                             .filter(stringStringPair -> stringStringPair.getValue() != null)
                             .toArray(Pair[]::new);
-                    return ServiceUtils.getCollectionPageFuture(accountRepo, page, pageSize, query);
+                    return ServiceUtils.getCollectionPageFuture(Account.class, page, pageSize, query);
                 });
         return handleExceptions(future, unitOfWork);
     }
 
     public Mono<Void> createFollower(long accountToBeFollowedId, long accountToFollowId, String username) {
         UnitOfWork unitOfWork = new UnitOfWork();
-
+        DataMapper<Follow, Follow.FollowKey> followMapper = getMapper(Follow.class, unitOfWork);
         CompletableFuture<Void> future = accountService.getAccount(accountToFollowId, username)
-                .thenCompose(account -> followsRepo.create(unitOfWork, new Follow(accountToBeFollowedId, accountToFollowId)))
+                .thenCompose(account -> followMapper.create(new Follow(accountToBeFollowedId, accountToFollowId)))
                 .thenCompose(aVoid -> unitOfWork.commit());
         return Mono.fromFuture(
                 handleExceptions(future, unitOfWork)
@@ -65,9 +62,9 @@ public class FollowService {
 
     public Mono<Void> deleteFollower(long id, long fid, String username) {
         UnitOfWork unitOfWork = new UnitOfWork();
-
+        DataMapper<Follow, Follow.FollowKey> followMapper = getMapper(Follow.class, unitOfWork);
         CompletableFuture<Void> future = accountService.getAccount(id, username)
-                .thenCompose(account -> followsRepo.deleteById(unitOfWork, new Follow.FollowKey(id, fid)))
+                .thenCompose(account -> followMapper.deleteById(new Follow.FollowKey(id, fid)))
                 .thenCompose(aVoid -> unitOfWork.commit());
         return Mono.fromFuture(
                 handleExceptions(future, unitOfWork)

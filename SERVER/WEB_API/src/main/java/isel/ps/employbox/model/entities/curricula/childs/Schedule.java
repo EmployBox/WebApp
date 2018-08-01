@@ -2,7 +2,7 @@ package isel.ps.employbox.model.entities.curricula.childs;
 
 
 import com.github.jayield.rapper.DomainObject;
-import com.github.jayield.rapper.Id;
+import com.github.jayield.rapper.annotations.Id;
 
 import java.security.InvalidParameterException;
 import java.text.DateFormatSymbols;

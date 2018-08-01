@@ -1,7 +1,8 @@
 package isel.ps.employbox.model.entities;
 
-import com.github.jayield.rapper.ColumnName;
-import com.github.jayield.rapper.utils.UnitOfWork;
+
+import com.github.jayield.rapper.annotations.ColumnName;
+import com.github.jayield.rapper.unitofwork.UnitOfWork;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
