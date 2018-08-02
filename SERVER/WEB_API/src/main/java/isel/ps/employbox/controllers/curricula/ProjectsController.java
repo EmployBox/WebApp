@@ -1,6 +1,5 @@
 package isel.ps.employbox.controllers.curricula;
 
-import com.github.jayield.rapper.DataRepository;
 import isel.ps.employbox.exceptions.BadRequestException;
 import isel.ps.employbox.model.binders.curricula.ProjectBinder;
 import isel.ps.employbox.model.entities.curricula.childs.Project;
@@ -23,13 +22,11 @@ public class ProjectsController {
 
     private final ProjectBinder projectBinder;
     private final CurriculumService curriculumService;
-    private final DataRepository<Project, Long> projectRepo;
     private final ProjectService projectService;
 
-    public ProjectsController(ProjectBinder projectBinder, CurriculumService curriculumService, DataRepository<Project, Long> projectRepo, ProjectService projectService) {
+    public ProjectsController(ProjectBinder projectBinder, CurriculumService curriculumService, ProjectService projectService) {
         this.projectBinder = projectBinder;
         this.curriculumService = curriculumService;
-        this.projectRepo = projectRepo;
         this.projectService = projectService;
     }
 
@@ -39,7 +36,7 @@ public class ProjectsController {
             @PathVariable long cid,
             @PathVariable long projectId
     ){
-        CompletableFuture<OutProject> future = curriculumService.getCurriculumChild(projectRepo, id, cid, projectId)
+        CompletableFuture<OutProject> future = curriculumService.getCurriculumChild(Project.class, id, cid, projectId)
                 .thenCompose(projectBinder::bindOutput);
         return Mono.fromFuture(future);
     }

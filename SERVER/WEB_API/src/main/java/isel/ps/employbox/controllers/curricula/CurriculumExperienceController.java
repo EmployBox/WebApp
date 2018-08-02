@@ -1,6 +1,5 @@
 package isel.ps.employbox.controllers.curricula;
 
-import com.github.jayield.rapper.DataRepository;
 import isel.ps.employbox.exceptions.BadRequestException;
 import isel.ps.employbox.model.binders.curricula.CurriculumExperienceBinder;
 import isel.ps.employbox.model.entities.curricula.childs.CurriculumExperience;
@@ -23,13 +22,11 @@ public class CurriculumExperienceController {
 
     private final CurriculumExperienceBinder curriculumExperienceBinder;
     private final CurriculumService curriculumService;
-    private final DataRepository<CurriculumExperience, Long> currExpRepo;
     private final CurriculumExperienceService curriculumExperienceService;
 
-    public CurriculumExperienceController(CurriculumExperienceBinder curriculumExperienceBinder, CurriculumService curriculumService, DataRepository<CurriculumExperience, Long> currExpRepo, CurriculumExperienceService curriculumExperienceService) {
+    public CurriculumExperienceController(CurriculumExperienceBinder curriculumExperienceBinder, CurriculumService curriculumService, CurriculumExperienceService curriculumExperienceService) {
         this.curriculumExperienceBinder = curriculumExperienceBinder;
         this.curriculumService = curriculumService;
-        this.currExpRepo = currExpRepo;
         this.curriculumExperienceService = curriculumExperienceService;
     }
 
@@ -38,7 +35,7 @@ public class CurriculumExperienceController {
             @PathVariable long id,
             @PathVariable long cid,
             @PathVariable long expId){
-        CompletableFuture<OutCurriculumExperience> future = curriculumService.getCurriculumChild(currExpRepo, id, cid, expId)
+        CompletableFuture<OutCurriculumExperience> future = curriculumService.getCurriculumChild(CurriculumExperience.class, id, cid, expId)
                 .thenCompose(curriculumExperienceBinder::bindOutput);
         return Mono.fromFuture(future);
     }

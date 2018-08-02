@@ -94,8 +94,8 @@ public class Job implements DomainObject<Long> {
             long version
     ) {
         UnitOfWork unitOfWork = new UnitOfWork();
-        //todo fix
-        this.account = new Foreign(accountId, unit -> getMapper(Account.class, unit).findById( accountId)
+        this.account = new Foreign(accountId, () -> getMapper(Account.class, unitOfWork).findById( accountId)
+                .thenCompose( res -> unitOfWork.commit().thenApply( __-> res))
                 .thenApply(account1 -> account1.orElseThrow(() -> new DataMapperException("Account not Found"))));
         this.jobId = jobId;
         this.title = title;

@@ -5,7 +5,6 @@ import isel.ps.employbox.model.entities.curricula.childs.AcademicBackground;
 import isel.ps.employbox.model.input.curricula.childs.InAcademicBackground;
 import isel.ps.employbox.model.output.OutAcademicBackground;
 import org.springframework.stereotype.Component;
-import reactor.core.publisher.Mono;
 
 import java.util.concurrent.CompletableFuture;
 
