@@ -303,7 +303,6 @@ public class UserAccountControllerTests {
         DataMapper<Application, Long> applicationRepo = getMapper(Application.class, unitOfWork);
         Application updatedApplication = applicationRepo.findById( application.getIdentityKey()).join().orElseThrow(() -> new ResourceNotFoundException("Application not found"));
         unitOfWork.commit().join();
-//        assertNotNull(updatedApplication.getDate());
         assertNotSame(updatedApplication.getVersion(), application.getVersion());
     }
 
@@ -385,7 +384,6 @@ public class UserAccountControllerTests {
                 .expectBody()
                 .consumeWith(document("deleteApplication"));
 
-        unitOfWork = new UnitOfWork();
         assertTrue(applicationRepo.findWhere(new Pair<>("accountId", userAccount.getIdentityKey()), new Pair<>("jobId", jobId)).join().isEmpty());
         unitOfWork.commit().join();
     }

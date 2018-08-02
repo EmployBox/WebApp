@@ -12,7 +12,7 @@ public class CurriculumExperience extends CurriculumChild implements DomainObjec
     private long accountId;
     private long curriculumId;
     private final String competences;
-    private final short years;
+    private final int years;
 
     @Version
     private final long version;
@@ -57,7 +57,7 @@ public class CurriculumExperience extends CurriculumChild implements DomainObjec
         return competences;
     }
 
-    public short getYears() {
+    public int getYears() {
         return years;
     }
 

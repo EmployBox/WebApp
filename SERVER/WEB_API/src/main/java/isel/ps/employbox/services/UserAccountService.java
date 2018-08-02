@@ -170,10 +170,12 @@ public class UserAccountService {
     public Mono<Void> deleteApplication(long userId, long jobId,long apId, String email) {
         UnitOfWork unit = new UnitOfWork();
         DataMapper<Application, Long> applicationMapper = getMapper(Application.class, unit);
-        CompletableFuture<Void> future = getUser(userId, email)
-                .thenCompose(userAccount -> getApplication(userId, jobId, apId))
-                .thenCompose(application -> applicationMapper.delete(application))
+
+        CompletableFuture<Void> future = getUser(userId, unit, email)
+                .thenCompose(userAccount -> getApplication(userId, jobId, apId, unit))
+                .thenCompose(applicationMapper::delete)
                 .thenCompose(aVoid -> unit.commit());
+
         return Mono.fromFuture(
                 handleExceptions(future, unit)
         );
