@@ -2,9 +2,9 @@ package isel.ps.employbox.controllers;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.jayield.rapper.DataRepository;
+import com.github.jayield.rapper.mapper.DataMapper;
+import com.github.jayield.rapper.unitofwork.UnitOfWork;
 import com.github.jayield.rapper.utils.Pair;
-import com.github.jayield.rapper.utils.UnitOfWork;
 import isel.ps.employbox.exceptions.ResourceNotFoundException;
 import isel.ps.employbox.model.entities.Application;
 import isel.ps.employbox.model.entities.Job;
@@ -28,17 +28,17 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
-import java.sql.Connection;
-import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.List;
 
+import static com.github.jayield.rapper.mapper.MapperRegistry.getMapper;
 import static isel.ps.employbox.DataBaseUtils.prepareDB;
 import static junit.framework.TestCase.*;
 import static org.springframework.restdocs.webtestclient.WebTestClientRestDocumentation.document;
 import static org.springframework.restdocs.webtestclient.WebTestClientRestDocumentation.documentationConfiguration;
 import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.springSecurity;
 import static org.springframework.web.reactive.function.client.ExchangeFilterFunctions.basicAuthentication;
+
 @RunWith(SpringRunner.class)
 @SpringBootTest
 public class UserAccountControllerTests {
@@ -46,12 +46,7 @@ public class UserAccountControllerTests {
     public JUnitRestDocumentation restDocumentation = new JUnitRestDocumentation();
     @Autowired
     private ApplicationContext context;
-    @Autowired
-    private DataRepository<UserAccount, Long> userAccountRepo;
-    @Autowired
-    private DataRepository<Job, Long> jobRepo;
-    @Autowired
-    private DataRepository<Application, Long> applicationRepo;
+
     private static final Logger logger = LoggerFactory.getLogger(UserAccountControllerTests.class);
     private WebTestClient webTestClient;
     private UserAccount userAccount;
@@ -69,15 +64,18 @@ public class UserAccountControllerTests {
                 .build();
 
         UnitOfWork unitOfWork = new UnitOfWork();
-        List<UserAccount> userAccounts = userAccountRepo.findWhere(unitOfWork, new Pair<>("email", "lol@hotmail.com")).join();
+        DataMapper<UserAccount, Long> userAccountRepo = getMapper(UserAccount.class, unitOfWork);
+        List<UserAccount> userAccounts = userAccountRepo.findWhere(new Pair<>("email", "lol@hotmail.com")).join();
         assertEquals(1, userAccounts.size());
         userAccount = userAccounts.get(0);
 
-        List<Job> jobs = jobRepo.findWhere(unitOfWork, new Pair<>("title", "Great Job")).join();
+        DataMapper<Job, Long> jobRepo = getMapper(Job.class, unitOfWork);
+        List<Job> jobs = jobRepo.findWhere(new Pair<>("title", "Great Job")).join();
         assertEquals(1, jobs.size());
         jobId = jobs.get(0).getIdentityKey();
 
-        List<Application> applications = applicationRepo.findWhere(unitOfWork, new Pair<>("accountId", userAccount.getIdentityKey()), new Pair<>("jobId", jobId)).join();
+        DataMapper<Application, Long> applicationRepo = getMapper(Application.class, unitOfWork);
+        List<Application> applications = applicationRepo.findWhere(new Pair<>("accountId", userAccount.getIdentityKey()), new Pair<>("jobId", jobId)).join();
         assertEquals(1, applications.size());
         application = applications.get(0);
 
@@ -126,11 +124,12 @@ public class UserAccountControllerTests {
 
     @Test
     public void testGetApplication() {
-        UnitOfWork unit = new UnitOfWork();
-        List<Application> applications = applicationRepo.findWhere(unit, new Pair<>("accountId", userAccount.getIdentityKey()), new Pair<>("jobId", jobId)).join();
+        UnitOfWork unitOfWork = new UnitOfWork();
+        DataMapper<Application, Long> applicationRepo = getMapper(Application.class, unitOfWork);
+        List<Application> applications = applicationRepo.findWhere(new Pair<>("accountId", userAccount.getIdentityKey()), new Pair<>("jobId", jobId)).join();
         assertEquals(1, applications.size());
         Application application = applications.get(0);
-        unit.commit().join();
+        unitOfWork.commit().join();
 
         webTestClient
                 .get()
@@ -162,9 +161,10 @@ public class UserAccountControllerTests {
                 .expectBody()
                 .consumeWith(document("createUserAccount"));
 
-        UnitOfWork unit = new UnitOfWork();
-        assertEquals(1, userAccountRepo.findWhere(unit, new Pair<>("email", "someEmail@hotmail.com")).join().size());
-        unit.commit().join();
+        UnitOfWork unitOfWork = new UnitOfWork();
+        DataMapper<UserAccount, Long> userAccountRepo = getMapper(UserAccount.class, unitOfWork);
+        assertEquals(1, userAccountRepo.findWhere( new Pair<>("email", "someEmail@hotmail.com")).join().size());
+        unitOfWork.commit().join();
 
         Logger logger = LoggerFactory.getLogger(UserAccountControllerTests.class);
         logger.info("OPENED CONNECTIONS - {}", UnitOfWork.numberOfOpenConnections.get());
@@ -190,9 +190,10 @@ public class UserAccountControllerTests {
                 .expectBody()
                 .consumeWith(document("createApplication"));
 
-        UnitOfWork unit = new UnitOfWork();
-        assertEquals(2, applicationRepo.findWhere(unit, new Pair<>("accountId", userAccount.getIdentityKey()), new Pair<>("jobId", jobId)).join().size());
-        unit.commit().join();
+        UnitOfWork unitOfWork = new UnitOfWork();
+        DataMapper<Application, Long> applicationRepo = getMapper(Application.class, unitOfWork);
+        assertEquals(2, applicationRepo.findWhere(new Pair<>("accountId", userAccount.getIdentityKey()), new Pair<>("jobId", jobId)).join().size());
+        unitOfWork.commit().join();
     }
 
     @Test
@@ -267,9 +268,10 @@ public class UserAccountControllerTests {
                 .expectBody()
                 .consumeWith(document("updateUserAccount"));
 
-        UnitOfWork unit = new UnitOfWork();
-        UserAccount userAccount = userAccountRepo.findById(unit, this.userAccount.getIdentityKey()).join().orElseThrow(() -> new ResourceNotFoundException("UserAccount not found"));
-        unit.commit().join();
+        UnitOfWork unitOfWork = new UnitOfWork();
+        DataMapper<UserAccount, Long> userAccountRepo = getMapper(UserAccount.class, unitOfWork);
+        UserAccount userAccount = userAccountRepo.findById( this.userAccount.getIdentityKey()).join().orElseThrow(() -> new ResourceNotFoundException("UserAccount not found"));
+        unitOfWork.commit().join();
         assertEquals("Sou um tipo simpatico", userAccount.getSummary());
         assertEquals("Manuel", userAccount.getName());
         assertEquals("someEmail@hotmail.com", userAccount.getEmail());
@@ -298,10 +300,11 @@ public class UserAccountControllerTests {
                 .expectBody()
                 .consumeWith(document("updateApplication"));
 
-        UnitOfWork unit = new UnitOfWork();
-        Application updatedApplication = applicationRepo.findById(unit, application.getIdentityKey()).join().orElseThrow(() -> new ResourceNotFoundException("Application not found"));
-        unit.commit().join();
-        assertTrue(updatedApplication.getVersion() != application.getVersion());
+        UnitOfWork unitOfWork = new UnitOfWork();
+        DataMapper<Application, Long> applicationRepo = getMapper(Application.class, unitOfWork);
+        Application updatedApplication = applicationRepo.findById( application.getIdentityKey()).join().orElseThrow(() -> new ResourceNotFoundException("Application not found"));
+        unitOfWork.commit().join();
+        assertNotSame(updatedApplication.getVersion(), application.getVersion());
     }
 
     @Test
@@ -339,19 +342,21 @@ public class UserAccountControllerTests {
                 .expectBody()
                 .consumeWith(document("deleteUserAccount"));
 
-        UnitOfWork unit = new UnitOfWork();
-        assertFalse(userAccountRepo.findById(unit, userAccount.getIdentityKey()).join().isPresent());
-        unit.commit().join();
+        UnitOfWork unitOfWork = new UnitOfWork();
+        DataMapper<UserAccount, Long> userAccountRepo = getMapper(UserAccount.class, unitOfWork);
+        assertFalse(userAccountRepo.findById( userAccount.getIdentityKey()).join().isPresent());
+        unitOfWork.commit().join();
     }
 
     @Test
     @WithMockUser
     public void testDeleteWrongApplication() {
-        UnitOfWork unit = new UnitOfWork();
-        List<Application> applications = applicationRepo.findWhere(unit, new Pair<>("accountId", userAccount.getIdentityKey()), new Pair<>("jobId", jobId)).join();
+        UnitOfWork unitOfWork = new UnitOfWork();
+        DataMapper<Application, Long> applicationRepo = getMapper(Application.class, unitOfWork);
+        List<Application> applications = applicationRepo.findWhere(new Pair<>("accountId", userAccount.getIdentityKey()), new Pair<>("jobId", jobId)).join();
         assertEquals(1, applications.size());
         Application application = applications.get(0);
-        unit.commit().join();
+        unitOfWork.commit().join();
 
         webTestClient
                 .delete()
@@ -365,11 +370,12 @@ public class UserAccountControllerTests {
     @Test
     @WithMockUser(username = "lol@hotmail.com")
     public void testDeleteApplication(){
-        UnitOfWork unit = new UnitOfWork();
-        List<Application> applications = applicationRepo.findWhere(unit, new Pair<>("accountId", userAccount.getIdentityKey()), new Pair<>("jobId", jobId)).join();
+        UnitOfWork unitOfWork = new UnitOfWork();
+        DataMapper<Application, Long> applicationRepo = getMapper(Application.class, unitOfWork);
+        List<Application> applications = applicationRepo.findWhere(new Pair<>("accountId", userAccount.getIdentityKey()), new Pair<>("jobId", jobId)).join();
         assertEquals(1, applications.size());
         Application application = applications.get(0);
-        unit.commit().join();
+        unitOfWork.commit().join();
 
         webTestClient
                 .delete()
@@ -379,8 +385,7 @@ public class UserAccountControllerTests {
                 .expectBody()
                 .consumeWith(document("deleteApplication"));
 
-        unit = new UnitOfWork();
-        assertTrue(applicationRepo.findWhere(unit, new Pair<>("accountId", userAccount.getIdentityKey()), new Pair<>("jobId", jobId)).join().isEmpty());
-        unit.commit().join();
+        assertTrue(applicationRepo.findWhere(new Pair<>("accountId", userAccount.getIdentityKey()), new Pair<>("jobId", jobId)).join().isEmpty());
+        unitOfWork.commit().join();
     }
 }

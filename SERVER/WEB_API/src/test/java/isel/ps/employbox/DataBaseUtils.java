@@ -1,8 +1,9 @@
 package isel.ps.employbox;
 
-import com.github.jayield.rapper.utils.ConnectionManager;
+
+import com.github.jayield.rapper.connections.ConnectionManager;
+import com.github.jayield.rapper.unitofwork.UnitOfWork;
 import com.github.jayield.rapper.utils.SqlUtils;
-import com.github.jayield.rapper.utils.UnitOfWork;
 import io.vertx.ext.sql.ResultSet;
 import io.vertx.ext.sql.SQLConnection;
 

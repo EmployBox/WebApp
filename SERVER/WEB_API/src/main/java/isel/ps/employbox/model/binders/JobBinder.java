@@ -1,12 +1,14 @@
 package isel.ps.employbox.model.binders;
 
-import com.github.jayield.rapper.utils.UnitOfWork;
+import com.github.jayield.rapper.unitofwork.UnitOfWork;
 import isel.ps.employbox.model.entities.Job;
 import isel.ps.employbox.model.input.InJob;
 import isel.ps.employbox.model.output.OutJob;
 import org.springframework.stereotype.Component;
 
 import java.util.concurrent.CompletableFuture;
+
+import static isel.ps.employbox.services.ServiceUtils.handleExceptions;
 
 @Component
 public class JobBinder implements ModelBinder<Job, OutJob, InJob> {
@@ -15,7 +17,7 @@ public class JobBinder implements ModelBinder<Job, OutJob, InJob> {
         UnitOfWork unitOfWork = new UnitOfWork();
         AccountBinder accountBinder = new AccountBinder();
 
-        return job.getAccount()
+        CompletableFuture<OutJob> future = job.getAccount()
                 .getForeignObject(unitOfWork)
                 .thenCompose(account1 -> unitOfWork.commit().thenApply(aVoid -> account1))
                 .thenCompose(accountBinder::bindOutput)
@@ -31,6 +33,8 @@ public class JobBinder implements ModelBinder<Job, OutJob, InJob> {
                         job.getOfferEndDate(),
                         job.getOfferType()
                 ));
+
+        return handleExceptions(future, unitOfWork);
     }
 
     @Override

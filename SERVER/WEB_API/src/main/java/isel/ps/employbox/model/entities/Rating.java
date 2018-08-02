@@ -2,8 +2,8 @@ package isel.ps.employbox.model.entities;
 
 
 import com.github.jayield.rapper.DomainObject;
-import com.github.jayield.rapper.EmbeddedId;
-import com.github.jayield.rapper.Version;
+import com.github.jayield.rapper.annotations.EmbeddedId;
+import com.github.jayield.rapper.annotations.Version;
 import com.github.jayield.rapper.utils.EmbeddedIdClass;
 
 public class Rating implements DomainObject<Rating.RatingKey> {

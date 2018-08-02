@@ -18,6 +18,14 @@ CREATE PROCEDURE populateDB()
     /*Insert AcademicBackground*/
     insert into ACADEMICBACKGROUND(ACCOUNTID, CURRICULUMID, INSTITUTION) values (account_id1, curriculum_id, 'ISEL');
 
+    /*Insert Project*/
+    insert into PROJECT(ACCOUNTID, CURRICULUMID, NAME, DESCRIPTION) values (account_id1, curriculum_id, 'project1', 'project one');
+
+    /*Insert CurriculumExperience*/
+    insert into CURRICULUMEXPERIENCE(ACCOUNTID, CURRICULUMID, COMPETENCES, YEARS) values (account_id1, curriculum_id, 'Knows to do stuff', 1);
+
+    /*Insert PreviousJobs*/
+    /*insert into PREVIOUSJOBS(ACCOUNTID, CURRICULUMID, BEGINDATE, ENDDATE, COMPANYNAME, WORKLOAD, ROLE) values (account_id1, curriculum_id, '1992-01-22', '2000-01-22', 'ISEL', 'FULL-TIME', 'TEACHER' );*/
     /*Insert Companies*/
     insert into ACCOUNT(NAME, EMAIL, PASSWORD, ACCOUNTTYPE) values ('company1', 'company1@gmail.com', '741', 'CMP');
     set company_id1 = IDENTITY();

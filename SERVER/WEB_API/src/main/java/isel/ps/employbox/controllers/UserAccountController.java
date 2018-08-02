@@ -58,7 +58,6 @@ public class UserAccountController {
             @PathVariable long id,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "5") int pageSize
-
     ){
         CompletableFuture<HalCollectionPage<Application>> future = userAccountService.getAllApplications(id, page, pageSize)
                 .thenCompose(applicationCollectionPage -> applicationBinder.bindOutput(applicationCollectionPage, this.getClass(), id));

@@ -2,9 +2,9 @@ package isel.ps.employbox.controllers;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.jayield.rapper.DataRepository;
+import com.github.jayield.rapper.mapper.DataMapper;
+import com.github.jayield.rapper.unitofwork.UnitOfWork;
 import com.github.jayield.rapper.utils.Pair;
-import com.github.jayield.rapper.utils.UnitOfWork;
 import isel.ps.employbox.exceptions.ResourceNotFoundException;
 import isel.ps.employbox.model.entities.Company;
 import isel.ps.employbox.model.input.InCompany;
@@ -25,10 +25,10 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
-import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.List;
 
+import static com.github.jayield.rapper.mapper.MapperRegistry.getMapper;
 import static isel.ps.employbox.DataBaseUtils.prepareDB;
 import static junit.framework.TestCase.*;
 import static org.springframework.restdocs.webtestclient.WebTestClientRestDocumentation.document;
@@ -43,8 +43,6 @@ public class CompanyControllerTests {
     public JUnitRestDocumentation restDocumentation = new JUnitRestDocumentation();
     @Autowired
     private ApplicationContext context;
-    @Autowired
-    private DataRepository<Company, Long> companyRepo;
     private static final Logger logger = LoggerFactory.getLogger(CompanyControllerTests.class);
     private WebTestClient webTestClient;
     private Company company;
@@ -59,7 +57,8 @@ public class CompanyControllerTests {
                 .filter(documentationConfiguration(restDocumentation))
                 .build();
         UnitOfWork unitOfWork = new UnitOfWork();
-        List<Company> companies = companyRepo.findWhere(unitOfWork, new Pair<>("email", "company2@gmail.com")).join();
+        DataMapper<Company, Long> companyRepo = getMapper(Company.class, unitOfWork);
+        List<Company> companies = companyRepo.findWhere( new Pair<>("email", "company2@gmail.com")).join();
         assertEquals(1, companies.size());
         company = companies.get(0);
         unitOfWork.commit().join();
@@ -105,6 +104,7 @@ public class CompanyControllerTests {
         ObjectMapper objectMapper = new ObjectMapper();
         String json = objectMapper.writeValueAsString(inCompany);
         UnitOfWork unitOfWork = new UnitOfWork();
+        DataMapper<Company, Long> companyRepo = getMapper(Company.class, unitOfWork);
         webTestClient
                 .post()
                 .uri("/accounts/companies")
@@ -115,7 +115,7 @@ public class CompanyControllerTests {
                 .expectBody()
                 .consumeWith(document("createCompany"));
 
-        assertTrue(companyRepo.findWhere(unitOfWork, new Pair<>("email", "someEmail@hotmail.com")).join().size() != 0);
+        assertTrue(companyRepo.findWhere( new Pair<>("email", "someEmail@hotmail.com")).join().size() != 0);
         unitOfWork.commit().join();
     }
 
@@ -158,6 +158,7 @@ public class CompanyControllerTests {
         ObjectMapper objectMapper = new ObjectMapper();
         String json = objectMapper.writeValueAsString(inCompany);
         UnitOfWork unitOfWork = new UnitOfWork();
+        DataMapper<Company, Long> companyRepo = getMapper(Company.class, unitOfWork);
         webTestClient
                 .put()
                 .uri("/accounts/companies/" + company.getIdentityKey())
@@ -168,7 +169,7 @@ public class CompanyControllerTests {
                 .expectBody()
                 .consumeWith(document("updateCompany"));
 
-        Company updatedCompany = companyRepo.findById(unitOfWork, company.getIdentityKey()).join().orElseThrow(() -> new ResourceNotFoundException("Company not found"));
+        Company updatedCompany = companyRepo.findById( company.getIdentityKey()).join().orElseThrow(() -> new ResourceNotFoundException("Company not found"));
         unitOfWork.commit().join();
 
         assertEquals("Microsoft", updatedCompany.getName());
@@ -214,7 +215,8 @@ public class CompanyControllerTests {
                 .expectBody()
                 .consumeWith(document("deleteCompany"));
         UnitOfWork unitOfWork = new UnitOfWork();
-        assertFalse(companyRepo.findById(unitOfWork, company.getIdentityKey()).join().isPresent());
+        DataMapper<Company, Long> companyRepo = getMapper(Company.class, unitOfWork);
+        assertFalse(companyRepo.findById( company.getIdentityKey()).join().isPresent());
         unitOfWork.commit().join();
     }
 }

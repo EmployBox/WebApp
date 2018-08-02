@@ -1,12 +1,11 @@
 package isel.ps.employbox.model.entities;
 
-import com.github.jayield.rapper.ColumnName;
 import com.github.jayield.rapper.DomainObject;
-import com.github.jayield.rapper.Id;
-import com.github.jayield.rapper.Version;
-import com.github.jayield.rapper.utils.UnitOfWork;
+import com.github.jayield.rapper.annotations.ColumnName;
+import com.github.jayield.rapper.annotations.Id;
+import com.github.jayield.rapper.annotations.Version;
+import com.github.jayield.rapper.unitofwork.UnitOfWork;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
@@ -16,7 +15,7 @@ import static isel.ps.employbox.model.entities.Role.DEFAULT;
 public class Account implements DomainObject<Long> {
     private static final Role role = DEFAULT;
 
-    @Id (isIdentity =  true)
+    @Id(isIdentity =  true)
     protected long accountId;
     protected final String name;
     protected final String email;

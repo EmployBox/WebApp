@@ -1,8 +1,8 @@
 package isel.ps.employbox.security;
 
-import com.github.jayield.rapper.DataRepository;
+import com.github.jayield.rapper.mapper.DataMapper;
+import com.github.jayield.rapper.unitofwork.UnitOfWork;
 import com.github.jayield.rapper.utils.Pair;
-import com.github.jayield.rapper.utils.UnitOfWork;
 import isel.ps.employbox.model.entities.Account;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.ReactiveUserDetailsService;
@@ -13,21 +13,19 @@ import reactor.core.publisher.Mono;
 import java.util.Collection;
 import java.util.Collections;
 
+import static com.github.jayield.rapper.mapper.MapperRegistry.getMapper;
+
 @Component
 public class RepositoryReactiveUserDetailsService implements ReactiveUserDetailsService {
-
-    private final DataRepository<Account, Long> accountRepo;
-
-    public RepositoryReactiveUserDetailsService(DataRepository<Account, Long> accountRepo) {
-        this.accountRepo = accountRepo;
-    }
 
     @Override
     public Mono<UserDetails> findByUsername(String username) {
         UnitOfWork unitOfWork = new UnitOfWork();
+        DataMapper<Account,Long> accountMapper = getMapper(Account.class, unitOfWork);
+
         return Mono.fromFuture(
-                accountRepo
-                        .findWhere(unitOfWork, new Pair<>("email", username))
+                accountMapper
+                        .findWhere( new Pair<>("email", username))
                         .thenCompose( res -> unitOfWork.commit().thenApply( aVoid -> res))
                         .thenApply(accounts -> {
                             if (!accounts.isEmpty())
@@ -39,7 +37,8 @@ public class RepositoryReactiveUserDetailsService implements ReactiveUserDetails
 
     static class CustomUserDetails extends Account implements UserDetails {
         CustomUserDetails(Account account) {
-            super(account.getIdentityKey(),
+            super(
+                    account.getIdentityKey(),
                     account.getName(),
                     account.getEmail(),
                     account.getPassword(),

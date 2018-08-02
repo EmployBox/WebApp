@@ -1,8 +1,9 @@
 package isel.ps.employbox.services.curricula;
 
-import com.github.jayield.rapper.DataRepository;
+import com.github.jayield.rapper.mapper.DataMapper;
+import com.github.jayield.rapper.mapper.MapperRegistry;
+import com.github.jayield.rapper.unitofwork.UnitOfWork;
 import com.github.jayield.rapper.utils.Pair;
-import com.github.jayield.rapper.utils.UnitOfWork;
 import isel.ps.employbox.ErrorMessages;
 import isel.ps.employbox.exceptions.ConflictException;
 import isel.ps.employbox.exceptions.ResourceNotFoundException;
@@ -21,21 +22,19 @@ import static isel.ps.employbox.services.ServiceUtils.handleExceptions;
 public class AcademicBackgroundService {
 
     private final CurriculumService curriculumService;
-    private final DataRepository<Curriculum, Long> curriculumRepo;
-    private final DataRepository<AcademicBackground, Long> academicBackgroundRepo;
 
-    public AcademicBackgroundService(CurriculumService curriculumService, DataRepository<Curriculum, Long> curriculumRepo, DataRepository<AcademicBackground, Long> academicBackgroundRepo) {
+    public AcademicBackgroundService(CurriculumService curriculumService) {
         this.curriculumService = curriculumService;
-        this.curriculumRepo = curriculumRepo;
-        this.academicBackgroundRepo = academicBackgroundRepo;
     }
 
     public CompletableFuture<CollectionPage<AcademicBackground>> getCurriculumAcademicBackgrounds(long curriculumId, int page, int pageSize) {
         UnitOfWork unitOfWork = new UnitOfWork();
-        CompletableFuture<CollectionPage<AcademicBackground>> future = curriculumRepo.findById(unitOfWork, curriculumId)
+        DataMapper<Curriculum, Long> curriculumMapper = MapperRegistry.getMapper(Curriculum.class, unitOfWork);
+
+        CompletableFuture<CollectionPage<AcademicBackground>> future = curriculumMapper.findById(curriculumId)
                 .thenCompose(res -> unitOfWork.commit().thenApply(aVoid -> res))
                 .thenApply(optional -> optional.orElseThrow(() -> new ResourceNotFoundException(ErrorMessages.RESOURCE_NOTFOUND_CURRICULUM)))
-                .thenCompose(curriculum -> ServiceUtils.getCollectionPageFuture(academicBackgroundRepo, page, pageSize, new Pair<>("curriculumId", curriculumId)));
+                .thenCompose(curriculum -> ServiceUtils.getCollectionPageFuture(AcademicBackground.class, page, pageSize, new Pair<>("curriculumId", curriculumId)));
         return handleExceptions(future, unitOfWork);
     }
 
@@ -48,8 +47,10 @@ public class AcademicBackgroundService {
         if(academicBackground.getAccountId() != accountId || academicBackground.getCurriculumId() != curriculumId)
             throw new ConflictException(ErrorMessages.BAD_REQUEST_IDS_MISMATCH);
         UnitOfWork unitOfWork = new UnitOfWork();
+        DataMapper<AcademicBackground, Long> academicBackgroundMapper = MapperRegistry.getMapper(AcademicBackground.class, unitOfWork);
+
         CompletableFuture<AcademicBackground> future = curriculumService.getCurriculum(accountId, curriculumId, email)
-                .thenCompose(curriculum -> academicBackgroundRepo.create(unitOfWork, academicBackground))
+                .thenCompose(curriculum -> academicBackgroundMapper.create(academicBackground))
                 .thenCompose(res -> unitOfWork.commit().thenApply(aVoid -> academicBackground));
         return handleExceptions(future, unitOfWork);
     }
@@ -61,8 +62,10 @@ public class AcademicBackgroundService {
             String email
     ) {
         UnitOfWork unitOfWork = new UnitOfWork();
+        DataMapper<AcademicBackground, Long> academicBackgroundMapper = MapperRegistry.getMapper(AcademicBackground.class, unitOfWork);
+
         CompletableFuture<Void> future = curriculumService.getCurriculum(accountId, curriculumId, email)
-                .thenCompose(curriculum -> academicBackgroundRepo.update(unitOfWork, academicBackground))
+                .thenCompose(curriculum -> academicBackgroundMapper.update( academicBackground))
                 .thenCompose(res -> unitOfWork.commit());
         return Mono.fromFuture(
                 handleExceptions(future, unitOfWork)
@@ -76,8 +79,10 @@ public class AcademicBackgroundService {
             String email
     ) {
         UnitOfWork unitOfWork = new UnitOfWork();
+        DataMapper<AcademicBackground, Long> academicBackgroundMapper = MapperRegistry.getMapper(AcademicBackground.class, unitOfWork);
+
         CompletableFuture<Void> future = curriculumService.getCurriculum(accountId, curriculumId, email)
-                .thenCompose(curriculum -> academicBackgroundRepo.deleteById(unitOfWork, academicBackgroundId))
+                .thenCompose(curriculum -> academicBackgroundMapper.deleteById(academicBackgroundId))
                 .thenCompose(res -> unitOfWork.commit());
         return Mono.fromFuture(handleExceptions(future, unitOfWork));
     }

@@ -1,8 +1,8 @@
 package isel.ps.employbox.services;
 
-import com.github.jayield.rapper.DataRepository;
+import com.github.jayield.rapper.mapper.DataMapper;
+import com.github.jayield.rapper.unitofwork.UnitOfWork;
 import com.github.jayield.rapper.utils.Pair;
-import com.github.jayield.rapper.utils.UnitOfWork;
 import isel.ps.employbox.ErrorMessages;
 import isel.ps.employbox.exceptions.BadRequestException;
 import isel.ps.employbox.exceptions.ConflictException;
@@ -21,21 +21,14 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
+import static com.github.jayield.rapper.mapper.MapperRegistry.getMapper;
 import static isel.ps.employbox.services.ServiceUtils.handleExceptions;
 
 @Service
 public class JobService {
-    private final DataRepository<Job, Long> jobRepo;
-    private final DataRepository<JobExperience, Long> jobExperienceRepo;
-    private final DataRepository<Account, Long> accountRepo;
-    private final DataRepository<Application, Long> applicationRepo;
     private final AccountService accountService;
 
-    public JobService(DataRepository<Job, Long> jobRepo, DataRepository<JobExperience, Long> jobExperienceExperienceRepo, DataRepository<Account, Long> accountRepo, DataRepository<Application, Long> applicationRepo, AccountService userService) {
-        this.jobRepo = jobRepo;
-        this.jobExperienceRepo = jobExperienceExperienceRepo;
-        this.accountRepo = accountRepo;
-        this.applicationRepo = applicationRepo;
+    public JobService( AccountService userService) {
         this.accountService = userService;
     }
 
@@ -54,7 +47,7 @@ public class JobService {
                 .collect(Collectors.toList());
 
         return ServiceUtils.getCollectionPageFuture(
-                jobRepo,
+                Job.class,
                 page,
                 pageSize,
                 pairs.toArray(new Pair[pairs.size()])
@@ -63,9 +56,13 @@ public class JobService {
 
     public CompletableFuture<Job> getJob(long jid) {
         UnitOfWork unitOfWork = new UnitOfWork();
+        return getJob(jid, unitOfWork)
+                .thenCompose(res -> unitOfWork.commit().thenApply(aVoid -> res));
+    }
 
-        CompletableFuture<Job> future = jobRepo.findById(unitOfWork, jid)
-                .thenCompose(res -> unitOfWork.commit().thenApply(aVoid -> res))
+    public CompletableFuture<Job> getJob(long jid, UnitOfWork unitOfWork) {
+        DataMapper<Job, Long> jobMapper = getMapper(Job.class, unitOfWork);
+        CompletableFuture<Job> future = jobMapper.findById(jid)
                 .thenApply(ojob -> ojob.orElseThrow(() -> new ResourceNotFoundException(ErrorMessages.RESOURCE_NOTFOUND_JOB)));
         return handleExceptions(future, unitOfWork);
     }
@@ -76,13 +73,14 @@ public class JobService {
         Pair[] query = pairs.stream()
                 .filter(stringStringPair -> stringStringPair.getValue() != null)
                 .toArray(Pair[]::new);
-        return getJob(jid).thenCompose(ignored -> ServiceUtils.getCollectionPageFuture(jobExperienceRepo, page, pageSize, query));
+        return getJob(jid).thenCompose(ignored -> ServiceUtils.getCollectionPageFuture(JobExperience.class, page, pageSize, query));
     }
 
     public CompletableFuture<JobExperience> getJobExperience(long id, long cid) {
         UnitOfWork unitOfWork = new UnitOfWork();
+        DataMapper<JobExperience, Long> jobExperienceMapper = getMapper(JobExperience.class, unitOfWork);
 
-        CompletableFuture<JobExperience> future = jobExperienceRepo.findById(unitOfWork, cid)
+        CompletableFuture<JobExperience> future = jobExperienceMapper.findById( cid)
                 .thenCompose(res -> unitOfWork.commit().thenApply(aVoid -> res))
                 .thenApply(oJobExperience -> oJobExperience.orElseThrow(() -> new ResourceNotFoundException(ErrorMessages.RESOURCE_NOTFOUND)))
                 .thenApply(jobExperience -> {
@@ -95,21 +93,22 @@ public class JobService {
 
     public CompletableFuture<Job> createJob(Job job, String email) {
         UnitOfWork unitOfWork = new UnitOfWork();
-
+        DataMapper<Job, Long> jobMapper = getMapper(Job.class, unitOfWork);
+        DataMapper<JobExperience, Long> jobExperienceMapper = getMapper(JobExperience.class, unitOfWork);
         CompletableFuture<Job> future = job.getAccount().getForeignObject(unitOfWork)
                 .thenApply(account -> {
                     if (!account.getEmail().equals(email))
                         throw new UnauthorizedException(ErrorMessages.UN_AUTHORIZED_ID_AND_EMAIL_MISMATCH);
                     return account;
                 })
-                .thenCompose(account -> jobRepo.create(unitOfWork, job))
+                .thenCompose(account -> jobMapper.create( job))
                 .thenCompose(aVoid -> job.getExperiences().apply(unitOfWork))
                 .thenCompose(experienceList -> {
                     if (experienceList.isEmpty()) return CompletableFuture.completedFuture(null);
 
                     experienceList.forEach(curr -> curr.setJobId(job.getIdentityKey()));
 
-                    return jobExperienceRepo.createAll(unitOfWork, experienceList);
+                    return jobExperienceMapper.createAll(experienceList);
                 })
                 .thenCompose(ignored -> unitOfWork.commit().thenApply(aVoid -> job));
         return handleExceptions(future, unitOfWork);
@@ -118,15 +117,17 @@ public class JobService {
     public CompletableFuture<Void> addJobExperienceToJob(long jobId, List<JobExperience> jobExperience, String username){
         UnitOfWork unitOfWork = new UnitOfWork();
 
-        CompletableFuture<Void> future = getJob(jobId)
+        DataMapper<JobExperience, Long> jobExperienceMapper = getMapper(JobExperience.class, unitOfWork);
+        DataMapper<Job, Long> jobMapper = getMapper(Job.class, unitOfWork);
+
+        CompletableFuture<Void> future = jobMapper.findById(jobId)
+                .thenApply(ojob -> ojob.orElseThrow(() -> new ResourceNotFoundException(ErrorMessages.RESOURCE_NOTFOUND_JOB)))
                 .thenCompose(job -> job.getAccount().getForeignObject(unitOfWork))
-                .thenApply(
-                        account -> {
-                            if (!account.getEmail().equals(username))
-                                throw new UnauthorizedException(ErrorMessages.UN_AUTHORIZED_ID_AND_EMAIL_MISMATCH);
-                            return account;
-                        })
-                .thenCompose(account -> jobExperienceRepo.createAll(unitOfWork, jobExperience))
+                .thenApply(account -> {
+                    if (!account.getEmail().equals(username)) throw new UnauthorizedException(ErrorMessages.UN_AUTHORIZED_ID_AND_EMAIL_MISMATCH);
+                    return account;
+                })
+                .thenCompose(account -> jobExperienceMapper.createAll( jobExperience))
                 .thenCompose(aVoid -> unitOfWork.commit());
 
         return handleExceptions(future, unitOfWork);
@@ -134,6 +135,7 @@ public class JobService {
 
     public Mono<Void> updateJob(Job job, String email) {
         UnitOfWork unitOfWork = new UnitOfWork();
+        DataMapper<Job, Long> jobMapper = getMapper(Job.class, unitOfWork);
         CompletableFuture<Void> future = CompletableFuture.allOf(
                 getJob(job.getIdentityKey()),
                 job.getAccount().getForeignObject(unitOfWork)
@@ -143,7 +145,7 @@ public class JobService {
                             return account;
                         })
         )
-                .thenCompose(aVoid -> jobRepo.update(unitOfWork, job))
+                .thenCompose(aVoid -> jobMapper.update(job))
                 .thenCompose(aVoid -> unitOfWork.commit());
 
         future = handleExceptions(future, unitOfWork);
@@ -153,14 +155,15 @@ public class JobService {
 
     public Mono<Void> updateJobExperience(JobExperience jobExperience, String username) {
         UnitOfWork unitOfWork = new UnitOfWork();
-        CompletableFuture<Void> future = getJob(jobExperience.getJobId())
+        DataMapper<JobExperience, Long> jobExperienceMapper = getMapper(JobExperience.class, unitOfWork);
+        CompletableFuture<Void> future = getJob(jobExperience.getJobId(), unitOfWork)
                 .thenCompose(job -> job.getAccount().getForeignObject(unitOfWork)
                         .thenApply(account -> {
                             if (!account.getEmail().equals(username))
                                 throw new UnauthorizedException(ErrorMessages.UN_AUTHORIZED_ID_AND_EMAIL_MISMATCH);
                             return account;
                         }))
-                .thenCompose(account -> jobExperienceRepo.update(unitOfWork, jobExperience))
+                .thenCompose(account -> jobExperienceMapper.update(jobExperience))
                 .thenCompose(aVoid -> unitOfWork.commit());
 
         future = handleExceptions(future, unitOfWork);
@@ -170,7 +173,8 @@ public class JobService {
 
     public Mono<Void> deleteJob(long jobId, String email) {
         UnitOfWork unitOfWork = new UnitOfWork();
-        CompletableFuture<Void> future = accountRepo.findWhere(unitOfWork, new Pair<>("email", email))
+        DataMapper<Account, Long> accountMapper = getMapper(Account.class, unitOfWork);
+        CompletableFuture<Void> future = accountMapper.findWhere(new Pair<>("email", email))
                 .thenApply(accounts -> {
                     if (accounts.isEmpty())
                         throw new UnauthorizedException(ErrorMessages.UN_AUTHORIZED);
@@ -200,28 +204,30 @@ public class JobService {
 
     private CompletableFuture<Void> executeDeleteTransaction(Job job) {
         UnitOfWork unitOfWork = new UnitOfWork();
-
+        DataMapper<Application, Long> applicationMapper = getMapper(Application.class, unitOfWork);
+        DataMapper<JobExperience, Long> jobExperienceMapper = getMapper(JobExperience.class, unitOfWork);
+        DataMapper<Job, Long> jobeMapper = getMapper(Job.class, unitOfWork);
         CompletableFuture<Void> future = job.getApplications().apply(unitOfWork)
                 .thenCompose(applications -> {
                     List<Long> applicationIds = applications.stream().map(Application::getIdentityKey).collect(Collectors.toList());
-                    return applicationRepo.deleteAll(unitOfWork, applicationIds);
+                    return applicationMapper.deleteAll(applicationIds);
                 })
                 .thenCompose(aVoid ->
                         job.getExperiences()
                                 .apply(unitOfWork)
                                 .thenCompose(jobExperiences -> {
                                     List<Long> jobExpIds = jobExperiences.stream().map(JobExperience::getIdentityKey).collect(Collectors.toList());
-                                    return jobExperienceRepo.deleteAll(unitOfWork, jobExpIds);
+                                    return jobExperienceMapper.deleteAll(jobExpIds);
                                 })
                 )
-                .thenAccept(aVoid -> jobRepo.delete(unitOfWork, job))
+                .thenAccept(aVoid -> jobeMapper.delete( job))
                 .thenCompose(aVoid -> unitOfWork.commit());
         return handleExceptions(future, unitOfWork);
     }
 
     public Mono<Void> deleteJobExperience(long jxpId, long jobId, String email) {
         UnitOfWork unitOfWork = new UnitOfWork();
-
+        DataMapper<JobExperience, Long> jobExperienceMapper = getMapper(JobExperience.class, unitOfWork);
         CompletableFuture<Void> future = getJob(jobId)
                 .thenCompose(job -> job.getAccount().getForeignObject(unitOfWork)
                         .thenApply(account -> {
@@ -229,7 +235,7 @@ public class JobService {
                                 throw new UnauthorizedException(ErrorMessages.UN_AUTHORIZED_ID_AND_EMAIL_MISMATCH);
                             return account;
                         }))
-                .thenCompose(account -> jobExperienceRepo.deleteById(unitOfWork, jxpId))
+                .thenCompose(account -> jobExperienceMapper.deleteById(jxpId))
                 .thenCompose(aVoid -> unitOfWork.commit());
         return Mono.fromFuture(
                 handleExceptions(future, unitOfWork)

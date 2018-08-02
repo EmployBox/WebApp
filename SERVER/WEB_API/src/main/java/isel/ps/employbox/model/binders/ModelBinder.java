@@ -4,8 +4,6 @@ import com.github.jayield.rapper.DomainObject;
 import com.github.jayield.rapper.utils.CollectionUtils;
 import isel.ps.employbox.model.output.HalCollectionPage;
 import isel.ps.employbox.model.output.OutputDto;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -14,20 +12,13 @@ import java.util.stream.Stream;
 
 public interface ModelBinder<T extends DomainObject, O extends OutputDto, I> {
     CompletableFuture<O> bindOutput(T object);
-
     T bindInput(I object);
 
     default Stream<T> bindInput(Stream<I> list) {
         return list.map(this::bindInput);
     }
 
-    default CompletableFuture<HalCollectionPage<T>> bindOutput(
-            CollectionPage<T> elementsPage,
-            Class selfController,
-            Object... parameters
-    ) {
-        //Logger logger = LoggerFactory.getLogger(ModelBinder.class);
-
+    default CompletableFuture<HalCollectionPage<T>> bindOutput(CollectionPage<T> elementsPage, Class selfController, Object... parameters) {
         List<CompletableFuture<Object>> items = elementsPage.getPageList()
                 .stream()
                 .map(t -> bindOutput(t).thenApply(OutputDto::getCollectionItemOutput))

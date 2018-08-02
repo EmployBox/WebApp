@@ -1,9 +1,8 @@
 package isel.ps.employbox.model.entities;
 
-
 import com.github.jayield.rapper.DomainObject;
-import com.github.jayield.rapper.Id;
-import com.github.jayield.rapper.Version;
+import com.github.jayield.rapper.annotations.Id;
+import com.github.jayield.rapper.annotations.Version;
 
 import java.sql.Timestamp;
 

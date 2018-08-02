@@ -1,6 +1,5 @@
 package isel.ps.employbox.controllers.curricula;
 
-import com.github.jayield.rapper.DataRepository;
 import isel.ps.employbox.exceptions.BadRequestException;
 import isel.ps.employbox.model.binders.curricula.AcademicBackgroundBinder;
 import isel.ps.employbox.model.entities.curricula.childs.AcademicBackground;
@@ -24,18 +23,15 @@ public class AcademicBackgroundController {
     private final AcademicBackgroundBinder academicBackgroundBinder;
     private final AcademicBackgroundService academicBackgroundService;
     private final CurriculumService curriculumService;
-    private final DataRepository<AcademicBackground, Long> backgroundRepo;
 
     public AcademicBackgroundController(
             AcademicBackgroundBinder academicBackgroundBinder,
             AcademicBackgroundService academicBackgroundService,
-            CurriculumService curriculumService,
-            DataRepository<AcademicBackground, Long> backgroundRepo
+            CurriculumService curriculumService
     ) {
         this.academicBackgroundBinder = academicBackgroundBinder;
         this.academicBackgroundService = academicBackgroundService;
         this.curriculumService = curriculumService;
-        this.backgroundRepo = backgroundRepo;
     }
 
     @GetMapping
@@ -56,7 +52,7 @@ public class AcademicBackgroundController {
             @PathVariable long cid,
             @PathVariable long academicId
     ){
-        CompletableFuture<OutAcademicBackground> future = curriculumService.getCurriculumChild(backgroundRepo, id, cid, academicId)
+        CompletableFuture<OutAcademicBackground> future = curriculumService.getCurriculumChild(AcademicBackground.class, id, cid, academicId)
                 .thenCompose(academicBackgroundBinder::bindOutput);
         return Mono.fromFuture(future);
     }

@@ -1,10 +1,10 @@
 package isel.ps.employbox.model.entities;
 
-import com.github.jayield.rapper.ColumnName;
 import com.github.jayield.rapper.DomainObject;
-import com.github.jayield.rapper.Id;
-import com.github.jayield.rapper.Version;
-import com.github.jayield.rapper.utils.UnitOfWork;
+import com.github.jayield.rapper.annotations.ColumnName;
+import com.github.jayield.rapper.annotations.Id;
+import com.github.jayield.rapper.annotations.Version;
+import com.github.jayield.rapper.unitofwork.UnitOfWork;
 import isel.ps.employbox.model.entities.curricula.childs.AcademicBackground;
 import isel.ps.employbox.model.entities.curricula.childs.CurriculumExperience;
 import isel.ps.employbox.model.entities.curricula.childs.PreviousJobs;
@@ -52,22 +52,23 @@ public class Curriculum implements DomainObject<Long> {
         this.version = version;
     }
 
-    public Curriculum(long accountId,
-                      long curriculumId,
-                      String title,
-                      long version,
-                      List<PreviousJobs> previousJobsList,
-                      List<AcademicBackground> academicBackgroundList,
-                      List<CurriculumExperience> experiencesList,
-                      List<Project> projectsList
+    public Curriculum(
+            long accountId,
+            long curriculumId,
+            String title,
+            long version,
+            List<PreviousJobs> previousJobsList,
+            List<AcademicBackground> academicBackgroundList,
+            List<CurriculumExperience> experiencesList,
+            List<Project> projectsList
     ) {
         this.accountId = accountId;
         this.curriculumId = curriculumId;
         this.title = title;
-        this.previousJobs = unit -> CompletableFuture.completedFuture(previousJobsList);
-        this.academicBackground = unit -> CompletableFuture.completedFuture(academicBackgroundList);
-        this.experiences = unit -> CompletableFuture.completedFuture(experiencesList);
-        this.projects = unit -> CompletableFuture.completedFuture(projectsList);
+        this.previousJobs = (__) -> CompletableFuture.completedFuture(previousJobsList);
+        this.academicBackground = (__) -> CompletableFuture.completedFuture(academicBackgroundList);
+        this.experiences = (__) -> CompletableFuture.completedFuture(experiencesList);
+        this.projects = (__) -> CompletableFuture.completedFuture(projectsList);
         this.version = version;
     }
 
