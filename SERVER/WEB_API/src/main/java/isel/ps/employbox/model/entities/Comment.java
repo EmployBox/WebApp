@@ -4,11 +4,12 @@ import com.github.jayield.rapper.DomainObject;
 import com.github.jayield.rapper.annotations.ColumnName;
 import com.github.jayield.rapper.annotations.Id;
 import com.github.jayield.rapper.annotations.Version;
+import com.github.jayield.rapper.unitofwork.UnitOfWork;
 
 import java.sql.Timestamp;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
-import java.util.function.Supplier;
+import java.util.function.Function;
 
 public class Comment implements DomainObject<Long> {
     @Id(isIdentity = true)
@@ -24,7 +25,7 @@ public class Comment implements DomainObject<Long> {
     private final long version;
 
     @ColumnName(foreignName = "mainCommentId")
-    private final Supplier<CompletableFuture<List<Comment>>> replies;
+    private final Function<UnitOfWork, CompletableFuture<List<Comment>>> replies;
 
     public Comment(){
         accountIdFrom = 0;
@@ -55,7 +56,7 @@ public class Comment implements DomainObject<Long> {
         this.datetime = date;
         this.text = text;
         this.status = status;
-        this.replies = ()-> CompletableFuture.completedFuture(replies);
+        this.replies = (__)-> CompletableFuture.completedFuture(replies);
         this.version = version;
     }
 
@@ -96,7 +97,7 @@ public class Comment implements DomainObject<Long> {
         return status;
     }
 
-    public Supplier<CompletableFuture<List<Comment>>> getReplies() {
+    public Function<UnitOfWork, CompletableFuture<List<Comment>>> getReplies() {
         return replies;
     }
 }

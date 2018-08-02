@@ -2,14 +2,15 @@ package isel.ps.employbox.model.entities;
 
 
 import com.github.jayield.rapper.annotations.ColumnName;
+import com.github.jayield.rapper.unitofwork.UnitOfWork;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
-import java.util.function.Supplier;
+import java.util.function.Function;
 
 public class Moderator extends Account {
     @ColumnName(foreignName = "moderatorId")
-    private final Supplier<CompletableFuture<List<Rating>>> ratingsModerated;
+    private final Function<UnitOfWork,  CompletableFuture<List<Rating>>> ratingsModerated;
 
     public Moderator(){
         ratingsModerated = null;
@@ -28,10 +29,10 @@ public class Moderator extends Account {
             List<Rating> ratingsModerated
     ) {
         super(accountID, name, email, password, "MOD", rating, version, null, comments, chats, ratings, null, null);
-        this.ratingsModerated = ()-> CompletableFuture.completedFuture(ratingsModerated);
+        this.ratingsModerated = (__)-> CompletableFuture.completedFuture(ratingsModerated);
     }
 
-    public Supplier<CompletableFuture<List<Rating>>> getRatingsModerated() {
+    public Function<UnitOfWork, CompletableFuture<List<Rating>>> getRatingsModerated() {
         return ratingsModerated;
     }
 }

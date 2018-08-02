@@ -35,7 +35,6 @@ public class JobController {
         this.jobExperienceBinder = jobExperienceBinder;
     }
 
-
     @GetMapping
     public Mono<HalCollectionPage<Job>> getAllJobs(
             @RequestParam(defaultValue = "0") int page,
@@ -99,7 +98,8 @@ public class JobController {
             Authentication authentication
     ) {
         List<JobExperience> jobExperiences = inJobExperiences.stream().map(jobExperienceBinder::bindInput).collect(Collectors.toList());
-        return Mono.fromFuture( jobService.addJobExperienceToJob(jid, jobExperiences, authentication.getName()));
+        CompletableFuture<Void> future = jobService.addJobExperienceToJob(jid, jobExperiences, authentication.getName());
+        return Mono.fromFuture(future);
     }
 
     @PutMapping("/{jid}")

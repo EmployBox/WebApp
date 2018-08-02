@@ -4,10 +4,11 @@ import com.github.jayield.rapper.DomainObject;
 import com.github.jayield.rapper.annotations.ColumnName;
 import com.github.jayield.rapper.annotations.Id;
 import com.github.jayield.rapper.annotations.Version;
+import com.github.jayield.rapper.unitofwork.UnitOfWork;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
-import java.util.function.Supplier;
+import java.util.function.Function;
 
 public class Chat implements DomainObject<Long> {
     @Id(isIdentity = true)
@@ -18,7 +19,7 @@ public class Chat implements DomainObject<Long> {
     private long version;
 
     @ColumnName(foreignName = "chatId")
-    private Supplier< CompletableFuture<List<Message>>> messages;
+    private Function<UnitOfWork, CompletableFuture<List<Message>>> messages;
 
     public Chat(){
         accountIdFirst = 0;
@@ -32,7 +33,7 @@ public class Chat implements DomainObject<Long> {
         this.accountIdFirst = accountIdFirst;
         this.accountIdSecond = accountIdSecond;
         this.version = version;
-        this.messages = ()-> CompletableFuture.completedFuture(messages);
+        this.messages = (__)-> CompletableFuture.completedFuture(messages);
     }
 
     public Chat(long accountIdFirst, long accountIdSecond){
@@ -57,7 +58,7 @@ public class Chat implements DomainObject<Long> {
         return accountIdSecond;
     }
 
-    public Supplier<CompletableFuture<List<Message>>> getMessages() {
+    public Function<UnitOfWork, CompletableFuture<List<Message>>> getMessages() {
         return messages;
     }
 }

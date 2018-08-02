@@ -12,7 +12,7 @@ import com.github.jayield.rapper.unitofwork.UnitOfWork;
 import java.sql.Timestamp;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
-import java.util.function.Supplier;
+import java.util.function.Function;
 
 import static com.github.jayield.rapper.mapper.MapperRegistry.getMapper;
 
@@ -34,9 +34,9 @@ public class Job implements DomainObject<Long> {
     @ColumnName(name = "accountId")
     private Foreign<Account,Long> account;
     @ColumnName(foreignName = "jobId")
-    private Supplier<CompletableFuture<List<Application>>> applications;
+    private Function<UnitOfWork, CompletableFuture<List<Application>>> applications;
     @ColumnName(foreignName = "jobId")
-    private Supplier<CompletableFuture<List<JobExperience>>> experiences;
+    private Function<UnitOfWork, CompletableFuture<List<JobExperience>>> experiences;
 
     public Job(){
         title = null;
@@ -94,7 +94,7 @@ public class Job implements DomainObject<Long> {
             long version
     ) {
         UnitOfWork unitOfWork = new UnitOfWork();
-        this.account = new Foreign(accountId, () -> getMapper(Account.class, unitOfWork).findById( accountId)
+        this.account = new Foreign(accountId, unit -> getMapper(Account.class, unitOfWork).findById( accountId)
                 .thenCompose( res -> unitOfWork.commit().thenApply( __-> res))
                 .thenApply(account1 -> account1.orElseThrow(() -> new DataMapperException("Account not Found"))));
         this.jobId = jobId;
@@ -106,8 +106,8 @@ public class Job implements DomainObject<Long> {
         this.offerBeginDate = offerBeginDate;
         this.offerEndDate = offerEndDate;
         this.offerType = offerType;
-        this.applications = ()-> CompletableFuture.completedFuture(applications);
-        this.experiences = ()-> CompletableFuture.completedFuture(experiences);
+        this.applications = (__)-> CompletableFuture.completedFuture(applications);
+        this.experiences = (__)-> CompletableFuture.completedFuture(experiences);
         this.version = version;
     }
 
@@ -152,11 +152,11 @@ public class Job implements DomainObject<Long> {
         return title;
     }
 
-    public Supplier<CompletableFuture<List<JobExperience>>> getExperiences() {
+    public Function<UnitOfWork, CompletableFuture<List<JobExperience>>> getExperiences() {
         return experiences;
     }
 
-    public Supplier<CompletableFuture<List<Application>>> getApplications() {
+    public Function<UnitOfWork, CompletableFuture<List<Application>>> getApplications() {
         return applications;
     }
 

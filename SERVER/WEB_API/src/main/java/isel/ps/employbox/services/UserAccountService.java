@@ -38,11 +38,17 @@ public class UserAccountService {
     }
 
     public CompletableFuture<UserAccount> getUser(long id, String... email) {
-        if (email.length > 1)
-            throw new InvalidParameterException("Only 1 or 2 parameters are allowed for this method");
-
         UnitOfWork unit = new UnitOfWork();
+        return getUser(id, unit, email);
+    }
+
+    private CompletableFuture<UserAccount> getUser(long id, UnitOfWork unit, String... email) {
+        if (email.length > 1) {
+            throw new InvalidParameterException("Only 1 or 2 parameters are allowed for this method");
+        }
+
         DataMapper<UserAccount, Long> userMapper = getMapper(UserAccount.class, unit);
+
         CompletableFuture<UserAccount> future = userMapper.findById(id)
                 .thenApply(res -> {
                     if (!res.isPresent()) throw new ResourceNotFoundException(RESOURCE_NOTFOUND_USER);
@@ -51,11 +57,16 @@ public class UserAccountService {
                     return res.get();
                 })
                 .thenCompose(userAccount -> unit.commit().thenApply(aVoid -> userAccount));
+
         return handleExceptions(future, unit);
     }
 
     public CompletableFuture<Application> getApplication(long userId, long jobId, long apId) {
         UnitOfWork unit = new UnitOfWork();
+        return getApplication(userId, jobId, apId, unit);
+    }
+
+    private CompletableFuture<Application> getApplication(long userId, long jobId, long apId, UnitOfWork unit) {
         DataMapper<Application, Long> applicationMapper = getMapper(Application.class, unit);
         CompletableFuture<Application> future = getUser(userId)
                 .thenCompose(ignored -> applicationMapper.findById(apId))
@@ -126,15 +137,16 @@ public class UserAccountService {
     public Mono<Void> updateApplication(Application application, String email, long apId) {
         if(apId != application.getIdentityKey())
             throw new BadRequestException(BAD_REQUEST_IDS_MISMATCH);
+
         UnitOfWork unit = new UnitOfWork();
         DataMapper<Application, Long> applicationMapper = getMapper(Application.class, unit);
-        CompletableFuture<Void> future = getUser(application.getAccountId(), email)
-                .thenCompose(userAccount -> getApplication(application.getAccountId(), application.getJobId(), application.getIdentityKey()))
+
+        CompletableFuture<Void> future = getUser(application.getAccountId(), unit, email)
+                .thenCompose(userAccount -> getApplication(application.getAccountId(), application.getJobId(), application.getIdentityKey(), unit))
                 .thenCompose(application1 -> applicationMapper.update(application)
                         .thenCompose(aVoid -> unit.commit()));
-        return Mono.fromFuture(
-                handleExceptions(future, unit)
-        );
+
+        return Mono.fromFuture(handleExceptions(future, unit));
     }
 
     public Mono<Void> deleteUser(long id, String email) {

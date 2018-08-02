@@ -18,7 +18,7 @@ public class JobBinder implements ModelBinder<Job, OutJob, InJob> {
         AccountBinder accountBinder = new AccountBinder();
 
         CompletableFuture<OutJob> future = job.getAccount()
-                .getForeignObject()
+                .getForeignObject(unitOfWork)
                 .thenCompose(account1 -> unitOfWork.commit().thenApply(aVoid -> account1))
                 .thenCompose(accountBinder::bindOutput)
                 .thenApply(outAccount -> new OutJob(

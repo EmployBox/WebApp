@@ -26,17 +26,14 @@ public class ServiceUtils {
         UnitOfWork unitOfWork = new UnitOfWork(TransactionIsolation.SERIALIZABLE);
         DataMapper<T, K> mapper = getMapper(tClass, unitOfWork);
 
-        return handleExceptions(mapper.findWhere(page, pageSize, query)
-                .thenCompose(tList -> getCollectionPageCF(mapper, page, pageSize, unitOfWork, tList, query)), unitOfWork);
-    }
+        CompletableFuture<CollectionPage<T>> future = mapper.findWhere(page, pageSize, query)
+                .thenCompose(tList -> mapper.getNumberOfEntries(query)
+                        .thenCompose(aLong -> {
+                            CollectionPage<T> collectionPage = new CollectionPage<>(aLong, pageSize, page, tList);
+                            return unitOfWork.commit().thenApply(aVoid -> collectionPage);
+                        }));
 
-    private static <T extends DomainObject<K>, K> CompletableFuture<CollectionPage<T>> getCollectionPageCF(DataMapper<T, K> repo, int page, int pageSize,
-                                                                                                           UnitOfWork unitOfWork, List<T> tList, Pair<String, Object>[] query) {
-        return repo.getNumberOfEntries(query)
-                .thenCompose(aLong -> {
-                    CollectionPage<T> collectionPage = new CollectionPage<>(aLong, pageSize, page, tList);
-                    return unitOfWork.commit().thenApply(aVoid -> collectionPage);
-                });
+        return handleExceptions(future, unitOfWork);
     }
 
     public static <T> CompletableFuture<T> handleExceptions(CompletableFuture<T> future, UnitOfWork unitOfWork) {

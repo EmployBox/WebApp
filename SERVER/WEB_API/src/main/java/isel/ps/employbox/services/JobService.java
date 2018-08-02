@@ -56,9 +56,13 @@ public class JobService {
 
     public CompletableFuture<Job> getJob(long jid) {
         UnitOfWork unitOfWork = new UnitOfWork();
+        return getJob(jid, unitOfWork)
+                .thenCompose(res -> unitOfWork.commit().thenApply(aVoid -> res));
+    }
+
+    public CompletableFuture<Job> getJob(long jid, UnitOfWork unitOfWork) {
         DataMapper<Job, Long> jobMapper = getMapper(Job.class, unitOfWork);
         CompletableFuture<Job> future = jobMapper.findById(jid)
-                .thenCompose(res -> unitOfWork.commit().thenApply(aVoid -> res))
                 .thenApply(ojob -> ojob.orElseThrow(() -> new ResourceNotFoundException(ErrorMessages.RESOURCE_NOTFOUND_JOB)));
         return handleExceptions(future, unitOfWork);
     }
@@ -91,7 +95,7 @@ public class JobService {
         UnitOfWork unitOfWork = new UnitOfWork();
         DataMapper<Job, Long> jobMapper = getMapper(Job.class, unitOfWork);
         DataMapper<JobExperience, Long> jobExperienceMapper = getMapper(JobExperience.class, unitOfWork);
-        CompletableFuture<Job> future = job.getAccount().getForeignObject()
+        CompletableFuture<Job> future = job.getAccount().getForeignObject(unitOfWork)
                 .thenApply(account -> {
                     if (!account.getEmail().equals(email))
                         throw new UnauthorizedException(ErrorMessages.UN_AUTHORIZED_ID_AND_EMAIL_MISMATCH);
@@ -112,15 +116,17 @@ public class JobService {
 
     public CompletableFuture<Void> addJobExperienceToJob(long jobId, List<JobExperience> jobExperience, String username){
         UnitOfWork unitOfWork = new UnitOfWork();
+
         DataMapper<JobExperience, Long> jobExperienceMapper = getMapper(JobExperience.class, unitOfWork);
-        CompletableFuture<Void> future = getJob(jobId)
-                .thenCompose(job -> job.getAccount().getForeignObject())
-                .thenApply(
-                        account -> {
-                            if (!account.getEmail().equals(username))
-                                throw new UnauthorizedException(ErrorMessages.UN_AUTHORIZED_ID_AND_EMAIL_MISMATCH);
-                            return account;
-                        })
+        DataMapper<Job, Long> jobMapper = getMapper(Job.class, unitOfWork);
+
+        CompletableFuture<Void> future = jobMapper.findById(jobId)
+                .thenApply(ojob -> ojob.orElseThrow(() -> new ResourceNotFoundException(ErrorMessages.RESOURCE_NOTFOUND_JOB)))
+                .thenCompose(job -> job.getAccount().getForeignObject(unitOfWork))
+                .thenApply(account -> {
+                    if (!account.getEmail().equals(username)) throw new UnauthorizedException(ErrorMessages.UN_AUTHORIZED_ID_AND_EMAIL_MISMATCH);
+                    return account;
+                })
                 .thenCompose(account -> jobExperienceMapper.createAll( jobExperience))
                 .thenCompose(aVoid -> unitOfWork.commit());
 
@@ -132,7 +138,7 @@ public class JobService {
         DataMapper<Job, Long> jobMapper = getMapper(Job.class, unitOfWork);
         CompletableFuture<Void> future = CompletableFuture.allOf(
                 getJob(job.getIdentityKey()),
-                job.getAccount().getForeignObject()
+                job.getAccount().getForeignObject(unitOfWork)
                         .thenApply(account -> {
                             if (!account.getEmail().equals(email))
                                 throw new UnauthorizedException(ErrorMessages.UN_AUTHORIZED_ID_AND_EMAIL_MISMATCH);
@@ -150,8 +156,8 @@ public class JobService {
     public Mono<Void> updateJobExperience(JobExperience jobExperience, String username) {
         UnitOfWork unitOfWork = new UnitOfWork();
         DataMapper<JobExperience, Long> jobExperienceMapper = getMapper(JobExperience.class, unitOfWork);
-        CompletableFuture<Void> future = getJob(jobExperience.getJobId())
-                .thenCompose(job -> job.getAccount().getForeignObject()
+        CompletableFuture<Void> future = getJob(jobExperience.getJobId(), unitOfWork)
+                .thenCompose(job -> job.getAccount().getForeignObject(unitOfWork)
                         .thenApply(account -> {
                             if (!account.getEmail().equals(username))
                                 throw new UnauthorizedException(ErrorMessages.UN_AUTHORIZED_ID_AND_EMAIL_MISMATCH);
@@ -186,7 +192,7 @@ public class JobService {
         CompletableFuture<Void> future = getJob(jobId)
                 .thenCompose(
                         job -> job.getAccount()
-                                .getForeignObject()
+                                .getForeignObject(unitOfWork)
                                 .thenCompose(acc -> {
                                     if (!acc.getIdentityKey().equals(account.getIdentityKey()))
                                         throw new BadRequestException(ErrorMessages.UN_AUTHORIZED_ID_AND_EMAIL_MISMATCH);
@@ -223,7 +229,7 @@ public class JobService {
         UnitOfWork unitOfWork = new UnitOfWork();
         DataMapper<JobExperience, Long> jobExperienceMapper = getMapper(JobExperience.class, unitOfWork);
         CompletableFuture<Void> future = getJob(jobId)
-                .thenCompose(job -> job.getAccount().getForeignObject()
+                .thenCompose(job -> job.getAccount().getForeignObject(unitOfWork)
                         .thenApply(account -> {
                             if (!account.getEmail().equals(email))
                                 throw new UnauthorizedException(ErrorMessages.UN_AUTHORIZED_ID_AND_EMAIL_MISMATCH);

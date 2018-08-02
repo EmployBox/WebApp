@@ -1,6 +1,5 @@
 package isel.ps.employbox.model.entities;
 
-
 import com.github.jayield.rapper.DomainObject;
 import com.github.jayield.rapper.annotations.Id;
 import com.github.jayield.rapper.annotations.Version;

@@ -303,7 +303,8 @@ public class UserAccountControllerTests {
         DataMapper<Application, Long> applicationRepo = getMapper(Application.class, unitOfWork);
         Application updatedApplication = applicationRepo.findById( application.getIdentityKey()).join().orElseThrow(() -> new ResourceNotFoundException("Application not found"));
         unitOfWork.commit().join();
-        assertTrue(updatedApplication.getVersion() != application.getVersion());
+//        assertNotNull(updatedApplication.getDate());
+        assertNotSame(updatedApplication.getVersion(), application.getVersion());
     }
 
     @Test
