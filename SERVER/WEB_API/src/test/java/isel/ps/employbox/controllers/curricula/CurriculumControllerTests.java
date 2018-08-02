@@ -2,9 +2,9 @@ package isel.ps.employbox.controllers.curricula;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.jayield.rapper.DataRepository;
+import com.github.jayield.rapper.mapper.DataMapper;
+import com.github.jayield.rapper.unitofwork.UnitOfWork;
 import com.github.jayield.rapper.utils.Pair;
-import com.github.jayield.rapper.utils.UnitOfWork;
 import isel.ps.employbox.exceptions.ResourceNotFoundException;
 import isel.ps.employbox.model.entities.Curriculum;
 import isel.ps.employbox.model.entities.UserAccount;
@@ -25,13 +25,12 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
-import java.sql.SQLException;
 import java.util.List;
 
+import static com.github.jayield.rapper.mapper.MapperRegistry.getMapper;
 import static isel.ps.employbox.DataBaseUtils.prepareDB;
 import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.assertFalse;
-import static junit.framework.TestCase.assertTrue;
 import static org.springframework.restdocs.webtestclient.WebTestClientRestDocumentation.document;
 import static org.springframework.restdocs.webtestclient.WebTestClientRestDocumentation.documentationConfiguration;
 import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.springSecurity;
@@ -45,10 +44,7 @@ public class CurriculumControllerTests {
     public JUnitRestDocumentation restDocumentation = new JUnitRestDocumentation();
     @Autowired
     private ApplicationContext context;
-    @Autowired
-    private DataRepository<UserAccount, Long> userAccountRepo;
-    @Autowired
-    private DataRepository<Curriculum, Long> curriculumRepo;
+
     private WebTestClient webTestClient;
     private UserAccount userAccount;
     private Curriculum curriculum;
@@ -63,11 +59,13 @@ public class CurriculumControllerTests {
                 .filter(documentationConfiguration(restDocumentation))
                 .build();
         UnitOfWork unitOfWork = new UnitOfWork();
-        List<UserAccount> userAccounts = userAccountRepo.findWhere(unitOfWork, new Pair<>("name", "Bruno")).join();
+        DataMapper<UserAccount, Long> userAccountMapper = getMapper(UserAccount.class, unitOfWork);
+        List<UserAccount> userAccounts = userAccountMapper.findWhere(new Pair<>("name", "Bruno")).join();
         assertEquals(1, userAccounts.size());
         userAccount = userAccounts.get(0);
 
-        List<Curriculum> curricula = curriculumRepo.findWhere(unitOfWork, new Pair<>("title", "Engenharia Civil")).join();
+        DataMapper<Curriculum, Long> curriculumMapper = getMapper(Curriculum.class, unitOfWork);
+        List<Curriculum> curricula = curriculumMapper.findWhere(new Pair<>("title", "Engenharia Civil")).join();
         assertEquals(1, curricula.size());
         curriculum = curricula.get(0);
 
@@ -113,6 +111,7 @@ public class CurriculumControllerTests {
         ObjectMapper objectMapper = new ObjectMapper();
         String json = objectMapper.writeValueAsString(inCurriculum);
         UnitOfWork unitOfWork = new UnitOfWork();
+        DataMapper<Curriculum, Long> curriculumMapper = getMapper(Curriculum.class, unitOfWork);
         webTestClient
                 .post()
                 .uri("/accounts/users/" + userAccount.getIdentityKey() + "/curricula")
@@ -123,7 +122,7 @@ public class CurriculumControllerTests {
                 .expectBody()
                 .consumeWith(document("createCurriculum"));
 
-        assertEquals(1, curriculumRepo.findWhere(unitOfWork, new Pair<>("title", "Verrryyy gud curriculum")).join().size());
+        assertEquals(1, curriculumMapper.findWhere(new Pair<>("title", "Verrryyy gud curriculum")).join().size());
         unitOfWork.commit().join();
     }
 
@@ -170,8 +169,8 @@ public class CurriculumControllerTests {
                 .expectStatus().isOk()
                 .expectBody()
                 .consumeWith(document("updateCurriculum"));
-
-        Curriculum updatedCurriculum = curriculumRepo.findById(unitOfWork, curriculum.getIdentityKey()).join().orElseThrow(() -> new ResourceNotFoundException("Curriculum not found"));
+        DataMapper<Curriculum, Long> curriculumMapper = getMapper(Curriculum.class, unitOfWork);
+        Curriculum updatedCurriculum = curriculumMapper.findById( curriculum.getIdentityKey()).join().orElseThrow(() -> new ResourceNotFoundException("Curriculum not found"));
         unitOfWork.commit().join();
 
         assertEquals("Qualquer coisa", updatedCurriculum.getTitle());
@@ -200,7 +199,8 @@ public class CurriculumControllerTests {
                 .expectBody()
                 .consumeWith(document("deleteCurriculum"));
         UnitOfWork unitOfWork = new UnitOfWork();
-        assertFalse(curriculumRepo.findById(unitOfWork, curriculum.getIdentityKey()).join().isPresent());
+        DataMapper<Curriculum, Long> curriculumMapper = getMapper(Curriculum.class, unitOfWork);
+        assertFalse(curriculumMapper.findById( curriculum.getIdentityKey()).join().isPresent());
         unitOfWork.commit().join();
     }
 }

@@ -2,11 +2,10 @@ package isel.ps.employbox.model.entities;
 
 import com.github.jayield.rapper.annotations.ColumnName;
 import com.github.jayield.rapper.annotations.Version;
-import com.github.jayield.rapper.unitofwork.UnitOfWork;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
-import java.util.function.Function;
+import java.util.function.Supplier;
 
 public class UserAccount extends Account {
     private final String summary;
@@ -15,9 +14,9 @@ public class UserAccount extends Account {
     private final long version;
 
     @ColumnName(foreignName = "accountId")
-    private final Function<UnitOfWork, CompletableFuture<List<Curriculum>>> curricula;
+    private final Supplier<CompletableFuture<List<Curriculum>>> curricula;
     @ColumnName(foreignName = "accountId")
-    private final Function<UnitOfWork, CompletableFuture<List<Application>>> applications;
+    private final Supplier<CompletableFuture<List<Application>>> applications;
 
     public UserAccount(){
         summary = null;
@@ -49,8 +48,8 @@ public class UserAccount extends Account {
         super(accountID, name, email, password, "USR", rating, accountVersion, offeredJobs, comments, chats, ratings,following, followers);
         this.summary = summary;
         this.photoUrl = photoUrl;
-        this.curricula = (__) -> CompletableFuture.completedFuture(curricula);
-        this.applications = (__) -> CompletableFuture.completedFuture(applications);
+        this.curricula = () -> CompletableFuture.completedFuture(curricula);
+        this.applications = () -> CompletableFuture.completedFuture(applications);
         this.version = version;
     }
 
@@ -95,11 +94,11 @@ public class UserAccount extends Account {
         return super.getVersion();
     }
 
-    public Function<UnitOfWork, CompletableFuture<List<Curriculum>>> getCurricula() {
+    public Supplier<CompletableFuture<List<Curriculum>>> getCurricula() {
         return curricula;
     }
 
-    public Function<UnitOfWork, CompletableFuture<List<Application>>> getApplications() {
+    public Supplier<CompletableFuture<List<Application>>> getApplications() {
         return applications;
     }
 }

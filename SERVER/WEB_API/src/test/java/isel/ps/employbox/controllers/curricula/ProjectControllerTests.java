@@ -1,12 +1,11 @@
 package isel.ps.employbox.controllers.curricula;
 
 
-import com.github.jayield.rapper.DataRepository;
+import com.github.jayield.rapper.mapper.DataMapper;
+import com.github.jayield.rapper.unitofwork.UnitOfWork;
 import com.github.jayield.rapper.utils.Pair;
-import com.github.jayield.rapper.utils.UnitOfWork;
 import isel.ps.employbox.model.entities.Curriculum;
 import isel.ps.employbox.model.entities.UserAccount;
-import isel.ps.employbox.model.entities.curricula.childs.AcademicBackground;
 import isel.ps.employbox.model.entities.curricula.childs.Project;
 import org.junit.After;
 import org.junit.Before;
@@ -25,6 +24,7 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 
 import java.util.List;
 
+import static com.github.jayield.rapper.mapper.MapperRegistry.getMapper;
 import static isel.ps.employbox.DataBaseUtils.prepareDB;
 import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.assertFalse;
@@ -42,12 +42,6 @@ public class ProjectControllerTests {
     @Autowired
     private ApplicationContext context;
     private WebTestClient webTestClient;
-    @Autowired
-    private DataRepository<UserAccount, Long> userAccountRepo;
-    @Autowired
-    private DataRepository<Curriculum, Long> curriculumRepo;
-    @Autowired
-    private DataRepository<Project, Long> projectRepo;
     private UserAccount userAccount;
     private Curriculum curriculum;
     private Project project;
@@ -62,15 +56,18 @@ public class ProjectControllerTests {
                 .filter(documentationConfiguration(restDocumentation))
                 .build();
         UnitOfWork unitOfWork = new UnitOfWork();
-        List<UserAccount> userAccounts = userAccountRepo.findWhere(unitOfWork, new Pair<>("name", "Bruno")).join();
+        DataMapper<UserAccount, Long> userAccountRepo = getMapper(UserAccount.class, unitOfWork);
+        List<UserAccount> userAccounts = userAccountRepo.findWhere( new Pair<>("name", "Bruno")).join();
         assertEquals(1, userAccounts.size());
         userAccount = userAccounts.get(0);
 
-        List<Curriculum> curricula = curriculumRepo.findWhere(unitOfWork, new Pair<>("title", "Engenharia Civil")).join();
+        DataMapper<Curriculum, Long> curriculumRepo = getMapper(Curriculum.class, unitOfWork);
+        List<Curriculum> curricula = curriculumRepo.findWhere( new Pair<>("title", "Engenharia Civil")).join();
         assertEquals(1, curricula.size());
         curriculum = curricula.get(0);
 
-        List<Project> projects = projectRepo.findWhere( unitOfWork, new Pair<>("description", "project one")).join();
+        DataMapper<Project, Long> projectRepo = getMapper(Project.class, unitOfWork);
+        List<Project> projects = projectRepo.findWhere( new Pair<>("description", "project one")).join();
         assertEquals(1, projects.size());
         project = projects.get(0);
         unitOfWork.commit().join();
@@ -128,7 +125,8 @@ public class ProjectControllerTests {
                 .expectBody()
                 .consumeWith(document("deleteProject"));
         UnitOfWork unitOfWork = new UnitOfWork();
-        assertFalse(projectRepo.findById(unitOfWork, project.getIdentityKey()).join().isPresent());
+        DataMapper<Project, Long> projectRepo = getMapper(Project.class, unitOfWork);
+        assertFalse(projectRepo.findById( project.getIdentityKey()).join().isPresent());
         unitOfWork.commit().join();
     }
 }

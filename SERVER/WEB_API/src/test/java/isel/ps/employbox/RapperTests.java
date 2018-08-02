@@ -1,13 +1,8 @@
 package isel.ps.employbox;
 
-import com.github.jayield.rapper.DataRepository;
-import com.github.jayield.rapper.utils.MapperRegistry;
-import isel.ps.employbox.model.entities.*;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.List;
 
 public class RapperTests {
 
@@ -15,6 +10,7 @@ public class RapperTests {
 
     @Test
     public void test() {
+        /*
         MapperRegistry.getRepository(Company.class);
         MapperRegistry.getRepository(Follow.class);
         MapperRegistry.getRepository(Application.class);
@@ -27,5 +23,6 @@ public class RapperTests {
         MapperRegistry.getRepository(UserAccount.class);
         MapperRegistry.getRepository(Company.class);
         MapperRegistry.getRepository(JobExperience.class);
+        */
     }
 }

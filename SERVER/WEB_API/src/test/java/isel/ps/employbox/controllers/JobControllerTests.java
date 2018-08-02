@@ -2,9 +2,9 @@ package isel.ps.employbox.controllers;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.jayield.rapper.DataRepository;
+import com.github.jayield.rapper.mapper.DataMapper;
+import com.github.jayield.rapper.unitofwork.UnitOfWork;
 import com.github.jayield.rapper.utils.Pair;
-import com.github.jayield.rapper.utils.UnitOfWork;
 import isel.ps.employbox.exceptions.ResourceNotFoundException;
 import isel.ps.employbox.model.entities.Job;
 import isel.ps.employbox.model.entities.JobExperience;
@@ -27,10 +27,10 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.github.jayield.rapper.mapper.MapperRegistry.getMapper;
 import static isel.ps.employbox.DataBaseUtils.prepareDB;
 import static junit.framework.TestCase.*;
 import static org.springframework.restdocs.webtestclient.WebTestClientRestDocumentation.document;
@@ -45,10 +45,7 @@ public class JobControllerTests {
     public JUnitRestDocumentation restDocumentation = new JUnitRestDocumentation();
     @Autowired
     private ApplicationContext context;
-    @Autowired
-    private DataRepository<Job, Long> jobRepo;
-    @Autowired
-    private DataRepository<JobExperience, Long> jobExperienceRepo;
+
     private static final Logger logger = LoggerFactory.getLogger(JobControllerTests.class);
     private WebTestClient webTestClient;
     private Long accountId;
@@ -65,11 +62,13 @@ public class JobControllerTests {
                 .filter(documentationConfiguration(restDocumentation))
                 .build();
         UnitOfWork unitOfWork = new UnitOfWork();
-        List<Job> jobs = jobRepo.findWhere(unitOfWork, new Pair<>("title", "Great Job")).join();
+        DataMapper<Job, Long> jobMapper = getMapper(Job.class, unitOfWork);
+        List<Job> jobs = jobMapper.findWhere( new Pair<>("title", "Great Job")).join();
         assertEquals(1, jobs.size());
         job = jobs.get(0);
 
-        List<JobExperience> jobExperiences = jobExperienceRepo.findWhere(unitOfWork, new Pair<>("JOBID", job.getIdentityKey())).join();
+        DataMapper<JobExperience, Long> jobExperienceMapper = getMapper(JobExperience.class, unitOfWork);
+        List<JobExperience> jobExperiences = jobExperienceMapper.findWhere( new Pair<>("JOBID", job.getIdentityKey())).join();
         assertEquals(1, jobExperiences.size());
         jobExperience = jobExperiences.get(0);
 
@@ -142,6 +141,7 @@ public class JobControllerTests {
         ObjectMapper objectMapper = new ObjectMapper();
         String json = objectMapper.writeValueAsString(inJob);
         UnitOfWork unitOfWork = new UnitOfWork();
+
         webTestClient
                 .post()
                 .uri("/jobs")
@@ -151,8 +151,8 @@ public class JobControllerTests {
                 .expectStatus().isOk()
                 .expectBody()
                 .consumeWith(document("createJob"));
-
-        assertTrue(jobRepo.findWhere(unitOfWork, new Pair<>("title", "Verrryyy gud job, come come")).join().size() != 0);
+        DataMapper<Job, Long> jobMapper = getMapper(Job.class, unitOfWork);
+        assertTrue(jobMapper.findWhere( new Pair<>("title", "Verrryyy gud job, come come")).join().size() != 0);
         unitOfWork.commit().join();
     }
 
@@ -179,8 +179,8 @@ public class JobControllerTests {
                 .expectStatus().isOk()
                 .expectBody()
                 .consumeWith(document("createJobExperience"));
-
-        assertEquals(1, jobExperienceRepo.findWhere(unitOfWork, new Pair<>("jobId", job.getIdentityKey()), new Pair<>("COMPETENCES", "C#")).join().size());
+        DataMapper<JobExperience, Long> jobExperienceMapper = getMapper(JobExperience.class, unitOfWork);
+        assertEquals(1, jobExperienceMapper.findWhere( new Pair<>("jobId", job.getIdentityKey()), new Pair<>("COMPETENCES", "C#")).join().size());
         unitOfWork.commit().join();
     }
 
@@ -256,8 +256,8 @@ public class JobControllerTests {
                 .expectStatus().isOk()
                 .expectBody()
                 .consumeWith(document("updateJob"));
-
-        Job updatedJob = jobRepo.findById(unitOfWork, job.getIdentityKey()).join().orElseThrow(() -> new ResourceNotFoundException("Job not found"));
+        DataMapper<Job, Long> jobMapper = getMapper(Job.class, unitOfWork);
+        Job updatedJob = jobMapper.findById( job.getIdentityKey()).join().orElseThrow(() -> new ResourceNotFoundException("Job not found"));
         unitOfWork.commit().join();
 
         assertEquals("Looking for Worker", updatedJob.getOfferType());
@@ -289,7 +289,8 @@ public class JobControllerTests {
                 .expectBody()
                 .consumeWith(document("updateJobExperience"));
 
-        JobExperience updatedJobExperience = jobExperienceRepo.findById(unitOfWork, jobExperience.getIdentityKey()).join().orElseThrow(() -> new ResourceNotFoundException("JobExperience not found"));
+        DataMapper<JobExperience, Long> jobExperienceMapper = getMapper(JobExperience.class, unitOfWork);
+        JobExperience updatedJobExperience = jobExperienceMapper.findById( jobExperience.getIdentityKey()).join().orElseThrow(() -> new ResourceNotFoundException("JobExperience not found"));
         unitOfWork.commit().join();
 
         assertEquals((short) 2, updatedJobExperience.getYears());
@@ -331,7 +332,8 @@ public class JobControllerTests {
                 .expectBody()
                 .consumeWith(document("deleteJob"));
         UnitOfWork unitOfWork = new UnitOfWork();
-        assertFalse(jobRepo.findById(unitOfWork, job.getIdentityKey()).join().isPresent());
+        DataMapper<Job, Long> jobMapper = getMapper(Job.class, unitOfWork);
+        assertFalse(jobMapper.findById( job.getIdentityKey()).join().isPresent());
         unitOfWork.commit().join();
     }
 }

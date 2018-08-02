@@ -4,11 +4,10 @@ import com.github.jayield.rapper.DomainObject;
 import com.github.jayield.rapper.annotations.ColumnName;
 import com.github.jayield.rapper.annotations.Id;
 import com.github.jayield.rapper.annotations.Version;
-import com.github.jayield.rapper.unitofwork.UnitOfWork;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
-import java.util.function.Function;
+import java.util.function.Supplier;
 
 import static isel.ps.employbox.model.entities.Role.DEFAULT;
 
@@ -26,22 +25,22 @@ public class Account implements DomainObject<Long> {
     private final long version;
 
     @ColumnName(foreignName = "accountId")
-    protected final Function<UnitOfWork,CompletableFuture<List<Job>>> offeredJobs;
+    protected final Supplier<CompletableFuture<List<Job>>> offeredJobs;
 
     @ColumnName(foreignName = "accountIdFrom")
-    protected final Function<UnitOfWork, CompletableFuture<List<Comment>>> comments;
+    protected final Supplier<CompletableFuture<List<Comment>>> comments;
 
     @ColumnName(table = "Follows", foreignName = "accountIdFollowed", externalName = "accountIdFollower")
-    protected final Function<UnitOfWork, CompletableFuture<List<Account>>> following;
+    protected final Supplier< CompletableFuture<List<Account>>> following;
 
     @ColumnName(table = "Follows", foreignName = "accountIdFollower", externalName = "accountIdFollowed")
-    protected final Function<UnitOfWork, CompletableFuture<List<Account>>> followers;
+    protected final Supplier<CompletableFuture<List<Account>>> followers;
 
     @ColumnName( foreignName = "accountIdFirst")
-    protected final Function<UnitOfWork, CompletableFuture<List<Chat>>> chats;
+    protected final Supplier<CompletableFuture<List<Chat>>> chats;
 
     @ColumnName(foreignName = "accountIdTo")
-    protected final Function<UnitOfWork, CompletableFuture<List<Rating>>> ratings;
+    protected final Supplier<CompletableFuture<List<Rating>>> ratings;
 
 
     public Account(){
@@ -79,12 +78,12 @@ public class Account implements DomainObject<Long> {
         this.accountType = accountType;
         this.rating = rating;
         this.version = version;
-        this.offeredJobs = (__) -> CompletableFuture.completedFuture(offeredJobs);
-        this.chats = (__) -> CompletableFuture.completedFuture(chats);
-        this.ratings = (__) -> CompletableFuture.completedFuture(ratings);
-        this.comments = (__) -> CompletableFuture.completedFuture(comments);
-        this.following = (__) -> CompletableFuture.completedFuture(following);
-        this.followers = (__) -> CompletableFuture.completedFuture(follower);
+        this.offeredJobs = () -> CompletableFuture.completedFuture(offeredJobs);
+        this.chats = () -> CompletableFuture.completedFuture(chats);
+        this.ratings = () -> CompletableFuture.completedFuture(ratings);
+        this.comments = () -> CompletableFuture.completedFuture(comments);
+        this.following = () -> CompletableFuture.completedFuture(following);
+        this.followers = () -> CompletableFuture.completedFuture(follower);
     }
 
     protected Account(long accountId, String name, String email, String password, String accountType, double rating, long version){
@@ -128,27 +127,27 @@ public class Account implements DomainObject<Long> {
         return accountType;
     }
 
-    public Function<UnitOfWork, CompletableFuture<List<Job>>> getOfferedJobs() {
+    public Supplier<CompletableFuture<List<Job>>> getOfferedJobs() {
         return offeredJobs;
     }
 
-    public Function<UnitOfWork, CompletableFuture<List<Comment>>> getComments() {
+    public Supplier<CompletableFuture<List<Comment>>> getComments() {
         return comments;
     }
 
-    public Function<UnitOfWork, CompletableFuture<List<Account>>> getFollowing() {
+    public Supplier< CompletableFuture<List<Account>>> getFollowing() {
         return following;
     }
 
-    public Function<UnitOfWork, CompletableFuture<List<Account>>> getFollowers() {
+    public Supplier<CompletableFuture<List<Account>>> getFollowers() {
         return followers;
     }
 
-    public Function<UnitOfWork, CompletableFuture<List<Chat>>> getChats() {
+    public Supplier<CompletableFuture<List<Chat>>> getChats() {
         return chats;
     }
 
-    public Function<UnitOfWork, CompletableFuture<List<Rating>>> getRatings() {
+    public Supplier<CompletableFuture<List<Rating>>> getRatings() {
         return ratings;
     }
 

@@ -36,7 +36,7 @@ import static org.springframework.restdocs.webtestclient.WebTestClientRestDocume
 import static org.springframework.restdocs.webtestclient.WebTestClientRestDocumentation.documentationConfiguration;
 import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.springSecurity;
 import static org.springframework.web.reactive.function.client.ExchangeFilterFunctions.basicAuthentication;
-//todo fix commits
+
 @RunWith(SpringRunner.class)
 @SpringBootTest
 public class AcademicBackgroundControllerTests {
@@ -45,12 +45,6 @@ public class AcademicBackgroundControllerTests {
     public JUnitRestDocumentation restDocumentation = new JUnitRestDocumentation();
     @Autowired
     private ApplicationContext context;
-    @Autowired
-    private DataMapper<UserAccount, Long> userAccountRepo = getMapper(UserAccount.class, new UnitOfWork());
-    @Autowired
-    private DataMapper<Curriculum, Long> curriculumRepo = getMapper(Curriculum.class, new UnitOfWork());
-    @Autowired
-    private DataMapper<AcademicBackground, Long> academicBackgroundRepo = getMapper(AcademicBackground.class, new UnitOfWork());
     private WebTestClient webTestClient;
     private UserAccount userAccount;
     private Curriculum curriculum;
@@ -66,14 +60,18 @@ public class AcademicBackgroundControllerTests {
                 .filter(documentationConfiguration(restDocumentation))
                 .build();
         UnitOfWork unitOfWork = new UnitOfWork();
+        DataMapper<UserAccount, Long> userAccountRepo = getMapper(UserAccount.class, unitOfWork);
         List<UserAccount> userAccounts = userAccountRepo.findWhere( new Pair<>("name", "Bruno")).join();
+
         assertEquals(1, userAccounts.size());
         userAccount = userAccounts.get(0);
 
+        DataMapper<Curriculum, Long> curriculumRepo = getMapper(Curriculum.class, unitOfWork);
         List<Curriculum> curricula = curriculumRepo.findWhere(new Pair<>("title", "Engenharia Civil")).join();
         assertEquals(1, curricula.size());
         curriculum = curricula.get(0);
 
+        DataMapper<AcademicBackground, Long> academicBackgroundRepo = getMapper(AcademicBackground.class,unitOfWork);
         List<AcademicBackground> academicBackgrounds = academicBackgroundRepo.findWhere( new Pair<>("institution", "ISEL")).join();
         assertEquals(1, academicBackgrounds.size());
         academicBackground = academicBackgrounds.get(0);
@@ -120,6 +118,7 @@ public class AcademicBackgroundControllerTests {
         ObjectMapper objectMapper = new ObjectMapper();
         String json = objectMapper.writeValueAsString(inAcademicBackground);
         UnitOfWork unitOfWork = new UnitOfWork();
+        DataMapper<AcademicBackground, Long> academicBackgroundRepo = getMapper(AcademicBackground.class,unitOfWork);
         webTestClient
                 .post()
                 .uri("/accounts/users/" + userAccount.getIdentityKey() + "/curricula/" + curriculum.getIdentityKey() + "/academic")
@@ -180,6 +179,7 @@ public class AcademicBackgroundControllerTests {
                 .expectBody()
                 .consumeWith(document("updateAcademicBackground"));
         UnitOfWork unitOfWork = new UnitOfWork();
+        DataMapper<AcademicBackground, Long> academicBackgroundRepo = getMapper(AcademicBackground.class,unitOfWork);
         AcademicBackground updatedAcademicBackground = academicBackgroundRepo
                 .findById(academicBackground.getIdentityKey()).join().orElseThrow(() -> new ResourceNotFoundException("AcademicBackground not found"));
         unitOfWork.commit().join();
@@ -210,6 +210,7 @@ public class AcademicBackgroundControllerTests {
                 .expectBody()
                 .consumeWith(document("deleteAcademicBackground"));
         UnitOfWork unitOfWork = new UnitOfWork();
+        DataMapper<AcademicBackground, Long> academicBackgroundRepo = getMapper(AcademicBackground.class,unitOfWork);
         assertFalse(academicBackgroundRepo.findById(academicBackground.getIdentityKey()).join().isPresent());
         unitOfWork.commit().join();
     }
