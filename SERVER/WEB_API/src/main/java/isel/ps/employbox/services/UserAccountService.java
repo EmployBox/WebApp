@@ -101,7 +101,8 @@ public class UserAccountService {
     public CompletableFuture<UserAccount> createUser(UserAccount userAccount) {
         UnitOfWork unit = new UnitOfWork();
         DataMapper<UserAccount, Long> userMapper = getMapper(UserAccount.class, unit);
-        CompletableFuture<UserAccount> future = userMapper.create( userAccount)
+
+        CompletableFuture<UserAccount> future = userMapper.create(userAccount)
                 .thenCompose(aVoid -> unit.commit())
                 .thenApply(res -> userAccount)
                 .exceptionally(throwable -> {

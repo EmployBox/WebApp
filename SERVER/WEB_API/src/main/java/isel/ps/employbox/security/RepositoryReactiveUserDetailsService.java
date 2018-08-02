@@ -37,7 +37,8 @@ public class RepositoryReactiveUserDetailsService implements ReactiveUserDetails
 
     static class CustomUserDetails extends Account implements UserDetails {
         CustomUserDetails(Account account) {
-            super(account.getIdentityKey(),
+            super(
+                    account.getIdentityKey(),
                     account.getName(),
                     account.getEmail(),
                     account.getPassword(),
