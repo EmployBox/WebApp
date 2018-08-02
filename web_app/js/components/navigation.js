@@ -1,7 +1,7 @@
 import React from 'react'
 import { Link, withRouter } from 'react-router-dom'
 
-export default withRouter(({about, logIn, signUp}) => (
+export default withRouter(({navItems}) => (
   <nav class='navbar navbar-expand-lg navbar-dark bg-dark navbar-fixed-top'>
     <div class='container'>
       <Link class='navbar-brand' to='/'>EmployBox</Link>
@@ -11,15 +11,14 @@ export default withRouter(({about, logIn, signUp}) => (
       </button>
       <div class='collapse navbar-collapse' id='navbarResponsive'>
         <ul class='navbar-nav ml-auto'>
-          <li class='nav-item'>
-            <Link class='nav-link' to={about}>About</Link>
-          </li>
-          <li class='nav-item'>
-            <Link class='nav-link' to={logIn}>Log in</Link>
-          </li>
-          <li class='nav-item'>
-            <Link class='btn btn-outline-primary' to={signUp}>Sign up</Link>
-          </li>
+          {navItems.map(item => (
+            <li key={item.name}>
+              {item.link
+                ? <Link class={item.class || 'nav-link'} to={item.link}>{item.name}</Link>
+                : <button class={item.class || 'nav-link'} onClick={item.click}>{item.name}</button>
+              }
+            </li>
+          ))}
         </ul>
       </div>
     </div>

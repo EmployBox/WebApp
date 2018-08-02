@@ -54,8 +54,8 @@ export default class extends React.Component {
     const obj = {
       method: method,
       headers: {
-        'Authorization': this.props.authorization,
-        'Access-Control-Allow-Origin': 'http://localhost:8080'
+        'Authorization': this.props.authorization
+        //'Access-Control-Allow-Origin': 'http://localhost:8080'
       },
       body: body
     }

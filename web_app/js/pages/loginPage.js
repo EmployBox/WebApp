@@ -1,19 +1,21 @@
 import React from 'react'
 import GenericForm from '../components/genericForm'
 import HttpRequest from '../components/httpRequest'
+import base64 from 'base-64'
 
 export default class extends React.Component {
   constructor (props) {
     super(props)
     this.state = {
-      inputs: undefined
+      auth: undefined
     }
     this.onSubmit = this.onSubmit.bind(this)
     console.log(this.props.url)
+    
   }
 
   onSubmit (inputs) {
-    this.setState({inputs: inputs})
+    this.setState({auth: 'Basic ' + base64.encode(`${inputs.email}:${inputs.password}`)})
   }
 
   render () {
@@ -32,12 +34,12 @@ export default class extends React.Component {
                 klass='form-group'
                 onSubmitHandler={this.onSubmit}
               />
-              {this.state.inputs
+              {this.state.auth
                 ? <HttpRequest
-                  method='POST'
+                  method='GET'
                   url={this.props.url}
-                  body={JSON.stringify(this.state.inputs)}
-                  afterResult={this.props.ToLogin}
+                  authorization={this.state.auth}
+                  afterResult={json => this.props.ToLogin(json, this.state.auth)}
                   onError={err => (
                     <div class='alert alert-danger' role='alert'>
                       {err.message}
