@@ -31,7 +31,7 @@ public class ProjectsController {
     }
 
     @GetMapping("/{projectId}")
-    public Mono<OutProject> getProject(
+    public Mono<OutProject> getProjectFromCurriculum(
             @PathVariable long id,
             @PathVariable long cid,
             @PathVariable long projectId
@@ -42,7 +42,7 @@ public class ProjectsController {
     }
 
     @GetMapping
-    public Mono<HalCollectionPage<Project>> getProject(
+    public Mono<HalCollectionPage<Project>> getProjects(
             @PathVariable long id,
             @PathVariable long cid,
             @RequestParam(defaultValue = "0") int page,
@@ -64,17 +64,18 @@ public class ProjectsController {
         return Mono.fromFuture(projectService.addProjectToCurriculum(id,cid, project,authentication.getName()));
     }
 
-    @PutMapping("/{ceId}")
+    @PutMapping("/{pjId}")
     public Mono<Void> updateProject(
-            @PathVariable long ceId,
+            @PathVariable long pjId,
             @PathVariable long id,
             @PathVariable long cid,
-            @RequestBody Project project,
+            @RequestBody InProject inProject,
             Authentication authentication
     ){
-        if(project.getAccountId() != id || project.getCurriculumId() != cid)
+        Project project = projectBinder.bindInput(inProject);
+        if(project.getCurriculumId() != cid || project.getIdentityKey() != pjId)
             throw new BadRequestException(BAD_REQUEST_IDS_MISMATCH);
-        return projectService.updateProject(ceId, id, cid, project,authentication.getName() );
+        return projectService.updateProject(pjId, id, cid, project, authentication.getName() );
     }
 
     @DeleteMapping("/{pjId}")

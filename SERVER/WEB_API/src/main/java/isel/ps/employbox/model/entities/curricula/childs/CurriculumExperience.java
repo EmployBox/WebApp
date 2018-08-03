@@ -27,7 +27,7 @@ public class CurriculumExperience extends CurriculumChild implements DomainObjec
         curriculumExperienceId = 0;
     }
 
-    public CurriculumExperience(long userId, long curriculumId, String competences, short years, long version, Long curriculumExperienceId){
+    public CurriculumExperience(long userId, long curriculumId, String competences, int years, long version, Long curriculumExperienceId){
         this.accountId = userId;
         this.curriculumId = curriculumId;
         this.competences = competences;
