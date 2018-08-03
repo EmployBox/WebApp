@@ -67,12 +67,13 @@ public class CurriculumExperienceController {
     public Mono<Void> updateCurriculumExperience(
             @PathVariable long id,
             @PathVariable long cid,
-            @PathVariable long jeId,
-            @RequestBody CurriculumExperience curriculumExperience,
+            @PathVariable long ceId,
+            @RequestBody InCurriculumExperience incurriculumExperience,
             Authentication authentication
     ){
-        if(curriculumExperience.getAccountId() != id || curriculumExperience.getCurriculumId() != cid || curriculumExperience.getIdentityKey() != jeId)
+        if( incurriculumExperience.getCurriculumId() != cid || incurriculumExperience.getCurriculumExperienceId() != ceId)
             throw new BadRequestException(BAD_REQUEST_IDS_MISMATCH);
+        CurriculumExperience curriculumExperience = curriculumExperienceBinder.bindInput(incurriculumExperience);
         return curriculumExperienceService.updateCurriculumExperience(id, cid, curriculumExperience,authentication.getName() );
     }
 

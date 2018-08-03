@@ -1,6 +1,5 @@
 package isel.ps.employbox.controllers.curricula;
 
-
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.jayield.rapper.mapper.DataMapper;
@@ -8,8 +7,8 @@ import com.github.jayield.rapper.unitofwork.UnitOfWork;
 import com.github.jayield.rapper.utils.Pair;
 import isel.ps.employbox.model.entities.Curriculum;
 import isel.ps.employbox.model.entities.UserAccount;
-import isel.ps.employbox.model.entities.curricula.childs.Project;
-import isel.ps.employbox.model.input.curricula.childs.InProject;
+import isel.ps.employbox.model.entities.curricula.childs.CurriculumExperience;
+import isel.ps.employbox.model.input.curricula.childs.InCurriculumExperience;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -31,15 +30,16 @@ import java.util.List;
 import static com.github.jayield.rapper.mapper.MapperRegistry.getMapper;
 import static isel.ps.employbox.DataBaseUtils.prepareDB;
 import static junit.framework.TestCase.assertEquals;
-import static junit.framework.TestCase.assertFalse;
+import static org.junit.Assert.assertFalse;
 import static org.springframework.restdocs.webtestclient.WebTestClientRestDocumentation.document;
 import static org.springframework.restdocs.webtestclient.WebTestClientRestDocumentation.documentationConfiguration;
 import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.springSecurity;
 import static org.springframework.web.reactive.function.client.ExchangeFilterFunctions.basicAuthentication;
 
+
 @RunWith(SpringRunner.class)
 @SpringBootTest
-public class ProjectControllerTests {
+public class CurriculumExperienceControllerTests {
     private static final Logger logger = LoggerFactory.getLogger(AcademicBackgroundControllerTests.class);
     @Rule
     public JUnitRestDocumentation restDocumentation = new JUnitRestDocumentation();
@@ -48,7 +48,7 @@ public class ProjectControllerTests {
     private WebTestClient webTestClient;
     private UserAccount userAccount;
     private Curriculum curriculum;
-    private Project project;
+    private CurriculumExperience curriculumExperience;
 
     @Before
     public void setUp() {
@@ -70,10 +70,10 @@ public class ProjectControllerTests {
         assertEquals(1, curricula.size());
         curriculum = curricula.get(0);
 
-        DataMapper<Project, Long> projectRepo = getMapper(Project.class, unitOfWork);
-        List<Project> projects = projectRepo.findWhere( new Pair<>("description", "project one")).join();
-        assertEquals(1, projects.size());
-        project = projects.get(0);
+        DataMapper<CurriculumExperience, Long> curriculumExperiencesMapper = getMapper(CurriculumExperience.class, unitOfWork);
+        List<CurriculumExperience> curriculumExperiences = curriculumExperiencesMapper.findWhere( new Pair<>("competences", "Knows to do stuff")).join();
+        assertEquals(1, curriculumExperiences.size());
+        curriculumExperience = curriculumExperiences.get(0);
         unitOfWork.commit().join();
     }
 
@@ -84,94 +84,101 @@ public class ProjectControllerTests {
         assertEquals(0, openedConnections);
     }
 
+
     @Test
-    public void testGetAllProjects(){
+    public void testGetAllCurriculumExperiences(){
         webTestClient
                 .get()
-                .uri("/accounts/users/" + userAccount.getIdentityKey() + "/curricula/" + curriculum.getIdentityKey() + "/projects")
+                .uri("/accounts/users/" + userAccount.getIdentityKey() + "/curricula/" + curriculum.getIdentityKey() + "/experiences")
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody()
-                .consumeWith(document("getAllProjects"));
+                .consumeWith(document("getAllCurriculumExperiences"));
     }
 
+
     @Test
-    public void testGetProject(){
+    public void testGetCurriculumExperience(){
         webTestClient
                 .get()
-                .uri("/accounts/users/" + userAccount.getIdentityKey() + "/curricula/" + curriculum.getIdentityKey() + "/projects/" + project.getIdentityKey())
+                .uri("/accounts/users/" + userAccount.getIdentityKey() + "/curricula/" + curriculum.getIdentityKey() + "/experiences/" + curriculumExperience.getIdentityKey())
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody()
                 .consumeWith(document("getProject"));
     }
 
+
     @Test
     @WithMockUser(username = "teste@gmail.com")
-    public void testCreateProject() throws Exception {
-        InProject inProject = new InProject();
-        inProject.setCurriculumId(curriculum.getIdentityKey());
-        inProject.setAccountId(userAccount.getIdentityKey());
-        inProject.setName("first project");
-        inProject.setDescription("project description");
+    public void testCreateCurriculumExperience() throws Exception {
+        InCurriculumExperience inCurriculumExperience = new InCurriculumExperience();
+        inCurriculumExperience.setCurriculumId(curriculum.getIdentityKey());
+        inCurriculumExperience.setAccountId(userAccount.getIdentityKey());
+        inCurriculumExperience.setCompetences("knows to do everything");
+        inCurriculumExperience.setYears(3);
 
         ObjectMapper objectMapper = new ObjectMapper();
-        String json = objectMapper.writeValueAsString(inProject);
+        String json = objectMapper.writeValueAsString(inCurriculumExperience);
         UnitOfWork unitOfWork = new UnitOfWork();
-        DataMapper<Project, Long> projectMapper = getMapper(Project.class,unitOfWork);
+        DataMapper<CurriculumExperience, Long> curriculumExperienceMapper = getMapper(CurriculumExperience.class,unitOfWork);
         webTestClient
                 .post()
-                .uri("/accounts/users/" + userAccount.getIdentityKey() + "/curricula/" + curriculum.getIdentityKey() + "/projects")
+                .uri("/accounts/users/" + userAccount.getIdentityKey() + "/curricula/" + curriculum.getIdentityKey() + "/experiences")
                 .contentType(MediaType.APPLICATION_JSON)
                 .syncBody(json)
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody()
-                .consumeWith(document("createProject"));
+                .consumeWith(document("createCurriculumExperience"));
 
-        assertEquals(1, projectMapper.findWhere( new Pair<>("description", "project description")).join().size());
-        assertEquals(1, projectMapper.findWhere( new Pair<>("name", "first project")).join().size());
+        assertEquals(1, curriculumExperienceMapper.findWhere( new Pair<>("competences", "knows to do everything")).join().size());
+        assertEquals(1, curriculumExperienceMapper.findWhere( new Pair<>("years", 3)).join().size());
         unitOfWork.commit().join();
     }
 
     @Test
     @WithMockUser(username = "company1@gmail.com")
-    public void testUpdateWrongProject() throws JsonProcessingException {
-        InProject inProject = new InProject();
-        inProject.setProjectId(project.getIdentityKey());
-        inProject.setCurriculumId(curriculum.getIdentityKey());
-        inProject.setAccountId(userAccount.getIdentityKey());
-        inProject.setVersion(project.getVersion());
+    public void testUpdateWrongCurriculumExperience() throws JsonProcessingException {
+        InCurriculumExperience inCurriculumExperience = new InCurriculumExperience();
+        inCurriculumExperience.setCurriculumExperienceId(curriculumExperience.getIdentityKey());
+        inCurriculumExperience.setCurriculumId(curriculum.getIdentityKey());
+        inCurriculumExperience.setAccountId(userAccount.getIdentityKey());
+        inCurriculumExperience.setCompetences("knows to do everything");
+        inCurriculumExperience.setYears(3);
+        inCurriculumExperience.setVersion(curriculumExperience.getVersion());
 
         ObjectMapper objectMapper = new ObjectMapper();
-        String json = objectMapper.writeValueAsString(inProject);
+        String json = objectMapper.writeValueAsString(inCurriculumExperience);
 
         webTestClient
                 .put()
-                .uri("/accounts/users/" + userAccount.getIdentityKey() + "/curricula/" + curriculum.getIdentityKey() + "/projects/" + project.getIdentityKey())
+                .uri("/accounts/users/" + userAccount.getIdentityKey() + "/curricula/" + curriculum.getIdentityKey() + "/experiences/" + curriculumExperience.getIdentityKey())
                 .contentType(MediaType.APPLICATION_JSON)
                 .syncBody(json)
                 .exchange()
                 .expectStatus().isUnauthorized()
                 .expectBody()
-                .consumeWith(document("updateWrongAcademicBackground"));
+                .consumeWith(document("updateWrongCurriculumExperience"));
     }
 
     @Test
     @WithMockUser(username = "teste@gmail.com")
     public void testUpdateProject() throws JsonProcessingException {
-        InProject inProject = new InProject();
-        inProject.setProjectId(project.getIdentityKey());
-        inProject.setCurriculumId(curriculum.getIdentityKey());
-        inProject.setAccountId(userAccount.getIdentityKey());
-        inProject.setVersion(project.getVersion());
+        InCurriculumExperience inCurriculumExperience = new InCurriculumExperience();
+        inCurriculumExperience.setCurriculumExperienceId(curriculumExperience.getIdentityKey());
+        inCurriculumExperience.setCurriculumId(curriculum.getIdentityKey());
+        inCurriculumExperience.setAccountId(userAccount.getIdentityKey());
+        inCurriculumExperience.setCompetences("knows to do everything");
+        inCurriculumExperience.setYears(3);
+        inCurriculumExperience.setVersion(curriculumExperience.getVersion());
 
         ObjectMapper objectMapper = new ObjectMapper();
-        String json = objectMapper.writeValueAsString(inProject);
+        String json = objectMapper.writeValueAsString(inCurriculumExperience);
 
         webTestClient
                 .put()
-                .uri("/accounts/users/" + userAccount.getIdentityKey() + "/curricula/" + curriculum.getIdentityKey() + "/projects/" + project.getIdentityKey())
+                .uri("/accounts/users/" + userAccount.getIdentityKey() + "/curricula/" + curriculum.getIdentityKey() + "/experiences/" + curriculumExperience.getIdentityKey())
                 .contentType(MediaType.APPLICATION_JSON)
                 .syncBody(json)
                 .exchange()
@@ -185,7 +192,7 @@ public class ProjectControllerTests {
     public void testDeleteWrongProject() {
         webTestClient
                 .delete()
-                .uri("/accounts/users/" + userAccount.getIdentityKey() + "/curricula/" + curriculum.getIdentityKey() + "/projects/" + project.getIdentityKey())
+                .uri("/accounts/users/" + userAccount.getIdentityKey() + "/curricula/" + curriculum.getIdentityKey() + "/experiences/" + curriculumExperience.getIdentityKey())
                 .exchange()
                 .expectStatus().isUnauthorized()
                 .expectBody()
@@ -197,14 +204,14 @@ public class ProjectControllerTests {
     public void testDeleteProject(){
         webTestClient
                 .delete()
-                .uri("/accounts/users/" + userAccount.getIdentityKey() + "/curricula/" + curriculum.getIdentityKey() + "/projects/" + project.getIdentityKey())
+                .uri("/accounts/users/" + userAccount.getIdentityKey() + "/curricula/" + curriculum.getIdentityKey() + "/experiences/" + curriculumExperience.getIdentityKey())
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody()
                 .consumeWith(document("deleteProject"));
         UnitOfWork unitOfWork = new UnitOfWork();
-        DataMapper<Project, Long> projectRepo = getMapper(Project.class, unitOfWork);
-        assertFalse(projectRepo.findById( project.getIdentityKey()).join().isPresent());
+        DataMapper<CurriculumExperience, Long> projectRepo = getMapper(CurriculumExperience.class, unitOfWork);
+        assertFalse(projectRepo.findById( curriculumExperience.getIdentityKey()).join().isPresent());
         unitOfWork.commit().join();
     }
 }

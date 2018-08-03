@@ -1,6 +1,7 @@
 package isel.ps.employbox.services.curricula;
 
 import com.github.jayield.rapper.mapper.DataMapper;
+import com.github.jayield.rapper.mapper.MapperRegistry;
 import com.github.jayield.rapper.unitofwork.UnitOfWork;
 import com.github.jayield.rapper.utils.Pair;
 import isel.ps.employbox.ErrorMessages;
@@ -55,6 +56,15 @@ public class ProjectService {
         return handleExceptions(future, unitOfWork);
     }
 
+    public CompletableFuture<Project> getProject(long projectId){
+        UnitOfWork unitOfWork = new UnitOfWork();
+        DataMapper<Project, Long> projectMapper = MapperRegistry.getMapper(Project.class, unitOfWork);
+
+        return projectMapper.findById(projectId)
+                .thenCompose(res -> unitOfWork.commit().thenApply(__ -> res))
+                .thenApply(oproject -> oproject.orElseThrow( ()-> new ResourceNotFoundException("Project not found")));
+    }
+
     public Mono<Void> updateProject(
             long projectId,
             long accountId,
@@ -62,12 +72,13 @@ public class ProjectService {
             Project project,
             String email
     ) {
-        if(project.getIdentityKey() != projectId)
-            throw new BadRequestException(ErrorMessages.BAD_REQUEST_IDS_MISMATCH);
+        if(project.getAccountId() != accountId)
+            throw new BadRequestException(ErrorMessages.UN_AUTHORIZED);
         UnitOfWork unitOfWork = new UnitOfWork();
         DataMapper<Project, Long> projectMapper = getMapper(Project.class, unitOfWork);
         CompletableFuture<Void> future = curriculumService.getCurriculum(accountId, curriculumId, email)
-                .thenCompose(curriculum -> projectMapper.update(project))
+                .thenCompose( __ -> getProject(projectId))
+                .thenCompose( __ -> projectMapper.update(project))
                 .thenCompose(res -> unitOfWork.commit());
         return Mono.fromFuture(handleExceptions(future, unitOfWork));
     }

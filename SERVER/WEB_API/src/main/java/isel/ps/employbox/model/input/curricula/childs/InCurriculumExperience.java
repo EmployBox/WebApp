@@ -6,7 +6,7 @@ public class InCurriculumExperience {
     private long accountId;
     private long curriculumId;
     private String competences;
-    private short years;
+    private int years;
     private long version;
 
     public long getCurriculumExperienceId() {
@@ -41,11 +41,11 @@ public class InCurriculumExperience {
         this.competences = competences;
     }
 
-    public short getYears() {
+    public int getYears() {
         return years;
     }
 
-    public void setYears(short years) {
+    public void setYears(int years) {
         this.years = years;
     }
 

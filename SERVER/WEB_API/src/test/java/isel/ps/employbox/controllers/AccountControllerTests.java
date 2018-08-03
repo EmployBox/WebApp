@@ -1,11 +1,6 @@
 package isel.ps.employbox.controllers;
 
-import com.github.jayield.rapper.mapper.DataMapper;
 import com.github.jayield.rapper.unitofwork.UnitOfWork;
-import com.github.jayield.rapper.utils.Pair;
-import isel.ps.employbox.model.entities.Application;
-import isel.ps.employbox.model.entities.Job;
-import isel.ps.employbox.model.entities.UserAccount;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -21,9 +16,6 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
-import java.util.List;
-
-import static com.github.jayield.rapper.mapper.MapperRegistry.getMapper;
 import static isel.ps.employbox.DataBaseUtils.prepareDB;
 import static junit.framework.TestCase.assertEquals;
 import static org.springframework.restdocs.webtestclient.WebTestClientRestDocumentation.document;
@@ -60,7 +52,7 @@ public class AccountControllerTests {
         assertEquals(0, openedConnections);
     }
 
-    /*@Test
+    @Test
     @WithMockUser(username =  "lol@hotmail.com")
     public void testAuthenticateCredentials() {
         webTestClient
@@ -70,5 +62,5 @@ public class AccountControllerTests {
                 .expectStatus().isOk()
                 .expectBody()
                 .consumeWith(document("authenticateCredentials"));
-    }*/
+    }
 }

@@ -8,6 +8,7 @@ import com.github.jayield.rapper.utils.Pair;
 import isel.ps.employbox.ErrorMessages;
 import isel.ps.employbox.exceptions.ConflictException;
 import isel.ps.employbox.exceptions.ResourceNotFoundException;
+import isel.ps.employbox.exceptions.UnauthorizedException;
 import isel.ps.employbox.model.binders.CollectionPage;
 import isel.ps.employbox.model.entities.curricula.childs.CurriculumExperience;
 import isel.ps.employbox.services.ServiceUtils;
@@ -31,7 +32,7 @@ public class CurriculumExperienceService {
         UnitOfWork unitOfWork = new UnitOfWork();
         DataMapper<CurriculumExperience, Long> curriculumExperienceMapper = MapperRegistry.getMapper(CurriculumExperience.class, unitOfWork);
 
-        CompletableFuture<CollectionPage<CurriculumExperience>> future = curriculumExperienceMapper.findById( curriculumId)
+        CompletableFuture<CollectionPage<CurriculumExperience>> future = curriculumExperienceMapper.findById(curriculumId)
                 .thenCompose(res -> unitOfWork.commit().thenApply(aVoid -> res))
                 .thenApply(ocurriculum -> ocurriculum.orElseThrow(() -> new ResourceNotFoundException(ErrorMessages.RESOURCE_NOTFOUND_CURRICULUM)))
                 .thenCompose(__ -> ServiceUtils.getCollectionPageFuture(CurriculumExperience.class, page, pageSize, new Pair<>("curriculumId", curriculumId)));
@@ -50,9 +51,8 @@ public class CurriculumExperienceService {
         DataMapper<CurriculumExperience, Long> curriculumExperienceMapper = MapperRegistry.getMapper(CurriculumExperience.class, unitOfWork);
 
         CompletableFuture<CurriculumExperience> future = curriculumService.getCurriculum(accountId, curriculumId, email)
-                .thenCompose(res -> unitOfWork.commit().thenApply(aVoid -> res))
-                .thenCompose(curriculum -> curriculumExperienceMapper.create(curriculumExperience))
-                .thenApply(res -> curriculumExperience);
+                .thenCompose(curriculum -> curriculumExperienceMapper.create(curriculumExperience)
+                .thenCompose(res -> unitOfWork.commit().thenApply(aVoid -> curriculumExperience)));
         return handleExceptions(future, unitOfWork);
     }
 
@@ -62,6 +62,8 @@ public class CurriculumExperienceService {
             CurriculumExperience curriculumExperience,
             String email
     ) {
+        if(curriculumExperience.getAccountId() != accountId)
+            throw new UnauthorizedException(ErrorMessages.UN_AUTHORIZED);
         UnitOfWork unitOfWork = new UnitOfWork();
         DataMapper<CurriculumExperience, Long> curriculumExperienceMapper = MapperRegistry.getMapper(CurriculumExperience.class, unitOfWork);
         CompletableFuture<Void> future = curriculumService.getCurriculum(accountId, curriculumId, email)
