@@ -16,12 +16,15 @@ import Auther from './components/auther'
 
 import URI from 'urijs'
 import URITemplate from 'urijs/src/URITemplate'
+import HttpRequest from './components/httpRequest'
+
+const apiURI = 'http://localhost:8080'
 
 const urls = {
   about: '/about',
-  logIn: new URITemplate('/logIn/{url}').expand({url: 'http://localhost:8080/account'}), // TODO endpoint to verify credentials
-  signUp: new URITemplate('/signup/{urlUser}/{urlCompany}').expand({urlUser: 'http://localhost:8080/accounts/users', urlCompany: 'http://localhost:8080/accounts/companies'}),
-  profile: new URITemplate('/profile/{url}').expand({url: 'http://localhost:8080/account'})
+  logIn: new URITemplate('/logIn/{url}').expand({url: apiURI + '/accounts/self'}), // TODO endpoint to verify credentials
+  signUp: new URITemplate('/signup/{urlUser}/{urlCompany}').expand({urlUser: apiURI + '/accounts/users', urlCompany: apiURI + '/accounts/companies'}),
+  profile: new URITemplate('/profile/{url}').expand({url: apiURI + '/accounts/self'})
 }
 
 const auther = new Auther(urls.logIn)
@@ -30,13 +33,12 @@ const PrivateRoute = PrivateRouter(auther)
 const signUpUserTempl = new URITemplate('/signup/user/{url}')
 const signUpCompanyTempl = new URITemplate('/signup/company/{url}')
 
-const apiURI = 'http://localhost:8080'
-
 export default class extends Component {
   constructor (props) {
     super(props)
     this.state = {
-      authenticated: false
+      authenticated: false,
+      home: undefined
     }
   }
 
@@ -45,19 +47,22 @@ export default class extends Component {
       <div>
         <BrowserRouter>
           <div>
-            <Navigation navItems={
-              this.state.authenticated
-                ? [
-                  {name: 'Profile', link: urls.profile},
-                  {name: 'About', link: urls.about},
-                  {name: 'Log out', click: () => { auther.unAuthenticate(); this.setState({authenticated: false}) }, class: 'btn btn-outline-primary'}
-                ]
-                : [
-                  {name: 'About', link: urls.about},
-                  {name: 'Log in', link: urls.logIn},
-                  {name: 'Sign up', link: urls.signUp, class: 'btn btn-outline-primary'}
-                ]}
-            />
+            {this.state.home
+              ? <Navigation navItems={
+                this.state.authenticated
+                  ? [
+                    {name: 'Profile', link: urls.profile},
+                    {name: 'About', link: urls.about},
+                    {name: 'Log out', click: () => { auther.unAuthenticate(); this.setState({authenticated: false}) }, class: 'btn btn-outline-primary'}
+                  ]
+                  : [
+                    {name: 'About', link: urls.about},
+                    {name: 'Log in', link: urls.logIn},
+                    {name: 'Sign up', link: urls.signUp, class: 'btn btn-outline-primary'}
+                  ]} />
+              : <HttpRequest url={apiURI}
+                afterResult={json => this.setState()}
+              />}
             <Switch>
               <Route exact path='/' component={IndexPage} />
               <Route exact path='/signup/user/:url' render={({history, match}) => <SignUpUser url={URI.decode(match.params.url)} />} />
