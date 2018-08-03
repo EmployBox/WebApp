@@ -4,7 +4,6 @@ import isel.ps.employbox.model.entities.Application;
 import isel.ps.employbox.model.input.InApplication;
 import isel.ps.employbox.model.output.OutApplication;
 import org.springframework.stereotype.Component;
-import reactor.core.publisher.Mono;
 
 import java.util.concurrent.CompletableFuture;
 
