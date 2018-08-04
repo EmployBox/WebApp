@@ -44,11 +44,11 @@ export default class extends Component {
 
   render () {
     return (
-      <div>
-        <BrowserRouter>
-          <div>
-            {this.state.home
-              ? <Navigation navItems={
+      this.state.home
+        ? <div>
+          <BrowserRouter>
+            <div>
+              <Navigation navItems={
                 this.state.authenticated
                   ? [
                     {name: 'Profile', link: profileTempl.expand({url: getLink('login', this.state.home)})},
@@ -71,56 +71,56 @@ export default class extends Component {
                       ),
                       class: 'btn btn-outline-primary'}
                   ]} />
-              : <HttpRequest url={apiURI}
-                afterResult={json => this.setState(oldstate => {
-                  oldstate.home = json
-                  auther.setLoginUrl(logInTempl.expand({url: json.login['_links'].self.href}))
-                  return oldstate
-                })}
-              />}
-            <Switch>
-              <Route exact path='/' component={IndexPage} />
-              <Route exact path='/signup/user/:url' render={({history, match}) => <SignUpUser url={URI.decode(match.params.url)} />} />
-              <Route exact path='/signup/company/:url' render={({history, match}) => <SignUpCompany url={URI.decode(match.params.url)} />} />
-              <Route exact path='/signup/:urlUser/:urlCompany' render={({history, match}) =>
-                <SignUp signUpUser={() => history.push(signUpUserTempl.expand({ url: match.params.urlUser }))}
-                  signUpCompany={() => history.push(signUpCompanyTempl.expand({ url: match.params.urlCompany }))} />}
-              />
-              <Route exact path='/login/:url' render={({history, match}) =>
-                <LogIn url={URI.decode(match.params.url)}
-                  ToLogin={(json, auth) => {
-                    this.setState(oldstate => {
-                      oldstate.authenticated = true
-                      auther.authenticate(auth)
-                      return oldstate
-                    })
-                    history.push(URI.parseQuery(history.location.search).redirect || '/')
-                  }} />
-              } />
-              <Route exact path='/jobs' render={(props) => (
-                <SearchPage
-                  apiURI={apiURI}
-                  uriTemplate={new URITemplate(`/jobs{?query*}`)}
-                  type='jobs' />
-              )} />
-              <Route exact path='/accounts/:type' render={({match}) => (
-                <SearchPage
-                  apiURI={apiURI}
-                  uriTemplate={new URITemplate(`/accounts/${match.params.type}{?query*}`)}
-                  type={match.params.type} />
-              )} />
-              <PrivateRoute exact path='/profile/:url' component={Profile} />
-              <Route path='/' render={({history}) =>
-                <center class='py-5'>
-                  <h2>Page not found</h2>
-                  <button onClick={() => history.push('/')}>home</button>
-                </center>
-              } />
-            </Switch>
-            <Footer />
-          </div>
-        </BrowserRouter>
-      </div>
+              <Switch>
+                <Route exact path='/' component={IndexPage} />
+                <Route exact path='/signup/user/:url' render={({history, match}) => <SignUpUser url={URI.decode(match.params.url)} />} />
+                <Route exact path='/signup/company/:url' render={({history, match}) => <SignUpCompany url={URI.decode(match.params.url)} />} />
+                <Route exact path='/signup/:urlUser/:urlCompany' render={({history, match}) =>
+                  <SignUp signUpUser={() => history.push(signUpUserTempl.expand({ url: match.params.urlUser }))}
+                    signUpCompany={() => history.push(signUpCompanyTempl.expand({ url: match.params.urlCompany }))} />}
+                />
+                <Route exact path='/login/:url' render={({history, match}) =>
+                  <LogIn url={URI.decode(match.params.url)}
+                    ToLogin={(json, auth) => {
+                      this.setState(oldstate => {
+                        oldstate.authenticated = true
+                        auther.authenticate(auth)
+                        return oldstate
+                      })
+                      history.push(URI.parseQuery(history.location.search).redirect || '/')
+                    }} />
+                } />
+                <Route exact path='/jobs' render={(props) => (
+                  <SearchPage
+                    apiURI={apiURI}
+                    uriTemplate={new URITemplate(`/jobs{?query*}`)}
+                    type='jobs' />
+                )} />
+                <Route exact path='/accounts/:type' render={({match}) => (
+                  <SearchPage
+                    apiURI={apiURI}
+                    uriTemplate={new URITemplate(`/accounts/${match.params.type}{?query*}`)}
+                    type={match.params.type} />
+                )} />
+                <PrivateRoute exact path='/profile/:url' component={Profile} />
+                <Route path='/' render={({history}) =>
+                  <center class='py-5'>
+                    <h2>Page not found</h2>
+                    <button onClick={() => history.push('/')}>home</button>
+                  </center>
+                } />
+              </Switch>
+              <Footer />
+            </div>
+          </BrowserRouter>
+        </div>
+        : <HttpRequest url={apiURI}
+          afterResult={json => this.setState(oldstate => {
+            oldstate.home = json
+            auther.setLoginUrl(logInTempl.expand({url: json.login['_links'].self.href}))
+            return oldstate
+          })}
+        />
     )
   }
 }
