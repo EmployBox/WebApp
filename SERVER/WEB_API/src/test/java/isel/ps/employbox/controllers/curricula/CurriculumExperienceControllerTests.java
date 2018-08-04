@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.jayield.rapper.mapper.DataMapper;
 import com.github.jayield.rapper.unitofwork.UnitOfWork;
 import com.github.jayield.rapper.utils.Pair;
+import isel.ps.employbox.exceptions.ResourceNotFoundException;
 import isel.ps.employbox.model.entities.Curriculum;
 import isel.ps.employbox.model.entities.UserAccount;
 import isel.ps.employbox.model.entities.curricula.childs.CurriculumExperience;
@@ -164,7 +165,7 @@ public class CurriculumExperienceControllerTests {
 
     @Test
     @WithMockUser(username = "teste@gmail.com")
-    public void testUpdateProject() throws JsonProcessingException {
+    public void testUpdateCurriculumExperience() throws JsonProcessingException {
         InCurriculumExperience inCurriculumExperience = new InCurriculumExperience();
         inCurriculumExperience.setCurriculumExperienceId(curriculumExperience.getIdentityKey());
         inCurriculumExperience.setCurriculumId(curriculum.getIdentityKey());
@@ -185,6 +186,12 @@ public class CurriculumExperienceControllerTests {
                 .expectStatus().isOk()
                 .expectBody()
                 .consumeWith(document("updateWrongAcademicBackground"));
+
+        UnitOfWork unitOfWork = new UnitOfWork();
+        DataMapper<CurriculumExperience, Long> curriculumExperienceMapper = getMapper(CurriculumExperience.class, unitOfWork);
+        CurriculumExperience updatedCurriculumExperience = curriculumExperienceMapper.findById(curriculumExperience.getIdentityKey()).join().orElseThrow(() -> new ResourceNotFoundException("Curriculum not found"));
+        unitOfWork.commit().join();
+        assertEquals("knows to do everything", updatedCurriculumExperience.getCompetences());
     }
 
     @Test

@@ -10,6 +10,7 @@ import isel.ps.employbox.exceptions.ConflictException;
 import isel.ps.employbox.exceptions.ResourceNotFoundException;
 import isel.ps.employbox.exceptions.UnauthorizedException;
 import isel.ps.employbox.model.binders.CollectionPage;
+import isel.ps.employbox.model.entities.Curriculum;
 import isel.ps.employbox.model.entities.curricula.childs.CurriculumExperience;
 import isel.ps.employbox.services.ServiceUtils;
 import org.springframework.stereotype.Service;
@@ -30,9 +31,9 @@ public class CurriculumExperienceService {
 
     public CompletableFuture<CollectionPage<CurriculumExperience>> getCurriculumExperiences(long curriculumId, int page, int pageSize) {
         UnitOfWork unitOfWork = new UnitOfWork();
-        DataMapper<CurriculumExperience, Long> curriculumExperienceMapper = MapperRegistry.getMapper(CurriculumExperience.class, unitOfWork);
+        DataMapper<Curriculum, Long> curriculumMapper = MapperRegistry.getMapper(Curriculum.class, unitOfWork);
 
-        CompletableFuture<CollectionPage<CurriculumExperience>> future = curriculumExperienceMapper.findById(curriculumId)
+        CompletableFuture<CollectionPage<CurriculumExperience>> future = curriculumMapper.findById(curriculumId)
                 .thenCompose(res -> unitOfWork.commit().thenApply(aVoid -> res))
                 .thenApply(ocurriculum -> ocurriculum.orElseThrow(() -> new ResourceNotFoundException(ErrorMessages.RESOURCE_NOTFOUND_CURRICULUM)))
                 .thenCompose(__ -> ServiceUtils.getCollectionPageFuture(CurriculumExperience.class, page, pageSize, new Pair<>("curriculumId", curriculumId)));

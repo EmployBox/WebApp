@@ -1,11 +1,15 @@
 package isel.ps.employbox.model.input;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import java.sql.Timestamp;
 
 public class InApplication {
     private long accountId;
     private long jobId;
     private Long curriculumId;
+
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm")
     private Timestamp date;
     private long applicationId;
     private long version;

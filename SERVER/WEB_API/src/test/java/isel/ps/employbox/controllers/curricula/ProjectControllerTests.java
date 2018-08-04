@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.jayield.rapper.mapper.DataMapper;
 import com.github.jayield.rapper.unitofwork.UnitOfWork;
 import com.github.jayield.rapper.utils.Pair;
+import isel.ps.employbox.exceptions.ResourceNotFoundException;
 import isel.ps.employbox.model.entities.Curriculum;
 import isel.ps.employbox.model.entities.UserAccount;
 import isel.ps.employbox.model.entities.curricula.childs.Project;
@@ -164,6 +165,7 @@ public class ProjectControllerTests {
         inProject.setProjectId(project.getIdentityKey());
         inProject.setCurriculumId(curriculum.getIdentityKey());
         inProject.setAccountId(userAccount.getIdentityKey());
+        inProject.setDescription("updated project");
         inProject.setVersion(project.getVersion());
 
         ObjectMapper objectMapper = new ObjectMapper();
@@ -178,6 +180,15 @@ public class ProjectControllerTests {
                 .expectStatus().isOk()
                 .expectBody()
                 .consumeWith(document("updateWrongAcademicBackground"));
+
+
+        UnitOfWork unitOfWork = new UnitOfWork();
+        DataMapper<Project, Long> projectMapper = getMapper(Project.class, unitOfWork);
+        Project updatedProject = projectMapper.findById(project.getIdentityKey()).join().orElseThrow(() -> new ResourceNotFoundException("Curriculum not found"));
+
+        unitOfWork.commit().join();
+        assertEquals("updated project", updatedProject.getDescription());
+
     }
 
     @Test
