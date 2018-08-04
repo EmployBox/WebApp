@@ -40,6 +40,13 @@ export default class extends Component {
       authenticated: false,
       home: undefined
     }
+    this.loginExpand = this.loginExpand.bind(this)
+  }
+
+  loginExpand () {
+    const url = logInTempl.expand({url: getLink('login', this.state.home)})
+    console.log(url)
+    return url
   }
 
   render () {
@@ -63,7 +70,7 @@ export default class extends Component {
                   ]
                   : [
                     {name: 'About', link: '/about'},
-                    {name: 'Log in', link: logInTempl.expand({url: getLink('login', this.state.home)})},
+                    {name: 'Log in', link: this.loginExpand()},
                     {name: 'Sign up',
                       link: signUpTempl.expand({
                         urlUser: getLink('users', this.state.home),
@@ -73,8 +80,8 @@ export default class extends Component {
                   ]} />
               <Switch>
                 <Route exact path='/' component={IndexPage} />
-                <Route exact path='/signup/user/:url' render={({history, match}) => <SignUpUser url={URI.decode(match.params.url)} />} />
-                <Route exact path='/signup/company/:url' render={({history, match}) => <SignUpCompany url={URI.decode(match.params.url)} />} />
+                <Route exact path='/signup/user/:url' render={({history, match}) => <SignUpUser url={URI.decode(match.params.url)} ToLogin={() => history.push(this.loginExpand())} />} />
+                <Route exact path='/signup/company/:url' render={({history, match}) => <SignUpCompany url={URI.decode(match.params.url)} ToLogin={() => history.push(this.loginExpand())} />} />
                 <Route exact path='/signup/:urlUser/:urlCompany' render={({history, match}) =>
                   <SignUp signUpUser={() => history.push(signUpUserTempl.expand({ url: match.params.urlUser }))}
                     signUpCompany={() => history.push(signUpCompanyTempl.expand({ url: match.params.urlCompany }))} />}
