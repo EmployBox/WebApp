@@ -34,6 +34,7 @@ import java.util.List;
 import static com.github.jayield.rapper.mapper.MapperRegistry.getMapper;
 import static isel.ps.employbox.DataBaseUtils.prepareDB;
 import static junit.framework.TestCase.*;
+import static org.junit.Assert.assertNotEquals;
 import static org.springframework.restdocs.webtestclient.WebTestClientRestDocumentation.document;
 import static org.springframework.restdocs.webtestclient.WebTestClientRestDocumentation.documentationConfiguration;
 import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.springSecurity;
@@ -278,7 +279,6 @@ public class UserAccountControllerTests {
         assertEquals("someEmail@hotmail.com", userAccount.getEmail());
     }
 
-    //to
     @Test
     @WithMockUser(username = "lol@hotmail.com")
     public void testUpdateApplication() throws JsonProcessingException {
@@ -303,15 +303,13 @@ public class UserAccountControllerTests {
                 .expectBody()
                 .consumeWith(document("updateApplication"));
 
-        /*//todo fix version incrementation
         UnitOfWork unitOfWork = new UnitOfWork();
         DataMapper<Application, Long> applicationRepo = getMapper(Application.class, unitOfWork);
         Application updatedApplication = applicationRepo.findById( application.getIdentityKey()).join().orElseThrow(() -> new ResourceNotFoundException("Application not found"));
         unitOfWork.commit().join();
 
-
         assertNotEquals( updatedApplication.getVersion(), application.getVersion() );
-        */
+
     }
 
     @Test

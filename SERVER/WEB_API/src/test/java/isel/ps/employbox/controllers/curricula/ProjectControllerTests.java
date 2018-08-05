@@ -33,6 +33,7 @@ import static com.github.jayield.rapper.mapper.MapperRegistry.getMapper;
 import static isel.ps.employbox.DataBaseUtils.prepareDB;
 import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.assertFalse;
+import static org.junit.Assert.assertNotEquals;
 import static org.springframework.restdocs.webtestclient.WebTestClientRestDocumentation.document;
 import static org.springframework.restdocs.webtestclient.WebTestClientRestDocumentation.documentationConfiguration;
 import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.springSecurity;
@@ -188,7 +189,7 @@ public class ProjectControllerTests {
 
         unitOfWork.commit().join();
         assertEquals("updated project", updatedProject.getDescription());
-
+        assertNotEquals( project.getVersion(), updatedProject.getVersion());
     }
 
     @Test

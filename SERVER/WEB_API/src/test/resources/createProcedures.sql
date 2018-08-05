@@ -26,6 +26,7 @@ CREATE PROCEDURE populateDB()
 
     /*Insert PreviousJobs*/
     /*insert into PREVIOUSJOBS(ACCOUNTID, CURRICULUMID, BEGINDATE, ENDDATE, COMPANYNAME, WORKLOAD, ROLE) values (account_id1, curriculum_id, '1992-01-22', '2000-01-22', 'ISEL', 'FULL-TIME', 'TEACHER' );*/
+
     /*Insert Companies*/
     insert into ACCOUNT(NAME, EMAIL, PASSWORD, ACCOUNTTYPE) values ('company1', 'company1@gmail.com', '741', 'CMP');
     set company_id1 = IDENTITY();
@@ -38,6 +39,9 @@ CREATE PROCEDURE populateDB()
     /*Insert Jobs*/
     insert into JOB(TITLE, ACCOUNTID, WAGE, DESCRIPTION, OFFERTYPE) values ('Great Job', account_id1, 1, 'Sou uma oferta simpatica', 'Looking for work');
     set job_id = IDENTITY();
+
+    /*Comment*/
+    insert into COMMENT( ACCOUNTIDFROM, ACCOUNTIDDEST, TEXT, STATUS) values (account_id1, account_id2, 'FIRST COMMENT', 0);
 
     /*Insert JobExperiences*/
     insert into JOBEXPERIENCE(JOBID, COMPETENCES, YEARS) values (job_id, 'Java', 3);
