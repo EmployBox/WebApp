@@ -28,8 +28,8 @@ export default class extends React.Component {
                 ? <HttpRequest
                   method='POST'
                   url={this.props.url}
-                  body={JSON.stringify(this.state.inputs)}
-                  afterResult={this.props.ToLogin}
+                  body={this.state.inputs}
+                  afterResult={this.props.ToLogin()}
                   onError={err => (
                     <div class='alert alert-danger' role='alert'>
                       {err.message}

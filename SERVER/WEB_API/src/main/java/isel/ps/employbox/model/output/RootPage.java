@@ -26,6 +26,9 @@ public class RootPage{
     @JsonProperty
     private final JobsCollectionLinks jobs;
 
+    @JsonProperty
+    private final AccountLoginLink login;
+
     @JsonCreator
     public RootPage() {
         this.self = new Self();
@@ -33,11 +36,27 @@ public class RootPage{
         this.companies = new CompanyCollectionLink();
         this.users = new UsersCollectionLinks();
         this.jobs = new JobsCollectionLinks();
+        this.login = new AccountLoginLink();
     }
 
     class Self{
         @JsonProperty
         final String href = HOSTNAME;
+    }
+
+    class AccountLoginLink {
+        @JsonProperty
+        private final _Links _links = new _Links();
+
+        private class _Links {
+            @JsonProperty
+            private Self self = new Self();
+
+            private class Self {
+                @JsonProperty
+                final String href = HOSTNAME + linkTo(AccountController.class).slash("self").withSelfRel().getHref();
+            }
+        }
     }
 
     class AccountsCollectionLink {

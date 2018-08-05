@@ -11,4 +11,8 @@ export default class {
   unAuthenticate () {
     this.auth = undefined
   }
+
+  setLoginUrl (loginUrl) {
+    this.loginUrl = loginUrl
+  }
 }
