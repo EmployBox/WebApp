@@ -5,7 +5,6 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import isel.ps.employbox.controllers.curricula.AcademicBackgroundController;
-import isel.ps.employbox.controllers.curricula.CurriculumController;
 
 import java.sql.Timestamp;
 
@@ -87,7 +86,7 @@ public class OutAcademicBackground implements OutputDto {
 
             private class Self {
                 @JsonProperty
-                final String href = HOSTNAME +  linkTo( methodOn(AcademicBackgroundController.class).getAcademicBackground(accountId, curriculumId, 0)).slash(academicBackgroundId).withSelfRel().getHref();
+                final String href = HOSTNAME +  linkTo( methodOn(AcademicBackgroundController.class).getAcademicBackground(accountId, curriculumId, academicBackgroundId)).withSelfRel().getHref();
             }
         }
     }
@@ -97,7 +96,7 @@ public class OutAcademicBackground implements OutputDto {
         private Self self = new Self();
 
         private class Self{
-            String href = linkTo( methodOn(AcademicBackgroundController.class).getAcademicBackground(accountId, curriculumId, 0)).slash(academicBackgroundId).withSelfRel().getHref();
+            String href = linkTo( methodOn(AcademicBackgroundController.class).getAcademicBackground(accountId, curriculumId, academicBackgroundId)).withSelfRel().getHref();
         }
     }
 }

@@ -48,7 +48,7 @@ public class OutJobExperience implements OutputDto {
 
             private class Self {
                 @JsonProperty
-                final String href = HOSTNAME + linkTo( methodOn(JobController.class).getJobExperiences(jobId, 0,0)).slash(jobExperienceId).withSelfRel().getHref();
+                final String href = HOSTNAME + linkTo( methodOn(JobController.class).getJobExperiences(jobId, 0,5)).slash(jobExperienceId).withSelfRel().getHref();
             }
         }
     }
@@ -59,7 +59,7 @@ public class OutJobExperience implements OutputDto {
 
         private class Self {
             @JsonProperty
-            final String href = HOSTNAME + linkTo( methodOn(JobController.class).getJobExperiences(jobId, 0,0)).slash(jobExperienceId).withSelfRel().getHref();
+            final String href = HOSTNAME + linkTo( methodOn(JobController.class).getJobExperiences(jobId, 0,5)).slash(jobExperienceId).withSelfRel().getHref();
         }
     }
 }

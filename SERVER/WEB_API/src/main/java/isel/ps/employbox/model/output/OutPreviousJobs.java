@@ -2,9 +2,9 @@ package isel.ps.employbox.model.output;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import isel.ps.employbox.controllers.curricula.CurriculumController;
 import isel.ps.employbox.controllers.curricula.PreviousJobsController;
-import isel.ps.employbox.model.entities.curricula.childs.PreviousJobs;
+
+import java.time.Instant;
 
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
@@ -21,10 +21,10 @@ public class OutPreviousJobs implements OutputDto {
     private final String companyName;
 
     @JsonProperty
-    private final String beginDate;
+    private final Instant beginDate;
 
     @JsonProperty
-    private final String endDate;
+    private final Instant endDate;
 
     @JsonProperty
     private final String workload;
@@ -43,8 +43,8 @@ public class OutPreviousJobs implements OutputDto {
             long accountId,
             long jobId,
             String companyName,
-            String beginDate,
-            String endDate,
+            Instant beginDate,
+            Instant endDate,
             String workload,
             String role
     )

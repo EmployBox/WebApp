@@ -122,7 +122,7 @@ public class OutUser implements OutputDto {
 
         private class Applications {
             @JsonProperty
-            final String href = HOSTNAME + linkTo( methodOn(UserAccountController.class).getAllApplications(id, 0, 0)).withRel("applications").getHref();
+            final String href = HOSTNAME + linkTo( methodOn(UserAccountController.class).getAllApplications(id, 0, 5)).withRel("applications").getHref();
         }
 
         private class Chats {
@@ -142,12 +142,12 @@ public class OutUser implements OutputDto {
 
         private class Followers {
             @JsonProperty
-            final String href = HOSTNAME + linkTo( methodOn(FollowsController.class,id).getFollowers(id, 0, 0) ).withRel("followers").getHref();
+            final String href = HOSTNAME + linkTo( methodOn(FollowsController.class,id).getFollowers(id, 0, 5) ).withRel("followers").getHref();
         }
 
         private class Following {
             @JsonProperty
-            final String href = HOSTNAME + linkTo( methodOn(FollowsController.class,id).getFollowing(id, 0, 0) ).withRel("following").getHref();
+            final String href = HOSTNAME + linkTo( methodOn(FollowsController.class,id).getFollowing(id, 0, 5) ).withRel("following").getHref();
         }
     }
 }
