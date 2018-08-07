@@ -10,8 +10,6 @@ import isel.ps.employbox.model.entities.Rating;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 import static com.github.jayield.rapper.mapper.MapperRegistry.getMapper;
@@ -28,12 +26,7 @@ public class RatingService {
     }
 
     public CompletableFuture<CollectionPage<Rating>> getRatings(long accountId, int page, int pageSize) {
-        List<Pair<String, String>> pairs = new ArrayList<>();
-        pairs.add( new Pair("accountId", accountId));
-        Pair[] query = pairs.stream()
-                .filter(stringStringPair -> stringStringPair.getValue() != null)
-                .toArray(Pair[]::new);
-        return ServiceUtils.getCollectionPageFuture(Rating.class, page, pageSize, query);
+        return ServiceUtils.getCollectionPageFuture(Rating.class, page, pageSize,  new Pair("accountIdFrom", accountId));
     }
 
     public CompletableFuture<Rating> getRating(long accountFrom, long accountTo) {
