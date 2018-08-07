@@ -1,12 +1,12 @@
 package isel.ps.employbox.controllers.curricula;
 
 import isel.ps.employbox.exceptions.BadRequestException;
-import isel.ps.employbox.model.binders.curricula.*;
-import isel.ps.employbox.model.entities.*;
-import isel.ps.employbox.model.entities.curricula.childs.CurriculumExperience;
+import isel.ps.employbox.model.binders.curricula.CurriculumBinder;
+import isel.ps.employbox.model.entities.Curriculum;
 import isel.ps.employbox.model.input.curricula.childs.InCurriculum;
-import isel.ps.employbox.model.output.*;
-import isel.ps.employbox.services.curricula.*;
+import isel.ps.employbox.model.output.HalCollectionPage;
+import isel.ps.employbox.model.output.OutCurriculum;
+import isel.ps.employbox.services.curricula.CurriculumService;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
@@ -19,20 +19,14 @@ import static isel.ps.employbox.ErrorMessages.BAD_REQUEST_IDS_MISMATCH;
 @RequestMapping("/accounts/users/{id}/curricula")
 public class CurriculumController {
     private final CurriculumBinder curriculumBinder;
-    private final CurriculumExperienceBinder curriculumExperienceBinder;
     private final CurriculumService curriculumService;
-    private final CurriculumExperienceService curriculumExperienceService;
 
     public CurriculumController(
             CurriculumService userService,
-            CurriculumBinder curriculumBinder,
-            CurriculumExperienceBinder curriculumExperienceBinder,
-            CurriculumExperienceService curriculumExperienceService
+            CurriculumBinder curriculumBinder
     ) {
         this.curriculumService = userService;
         this.curriculumBinder = curriculumBinder;
-        this.curriculumExperienceBinder = curriculumExperienceBinder;
-        this.curriculumExperienceService = curriculumExperienceService;
     }
 
     @GetMapping

@@ -2,13 +2,9 @@ package isel.ps.employbox.model.binders.curricula;
 
 import isel.ps.employbox.model.binders.ModelBinder;
 import isel.ps.employbox.model.entities.curricula.childs.PreviousJobs;
-import isel.ps.employbox.model.entities.curricula.childs.Project;
 import isel.ps.employbox.model.input.curricula.childs.InPreviousJobs;
-import isel.ps.employbox.model.input.curricula.childs.InProject;
 import isel.ps.employbox.model.output.OutPreviousJobs;
 import org.springframework.stereotype.Component;
-import reactor.core.publisher.Mono;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.util.concurrent.CompletableFuture;
 
@@ -21,8 +17,8 @@ public class PreviousJobsBinder implements ModelBinder<PreviousJobs, OutPrevious
                 previousJob.getAccountId(),
                 previousJob.getCurriculumId(),
                 previousJob.getCompanyName(),
-                previousJob.getBeginDate().toString(),
-                previousJob.getEndDate().toString(),
+                previousJob.getBeginDate(),
+                previousJob.getEndDate(),
                 previousJob.getWorkLoad(),
                 previousJob.getRole()
         ));

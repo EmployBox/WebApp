@@ -10,6 +10,7 @@ import isel.ps.employbox.exceptions.ResourceNotFoundException;
 import isel.ps.employbox.exceptions.UnauthorizedException;
 import isel.ps.employbox.model.binders.CollectionPage;
 import isel.ps.employbox.model.entities.Application;
+import isel.ps.employbox.model.entities.Comment;
 import isel.ps.employbox.model.entities.UserAccount;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
@@ -154,6 +155,7 @@ public class UserAccountService {
         UnitOfWork unit = new UnitOfWork();
         DataMapper<Application, Long> applicationMapper = getMapper(Application.class, unit);
         DataMapper<UserAccount, Long> userMapper = getMapper(UserAccount.class, unit);
+        DataMapper<Comment, Long> commentMapper = getMapper(Comment.class, unit);
         CompletableFuture<Void> future = getUser(id, email)
                 //TODO remove entries from other tables where user has foreign key
                 .thenCompose(userAccount -> userAccount.getApplications().apply(unit)
@@ -161,12 +163,21 @@ public class UserAccountService {
                             List<Long> applicationIds = applications.stream().map(Application::getIdentityKey).collect(Collectors.toList());
                             return applicationMapper.deleteAll( applicationIds);
                         })
+                        .thenCompose( __ -> userAccount.getComments().apply(unit))
+                        .thenCompose(
+                                comments -> {
+                                    List<Long> commentsIds = comments.stream().map(Comment::getIdentityKey).collect(Collectors.toList());
+                                    return commentMapper.deleteAll(commentsIds);
+                                }
+                        )
                         .thenCompose(aVoid -> userMapper.delete(userAccount))
                         .thenCompose(aVoid -> unit.commit()));
         return Mono.fromFuture(
                 handleExceptions(future, unit)
         );
     }
+
+
 
     public Mono<Void> deleteApplication(long userId, long jobId,long apId, String email) {
         UnitOfWork unit = new UnitOfWork();

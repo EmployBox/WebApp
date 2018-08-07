@@ -180,7 +180,7 @@ CREATE TABLE Message(
   messageId BIGINT IDENTITY primary key,
   chatId BIGINT,
   text VARCHAR(200),
-  datetime datetime default CURRENT_DATE,
+  datetime datetime default SYSDATE,
   version bigint default 1,
 
   FOREIGN KEY (chatId) REFERENCES Chat(chatId) ON DELETE CASCADE,
@@ -191,7 +191,7 @@ CREATE TABLE Comment (
   commentId BIGINT identity primary key,
   accountIdFrom BIGINT,
   accountIdDest BIGINT,
-  datetime DATETIME default CURRENT_DATE,
+  datetime DATE DEFAULT current_date,
   text VARCHAR(300),
   mainCommentId BIGINT,
   status bit,

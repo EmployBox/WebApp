@@ -4,7 +4,6 @@ import isel.ps.employbox.model.entities.Comment;
 import isel.ps.employbox.model.input.InComment;
 import isel.ps.employbox.model.output.OutComment;
 import org.springframework.stereotype.Component;
-import reactor.core.publisher.Mono;
 
 import java.util.concurrent.CompletableFuture;
 
@@ -19,7 +18,7 @@ public class CommentBinder implements ModelBinder<Comment,OutComment,InComment> 
                         comment.getAccountIdDest(),
                         comment.getIdentityKey(),
                         comment.getMainCommendID(),
-                        comment.getDatetime().toString(),
+                        comment.getDatetime(),
                         comment.getText()
                 ));
     }

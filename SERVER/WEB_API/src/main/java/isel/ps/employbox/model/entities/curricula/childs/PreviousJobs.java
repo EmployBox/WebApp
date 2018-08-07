@@ -4,7 +4,7 @@ import com.github.jayield.rapper.DomainObject;
 import com.github.jayield.rapper.annotations.Id;
 import com.github.jayield.rapper.annotations.Version;
 
-import java.sql.Timestamp;
+import java.time.Instant;
 
 public class PreviousJobs extends CurriculumChild implements DomainObject<Long> {
 
@@ -13,8 +13,8 @@ public class PreviousJobs extends CurriculumChild implements DomainObject<Long> 
 
     private long accountId;
     private long curriculumId;
-    private final Timestamp beginDate;
-    private final Timestamp endDate;
+    private final Instant beginDate;
+    private final Instant endDate;
     private final String companyName;
     private final String workLoad;
     private final String role;
@@ -38,8 +38,8 @@ public class PreviousJobs extends CurriculumChild implements DomainObject<Long> 
             long previousJobId,
             long userId,
             long curriculumId,
-            Timestamp beginDate,
-            Timestamp endDate,
+            Instant beginDate,
+            Instant endDate,
             String companyName,
             String workLoad,
             String role,
@@ -85,11 +85,11 @@ public class PreviousJobs extends CurriculumChild implements DomainObject<Long> 
         return role;
     }
 
-    public Timestamp getBeginDate() {
+    public Instant getBeginDate() {
         return beginDate;
     }
 
-    public Timestamp getEndDate() {
+    public Instant getEndDate() {
         return endDate;
     }
 

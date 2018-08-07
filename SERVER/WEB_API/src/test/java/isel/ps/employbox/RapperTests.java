@@ -12,7 +12,7 @@ public class RapperTests {
     public void test() {
         /*
         MapperRegistry.getRepository(Company.class);
-        MapperRegistry.getRepository(Follow.class);
+        MapperRegistry.getRepository(Follows.class);
         MapperRegistry.getRepository(Application.class);
         MapperRegistry.getRepository(Job.class);
         MapperRegistry.getRepository(Rating.class);

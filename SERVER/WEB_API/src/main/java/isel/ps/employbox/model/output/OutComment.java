@@ -4,6 +4,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import isel.ps.employbox.controllers.CommentController;
 
+import java.time.Instant;
+
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 
 public class OutComment implements OutputDto {
@@ -21,7 +23,7 @@ public class OutComment implements OutputDto {
     private final long mainCommentId;
 
     @JsonProperty
-    private final String datetime;
+    private final Instant datetime;
 
     @JsonProperty
     private final String text;
@@ -29,7 +31,7 @@ public class OutComment implements OutputDto {
     @JsonProperty
     private final _Links _links;
 
-    public OutComment(long accountIdFrom, long accountIdTo, long commmentId, long mainCommentId, String datetime, String text) {
+    public OutComment(long accountIdFrom, long accountIdTo, long commmentId, long mainCommentId, Instant datetime, String text) {
         this.accountIdFrom = accountIdFrom;
         this.accountIdTo = accountIdTo;
         this.commmentId = commmentId;

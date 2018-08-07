@@ -25,7 +25,7 @@ CREATE PROCEDURE populateDB()
     insert into CURRICULUMEXPERIENCE(ACCOUNTID, CURRICULUMID, COMPETENCES, YEARS) values (account_id1, curriculum_id, 'Knows to do stuff', 1);
 
     /*Insert PreviousJobs*/
-    /*insert into PREVIOUSJOBS(ACCOUNTID, CURRICULUMID, BEGINDATE, ENDDATE, COMPANYNAME, WORKLOAD, ROLE) values (account_id1, curriculum_id, '1992-01-22', '2000-01-22', 'ISEL', 'FULL-TIME', 'TEACHER' );*/
+    insert into PREVIOUSJOBS(ACCOUNTID, CURRICULUMID, COMPANYNAME, WORKLOAD, ROLE) values (account_id1, curriculum_id,'ISEL', 'partial', 'TEACHER' );
 
     /*Insert Companies*/
     insert into ACCOUNT(NAME, EMAIL, PASSWORD, ACCOUNTTYPE) values ('company1', 'company1@gmail.com', '741', 'CMP');

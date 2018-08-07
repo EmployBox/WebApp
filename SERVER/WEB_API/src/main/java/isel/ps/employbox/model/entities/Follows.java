@@ -5,24 +5,24 @@ import com.github.jayield.rapper.annotations.EmbeddedId;
 import com.github.jayield.rapper.annotations.Version;
 import com.github.jayield.rapper.utils.EmbeddedIdClass;
 
-public class Follow implements DomainObject<Follow.FollowKey> {
+public class Follows implements DomainObject<Follows.FollowKey> {
 
     @EmbeddedId
     private final FollowKey followKey;
     @Version
     private final long version;
 
-    public Follow(){
+    public Follows(){
         followKey = new FollowKey();
         version = 0;
     }
 
-    public Follow(long accountIdFollower, long accountIdFollowed, long version) {
+    public Follows(long accountIdFollower, long accountIdFollowed, long version) {
         this.version = version;
         followKey = new FollowKey(accountIdFollowed, accountIdFollower);
     }
 
-    public Follow(long accountIdFollower, long accountIdFollowed) {
+    public Follows(long accountIdFollower, long accountIdFollowed) {
         this.version = -1;
         followKey = new FollowKey(accountIdFollowed, accountIdFollower);
     }

@@ -1,14 +1,14 @@
 package isel.ps.employbox.model.input.curricula.childs;
 
-import java.sql.Timestamp;
+import java.time.Instant;
 
 public class InPreviousJobs {
 
     private long previousJobId;
     private long accountId;
     private long curriculumId;
-    private Timestamp beginDate;
-    private Timestamp endDate;
+    private Instant beginDate;
+    private Instant endDate;
     private String companyName;
     private String workLoad;
     private String role;
@@ -46,11 +46,11 @@ public class InPreviousJobs {
         this.accountId = accountId;
     }
 
-    public Timestamp getBeginDate() {
+    public Instant getBeginDate() {
         return beginDate;
     }
 
-    public void setBeginDate(Timestamp beginDate) {
+    public void setBeginDate(Instant beginDate) {
         this.beginDate = beginDate;
     }
 
@@ -70,11 +70,11 @@ public class InPreviousJobs {
         this.companyName = companyName;
     }
 
-    public Timestamp getEndDate() {
+    public Instant getEndDate() {
         return endDate;
     }
 
-    public void setEndDate(Timestamp endDate) {
+    public void setEndDate(Instant endDate) {
         this.endDate = endDate;
     }
 

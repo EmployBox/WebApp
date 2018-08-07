@@ -32,7 +32,7 @@ public class JobService {
         this.accountService = userService;
     }
 
-    public CompletableFuture<CollectionPage<Job>> getAllJobs(int page, int pageSize,String address, String location, String title, Integer wage, String offerType, Integer ratingLow, Integer ratingHigh) {
+    public CompletableFuture<CollectionPage<Job>> getAllJobs(int page, int pageSize, String address, String location, String title, Integer wage, String offerType, Integer ratingLow, Integer ratingHigh) {
         List<Pair<String, Object>> pairs = new ArrayList<>();
         pairs.add(new Pair<>("address", address));
         //pairs.add(new Pair<>("location",location));

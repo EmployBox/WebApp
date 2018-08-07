@@ -1,4 +1,108 @@
 package isel.ps.employbox.controllers.curricula;
 
+import com.github.jayield.rapper.mapper.DataMapper;
+import com.github.jayield.rapper.unitofwork.UnitOfWork;
+import com.github.jayield.rapper.utils.Pair;
+import isel.ps.employbox.model.entities.Curriculum;
+import isel.ps.employbox.model.entities.UserAccount;
+import isel.ps.employbox.model.entities.curricula.childs.PreviousJobs;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.ApplicationContext;
+import org.springframework.restdocs.JUnitRestDocumentation;
+import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.web.reactive.server.WebTestClient;
+
+import java.util.List;
+
+import static com.github.jayield.rapper.mapper.MapperRegistry.getMapper;
+import static isel.ps.employbox.DataBaseUtils.prepareDB;
+import static junit.framework.TestCase.assertEquals;
+import static org.springframework.restdocs.webtestclient.WebTestClientRestDocumentation.document;
+import static org.springframework.restdocs.webtestclient.WebTestClientRestDocumentation.documentationConfiguration;
+import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.springSecurity;
+import static org.springframework.web.reactive.function.client.ExchangeFilterFunctions.basicAuthentication;
+
+
+@RunWith(SpringRunner.class)
+@SpringBootTest
 public class PreviousJobsControllerTests {
+    private static final Logger logger = LoggerFactory.getLogger(CurriculumControllerTests.class);
+    @Rule
+    public JUnitRestDocumentation restDocumentation = new JUnitRestDocumentation();
+    @Autowired
+    private ApplicationContext context;
+
+    private WebTestClient webTestClient;
+    private UserAccount userAccount;
+    private PreviousJobs previousJobs;
+    private Curriculum curriculum;
+
+
+    @Before
+    public void setUp() {
+        prepareDB();
+        webTestClient = WebTestClient.bindToApplicationContext(context)
+                .apply(springSecurity())
+                .configureClient()
+                .filter(basicAuthentication())
+                .filter(documentationConfiguration(restDocumentation))
+                .build();
+        UnitOfWork unitOfWork = new UnitOfWork();
+        DataMapper<UserAccount, Long> userAccountMapper = getMapper(UserAccount.class, unitOfWork);
+        List<UserAccount> userAccounts = userAccountMapper.findWhere(new Pair<>("name", "Bruno")).join();
+        assertEquals(1, userAccounts.size());
+        userAccount = userAccounts.get(0);
+
+
+        DataMapper<Curriculum, Long> curriculumRepo = getMapper(Curriculum.class, unitOfWork);
+        List<Curriculum> curricula = curriculumRepo.findWhere( new Pair<>("title", "Engenharia Civil")).join();
+        assertEquals(1, curricula.size());
+        curriculum = curricula.get(0);
+
+        DataMapper<PreviousJobs, Long> commentsMapper = getMapper(PreviousJobs.class, unitOfWork);
+        List<PreviousJobs> previousJobs = commentsMapper.findWhere(new Pair<>("COMPANYNAME", "ISEL")).join();
+        assertEquals(1, previousJobs.size());
+        this.previousJobs = previousJobs.get(0);
+
+        unitOfWork.commit().join();
+    }
+
+    @After
+    public void after() {
+        int openedConnections = UnitOfWork.numberOfOpenConnections.get();
+        logger.info("OPENED CONNECTIONS - {}", openedConnections);
+        assertEquals(0, openedConnections);
+    }
+
+    @Test
+    public void testGetAllPreviousJobs(){
+        webTestClient
+                .get()
+                .uri("/accounts/users/"+userAccount.getIdentityKey()+ "/curricula/"+ curriculum.getIdentityKey()+"/previousJobs")
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody()
+                .consumeWith(document("getAllPreviousJobs"));
+    }
+
+    @Test
+    public void testGetAPreviousJob(){
+        webTestClient
+                .get()
+                .uri("/accounts/users/"+userAccount.getIdentityKey()+ "/curricula/"+ curriculum.getIdentityKey()+"/previousJobs/"+ previousJobs.getIdentityKey())
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody()
+                .consumeWith(document("getAllPreviousJobs"));
+    }
+
+
 }

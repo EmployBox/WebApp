@@ -6,7 +6,7 @@ import com.github.jayield.rapper.unitofwork.UnitOfWork;
 import com.github.jayield.rapper.utils.Pair;
 import isel.ps.employbox.model.binders.CollectionPage;
 import isel.ps.employbox.model.entities.Account;
-import isel.ps.employbox.model.entities.Follow;
+import isel.ps.employbox.model.entities.Follows;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
@@ -35,12 +35,12 @@ public class FollowService {
 
     private CompletableFuture<CollectionPage<Account>> getAccountFromFollowAux(long followId, String collumn, int page, int pageSize) {
         UnitOfWork unitOfWork = new UnitOfWork();
-        DataMapper<Follow, Follow.FollowKey> followMapper = getMapper(Follow.class, unitOfWork);
+        DataMapper<Follows, Follows.FollowKey> followMapper = getMapper(Follows.class, unitOfWork);
         CompletableFuture future = followMapper.findWhere(new Pair(collumn, followId))
                 .thenCompose(res -> unitOfWork.commit().thenApply(aVoid -> res))
                 .thenCompose(follow -> {
                     List<Pair<String, String>> pairs = new ArrayList<>();
-                    ((List<Follow>) follow).forEach(curr -> pairs.add(new Pair("accountId", curr.getAccountIdFollowed())));
+                    ((List<Follows>) follow).forEach(curr -> pairs.add(new Pair("accountId", curr.getAccountIdFollowed())));
                     Pair[] query = pairs.stream()
                             .filter(stringStringPair -> stringStringPair.getValue() != null)
                             .toArray(Pair[]::new);
@@ -51,9 +51,9 @@ public class FollowService {
 
     public Mono<Void> createFollower(long accountToBeFollowedId, long accountToFollowId, String username) {
         UnitOfWork unitOfWork = new UnitOfWork();
-        DataMapper<Follow, Follow.FollowKey> followMapper = getMapper(Follow.class, unitOfWork);
+        DataMapper<Follows, Follows.FollowKey> followMapper = getMapper(Follows.class, unitOfWork);
         CompletableFuture<Void> future = accountService.getAccount(accountToFollowId, username)
-                .thenCompose(account -> followMapper.create(new Follow(accountToBeFollowedId, accountToFollowId)))
+                .thenCompose(account -> followMapper.create(new Follows(accountToBeFollowedId, accountToFollowId)))
                 .thenCompose(aVoid -> unitOfWork.commit());
         return Mono.fromFuture(
                 handleExceptions(future, unitOfWork)
@@ -62,9 +62,9 @@ public class FollowService {
 
     public Mono<Void> deleteFollower(long id, long fid, String username) {
         UnitOfWork unitOfWork = new UnitOfWork();
-        DataMapper<Follow, Follow.FollowKey> followMapper = getMapper(Follow.class, unitOfWork);
+        DataMapper<Follows, Follows.FollowKey> followMapper = getMapper(Follows.class, unitOfWork);
         CompletableFuture<Void> future = accountService.getAccount(id, username)
-                .thenCompose(account -> followMapper.deleteById(new Follow.FollowKey(id, fid)))
+                .thenCompose(account -> followMapper.deleteById(new Follows.FollowKey(id, fid)))
                 .thenCompose(aVoid -> unitOfWork.commit());
         return Mono.fromFuture(
                 handleExceptions(future, unitOfWork)

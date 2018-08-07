@@ -85,7 +85,6 @@ public class CurriculumExperienceControllerTests {
         assertEquals(0, openedConnections);
     }
 
-
     @Test
     public void testGetAllCurriculumExperiences(){
         webTestClient
@@ -97,7 +96,6 @@ public class CurriculumExperienceControllerTests {
                 .consumeWith(document("getAllCurriculumExperiences"));
     }
 
-
     @Test
     public void testGetCurriculumExperience(){
         webTestClient
@@ -108,7 +106,6 @@ public class CurriculumExperienceControllerTests {
                 .expectBody()
                 .consumeWith(document("getProject"));
     }
-
 
     @Test
     @WithMockUser(username = "teste@gmail.com")
