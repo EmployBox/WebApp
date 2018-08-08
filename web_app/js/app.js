@@ -1,5 +1,5 @@
 import React, {Component} from 'react'
-import {BrowserRouter, Route, Switch, Redirect} from 'react-router-dom'
+import {BrowserRouter, Route, Switch} from 'react-router-dom'
 
 import Navigation from './components/navigation'
 import Footer from './components/footer'
@@ -34,9 +34,10 @@ const signUpUserTempl = new URITemplate('/signup/user/{url}')
 const signUpCompanyTempl = new URITemplate('/signup/company/{url}')
 const logInTempl = new URITemplate('/logIn/{url}')
 const signUpTempl = new URITemplate('/signup/{urlUser}/{urlCompany}')
-//const profileTempl = new URITemplate('/profile/{url}')
 const accountTempl = new URITemplate('/account/{url}')
 const searchTempl = new URITemplate('/search/{url}')
+const companyTempl = new URITemplate('/company/{url}')
+const jobTempl = new URITemplate('/job/{url}')
 
 function getLink (link, hal) {
   return hal[link]['_links'].self.href
@@ -46,11 +47,15 @@ function loginExpand (json) {
   return logInTempl.expand({url: getLink('login', json)})
 }
 
+const UserTable1 = ({...rest}) => <UserTable {...rest} accountTempl={accountTempl} />
+const CompanyTable1 = ({...rest}) => <CompanyTable {...rest} companyTempl={companyTempl} />
+const JobTable1 = ({...rest}) => <JobTable {...rest} jobTempl={jobTempl} accountTempl={accountTempl} companyTempl={companyTempl} />
+
 function getOptions (json) {
   return {
-    jobs: new Option('Jobs', 'Job\'s title', 'title', getLink('jobs', json), new Render(JobFilters, JobTable)),
-    companies: new Option('Companies', 'Company\'s name', 'name', getLink('companies', json), new Render(CompanyFilters, CompanyTable)),
-    users: new Option('Users', 'User\'s name', 'name', getLink('users', json), new Render(UserFilters, UserTable))
+    jobs: new Option('Jobs', 'Job\'s title', 'title', getLink('jobs', json), new Render(JobFilters, JobTable1)),
+    companies: new Option('Companies', 'Company\'s name', 'name', getLink('companies', json), new Render(CompanyFilters, CompanyTable1)),
+    users: new Option('Users', 'User\'s name', 'name', getLink('users', json), new Render(UserFilters, UserTable1))
   }
 }
 

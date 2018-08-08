@@ -69,10 +69,7 @@ class SearchPage extends React.Component {
       const type = this.props.match.params.type
 
       const newURI = this.props.uriTemplate.expand({type: type, query: query})
-      //console.log('newURI ' + JSON.stringify(newURI))
       this.setState({currentQuery: Object.assign({}, query), uri: newURI})
-
-      //const newUrl = this.props.uriTemplate.expand({entityType: type, query: query})
       this.props.history.push(this.props.searchTempl.expand({url: newURI}))
     }
   }
