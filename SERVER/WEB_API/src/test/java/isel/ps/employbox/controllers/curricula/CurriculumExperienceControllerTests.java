@@ -3,8 +3,8 @@ package isel.ps.employbox.controllers.curricula;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.jayield.rapper.mapper.DataMapper;
+import com.github.jayield.rapper.mapper.conditions.EqualCondition;
 import com.github.jayield.rapper.unitofwork.UnitOfWork;
-import com.github.jayield.rapper.utils.Pair;
 import isel.ps.employbox.exceptions.ResourceNotFoundException;
 import isel.ps.employbox.model.entities.Curriculum;
 import isel.ps.employbox.model.entities.UserAccount;
@@ -62,17 +62,17 @@ public class CurriculumExperienceControllerTests {
                 .build();
         UnitOfWork unitOfWork = new UnitOfWork();
         DataMapper<UserAccount, Long> userAccountRepo = getMapper(UserAccount.class, unitOfWork);
-        List<UserAccount> userAccounts = userAccountRepo.findWhere( new Pair<>("name", "Bruno")).join();
+        List<UserAccount> userAccounts = userAccountRepo.find( new EqualCondition<>("name", "Bruno")).join();
         assertEquals(1, userAccounts.size());
         userAccount = userAccounts.get(0);
 
         DataMapper<Curriculum, Long> curriculumRepo = getMapper(Curriculum.class, unitOfWork);
-        List<Curriculum> curricula = curriculumRepo.findWhere( new Pair<>("title", "Engenharia Civil")).join();
+        List<Curriculum> curricula = curriculumRepo.find( new EqualCondition<>("title", "Engenharia Civil")).join();
         assertEquals(1, curricula.size());
         curriculum = curricula.get(0);
 
         DataMapper<CurriculumExperience, Long> curriculumExperiencesMapper = getMapper(CurriculumExperience.class, unitOfWork);
-        List<CurriculumExperience> curriculumExperiences = curriculumExperiencesMapper.findWhere( new Pair<>("competences", "Knows to do stuff")).join();
+        List<CurriculumExperience> curriculumExperiences = curriculumExperiencesMapper.find( new EqualCondition<>("competences", "Knows to do stuff")).join();
         assertEquals(1, curriculumExperiences.size());
         curriculumExperience = curriculumExperiences.get(0);
         unitOfWork.commit().join();
@@ -80,7 +80,7 @@ public class CurriculumExperienceControllerTests {
 
     @After
     public void after() {
-        int openedConnections = UnitOfWork.numberOfOpenConnections.get();
+        int openedConnections = UnitOfWork.getNumberOfOpenConnections().get();
         logger.info("OPENED CONNECTIONS - {}", openedConnections);
         assertEquals(0, openedConnections);
     }
@@ -130,8 +130,8 @@ public class CurriculumExperienceControllerTests {
                 .expectBody()
                 .consumeWith(document("createCurriculumExperience"));
 
-        assertEquals(1, curriculumExperienceMapper.findWhere( new Pair<>("competences", "knows to do everything")).join().size());
-        assertEquals(1, curriculumExperienceMapper.findWhere( new Pair<>("years", 3)).join().size());
+        assertEquals(1, curriculumExperienceMapper.find( new EqualCondition<>("competences", "knows to do everything")).join().size());
+        assertEquals(1, curriculumExperienceMapper.find( new EqualCondition<>("years", 3)).join().size());
         unitOfWork.commit().join();
     }
 

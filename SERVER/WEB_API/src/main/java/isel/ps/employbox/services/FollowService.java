@@ -2,8 +2,9 @@ package isel.ps.employbox.services;
 
 
 import com.github.jayield.rapper.mapper.DataMapper;
+import com.github.jayield.rapper.mapper.conditions.Condition;
+import com.github.jayield.rapper.mapper.conditions.EqualCondition;
 import com.github.jayield.rapper.unitofwork.UnitOfWork;
-import com.github.jayield.rapper.utils.Pair;
 import isel.ps.employbox.model.binders.CollectionPage;
 import isel.ps.employbox.model.entities.Account;
 import isel.ps.employbox.model.entities.Follows;
@@ -36,14 +37,15 @@ public class FollowService {
     private CompletableFuture<CollectionPage<Account>> getAccountFromFollowAux(long followId, String collumn, int page, int pageSize) {
         UnitOfWork unitOfWork = new UnitOfWork();
         DataMapper<Follows, Follows.FollowKey> followMapper = getMapper(Follows.class, unitOfWork);
-        CompletableFuture future = followMapper.findWhere(new Pair(collumn, followId))
+
+        CompletableFuture future = followMapper.find(new EqualCondition<>(collumn, followId))
                 .thenCompose(res -> unitOfWork.commit().thenApply(aVoid -> res))
                 .thenCompose(follow -> {
-                    List<Pair<String, String>> pairs = new ArrayList<>();
-                    ((List<Follows>) follow).forEach(curr -> pairs.add(new Pair("accountId", curr.getAccountIdFollowed())));
-                    Pair[] query = pairs.stream()
+                    List<Condition<Long>> pairs = new ArrayList<>();
+                    follow.forEach(curr -> pairs.add(new EqualCondition<Long>("accountId", curr.getAccountIdFollowed())));
+                    Condition[] query = pairs.stream()
                             .filter(stringStringPair -> stringStringPair.getValue() != null)
-                            .toArray(Pair[]::new);
+                            .toArray(Condition[]::new);
                     return ServiceUtils.getCollectionPageFuture(Account.class, page, pageSize, query);
                 });
         return handleExceptions(future, unitOfWork);

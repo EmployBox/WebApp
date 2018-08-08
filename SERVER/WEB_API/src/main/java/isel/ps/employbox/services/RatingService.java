@@ -1,8 +1,8 @@
 package isel.ps.employbox.services;
 
 import com.github.jayield.rapper.mapper.DataMapper;
+import com.github.jayield.rapper.mapper.conditions.EqualCondition;
 import com.github.jayield.rapper.unitofwork.UnitOfWork;
-import com.github.jayield.rapper.utils.Pair;
 import isel.ps.employbox.ErrorMessages;
 import isel.ps.employbox.exceptions.ResourceNotFoundException;
 import isel.ps.employbox.model.binders.CollectionPage;
@@ -26,7 +26,7 @@ public class RatingService {
     }
 
     public CompletableFuture<CollectionPage<Rating>> getRatings(long accountId, int page, int pageSize) {
-        return ServiceUtils.getCollectionPageFuture(Rating.class, page, pageSize,  new Pair("accountIdFrom", accountId));
+        return ServiceUtils.getCollectionPageFuture(Rating.class, page, pageSize,  new EqualCondition<>("accountIdFrom", accountId));
     }
 
     public CompletableFuture<Rating> getRating(long accountFrom, long accountTo) {

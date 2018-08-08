@@ -2,8 +2,8 @@ package isel.ps.employbox.services.curricula;
 
 import com.github.jayield.rapper.DomainObject;
 import com.github.jayield.rapper.mapper.DataMapper;
+import com.github.jayield.rapper.mapper.conditions.EqualCondition;
 import com.github.jayield.rapper.unitofwork.UnitOfWork;
-import com.github.jayield.rapper.utils.Pair;
 import io.vertx.ext.sql.TransactionIsolation;
 import isel.ps.employbox.ErrorMessages;
 import isel.ps.employbox.exceptions.BadRequestException;
@@ -22,7 +22,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
-import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import static com.github.jayield.rapper.mapper.MapperRegistry.getMapper;
@@ -89,7 +88,7 @@ public class CurriculumService {
 
     public CompletableFuture<CollectionPage<Curriculum>> getCurricula(long accountId, int page, int pageSize) {
         return userAccountService.getUser(accountId)
-                .thenCompose(userAccount -> ServiceUtils.getCollectionPageFuture(Curriculum.class, page, pageSize, new Pair<>("accountId", accountId)));
+                .thenCompose(userAccount -> ServiceUtils.getCollectionPageFuture(Curriculum.class, page, pageSize, new EqualCondition<>("accountId", accountId)));
     }
 
     public CompletableFuture<Curriculum> getCurriculum(long userId, long cid, String... email) {
@@ -119,7 +118,7 @@ public class CurriculumService {
         );
     }
 
-    public Mono<Void> deleteCurriculum(long userId, long cid, String email) {
+    public Mono<Void> deleteCurriculum(long userId, long cid, String... email) {
         List<Curriculum> curriculum = new ArrayList<>(1);
 
         UnitOfWork unitOfWork = new UnitOfWork();

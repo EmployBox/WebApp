@@ -47,7 +47,7 @@ public class AccountControllerTests {
 
     @After
     public void after() {
-        int openedConnections = UnitOfWork.numberOfOpenConnections.get();
+        int openedConnections = UnitOfWork.getNumberOfOpenConnections().get();
         logger.info("OPENED CONNECTIONS - {}", openedConnections);
         assertEquals(0, openedConnections);
     }

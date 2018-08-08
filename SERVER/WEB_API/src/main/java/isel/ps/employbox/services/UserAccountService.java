@@ -1,8 +1,10 @@
 package isel.ps.employbox.services;
 
+import com.github.jayield.rapper.DomainObject;
 import com.github.jayield.rapper.mapper.DataMapper;
+import com.github.jayield.rapper.mapper.conditions.Condition;
+import com.github.jayield.rapper.mapper.conditions.EqualCondition;
 import com.github.jayield.rapper.unitofwork.UnitOfWork;
-import com.github.jayield.rapper.utils.Pair;
 import isel.ps.employbox.ErrorMessages;
 import isel.ps.employbox.exceptions.BadRequestException;
 import isel.ps.employbox.exceptions.ConflictException;
@@ -11,7 +13,9 @@ import isel.ps.employbox.exceptions.UnauthorizedException;
 import isel.ps.employbox.model.binders.CollectionPage;
 import isel.ps.employbox.model.entities.Application;
 import isel.ps.employbox.model.entities.Comment;
+import isel.ps.employbox.model.entities.Curriculum;
 import isel.ps.employbox.model.entities.UserAccount;
+import isel.ps.employbox.services.curricula.CurriculumService;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
@@ -19,6 +23,7 @@ import java.security.InvalidParameterException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static com.github.jayield.rapper.mapper.MapperRegistry.getMapper;
@@ -28,13 +33,12 @@ import static isel.ps.employbox.services.ServiceUtils.handleExceptions;
 @Service
 public class UserAccountService {
 
-
     public CompletableFuture<CollectionPage<UserAccount>> getAllUsers(int page, int pageSize, String name, Integer ratingLow, Integer ratingHigh) {
-        List<Pair<String, String>> pairs = new ArrayList<>();
-        pairs.add(new Pair<>("name", name));
-        Pair[] query = pairs.stream()
+        List<Condition<String>> pairs = new ArrayList<>();
+        pairs.add(new EqualCondition<>("name", name));
+        Condition[] query = pairs.stream()
                 .filter(stringStringPair -> stringStringPair.getValue() != null)
-                .toArray(Pair[]::new);
+                .toArray(Condition[]::new);
         return ServiceUtils.getCollectionPageFuture(UserAccount.class, page, pageSize, query);
     }
 
@@ -87,10 +91,10 @@ public class UserAccountService {
         DataMapper<Application, Long> applicationMapper = getMapper(Application.class, unit);
         CompletableFuture<CollectionPage<Application>> future = userMapper.findById( accountId)
                 .thenApply(ouser -> ouser.orElseThrow(() -> new ResourceNotFoundException(ErrorMessages.RESOURCE_NOTFOUND_USER)))
-                .thenCompose(ignored -> applicationMapper.findWhere(page, pageSize, new Pair<>("accountId", accountId))
-                        .thenCompose(listRes -> applicationMapper.getNumberOfEntries(new Pair<>("accountId", accountId))
+                .thenCompose(ignored -> applicationMapper.find(page, pageSize, new EqualCondition<Long>("accountId", accountId))
+                        .thenCompose(listRes -> applicationMapper.getNumberOfEntries( new EqualCondition<Long>("accountId",accountId))
                                 .thenCompose(aLong -> unit.commit().thenApply(aVoid -> aLong))
-                                .thenApply(collectionSize -> new CollectionPage<>(
+                                .thenApply(collectionSize -> new CollectionPage<Application>(
                                         collectionSize,
                                         pageSize,
                                         page,
@@ -151,11 +155,15 @@ public class UserAccountService {
         return Mono.fromFuture(handleExceptions(future, unit));
     }
 
+    //todo fix bug here
     public Mono<Void> deleteUser(long id, String email) {
         UnitOfWork unit = new UnitOfWork();
         DataMapper<Application, Long> applicationMapper = getMapper(Application.class, unit);
         DataMapper<UserAccount, Long> userMapper = getMapper(UserAccount.class, unit);
         DataMapper<Comment, Long> commentMapper = getMapper(Comment.class, unit);
+        DataMapper<Curriculum, Long> curriculumMapper = getMapper(Curriculum.class, unit);
+        CurriculumService curriculumService = new CurriculumService(this);
+
         CompletableFuture<Void> future = getUser(id, email)
                 //TODO remove entries from other tables where user has foreign key
                 .thenCompose(userAccount -> userAccount.getApplications().apply(unit)
@@ -170,6 +178,12 @@ public class UserAccountService {
                                     return commentMapper.deleteAll(commentsIds);
                                 }
                         )
+                        .thenCompose( __ -> curriculumMapper.find( new EqualCondition<Long>("accountId", id)))
+                        .thenCompose( list -> {
+                            List<CompletableFuture<Void>> cflist = new ArrayList<>();
+                            list.forEach(curr ->cflist.add( curriculumMapper.delete(curr) ));
+                            return CompletableFuture.allOf(cflist.toArray(new CompletableFuture[cflist.size()]));
+                        })
                         .thenCompose(aVoid -> userMapper.delete(userAccount))
                         .thenCompose(aVoid -> unit.commit()));
         return Mono.fromFuture(
@@ -177,6 +191,15 @@ public class UserAccountService {
         );
     }
 
+    private CompletableFuture<Void> deleteUserChildList(Function<UnitOfWork, CompletableFuture<List<Object>>> func, UnitOfWork unit, DataMapper mapper) {
+        return func.apply(unit)
+                .thenCompose(
+                        res -> {
+                            List list = res.stream().map( curr -> ((DomainObject)curr).getIdentityKey()).collect(Collectors.toList());
+                            return mapper.deleteAll(list);
+                        }
+               );
+    }
 
 
     public Mono<Void> deleteApplication(long userId, long jobId,long apId, String email) {
