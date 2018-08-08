@@ -2,12 +2,11 @@ package isel.ps.employbox.services;
 
 import com.github.jayield.rapper.DomainObject;
 import com.github.jayield.rapper.mapper.DataMapper;
+import com.github.jayield.rapper.mapper.conditions.Condition;
 import com.github.jayield.rapper.unitofwork.UnitOfWork;
-import com.github.jayield.rapper.utils.Pair;
 import io.vertx.ext.sql.TransactionIsolation;
 import isel.ps.employbox.model.binders.CollectionPage;
 
-import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 import static com.github.jayield.rapper.mapper.MapperRegistry.getMapper;
@@ -21,12 +20,12 @@ public class ServiceUtils {
             Class<T> tClass,
             int page,
             int pageSize,
-            Pair<String, Object>... query
+            Condition<Object>... query
     ) {
         UnitOfWork unitOfWork = new UnitOfWork(TransactionIsolation.SERIALIZABLE);
         DataMapper<T, K> mapper = getMapper(tClass, unitOfWork);
 
-        CompletableFuture<CollectionPage<T>> future = mapper.findWhere(page, pageSize, query)
+        CompletableFuture<CollectionPage<T>> future = mapper.find(page, pageSize, query)
                 .thenCompose(tList -> mapper.getNumberOfEntries(query)
                         .thenCompose(aLong -> {
                             CollectionPage<T> collectionPage = new CollectionPage<>(aLong, pageSize, page, tList);

@@ -3,8 +3,8 @@ package isel.ps.employbox.services.curricula;
 
 import com.github.jayield.rapper.mapper.DataMapper;
 import com.github.jayield.rapper.mapper.MapperRegistry;
+import com.github.jayield.rapper.mapper.conditions.EqualCondition;
 import com.github.jayield.rapper.unitofwork.UnitOfWork;
-import com.github.jayield.rapper.utils.Pair;
 import isel.ps.employbox.ErrorMessages;
 import isel.ps.employbox.exceptions.ConflictException;
 import isel.ps.employbox.exceptions.ResourceNotFoundException;
@@ -36,7 +36,7 @@ public class CurriculumExperienceService {
         CompletableFuture<CollectionPage<CurriculumExperience>> future = curriculumMapper.findById(curriculumId)
                 .thenCompose(res -> unitOfWork.commit().thenApply(aVoid -> res))
                 .thenApply(ocurriculum -> ocurriculum.orElseThrow(() -> new ResourceNotFoundException(ErrorMessages.RESOURCE_NOTFOUND_CURRICULUM)))
-                .thenCompose(__ -> ServiceUtils.getCollectionPageFuture(CurriculumExperience.class, page, pageSize, new Pair<>("curriculumId", curriculumId)));
+                .thenCompose(__ -> ServiceUtils.getCollectionPageFuture(CurriculumExperience.class, page, pageSize, new EqualCondition<>("curriculumId", curriculumId)));
         return handleExceptions(future, unitOfWork);
     }
 

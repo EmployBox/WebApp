@@ -1,8 +1,8 @@
 package isel.ps.employbox.controllers;
 
 import com.github.jayield.rapper.mapper.DataMapper;
+import com.github.jayield.rapper.mapper.conditions.EqualCondition;
 import com.github.jayield.rapper.unitofwork.UnitOfWork;
-import com.github.jayield.rapper.utils.Pair;
 import isel.ps.employbox.controllers.curricula.CurriculumControllerTests;
 import isel.ps.employbox.model.entities.Comment;
 import isel.ps.employbox.model.entities.UserAccount;
@@ -55,12 +55,12 @@ public class CommentControllerTests {
                 .build();
         UnitOfWork unitOfWork = new UnitOfWork();
         DataMapper<UserAccount, Long> userAccountMapper = getMapper(UserAccount.class, unitOfWork);
-        List<UserAccount> userAccounts = userAccountMapper.findWhere(new Pair<>("name", "Bruno")).join();
+        List<UserAccount> userAccounts = userAccountMapper.find(new EqualCondition<>("name", "Bruno")).join();
         assertEquals(1, userAccounts.size());
         userAccount = userAccounts.get(0);
 
         DataMapper<Comment, Long> commentsMapper = getMapper(Comment.class, unitOfWork);
-        List<Comment> comments = commentsMapper.findWhere(new Pair<>("TEXT", "FIRST COMMENT")).join();
+        List<Comment> comments = commentsMapper.find(new EqualCondition<>("TEXT", "FIRST COMMENT")).join();
         assertEquals(1, comments.size());
         comment = comments.get(0);
 
@@ -69,7 +69,7 @@ public class CommentControllerTests {
 
     @After
     public void after() {
-        int openedConnections = UnitOfWork.numberOfOpenConnections.get();
+        int openedConnections = UnitOfWork.getNumberOfOpenConnections().get();
         logger.info("OPENED CONNECTIONS - {}", openedConnections);
         assertEquals(0, openedConnections);
     }

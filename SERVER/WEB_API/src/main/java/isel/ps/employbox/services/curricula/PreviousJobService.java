@@ -3,8 +3,8 @@ package isel.ps.employbox.services.curricula;
 
 import com.github.jayield.rapper.mapper.DataMapper;
 import com.github.jayield.rapper.mapper.MapperRegistry;
+import com.github.jayield.rapper.mapper.conditions.EqualCondition;
 import com.github.jayield.rapper.unitofwork.UnitOfWork;
-import com.github.jayield.rapper.utils.Pair;
 import isel.ps.employbox.ErrorMessages;
 import isel.ps.employbox.exceptions.BadRequestException;
 import isel.ps.employbox.exceptions.ConflictException;
@@ -30,7 +30,7 @@ public class PreviousJobService {
         UnitOfWork unitOfWork = new UnitOfWork();
         DataMapper<PreviousJobs, Long> previousJobsMapper = MapperRegistry.getMapper(PreviousJobs.class, unitOfWork);
         CompletableFuture<CollectionPage<PreviousJobs>> future = curriculumService.getCurriculum(userId, curriculumId)
-                .thenCompose(__ -> ServiceUtils.getCollectionPageFuture(PreviousJobs.class, page, pageSize, new Pair<>("curriculumId", curriculumId)));
+                .thenCompose(__ -> ServiceUtils.getCollectionPageFuture(PreviousJobs.class, page, pageSize, new EqualCondition<>("curriculumId", curriculumId)));
         return handleExceptions(future, unitOfWork);
     }
 

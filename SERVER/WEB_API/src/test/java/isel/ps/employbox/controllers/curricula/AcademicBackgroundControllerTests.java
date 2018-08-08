@@ -3,8 +3,8 @@ package isel.ps.employbox.controllers.curricula;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.jayield.rapper.mapper.DataMapper;
+import com.github.jayield.rapper.mapper.conditions.EqualCondition;
 import com.github.jayield.rapper.unitofwork.UnitOfWork;
-import com.github.jayield.rapper.utils.Pair;
 import isel.ps.employbox.exceptions.ResourceNotFoundException;
 import isel.ps.employbox.model.entities.Curriculum;
 import isel.ps.employbox.model.entities.UserAccount;
@@ -61,18 +61,18 @@ public class AcademicBackgroundControllerTests {
                 .build();
         UnitOfWork unitOfWork = new UnitOfWork();
         DataMapper<UserAccount, Long> userAccountRepo = getMapper(UserAccount.class, unitOfWork);
-        List<UserAccount> userAccounts = userAccountRepo.findWhere( new Pair<>("name", "Bruno")).join();
+        List<UserAccount> userAccounts = userAccountRepo.find( new EqualCondition<>("name", "Bruno")).join();
 
         assertEquals(1, userAccounts.size());
         userAccount = userAccounts.get(0);
 
         DataMapper<Curriculum, Long> curriculumRepo = getMapper(Curriculum.class, unitOfWork);
-        List<Curriculum> curricula = curriculumRepo.findWhere(new Pair<>("title", "Engenharia Civil")).join();
+        List<Curriculum> curricula = curriculumRepo.find(new EqualCondition<>("title", "Engenharia Civil")).join();
         assertEquals(1, curricula.size());
         curriculum = curricula.get(0);
 
         DataMapper<AcademicBackground, Long> academicBackgroundRepo = getMapper(AcademicBackground.class,unitOfWork);
-        List<AcademicBackground> academicBackgrounds = academicBackgroundRepo.findWhere( new Pair<>("institution", "ISEL")).join();
+        List<AcademicBackground> academicBackgrounds = academicBackgroundRepo.find( new EqualCondition<>("institution", "ISEL")).join();
         assertEquals(1, academicBackgrounds.size());
         academicBackground = academicBackgrounds.get(0);
         unitOfWork.commit().join();
@@ -80,7 +80,7 @@ public class AcademicBackgroundControllerTests {
 
     @After
     public void after() {
-        int openedConnections = UnitOfWork.numberOfOpenConnections.get();
+        int openedConnections = UnitOfWork.getNumberOfOpenConnections().get();
         logger.info("OPENED CONNECTIONS - {}", openedConnections);
         assertEquals(0, openedConnections);
     }
@@ -129,7 +129,7 @@ public class AcademicBackgroundControllerTests {
                 .expectBody()
                 .consumeWith(document("createAcademicBackground"));
 
-        assertEquals(1, academicBackgroundRepo.findWhere( new Pair<>("degreeObtained", "bachelor")).join().size());
+        assertEquals(1, academicBackgroundRepo.find( new EqualCondition<>("degreeObtained", "bachelor")).join().size());
         unitOfWork.commit().join();
     }
 

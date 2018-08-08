@@ -3,8 +3,8 @@ package isel.ps.employbox.controllers;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.jayield.rapper.mapper.DataMapper;
+import com.github.jayield.rapper.mapper.conditions.EqualCondition;
 import com.github.jayield.rapper.unitofwork.UnitOfWork;
-import com.github.jayield.rapper.utils.Pair;
 import isel.ps.employbox.exceptions.ResourceNotFoundException;
 import isel.ps.employbox.model.entities.Job;
 import isel.ps.employbox.model.entities.JobExperience;
@@ -63,12 +63,12 @@ public class JobControllerTests {
                 .build();
         UnitOfWork unitOfWork = new UnitOfWork();
         DataMapper<Job, Long> jobMapper = getMapper(Job.class, unitOfWork);
-        List<Job> jobs = jobMapper.findWhere( new Pair<>("title", "Great Job")).join();
+        List<Job> jobs = jobMapper.find( new EqualCondition<>("title", "Great Job")).join();
         assertEquals(1, jobs.size());
         job = jobs.get(0);
 
         DataMapper<JobExperience, Long> jobExperienceMapper = getMapper(JobExperience.class, unitOfWork);
-        List<JobExperience> jobExperiences = jobExperienceMapper.findWhere( new Pair<>("JOBID", job.getIdentityKey())).join();
+        List<JobExperience> jobExperiences = jobExperienceMapper.find( new EqualCondition<>("JOBID", job.getIdentityKey())).join();
         assertEquals(1, jobExperiences.size());
         jobExperience = jobExperiences.get(0);
 
@@ -79,7 +79,7 @@ public class JobControllerTests {
 
     @After
     public void after() {
-        int openedConnections = UnitOfWork.numberOfOpenConnections.get();
+        int openedConnections = UnitOfWork.getNumberOfOpenConnections().get();
         logger.info("OPENED CONNECTIONS - {}", openedConnections);
         assertEquals(0, openedConnections);
     }
@@ -152,7 +152,7 @@ public class JobControllerTests {
                 .expectBody()
                 .consumeWith(document("createJob"));
         DataMapper<Job, Long> jobMapper = getMapper(Job.class, unitOfWork);
-        assertTrue(jobMapper.findWhere( new Pair<>("title", "Verrryyy gud job, come come")).join().size() != 0);
+        assertTrue(jobMapper.find( new EqualCondition<>("title", "Verrryyy gud job, come come")).join().size() != 0);
         unitOfWork.commit().join();
     }
 
@@ -180,7 +180,7 @@ public class JobControllerTests {
                 .expectBody()
                 .consumeWith(document("createJobExperience"));
         DataMapper<JobExperience, Long> jobExperienceMapper = getMapper(JobExperience.class, unitOfWork);
-        assertEquals(1, jobExperienceMapper.findWhere( new Pair<>("jobId", job.getIdentityKey()), new Pair<>("COMPETENCES", "C#")).join().size());
+        assertEquals(1, jobExperienceMapper.find( new EqualCondition<>("jobId", job.getIdentityKey()), new EqualCondition<>("COMPETENCES", "C#")).join().size());
         unitOfWork.commit().join();
     }
 

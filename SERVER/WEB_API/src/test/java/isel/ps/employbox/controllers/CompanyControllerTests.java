@@ -3,8 +3,8 @@ package isel.ps.employbox.controllers;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.jayield.rapper.mapper.DataMapper;
+import com.github.jayield.rapper.mapper.conditions.EqualCondition;
 import com.github.jayield.rapper.unitofwork.UnitOfWork;
-import com.github.jayield.rapper.utils.Pair;
 import isel.ps.employbox.exceptions.ResourceNotFoundException;
 import isel.ps.employbox.model.entities.Company;
 import isel.ps.employbox.model.input.InCompany;
@@ -58,7 +58,7 @@ public class CompanyControllerTests {
                 .build();
         UnitOfWork unitOfWork = new UnitOfWork();
         DataMapper<Company, Long> companyRepo = getMapper(Company.class, unitOfWork);
-        List<Company> companies = companyRepo.findWhere( new Pair<>("email", "company2@gmail.com")).join();
+        List<Company> companies = companyRepo.find( new EqualCondition<>("email", "company2@gmail.com")).join();
         assertEquals(1, companies.size());
         company = companies.get(0);
         unitOfWork.commit().join();
@@ -66,7 +66,7 @@ public class CompanyControllerTests {
 
     @After
     public void after() {
-        int openedConnections = UnitOfWork.numberOfOpenConnections.get();
+        int openedConnections = UnitOfWork.getNumberOfOpenConnections().get();
         logger.info("OPENED CONNECTIONS - {}", openedConnections);
         assertEquals(0, openedConnections);
     }
@@ -115,7 +115,7 @@ public class CompanyControllerTests {
                 .expectBody()
                 .consumeWith(document("createCompany"));
 
-        assertTrue(companyRepo.findWhere( new Pair<>("email", "someEmail@hotmail.com")).join().size() != 0);
+        assertTrue(companyRepo.find( new EqualCondition<>("email", "someEmail@hotmail.com")).join().size() != 0);
         unitOfWork.commit().join();
     }
 
@@ -177,7 +177,7 @@ public class CompanyControllerTests {
         assertEquals("someEmail@hotmail.com", updatedCompany.getEmail());
 
         Logger logger = LoggerFactory.getLogger(CompanyControllerTests.class);
-        logger.info("OPENED CONNECTIONS - {}", UnitOfWork.numberOfOpenConnections.get());
+        logger.info("OPENED CONNECTIONS - {}", UnitOfWork.getNumberOfOpenConnections().get());
     }
 
     @Test

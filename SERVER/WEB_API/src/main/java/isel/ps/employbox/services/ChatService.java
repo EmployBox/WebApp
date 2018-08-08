@@ -1,8 +1,8 @@
 package isel.ps.employbox.services;
 
 import com.github.jayield.rapper.mapper.DataMapper;
+import com.github.jayield.rapper.mapper.conditions.EqualCondition;
 import com.github.jayield.rapper.unitofwork.UnitOfWork;
-import com.github.jayield.rapper.utils.Pair;
 import isel.ps.employbox.ErrorMessages;
 import isel.ps.employbox.exceptions.BadRequestException;
 import isel.ps.employbox.exceptions.ResourceNotFoundException;
@@ -30,14 +30,13 @@ public class ChatService {
 
     //todo endpoint
     public CompletableFuture<CollectionPage<Chat>> getAccountChats(long accountId, int page, int pageSize) {
-
         return accountService.getAccount(accountId)
-                .thenCompose(__ -> ServiceUtils.getCollectionPageFuture( Chat.class, page, pageSize, new Pair<>("accountId", accountId)));
+                .thenCompose(__ -> ServiceUtils.getCollectionPageFuture( Chat.class, page, pageSize, new EqualCondition<>("accountId", accountId)));
     }
 
     public CompletableFuture<CollectionPage<Message>> getAccountChatsMessages(long accountId, String email, int page, int pageSize) {
         return accountService.getAccount(accountId, email)
-                .thenCompose(__ -> ServiceUtils.getCollectionPageFuture( Message.class, page, pageSize, new Pair<>("accountId", accountId)));
+                .thenCompose(__ -> ServiceUtils.getCollectionPageFuture( Message.class, page, pageSize, new EqualCondition<>("accountId", accountId)));
     }
 
 
