@@ -11,7 +11,6 @@ export default class extends React.Component {
     }
     this.onSubmit = this.onSubmit.bind(this)
     console.log(this.props.url)
-    
   }
 
   onSubmit (inputs) {
@@ -35,15 +34,18 @@ export default class extends React.Component {
                 onSubmitHandler={this.onSubmit}
               />
               {this.state.auth
-                ? <HttpRequest
+                ? <HttpRequest key={this.state.auth}
                   method='GET'
                   url={this.props.url}
                   authorization={this.state.auth}
-                  afterResult={json => this.props.ToLogin(json, this.state.auth)}
+                  afterResult={json => {
+                    this.props.ToLogin(json, this.state.auth)
+                  }}
                   onError={err => (
                     <div class='alert alert-danger' role='alert'>
                       {err.message}
-                    </div>)}
+                    </div>)
+                  }
                 />
                 : <div /> }
             </div>

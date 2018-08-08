@@ -1,9 +1,9 @@
 import React from 'react'
 import { Link, withRouter } from 'react-router-dom'
 
-export default withRouter((props) => {
-  if (props._embedded) {
-    const tableRows = props._embedded.items.map(item => {
+export default withRouter(({_embedded, history}) => {
+  if (_embedded) {
+    const tableRows = _embedded.items.map(item => {
       const { account } = item
 
       let link
@@ -14,7 +14,7 @@ export default withRouter((props) => {
       let wasLinkClicked = false
 
       return (
-        <tr key={item._links.self.href} onClick={() => { if (!wasLinkClicked) props.history.push('/jobs/' + item.jobId) }}>
+        <tr key={item._links.self.href} onClick={() => { if (!wasLinkClicked) history.push('/jobs/' + item.jobId) }}>
           <td>
             <Link to={link} onClick={() => { wasLinkClicked = true }}>{account.name}</Link>
           </td>
