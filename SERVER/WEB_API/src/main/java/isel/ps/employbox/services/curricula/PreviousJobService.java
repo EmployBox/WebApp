@@ -8,7 +8,6 @@ import com.github.jayield.rapper.utils.Pair;
 import isel.ps.employbox.ErrorMessages;
 import isel.ps.employbox.exceptions.BadRequestException;
 import isel.ps.employbox.exceptions.ConflictException;
-import isel.ps.employbox.exceptions.ResourceNotFoundException;
 import isel.ps.employbox.model.binders.CollectionPage;
 import isel.ps.employbox.model.entities.curricula.childs.PreviousJobs;
 import isel.ps.employbox.services.ServiceUtils;
@@ -27,12 +26,10 @@ public class PreviousJobService {
         this.curriculumService = curriculumService;
     }
 
-    public CompletableFuture<CollectionPage<PreviousJobs>> getCurriculumPreviousJobs(long curriculumId, int page, int pageSize) {
+    public CompletableFuture<CollectionPage<PreviousJobs>> getCurriculumPreviousJobs(long userId, long curriculumId, int page, int pageSize) {
         UnitOfWork unitOfWork = new UnitOfWork();
         DataMapper<PreviousJobs, Long> previousJobsMapper = MapperRegistry.getMapper(PreviousJobs.class, unitOfWork);
-        CompletableFuture<CollectionPage<PreviousJobs>> future = previousJobsMapper.findById(curriculumId)
-                .thenCompose(res -> unitOfWork.commit().thenApply(aVoid -> res))
-                .thenApply(ocurriculum -> ocurriculum.orElseThrow(() -> new ResourceNotFoundException(ErrorMessages.RESOURCE_NOTFOUND_CURRICULUM)))
+        CompletableFuture<CollectionPage<PreviousJobs>> future = curriculumService.getCurriculum(userId, curriculumId)
                 .thenCompose(__ -> ServiceUtils.getCollectionPageFuture(PreviousJobs.class, page, pageSize, new Pair<>("curriculumId", curriculumId)));
         return handleExceptions(future, unitOfWork);
     }
