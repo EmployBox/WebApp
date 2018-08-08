@@ -2,35 +2,20 @@ import React from 'react'
 import {withRouter} from 'react-router-dom'
 import URI from 'urijs'
 
-import Options from '../searchFormOptions'
 import SearchForm from '../components/searchForm'
-import JobFilters from '../components/jobFilters'
-import JobTable from '../components/jobTable'
-import CompanyFilters from '../components/companyFilters'
-import CompanyTable from '../components/companyTable'
-import UserFilters from '../components/userFilters'
-import UserTable from '../components/userTable'
 import HttpRequest from '../components/httpRequest'
 
-const options = {
-  jobs: {
-    renderFilters: JobFilters,
-    renderTable: JobTable
-  },
-  companies: {
-    renderFilters: CompanyFilters,
-    renderTable: CompanyTable
-  },
-  users: {
-    renderFilters: UserFilters,
-    renderTable: UserTable
+function getFormOptions (url, options) {
+  const formOptions = Object.assign({}, options)
+  let deleted
+  for (var name in formOptions) {
+    if (formOptions[name].uriTemplate === url) {
+      deleted = formOptions[name]
+      delete formOptions[name]
+      break
+    }
   }
-}
-
-function getFormOptions (type) {
-  const formOptions = Object.assign({}, Options)
-  delete formOptions[type]
-  return formOptions
+  return [formOptions, deleted]
 }
 
 class SearchPage extends React.Component {
@@ -38,15 +23,22 @@ class SearchPage extends React.Component {
   constructor (props) {
     super(props)
     console.log('search construct')
-    const query = URI.parseQuery(props.location.search)
-    // if (!query.pageSize) query.pageSize = '10'
 
-    const formOptions = getFormOptions(props.type)
+    const uri = URI.decode(props.match.params.url)
+    const queryStr = URI.parse(uri).query
+
+    const query = URI.parseQuery(queryStr)
+    // if (!query.pageSize) query.pageSize = '10'
+    console.log(query)
+
+    const [formOptions, deleted] = getFormOptions(uri.split('?')[0], props.options)
+
+    console.log(formOptions)
 
     this.state = {
       currentQuery: Object.assign({}, query),
       query: query,
-      entity: options[props.type],
+      entity: deleted,
       uri: props.uriTemplate.expand({query: query}),
       formOptions: formOptions
     }
@@ -55,16 +47,17 @@ class SearchPage extends React.Component {
   }
 
   static getDerivedStateFromProps (nextProps, prevState) {
-    const nextQuery = URI.parseQuery(nextProps.location.search)
+    const aux = URI.decode(nextProps.match.params.url)
+    const nextQuery = URI.parseQuery(URI.parse(aux).query)
     const nextURI = nextProps.uriTemplate.expand({query: nextQuery})
 
     if (nextURI === prevState.uri) return null
-    const formOptions = getFormOptions(nextProps.type)
+    const [formOptions, deleted] = getFormOptions(nextURI.split('?')[0], nextProps.options)
 
     return {
       currentQuery: Object.assign({}, nextQuery),
       query: nextQuery,
-      entity: options[nextProps.type],
+      entity: deleted,
       uri: nextURI,
       formOptions: formOptions
     }
@@ -77,9 +70,7 @@ class SearchPage extends React.Component {
 
       const newURI = this.props.uriTemplate.expand({type: type, query: query})
       this.setState({currentQuery: Object.assign({}, query), uri: newURI})
-
-      const newUrl = this.props.uriTemplate.expand({entityType: type, query: query})
-      this.props.history.push(newUrl)
+      this.props.history.push(this.props.searchTempl.expand({url: newURI}))
     }
   }
 
@@ -89,18 +80,17 @@ class SearchPage extends React.Component {
 
   render () {
     const { entity, uri, currentQuery, query } = this.state
-
     let buttonClass = 'btn btn-success'
     if (JSON.stringify(currentQuery) === JSON.stringify(query)) buttonClass = buttonClass + ' disabled'
 
     return (
       <div class='container'>
-        <SearchForm style='compact' options={this.state.formOptions} />
+        <SearchForm style='compact' options={this.state.formOptions} searchTempl={this.props.searchTempl} />
         <div class='row'>
           <div class='col col-lg-3'>
             <h3 class='text-center text-white border bg-dark'>Filters</h3>
             <div class='container'>
-              {entity.renderFilters(query, this.handleNewQuery)}
+              {entity.render.renderFilters(query, this.handleNewQuery)}
               <br />
               <div class='form-group'>
                 <label>Number of Results</label>
@@ -119,8 +109,8 @@ class SearchPage extends React.Component {
           <div class='col'>
             <h3 class='text-center text-white border bg-dark'>Results</h3>
             <HttpRequest
-              url={`${this.props.apiURI}${uri}`}
-              onResult={data => entity.renderTable(data)} />
+              url={uri}
+              onResult={data => entity.render.renderTable(data)} />
           </div>
         </div>
       </div>

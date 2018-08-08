@@ -58,7 +58,7 @@ class SearchForm extends React.Component {
             if (code === 13) this.buttonClick.click()
           }}>
             <input class='form-control form-control-lg col' type='text' value={searchText} placeholder={active.placeholder} onChange={this.handleChange} />
-            <button class='btn btn-primary' ref={input => { this.buttonClick = input }} onClick={() => this.props.history.push(getURI(active, searchText))}>Search</button>
+            <button class='btn btn-primary' ref={input => { this.buttonClick = input }} onClick={() => this.props.history.push(this.props.searchTempl.expand({url: getURI(active, searchText)}))}>Search</button>
           </div>
         </div>
       </div>
@@ -89,7 +89,7 @@ class SearchForm extends React.Component {
           if (code === 13) this.buttonClick.click()
         }}>
           <input class='form-control form-control-lg col' type='text' value={searchText} placeholder={active.placeholder} onChange={this.handleChange} />
-          <button class='btn btn-primary' ref={input => { this.buttonClick = input }} onClick={() => this.props.history.push(getURI(active, searchText))}>Search</button>
+          <button class='btn btn-primary' ref={input => { this.buttonClick = input }} onClick={() => this.props.history.push(this.props.searchTempl.expand({url: getURI(active, searchText)}))}>Search</button>
         </div>
       </div>
     )

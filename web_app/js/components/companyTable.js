@@ -1,11 +1,11 @@
 import React from 'react'
 import { withRouter } from 'react-router-dom'
 
-export default withRouter((companies) => {
-  if (companies._embedded) {
-    const tableRows = companies._embedded.items.map(item => {
+export default withRouter(({_embedded, history, companyTempl}) => {
+  if (_embedded) {
+    const tableRows = _embedded.items.map(item => {
       return (
-        <tr key={item._links.self.href} onClick={() => companies.history.push(`/accounts/companies/${item.accountId}`)}>
+        <tr key={item._links.self.href} onClick={() => history.push(companyTempl.expand({url: item._links.self.href}))}>
           <td>{item.name}</td>
           <td>{item.rating}</td>
           <td>{item.specialization || 'Not defined'}</td>

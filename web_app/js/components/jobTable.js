@@ -1,22 +1,22 @@
 import React from 'react'
 import { Link, withRouter } from 'react-router-dom'
 
-export default withRouter((props) => {
-  if (props._embedded) {
-    const tableRows = props._embedded.items.map(item => {
+export default withRouter(({_embedded, history, accountTempl, companyTempl, moderatorTempl, jobTempl}) => {
+  if (_embedded) {
+    const tableRows = _embedded.items.map(item => {
       const { account } = item
 
-      let link
-      if (account.accountType === 'USR') link = '/accounts/users/' + account.accountId
-      else if (account.accountType === 'CMP') link = '/accounts/companies/' + account.accountId
-      else link = '/accounts/moderators/' + account.accountId
+      let templ
+      if (account.accountType === 'USR') templ = accountTempl
+      else if (account.accountType === 'CMP') templ = companyTempl
+      else templ = moderatorTempl
 
       let wasLinkClicked = false
 
       return (
-        <tr key={item._links.self.href} onClick={() => { if (!wasLinkClicked) props.history.push('/jobs/' + item.jobId) }}>
+        <tr key={item._links.self.href} onClick={() => { if (!wasLinkClicked) history.push(jobTempl.expand({url: item._links.self.href})) }}>
           <td>
-            <Link to={link} onClick={() => { wasLinkClicked = true }}>{account.name}</Link>
+            <Link to={templ.expand({url: account._links.self.href})} onClick={() => { wasLinkClicked = true }}>{account.name}</Link>
           </td>
           <td>{account.rating}</td>
           <td>{item.title}</td>
