@@ -30,8 +30,8 @@ public class FollowService {
         return getAccountFromFollowAux(followedAccountId, "accountIdFollower", page, pageSize);
     }
 
-    public CompletableFuture<CollectionPage<Account>> getAccountFollowing(long followerAccountId, int page, int pageSize) {
-        return getAccountFromFollowAux(followerAccountId, "accountIdFollowing", page, pageSize);
+    public CompletableFuture<CollectionPage<Account>> getAccountFolloweds(long followerAccountId, int page, int pageSize) {
+        return getAccountFromFollowAux(followerAccountId, "accountIdFollowed", page, pageSize);
     }
 
     private CompletableFuture<CollectionPage<Account>> getAccountFromFollowAux(long followId, String collumn, int page, int pageSize) {

@@ -40,7 +40,7 @@ public class FollowsController {
             @RequestParam(defaultValue = "5") int pageSize
 
     ){
-        CompletableFuture<HalCollectionPage<Account>> future = followService.getAccountFollowing(id, page, pageSize)
+        CompletableFuture<HalCollectionPage<Account>> future = followService.getAccountFolloweds(id, page, pageSize)
                 .thenCompose(accountCollectionPage -> accountBinder.bindOutput(accountCollectionPage, this.getClass(), id));
         return Mono.fromFuture(future);
     }

@@ -197,9 +197,9 @@ CREATE TABLE Comment (
   status bit,
   version bigint default 1,
 
-  FOREIGN KEY (accountIdFrom) REFERENCES Account(accountID),
-  FOREIGN KEY (accountIdDest) REFERENCES Account(accountID),
-  FOREIGN KEY (MainCommentId) REFERENCES Comment(commentId)
+  FOREIGN KEY (accountIdFrom) REFERENCES Account(accountID) ON DELETE CASCADE,
+  FOREIGN KEY (accountIdDest) REFERENCES Account(accountID) ON DELETE CASCADE,
+  FOREIGN KEY (MainCommentId) REFERENCES Comment(commentId) ON DELETE CASCADE
 );
 
 CREATE TABLE Follows (

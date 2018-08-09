@@ -15,7 +15,6 @@ import isel.ps.employbox.model.entities.Application;
 import isel.ps.employbox.model.entities.Comment;
 import isel.ps.employbox.model.entities.Curriculum;
 import isel.ps.employbox.model.entities.UserAccount;
-import isel.ps.employbox.services.curricula.CurriculumService;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
@@ -155,33 +154,35 @@ public class UserAccountService {
         return Mono.fromFuture(handleExceptions(future, unit));
     }
 
-    //todo fix bug here
     public Mono<Void> deleteUser(long id, String email) {
         UnitOfWork unit = new UnitOfWork();
         DataMapper<Application, Long> applicationMapper = getMapper(Application.class, unit);
         DataMapper<UserAccount, Long> userMapper = getMapper(UserAccount.class, unit);
         DataMapper<Comment, Long> commentMapper = getMapper(Comment.class, unit);
         DataMapper<Curriculum, Long> curriculumMapper = getMapper(Curriculum.class, unit);
-        CurriculumService curriculumService = new CurriculumService(this);
 
         CompletableFuture<Void> future = getUser(id, email)
                 //TODO remove entries from other tables where user has foreign key
                 .thenCompose(userAccount -> userAccount.getApplications().apply(unit)
                         .thenCompose(applications -> {
                             List<Long> applicationIds = applications.stream().map(Application::getIdentityKey).collect(Collectors.toList());
-                            return applicationMapper.deleteAll( applicationIds);
+                            return applicationMapper.deleteAll(applicationIds);
                         })
-                        .thenCompose( __ -> userAccount.getComments().apply(unit))
+                        .thenCompose(__ ->
+                                commentMapper.find(new EqualCondition<>("accountIdFrom", userAccount.getIdentityKey()),
+                                        new EqualCondition<>("accountIdDest", userAccount.getIdentityKey())
+                                )
+                        )
                         .thenCompose(
                                 comments -> {
                                     List<Long> commentsIds = comments.stream().map(Comment::getIdentityKey).collect(Collectors.toList());
                                     return commentMapper.deleteAll(commentsIds);
                                 }
                         )
-                        .thenCompose( __ -> curriculumMapper.find( new EqualCondition<Long>("accountId", id)))
-                        .thenCompose( list -> {
+                        .thenCompose(__ -> curriculumMapper.find(new EqualCondition<Long>("accountId", id)))
+                        .thenCompose(list -> {
                             List<CompletableFuture<Void>> cflist = new ArrayList<>();
-                            list.forEach(curr ->cflist.add( curriculumMapper.delete(curr) ));
+                            list.forEach(curr -> cflist.add(curriculumMapper.delete(curr)));
                             return CompletableFuture.allOf(cflist.toArray(new CompletableFuture[cflist.size()]));
                         })
                         .thenCompose(aVoid -> userMapper.delete(userAccount))
