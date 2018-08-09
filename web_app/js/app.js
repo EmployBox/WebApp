@@ -78,40 +78,45 @@ export default class extends Component {
                 <Navigation navItems={
                   this.state.authenticated
                     ? [
-                      {name: 'Profile', link: accountTempl.expand({url: this.state.self})},
-                      {name: 'About', link: '/about'},
-                      {name: 'Log out',
+                      { name: 'Profile', link: accountTempl.expand({ url: this.state.self }) },
+                      { name: 'About', link: '/about' },
+                      {
+                        name: 'Log out',
                         class: 'btn btn-outline-primary',
                         click: () => this.setState(oldstate => {
                           oldstate.authenticated = false
                           oldstate.self = undefined
                           auther.unAuthenticate()
                           return oldstate
-                        }) }
+                        })
+                      }
                     ]
                     : [
-                      {name: 'About', link: '/about'},
-                      {name: 'Log in', link: loginExpand(json)},
-                      {name: 'Sign up',
+                      { name: 'About', link: '/about' },
+                      { name: 'Log in', link: loginExpand(json) },
+                      {
+                        name: 'Sign up',
                         link: signUpTempl.expand({
                           urlUser: getLink('users', json),
-                          urlCompany: getLink('companies', json)}
+                          urlCompany: getLink('companies', json)
+                        }
                         ),
-                        class: 'btn btn-outline-primary'}
+                        class: 'btn btn-outline-primary'
+                      }
                     ]} />
                 <Switch>
                   <Route exact path='/' render={(props) =>
                     <IndexPage options={getOptions(json)} searchTempl={searchTempl} />}
                   />
-                  <Route exact path='/signup/user/:url' render={({history, match}) =>
+                  <Route exact path='/signup/user/:url' render={({ history, match }) =>
                     <SignUpUser url={URI.decode(match.params.url)} ToLogin={() => history.push(loginExpand(json))} />} />
-                  <Route exact path='/signup/company/:url' render={({history, match}) =>
+                  <Route exact path='/signup/company/:url' render={({ history, match }) =>
                     <SignUpCompany url={URI.decode(match.params.url)} ToLogin={() => history.push(loginExpand(json))} />} />
-                  <Route exact path='/signup/:urlUser/:urlCompany' render={({history, match}) =>
+                  <Route exact path='/signup/:urlUser/:urlCompany' render={({ history, match }) =>
                     <SignUp signUpUser={() => history.push(signUpUserTempl.expand({ url: match.params.urlUser }))}
                       signUpCompany={() => history.push(signUpCompanyTempl.expand({ url: match.params.urlCompany }))} />}
                   />
-                  <Route exact path='/login/:url' render={({history, match}) =>
+                  <Route exact path='/login/:url' render={({ history, match }) =>
                     <LogIn url={URI.decode(match.params.url)}
                       ToLogin={(json, auth) => {
                         this.setState(oldstate => {
@@ -123,7 +128,7 @@ export default class extends Component {
                         history.push(URI.parseQuery(history.location.search).redirect || '/')
                       }} />
                   } />
-                  <Route exact path='/search/:url' render={({match}) => (
+                  <Route exact path='/search/:url' render={({ match }) => (
                     <SearchPage
                       uriTemplate={new URITemplate(URI.decode(match.params.url).split('?')[0] + '{?query*}')}
                       options={getOptions(json)}
@@ -132,7 +137,7 @@ export default class extends Component {
                     />
                   )} />
                   <PrivateRoute exact path='/account/:url' component={Profile} />
-                  <Route path='/' render={({history}) =>
+                  <Route path='/' render={({ history }) =>
                     <center class='py-5'>
                       <h2>Page not found</h2>
                       <button onClick={() => history.push('/')}>home</button>
@@ -142,7 +147,9 @@ export default class extends Component {
                 <Footer />
               </div>
             </BrowserRouter>
-          </div>)}
-      />)
+          </div>
+        )}
+      />
+    )
   }
 }

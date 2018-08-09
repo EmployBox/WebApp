@@ -3,6 +3,7 @@ package isel.ps.employbox.services;
 import com.github.jayield.rapper.mapper.DataMapper;
 import com.github.jayield.rapper.mapper.conditions.Condition;
 import com.github.jayield.rapper.mapper.conditions.EqualCondition;
+import com.github.jayield.rapper.mapper.conditions.LikeCondition;
 import com.github.jayield.rapper.unitofwork.UnitOfWork;
 import isel.ps.employbox.ErrorMessages;
 import isel.ps.employbox.exceptions.BadRequestException;
@@ -27,25 +28,15 @@ import static isel.ps.employbox.services.ServiceUtils.handleExceptions;
 
 @Service
 public class JobService {
-    private final AccountService accountService;
-
-    public JobService( AccountService userService) {
-        this.accountService = userService;
-    }
 
     public CompletableFuture<CollectionPage<Job>> getAllJobs(int page, int pageSize, String address, String location, String title, Integer wage, String offerType, Integer ratingLow, Integer ratingHigh) {
         List<Condition> pairs = new ArrayList<>();
-        pairs.add(new EqualCondition<>("address", address));
-        pairs.add(new EqualCondition("location", location));
-        pairs.add(new EqualCondition<>("title", title));
-
-        if (wage != null)
-            pairs.add(new EqualCondition<>("wage", wage.longValue()));
+        pairs.add(new LikeCondition("address", address));
+        pairs.add(new LikeCondition("title", title));
+        pairs.add(new EqualCondition<>("wage", wage));
         pairs.add(new EqualCondition<>("offerType", offerType));
-        if (ratingLow != null)
-            pairs.add(new EqualCondition("wage", ratingLow.longValue()));
-        if (ratingHigh != null)
-            pairs.add(new EqualCondition("wage", ratingHigh.longValue()));
+        pairs.add(new Condition<>("rating",">", ratingLow));
+        pairs.add(new Condition<>("rating", "<", ratingHigh));
 
         pairs = pairs.stream()
                 .filter(stringPair -> stringPair.getValue() != null)

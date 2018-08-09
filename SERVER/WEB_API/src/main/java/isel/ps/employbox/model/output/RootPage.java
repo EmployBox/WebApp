@@ -13,19 +13,14 @@ import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 public class RootPage{
     @JsonProperty
     private final Self self;
-
     @JsonProperty
     private final AccountsCollectionLink accounts;
-
     @JsonProperty
     private final CompanyCollectionLink companies;
-
     @JsonProperty
     private final UsersCollectionLinks users;
-
     @JsonProperty
     private final JobsCollectionLinks jobs;
-
     @JsonProperty
     private final AccountLoginLink login;
 
