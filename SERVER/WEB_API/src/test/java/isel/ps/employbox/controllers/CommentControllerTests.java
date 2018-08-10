@@ -1,11 +1,15 @@
 package isel.ps.employbox.controllers;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.jayield.rapper.mapper.DataMapper;
 import com.github.jayield.rapper.mapper.conditions.EqualCondition;
 import com.github.jayield.rapper.unitofwork.UnitOfWork;
 import isel.ps.employbox.controllers.curricula.CurriculumControllerTests;
 import isel.ps.employbox.model.entities.Comment;
 import isel.ps.employbox.model.entities.UserAccount;
+import isel.ps.employbox.model.entities.curricula.childs.Project;
+import isel.ps.employbox.model.input.InComment;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -16,7 +20,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.ApplicationContext;
+import org.springframework.http.MediaType;
 import org.springframework.restdocs.JUnitRestDocumentation;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
@@ -25,6 +31,7 @@ import java.util.List;
 import static com.github.jayield.rapper.mapper.MapperRegistry.getMapper;
 import static isel.ps.employbox.DataBaseUtils.prepareDB;
 import static junit.framework.TestCase.assertEquals;
+import static junit.framework.TestCase.assertFalse;
 import static org.springframework.restdocs.webtestclient.WebTestClientRestDocumentation.document;
 import static org.springframework.restdocs.webtestclient.WebTestClientRestDocumentation.documentationConfiguration;
 import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.springSecurity;
@@ -40,7 +47,7 @@ public class CommentControllerTests {
     private ApplicationContext context;
 
     private WebTestClient webTestClient;
-    private UserAccount userAccount;
+    private UserAccount userAccount, userAccount2;
     private Comment comment;
 
 
@@ -58,6 +65,10 @@ public class CommentControllerTests {
         List<UserAccount> userAccounts = userAccountMapper.find(new EqualCondition<>("name", "Bruno")).join();
         assertEquals(1, userAccounts.size());
         userAccount = userAccounts.get(0);
+
+        userAccounts = userAccountMapper.find(new EqualCondition<>("name", "Maria")).join();
+        assertEquals(1, userAccounts.size());
+        userAccount2 = userAccounts.get(0);
 
         DataMapper<Comment, Long> commentsMapper = getMapper(Comment.class, unitOfWork);
         List<Comment> comments = commentsMapper.find(new EqualCondition<>("TEXT", "FIRST COMMENT")).join();
@@ -83,5 +94,87 @@ public class CommentControllerTests {
                 .expectStatus().isOk()
                 .expectBody()
                 .consumeWith(document("getAllComments"));
+    }
+
+    @Test
+    @WithMockUser(username = "teste@gmail.com")
+    public void testGetComment(){
+        webTestClient
+                .get()
+                .uri("/accounts/"+userAccount.getIdentityKey()+"/comments/"+ comment.getIdentityKey())
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody()
+                .consumeWith(document("getAllComments"));
+    }
+
+    @Test
+    @WithMockUser(username = "company1@gmail.com")
+    public void testUpdateWrongComment() throws JsonProcessingException {
+        InComment inComment = new InComment();
+        inComment.setAccountIdFrom(userAccount.getIdentityKey());
+        inComment.setAccountIdTo(userAccount2.getIdentityKey());
+        inComment.setText("WRONG");
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        String json = objectMapper.writeValueAsString(inComment);
+
+        webTestClient
+                .put()
+                .uri("/accounts/" + userAccount.getIdentityKey() + "/comments/" + comment.getIdentityKey())
+                .contentType(MediaType.APPLICATION_JSON)
+                .syncBody(json)
+                .exchange()
+                .expectStatus().isBadRequest()
+                .expectBody()
+                .consumeWith(document("updateWrongComments"));
+    }
+
+    @Test
+    @WithMockUser(username = "teste@gmail.com")
+    public void testUpdateComment() throws JsonProcessingException {
+        InComment inComment = new InComment();
+        inComment.setAccountIdFrom(userAccount.getIdentityKey());
+        inComment.setAccountIdTo(userAccount2.getIdentityKey());
+        inComment.setCommmentId( comment.getIdentityKey());
+        inComment.setText("RIGHT");
+        inComment.setVersion( comment.getVersion());
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        String json = objectMapper.writeValueAsString(inComment);
+
+        webTestClient
+                .put()
+                .uri("/accounts/" + userAccount.getIdentityKey() + "/comments/" + comment.getIdentityKey())
+                .contentType(MediaType.APPLICATION_JSON)
+                .syncBody(json)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody()
+                .consumeWith(document("updateWrongComments"));
+
+        UnitOfWork unitOfWork = new UnitOfWork();
+        DataMapper<Comment, Long> commentMapper = getMapper(Comment.class, unitOfWork);
+        Comment testComment = commentMapper.findById( comment.getIdentityKey()).join().get();
+        unitOfWork.commit().join();
+
+        assertEquals(testComment.getText(), "RIGHT");
+    }
+
+    
+    @Test
+    @WithMockUser(username = "teste@gmail.com")
+    public void testDeleteComment(){
+        webTestClient
+                .delete()
+                .uri("/accounts/" + userAccount.getIdentityKey() + "/comments/" + comment.getIdentityKey())
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody()
+                .consumeWith(document("deleteComment"));
+        UnitOfWork unitOfWork = new UnitOfWork();
+        DataMapper<Project, Long> projectRepo = getMapper(Project.class, unitOfWork);
+        assertFalse(projectRepo.findById( comment.getIdentityKey()).join().isPresent());
+        unitOfWork.commit().join();
     }
 }

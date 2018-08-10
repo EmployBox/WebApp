@@ -10,22 +10,18 @@ public class Rating implements DomainObject<Rating.RatingKey> {
     @EmbeddedId
     private final RatingKey ratingKey;
 
-    private final long accountIdFrom;
-    private final long accountIdTo;
-    private final float workLoad;
-    private final float wage;
-    private final float workEnviroment;
-    private final float competences;
-    private final float ponctuality;
-    private final float assiduity;
-    private final float demeanor;
+    private final double workLoad;
+    private final double wage;
+    private final double workEnviroment;
+    private final double competences;
+    private final double ponctuality;
+    private final double assiduity;
+    private final double demeanor;
     @Version
     private final long version;
 
     public Rating(){
         ratingKey = null;
-        accountIdFrom = 0;
-        accountIdTo = 0;
         workLoad = 0;
         wage = 0;
         workEnviroment = 0;
@@ -38,17 +34,15 @@ public class Rating implements DomainObject<Rating.RatingKey> {
 
     public Rating(long accountIDFrom,
                   long accountIDTo,
-                  float workLoad,
-                  float wage,
-                  float workEnvironment,
-                  float competence,
-                  float pontuality,
-                  float assiduity,
-                  float demeanor,
+                  double workLoad,
+                  double wage,
+                  double workEnvironment,
+                  double competence,
+                  double pontuality,
+                  double assiduity,
+                  double demeanor,
                   long version
     ) {
-        this.accountIdFrom = accountIDFrom;
-        this.accountIdTo = accountIDTo;
         this.workLoad = workLoad;
         this.wage = wage;
         this.workEnviroment = workEnvironment;
@@ -61,38 +55,38 @@ public class Rating implements DomainObject<Rating.RatingKey> {
     }
 
     public long getAccountIdFrom() {
-        return accountIdFrom;
+        return this.ratingKey.accountIdFrom;
     }
 
     public long getAccountIdTo() {
-        return accountIdTo;
+        return this.ratingKey.accountIdDest;
     }
 
-    public float getWorkLoad() {
+    public double getWorkLoad() {
         return workLoad;
     }
 
-    public float getWage() {
+    public double getWage() {
         return wage;
     }
 
-    public float getWorkEnviroment() {
+    public double getWorkEnviroment() {
         return workEnviroment;
     }
 
-    public float getCompetences() {
+    public double getCompetences() {
         return competences;
     }
 
-    public float getPonctuality() {
+    public double getPonctuality() {
         return ponctuality;
     }
 
-    public float getAssiduity() {
+    public double getAssiduity() {
         return assiduity;
     }
 
-    public float getDemeanor() {
+    public double getDemeanor() {
         return demeanor;
     }
 
@@ -108,26 +102,26 @@ public class Rating implements DomainObject<Rating.RatingKey> {
 
     public static class RatingKey extends EmbeddedIdClass {
         private final long accountIdFrom;
-        private final long accountIdTo;
+        private final long accountIdDest;
 
         public RatingKey(){
             super();
             accountIdFrom = 0;
-            accountIdTo = 0;
+            accountIdDest = 0;
         }
 
         public RatingKey(long accountIdFollowed, long accountIdFollower) {
             super(accountIdFollowed, accountIdFollower);
             this.accountIdFrom = accountIdFollowed;
-            this.accountIdTo = accountIdFollower;
+            this.accountIdDest = accountIdFollower;
         }
 
         public long getAccountIdFrom() {
             return accountIdFrom;
         }
 
-        public long getAccountIdTo() {
-            return accountIdTo;
+        public long getAccountIdDest() {
+            return accountIdDest;
         }
     }
 }

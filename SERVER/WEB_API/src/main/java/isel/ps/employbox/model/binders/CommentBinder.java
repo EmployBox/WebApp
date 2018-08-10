@@ -24,7 +24,16 @@ public class CommentBinder implements ModelBinder<Comment,OutComment,InComment> 
     }
 
     @Override
-    public Comment bindInput(InComment object) {
-        return null;
+    public Comment bindInput(InComment comment) {
+        return new Comment(
+                        comment.getCommmentId(),
+                        comment.getAccountIdFrom(),
+                        comment.getAccountIdTo(),
+                        comment.getMainCommentId(),
+                        comment.getDatetime(),
+                        comment.getText(),
+                        comment.getStatus(),
+                        comment.getVersion()
+                );
     }
 }

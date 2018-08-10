@@ -27,6 +27,9 @@ CREATE PROCEDURE populateDB()
     /*Insert PreviousJobs*/
     insert into PREVIOUSJOBS(ACCOUNTID, CURRICULUMID, COMPANYNAME, WORKLOAD, ROLE) values (account_id1, curriculum_id,'ISEL', 'partial', 'TEACHER' );
 
+    /*Insert Rating*/
+    insert into RATING(ACCOUNTIDFROM, ACCOUNTIDDEST) values (account_id1, account_id2);
+
     /*Insert Companies*/
     insert into ACCOUNT(NAME, EMAIL, PASSWORD, ACCOUNTTYPE) values ('company1', 'company1@gmail.com', '741', 'CMP');
     set company_id1 = IDENTITY();

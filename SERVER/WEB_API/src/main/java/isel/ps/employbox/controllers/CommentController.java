@@ -16,7 +16,7 @@ import java.util.concurrent.CompletableFuture;
 import static isel.ps.employbox.ErrorMessages.BAD_REQUEST_IDS_MISMATCH;
 
 @RestController
-@RequestMapping("/accounts/{id}/comments")
+@RequestMapping("/accounts/{accountId}/comments")
 public class CommentController {
     private final CommentService commentService;
     private final CommentBinder commentBinder;
@@ -28,31 +28,31 @@ public class CommentController {
 
     @GetMapping
     public Mono<HalCollectionPage<Comment>> getAllComments(
-            @PathVariable long id,
+            @PathVariable long accountId,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "5") int pageSize
     ) {
-        CompletableFuture<HalCollectionPage<Comment>> future = commentService.getComments(id, page, pageSize)
-                .thenCompose(commentCollectionPage -> commentBinder.bindOutput(commentCollectionPage, this.getClass(), id));
+        CompletableFuture<HalCollectionPage<Comment>> future = commentService.getComments(accountId, page, pageSize)
+                .thenCompose(commentCollectionPage -> commentBinder.bindOutput(commentCollectionPage, this.getClass(), accountId));
         return Mono.fromFuture(future);
     }
 
-    @GetMapping("{commentId}")
-    public Mono<OutComment> getComment(@PathVariable long accountId, @RequestBody long accountTo, @PathVariable long commentId, Authentication authentication){
-        CompletableFuture<OutComment> future = commentService.getComment(accountId, accountTo, commentId, authentication.getName())
+    @GetMapping("/{commentId}")
+    public Mono<OutComment> getComment(@PathVariable long accountId, @PathVariable long commentId, Authentication authentication){
+        CompletableFuture<OutComment> future = commentService.getComment(accountId, commentId)
                 .thenCompose(commentBinder::bindOutput);
         return Mono.fromFuture(future);
     }
 
-    @PutMapping
+    @PutMapping("/{commentId}")
     public Mono<Void> updateComment(
-            @PathVariable long id,
-            @RequestParam long accountTo,
-            @RequestBody InComment comment,
+            @PathVariable long accountId,
+            @PathVariable long commentId,
+            @RequestBody InComment inComment,
             Authentication authentication
     ){
-        if(id != comment.getAccountIdFrom() || accountTo != comment.getAccountIdTo()) throw new BadRequestException(BAD_REQUEST_IDS_MISMATCH);
-        return commentService.updateComment(commentBinder.bindInput(comment), authentication.getName());
+        if(accountId != inComment.getAccountIdFrom() || commentId != inComment.getCommmentId()) throw new BadRequestException(BAD_REQUEST_IDS_MISMATCH);
+        return commentService.updateComment(commentBinder.bindInput(inComment));
     }
 
     @PostMapping
@@ -68,7 +68,7 @@ public class CommentController {
         return Mono.fromFuture(future);
     }
 
-    @DeleteMapping("{commentId}")
+    @DeleteMapping("/{commentId}")
     public Mono<Void> deleteComment(@PathVariable long commentId, Authentication authentication){
         return commentService.deleteComment(commentId,  authentication.getName());
     }

@@ -348,8 +348,8 @@ public class UserAccountControllerTests {
                 .consumeWith(document("deleteUserAccount"));
 
         UnitOfWork unitOfWork = new UnitOfWork();
-        DataMapper<UserAccount, Long> userAccountRepo = getMapper(UserAccount.class, unitOfWork);
-        assertFalse(userAccountRepo.findById( userAccount.getIdentityKey()).join().isPresent());
+        DataMapper<UserAccount, Long> userAccountMapper = getMapper(UserAccount.class, unitOfWork);
+        assertFalse(userAccountMapper.findById( userAccount.getIdentityKey()).join().isPresent());
         unitOfWork.commit().join();
     }
 

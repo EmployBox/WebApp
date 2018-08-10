@@ -14,25 +14,25 @@ public class OutRating implements OutputDto {
     private final long accountIDTo;
 
     @JsonProperty
-    private final float workLoad;
+    private final double workLoad;
 
     @JsonProperty
-    private final float wage;
+    private final double wage;
 
     @JsonProperty
-    private final float workEnvironment;
+    private final double workEnvironment;
 
     @JsonProperty
-    private final float competence;
+    private final double competence;
 
     @JsonProperty
-    private final float pontuality;
+    private final double pontuality;
 
     @JsonProperty
-    private final float assiduity;
+    private final double assiduity;
 
     @JsonProperty
-    private final float demeanor;
+    private final double demeanor;
 
     @JsonProperty
     private final _Links _links;
@@ -40,13 +40,13 @@ public class OutRating implements OutputDto {
     public OutRating(
             long accountIDFrom,
             long accountIDTo,
-            float workLoad,
-            float wage,
-            float workEnvironment,
-            float competence,
-            float pontuality,
-            float assiduity,
-            float demeanor)
+            double workLoad,
+            double wage,
+            double workEnvironment,
+            double competence,
+            double pontuality,
+            double assiduity,
+            double demeanor)
     {
         this.accountIDFrom = accountIDFrom;
         this.accountIDTo = accountIDTo;

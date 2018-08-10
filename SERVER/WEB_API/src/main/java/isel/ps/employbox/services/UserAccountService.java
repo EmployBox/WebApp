@@ -1,6 +1,5 @@
 package isel.ps.employbox.services;
 
-import com.github.jayield.rapper.DomainObject;
 import com.github.jayield.rapper.mapper.DataMapper;
 import com.github.jayield.rapper.mapper.conditions.Condition;
 import com.github.jayield.rapper.mapper.conditions.EqualCondition;
@@ -11,10 +10,8 @@ import isel.ps.employbox.exceptions.ConflictException;
 import isel.ps.employbox.exceptions.ResourceNotFoundException;
 import isel.ps.employbox.exceptions.UnauthorizedException;
 import isel.ps.employbox.model.binders.CollectionPage;
-import isel.ps.employbox.model.entities.Application;
-import isel.ps.employbox.model.entities.Comment;
-import isel.ps.employbox.model.entities.Curriculum;
-import isel.ps.employbox.model.entities.UserAccount;
+import isel.ps.employbox.model.entities.*;
+import isel.ps.employbox.services.curricula.CurriculumService;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
@@ -22,7 +19,6 @@ import java.security.InvalidParameterException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static com.github.jayield.rapper.mapper.MapperRegistry.getMapper;
@@ -160,6 +156,8 @@ public class UserAccountService {
         DataMapper<UserAccount, Long> userMapper = getMapper(UserAccount.class, unit);
         DataMapper<Comment, Long> commentMapper = getMapper(Comment.class, unit);
         DataMapper<Curriculum, Long> curriculumMapper = getMapper(Curriculum.class, unit);
+        CurriculumService curriculumService = new CurriculumService(this);
+        DataMapper<Rating, Rating.RatingKey> ratingMapper = getMapper(Rating.class, unit);
 
         CompletableFuture<Void> future = getUser(id, email)
                 //TODO remove entries from other tables where user has foreign key
@@ -169,21 +167,27 @@ public class UserAccountService {
                             return applicationMapper.deleteAll(applicationIds);
                         })
                         .thenCompose(__ ->
-                                commentMapper.find(new EqualCondition<>("accountIdFrom", userAccount.getIdentityKey()),
-                                        new EqualCondition<>("accountIdDest", userAccount.getIdentityKey())
+                                commentMapper.find(new EqualCondition<Long>("accountIdFrom", userAccount.getIdentityKey()
                                 )
-                        )
+                        ))
                         .thenCompose(
                                 comments -> {
                                     List<Long> commentsIds = comments.stream().map(Comment::getIdentityKey).collect(Collectors.toList());
                                     return commentMapper.deleteAll(commentsIds);
                                 }
                         )
-                        .thenCompose(__ -> curriculumMapper.find(new EqualCondition<Long>("accountId", id)))
+                        .thenCompose(__ -> curriculumMapper.find(new EqualCondition<>("accountId", id)))
                         .thenCompose(list -> {
                             List<CompletableFuture<Void>> cflist = new ArrayList<>();
-                            list.forEach(curr -> cflist.add(curriculumMapper.delete(curr)));
+                            list.forEach(curr -> cflist.add(curriculumService.deleteCurriculum(userAccount.getIdentityKey(), curr.getIdentityKey()).toFuture()));
                             return CompletableFuture.allOf(cflist.toArray(new CompletableFuture[cflist.size()]));
+                        })
+                        .thenCompose(aVoid ->
+                                ratingMapper.find(new EqualCondition<>("accountIdFrom", userAccount.getIdentityKey())
+                                )
+                        ).thenCompose(ratings -> {
+                            List<Rating.RatingKey> ratingsIds = ratings.stream().map(Rating::getIdentityKey).collect(Collectors.toList());
+                            return ratingMapper.deleteAll(ratingsIds);
                         })
                         .thenCompose(aVoid -> userMapper.delete(userAccount))
                         .thenCompose(aVoid -> unit.commit()));
@@ -191,17 +195,21 @@ public class UserAccountService {
                 handleExceptions(future, unit)
         );
     }
-
-    private CompletableFuture<Void> deleteUserChildList(Function<UnitOfWork, CompletableFuture<List<Object>>> func, UnitOfWork unit, DataMapper mapper) {
-        return func.apply(unit)
-                .thenCompose(
-                        res -> {
-                            List list = res.stream().map( curr -> ((DomainObject)curr).getIdentityKey()).collect(Collectors.toList());
-                            return mapper.deleteAll(list);
+    /*
+    private <T,K extends DomainObject<T>> CompletableFuture<Void> deleteUserAccountAux(UserAccount userAccount, DataMapper mapper){
+        return CompletableFuture.runAsync(
+            new Thread( () -> {
+                mapper.find(new EqualCondition<>("accountIdFrom", userAccount.getIdentityKey()),
+                        new EqualCondition<>("accountIdDest", userAccount.getIdentityKey())
+                ).thenCompose(
+                        list -> {
+                            List<T> idsList = ((List)list).stream().map(t -> K.getIdentityKey(t)).collect(Collectors.toList());
+                            return mapper.deleteAll(idsList);
                         }
-               );
-    }
-
+                );
+            })
+        );
+    }*/
 
     public Mono<Void> deleteApplication(long userId, long jobId,long apId, String email) {
         UnitOfWork unit = new UnitOfWork();

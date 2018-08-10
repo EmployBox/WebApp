@@ -18,11 +18,9 @@ import static isel.ps.employbox.services.ServiceUtils.handleExceptions;
 @Service
 public class RatingService {
     private final UserAccountService userAccountService;
-    private final AccountService accountService;
 
-    public RatingService(UserAccountService userAccountService, AccountService accountService) {
+    public RatingService(UserAccountService userAccountService) {
         this.userAccountService = userAccountService;
-        this.accountService = accountService;
     }
 
     public CompletableFuture<CollectionPage<Rating>> getRatings(long accountId, int page, int pageSize) {

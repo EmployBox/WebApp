@@ -32,11 +32,12 @@ public class JobService {
     public CompletableFuture<CollectionPage<Job>> getAllJobs(int page, int pageSize, String address, String location, String title, Integer wage, String offerType, Integer ratingLow, Integer ratingHigh) {
         List<Condition> pairs = new ArrayList<>();
         pairs.add(new LikeCondition("address", address));
-        pairs.add(new LikeCondition("title", title));
+        pairs.add(new EqualCondition<>("location", location));
+        pairs.add(new EqualCondition<>("wage", wage));
         pairs.add(new EqualCondition<>("wage", wage));
         pairs.add(new EqualCondition<>("offerType", offerType));
-        pairs.add(new Condition<>("rating",">", ratingLow));
-        pairs.add(new Condition<>("rating", "<", ratingHigh));
+        pairs.add(new Condition<>("ratingLow",">", ratingLow));
+        pairs.add(new Condition<>("ratingHigh","<", ratingHigh));
 
         pairs = pairs.stream()
                 .filter(stringPair -> stringPair.getValue() != null)

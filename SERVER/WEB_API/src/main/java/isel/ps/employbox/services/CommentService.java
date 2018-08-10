@@ -31,15 +31,18 @@ public class CommentService {
                 .thenCompose(__-> ServiceUtils.getCollectionPageFuture(Comment.class, page, pageSize, new EqualCondition<>("accountIdFrom", accountFromId)));
     }
 
-    public CompletableFuture<Comment> getComment(long accountFromId, long accountToId, long commentId, String email) {
+    public CompletableFuture<Comment> getComment(long accountIdFrom, long commentId) {
         UnitOfWork unitOfWork = new UnitOfWork();
+        DataMapper<Account, Long> accoutnMapper = getMapper(Account.class, unitOfWork);
         DataMapper<Comment, Long> commentMapper = getMapper(Comment.class, unitOfWork);
-        CompletableFuture<Comment> future = accountService.getAccount(accountFromId, email)
+
+
+        CompletableFuture<Comment> future = accoutnMapper.findById(accountIdFrom)
                 .thenCompose(account -> commentMapper.findById(commentId))
                 .thenCompose(res -> unitOfWork.commit().thenApply(aVoid -> res))
                 .thenApply(ocomment -> {
                             Comment comment = ocomment.orElseThrow(() -> new ResourceNotFoundException(ErrorMessages.RESOURCE_NOTFOUND_COMMENT));
-                            if (comment.getAccountIdFrom() != accountFromId && comment.getAccountIdDest() != accountToId)
+                            if (comment.getAccountIdFrom() != accountIdFrom)
                                 throw new BadRequestException(ErrorMessages.BAD_REQUEST_IDS_MISMATCH);
                             return comment;
                         }
@@ -47,12 +50,19 @@ public class CommentService {
         return handleExceptions(future, unitOfWork);
     }
 
-    public Mono<Void> updateComment(Comment comment, String username) {
+    public Mono<Void> updateComment(Comment comment) {
         UnitOfWork unitOfWork = new UnitOfWork();
         DataMapper<Comment, Long> commentMapper = getMapper(Comment.class, unitOfWork);
-        CompletableFuture<Void> future = getComment(comment.getAccountIdFrom(), comment.getAccountIdDest(), comment.getIdentityKey(), username)
-                .thenCompose(__ -> commentMapper.update( comment))
-                .thenCompose(res -> unitOfWork.commit());
+
+        CompletableFuture<Void> future = commentMapper.find(
+                new EqualCondition<>("commentId", comment.getIdentityKey()),
+                new EqualCondition<>("accountIdFrom", comment.getAccountIdFrom()),
+                new EqualCondition<>("accountIdDest", comment.getAccountIdDest())
+        ).thenCompose(commentRes -> {
+            if (commentRes.size() == 0)
+                throw new ResourceNotFoundException(ErrorMessages.RESOURCE_NOTFOUND_COMMENT);
+            return commentMapper.update(comment);
+        }).thenCompose(res -> unitOfWork.commit());
         return Mono.fromFuture(
                 handleExceptions(future, unitOfWork)
         );
