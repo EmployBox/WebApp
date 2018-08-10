@@ -25,14 +25,14 @@ export default class extends React.Component {
               <h2 class='text-center'>SignUp</h2>
               {this.props.form(this.onSignUp)}
               {this.state.inputs
-                ? <HttpRequest
+                ? <HttpRequest key={new Date().valueOf()}
                   method='POST'
                   url={this.props.url}
                   body={this.state.inputs}
-                  afterResult={this.props.ToLogin()}
+                  afterResult={json => this.props.ToLogin()}
                   onError={err => (
                     <div class='alert alert-danger' role='alert'>
-                      {err.message}
+                      {JSON.parse(err.message).detail || err.message}
                     </div>)}
                 />
                 : <div /> }

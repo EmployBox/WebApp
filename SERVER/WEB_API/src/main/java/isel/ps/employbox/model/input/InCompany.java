@@ -7,7 +7,7 @@ public class InCompany {
     private String password;
     private float rating;
     private String specialization;
-    private short yearFounded;
+    private int yearFounded;
     private String logoUrl;
     private String webpageUrl;
     private String description;
@@ -35,7 +35,7 @@ public class InCompany {
 
     public void setSpecialization(String specialization) { this.specialization = specialization; }
 
-    public short getYearFounded() { return yearFounded; }
+    public int getYearFounded() { return yearFounded; }
 
     public void setYearFounded(short yearFounded) { this.yearFounded = yearFounded; }
 

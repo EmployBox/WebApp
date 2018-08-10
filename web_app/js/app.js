@@ -19,6 +19,7 @@ import SearchPage from './pages/searchPage'
 import SignUpUser from './pages/signupUser'
 import SignUpCompany from './pages/signupCompany'
 import Profile from './pages/profile'
+import Company from './pages/company'
 
 import URI from 'urijs'
 import URITemplate from 'urijs/src/URITemplate'
@@ -137,6 +138,7 @@ export default class extends Component {
                     />
                   )} />
                   <PrivateRoute exact path='/account/:url' component={Profile} />
+                  <PrivateRoute exact path='/company/:url' component={Company} />
                   <Route path='/' render={({ history }) =>
                     <center class='py-5'>
                       <h2>Page not found</h2>
