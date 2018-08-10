@@ -24,7 +24,7 @@ public class OutCompany implements OutputDto {
     private final String specialization;
 
     @JsonProperty
-    private final Short yearFounded;
+    private final Integer yearFounded;
 
     @JsonProperty
     private final String logoUrl;
@@ -38,7 +38,7 @@ public class OutCompany implements OutputDto {
     @JsonProperty
     private final _Links _links;
 
-    public OutCompany(long accountId, String email, double rating, String name, String specialization, Short yearFounded, String logoUrl, String webpageUrl, String description) {
+    public OutCompany(long accountId, String email, double rating, String name, String specialization, Integer yearFounded, String logoUrl, String webpageUrl, String description) {
         this.accountId = accountId;
         this.email = email;
         this.rating = rating;
@@ -67,11 +67,11 @@ public class OutCompany implements OutputDto {
         @JsonProperty
         private final String specialization;
         @JsonProperty
-        private final Short yearFounded;
+        private final Integer yearFounded;
         @JsonProperty
         private final _Links _links;
 
-        private CompanyItemOutput(Long accountId, double rating, String name, String specialization, Short yearFounded){
+        private CompanyItemOutput(Long accountId, double rating, String name, String specialization, Integer yearFounded){
             this.accountId = accountId;
             this.rating = rating;
             this.name = name;

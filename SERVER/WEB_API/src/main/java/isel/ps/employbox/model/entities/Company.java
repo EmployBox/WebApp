@@ -6,7 +6,7 @@ import java.util.List;
 
 public class Company extends Account {
     private final String specialization;
-    private final Short yearFounded;
+    private final Integer yearFounded;
     private final String logoUrl;
     private final String webPageUrl;
     private final String description;
@@ -30,7 +30,7 @@ public class Company extends Account {
             long version,
             String name,
             String specialization,
-            short yearFounded,
+            int yearFounded,
             String logoUrl,
             String webPageUrl,
             String description,
@@ -57,7 +57,7 @@ public class Company extends Account {
             float rating,
             String name,
             String specialization,
-            short yearFounded,
+            int yearFounded,
             String logoUrl,
             String webPageUrl,
             String description,
@@ -80,7 +80,7 @@ public class Company extends Account {
         return specialization;
     }
 
-    public Short getYearFounded() {
+    public Integer getYearFounded() {
         return yearFounded;
     }
 

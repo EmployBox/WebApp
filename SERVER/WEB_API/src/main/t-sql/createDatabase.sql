@@ -26,10 +26,10 @@ CREATE TABLE [Account] (
 
 CREATE TABLE [Company] (
 	accountId BIGINT primary key references Account,
-	yearFounded SMALLINT,
+	yearFounded int,
 	specialization NVARCHAR(20),
-	webPageUrl NVARCHAR(50),
-	LogoUrl NVARCHAR(100),
+	webPageUrl NVARCHAR(200),
+	LogoUrl NVARCHAR(200),
 	[description] NVARCHAR(50),
 	[version] rowversion
 )
@@ -41,7 +41,7 @@ CREATE TABLE [Moderator] (
 CREATE TABLE [UserAccount] (
 	accountId BIGINT primary key references Account,
 	summary NVARCHAR(1500),
-	PhotoUrl NVARCHAR(100),
+	PhotoUrl NVARCHAR(200),
 	[version] rowversion
 )
 

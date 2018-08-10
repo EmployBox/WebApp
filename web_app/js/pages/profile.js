@@ -4,9 +4,9 @@ import URI from 'urijs'
 
 const style = {
   width: 200,
-  height: 200, 
-  border: 1, 
-  ['border-radius']: '50%'
+  height: 200,
+  border: 1,
+  borderRadius: '50%'
 }
 
 export default ({auth, match}) => (
@@ -24,7 +24,7 @@ export default ({auth, match}) => (
         <button >Curricula</button>
         <button >Aplications</button>
         <button >Followers</button>
-        <button>Following</button>
+        <button >Following</button>
       </div>
     )}
   />

@@ -34,7 +34,7 @@ export default class extends React.Component {
                 onSubmitHandler={this.onSubmit}
               />
               {this.state.auth
-                ? <HttpRequest key={this.state.auth}
+                ? <HttpRequest key={new Date().valueOf()}
                   method='GET'
                   url={this.props.url}
                   authorization={this.state.auth}
