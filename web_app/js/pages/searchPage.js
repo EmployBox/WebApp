@@ -19,21 +19,20 @@ function getFormOptions (url, options) {
 }
 
 class SearchPage extends React.Component {
-  // String type, URITemplate uri
+  // String type, URITemplate uri, Object options, Match match, URITemplate searchTempl, boolean authenticated
   constructor (props) {
     super(props)
-    console.log('search construct')
 
     const uri = URI.decode(props.match.params.url)
     const queryStr = URI.parse(uri).query
 
     const query = URI.parseQuery(queryStr)
     // if (!query.pageSize) query.pageSize = '10'
-    console.log(query)
+    // console.log(query)
 
     const [formOptions, deleted] = getFormOptions(uri.split('?')[0], props.options)
 
-    console.log(formOptions)
+    // console.log(formOptions)
 
     this.state = {
       currentQuery: Object.assign({}, query),
@@ -84,10 +83,10 @@ class SearchPage extends React.Component {
     if (JSON.stringify(currentQuery) === JSON.stringify(query)) buttonClass = buttonClass + ' disabled'
 
     return (
-      <div class='container'>
+      <div class='container-fluid'>
         <SearchForm style='compact' options={this.state.formOptions} searchTempl={this.props.searchTempl} />
         <div class='row'>
-          <div class='col col-lg-3'>
+          <div class='col col-lg-2'>
             <h3 class='text-center text-white border bg-dark'>Filters</h3>
             <div class='container'>
               {entity.render.renderFilters(query, this.handleNewQuery)}
@@ -110,7 +109,8 @@ class SearchPage extends React.Component {
             <h3 class='text-center text-white border bg-dark'>Results</h3>
             <HttpRequest
               url={uri}
-              onResult={data => entity.render.renderTable(data)} />
+              onResult={data => entity.render.renderTable(data)}
+            />
           </div>
         </div>
       </div>
