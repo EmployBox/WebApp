@@ -27,28 +27,34 @@ public class RatingService {
         return ServiceUtils.getCollectionPageFuture(Rating.class, page, pageSize,  new EqualCondition<>("accountIdFrom", accountId));
     }
 
-    public CompletableFuture<Rating> getRating(long accountFrom, long accountTo) {
+    public CompletableFuture<Rating> getRating(long accountFrom) {
         UnitOfWork unitOfWork = new UnitOfWork();
         DataMapper<Rating, Rating.RatingKey> ratingMapper = getMapper(Rating.class, unitOfWork);
-        CompletableFuture<Rating> future = ratingMapper.findById(new Rating.RatingKey(accountFrom, accountTo))
-                .thenApply(orating -> {
-                    if (!orating.isPresent())
+        CompletableFuture<Rating> future = ratingMapper.find(new EqualCondition<>("accountIdFrom", accountFrom))
+                .thenCompose(ratings -> {
+                    if ( ratings.size()==0)
                         throw new ResourceNotFoundException(ErrorMessages.RESOURCE_NOTFOUND_RATING);
-                    return orating.get();
-                })
-                .thenCompose(rating -> unitOfWork.commit().thenApply(__ -> rating));
+                    return  unitOfWork.commit().thenApply(__ -> ratings.get(0));
+                });
         return handleExceptions(future, unitOfWork);
     }
 
     public Mono<Void> updateRating(Rating rating, String email) {
+
         UnitOfWork unitOfWork = new UnitOfWork();
         DataMapper<Rating, Rating.RatingKey> ratingMapper = getMapper(Rating.class, unitOfWork);
-        CompletableFuture<Void> future = CompletableFuture.allOf(
-                userAccountService.getUser(rating.getAccountIdFrom(), email),//throws exceptions
-                getRating(rating.getAccountIdFrom(), rating.getAccountIdTo())
-        )
-                .thenCompose(aVoid -> ratingMapper.update(rating))
-                .thenCompose(aVoid -> unitOfWork.commit());
+        CompletableFuture<Void> future =
+                userAccountService.getUser(rating.getAccountIdFrom(), email)//throws exceptions
+                        .thenCompose(user -> ratingMapper.find(new EqualCondition("accountIdFrom", rating.getAccountIdFrom()),
+                                new EqualCondition<>("accountIdDest", rating.getAccountIdTo()))
+                        )
+                        .thenCompose(ratings -> {
+                                    if (ratings.size() == 0)
+                                        throw new ResourceNotFoundException(ErrorMessages.RESOURCE_NOTFOUND);
+                                    return ratingMapper.update(ratings.get(0));
+                                }
+                        )
+                        .thenCompose(aVoid -> unitOfWork.commit());
         return Mono.fromFuture(
                 handleExceptions(future, unitOfWork)
         );
@@ -72,8 +78,14 @@ public class RatingService {
         UnitOfWork unitOfWork = new UnitOfWork();
         DataMapper<Rating, Rating.RatingKey> ratingMapper = getMapper(Rating.class, unitOfWork);
         CompletableFuture<Void> future = userAccountService.getUser(accountIDFrom, email)
-                .thenCompose(userAccount -> getRating(accountIDFrom, accountIDTo))
-                .thenCompose(rating -> ratingMapper.delete( rating))
+                .thenCompose(user -> ratingMapper.find(new EqualCondition("accountIdFrom", accountIDFrom),
+                        new EqualCondition<>("accountIdDest", accountIDTo))
+                )
+                .thenCompose(ratings -> {
+                    if (ratings.size() == 0)
+                        throw new ResourceNotFoundException(ErrorMessages.RESOURCE_NOTFOUND);
+                    return  ratingMapper.delete(ratings.get(0));
+                })
                 .thenCompose(aVoid -> unitOfWork.commit());
         return Mono.fromFuture(
                 handleExceptions(future, unitOfWork)

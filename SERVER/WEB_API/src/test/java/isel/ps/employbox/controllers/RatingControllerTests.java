@@ -84,4 +84,15 @@ public class RatingControllerTests {
                 .expectBody()
                 .consumeWith(document("getAllRatings"));
     }
+
+    @Test
+    public void testGetRating(){
+        webTestClient
+                .get()
+                .uri("/accounts/"+userAccount.getIdentityKey()+"/ratings/single")
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody()
+                .consumeWith(document("getAllRatings"));
+    }
 }

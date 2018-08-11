@@ -39,8 +39,8 @@ public class RatingController {
     }
 
     @GetMapping("/single")
-    public Mono<OutRating> getRating(@PathVariable long id, @RequestBody long accountTo){
-        CompletableFuture<OutRating> future = ratingService.getRating(id, accountTo)
+    public Mono<OutRating> getRating(@PathVariable long id){
+        CompletableFuture<OutRating> future = ratingService.getRating(id)
                 .thenCompose(ratingBinder::bindOutput);
 
         return Mono.fromFuture(future);
