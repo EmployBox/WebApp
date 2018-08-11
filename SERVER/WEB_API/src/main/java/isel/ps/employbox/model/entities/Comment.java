@@ -39,7 +39,7 @@ public class Comment implements DomainObject<Long> {
     }
 
     public Comment(
-            long commentID,
+            long commentId,
             long accountIdFrom,
             long accountIdTo,
             long parentCommendID,
@@ -49,7 +49,7 @@ public class Comment implements DomainObject<Long> {
             List<Comment> replies,
             long version)
     {
-        this.commentId = commentID;
+        this.commentId = commentId;
         this.accountIdFrom = accountIdFrom;
         this.accountIdDest = accountIdTo;
         this.mainCommentId = parentCommendID;
@@ -57,6 +57,27 @@ public class Comment implements DomainObject<Long> {
         this.text = text;
         this.status = status;
         this.replies = (__)-> CompletableFuture.completedFuture(replies);
+        this.version = version;
+    }
+
+    public Comment(
+            long commentId,
+            long accountIdFrom,
+            long accountIdTo,
+            Long parentCommendID,
+            Instant date,
+            String text,
+            boolean status,
+            long version)
+    {
+        this.commentId = commentId;
+        this.accountIdFrom = accountIdFrom;
+        this.accountIdDest = accountIdTo;
+        this.mainCommentId = parentCommendID;
+        this.datetime = date;
+        this.text = text;
+        this.status = status;
+        this.replies = null;
         this.version = version;
     }
 

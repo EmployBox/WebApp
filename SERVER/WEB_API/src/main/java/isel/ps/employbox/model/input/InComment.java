@@ -1,6 +1,6 @@
 package isel.ps.employbox.model.input;
 
-import java.sql.Timestamp;
+import java.time.Instant;
 import java.util.List;
 
 public class InComment {
@@ -8,9 +8,11 @@ public class InComment {
     private long accountIdTo;
     private long commmentId;
     private long mainCommentId;
-    private Timestamp datetime;
+    private boolean status;
+    private Instant datetime;
     private String text;
     private List<InComment> replies;
+    private long version;
 
     public long getAccountIdFrom() {
         return accountIdFrom;
@@ -36,7 +38,8 @@ public class InComment {
         this.commmentId = commmentId;
     }
 
-    public long getMainCommentId() {
+    public Long getMainCommentId() {
+        if(mainCommentId== 0) return null;
         return mainCommentId;
     }
 
@@ -44,11 +47,11 @@ public class InComment {
         this.mainCommentId = mainCommentId;
     }
 
-    public Timestamp getDatetime() {
+    public Instant getDatetime() {
         return datetime;
     }
 
-    public void setDatetime(Timestamp datetime) {
+    public void setDatetime(Instant datetime) {
         this.datetime = datetime;
     }
 
@@ -66,5 +69,21 @@ public class InComment {
 
     public void setReplies(List<InComment> replies) {
         this.replies = replies;
+    }
+
+    public boolean getStatus() {
+        return status;
+    }
+
+    public void setStatus(boolean status) {
+        this.status = status;
+    }
+
+    public long getVersion() {
+        return version;
+    }
+
+    public void setVersion(long version) {
+        this.version = version;
     }
 }
