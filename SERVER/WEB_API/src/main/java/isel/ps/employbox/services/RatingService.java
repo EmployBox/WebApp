@@ -24,13 +24,13 @@ public class RatingService {
     }
 
     public CompletableFuture<CollectionPage<Rating>> getRatings(long accountId, int page, int pageSize) {
-        return ServiceUtils.getCollectionPageFuture(Rating.class, page, pageSize,  new EqualCondition<>("accountIdFrom", accountId));
+        return ServiceUtils.getCollectionPageFuture(Rating.class, page, pageSize,  new EqualCondition<>("accountIdDest", accountId));
     }
 
-    public CompletableFuture<Rating> getRating(long accountFrom) {
+    public CompletableFuture<Rating> getRating(long accountIdFrom, long accountIdDest) {
         UnitOfWork unitOfWork = new UnitOfWork();
         DataMapper<Rating, Rating.RatingKey> ratingMapper = getMapper(Rating.class, unitOfWork);
-        CompletableFuture<Rating> future = ratingMapper.find(new EqualCondition<>("accountIdFrom", accountFrom))
+        CompletableFuture<Rating> future = ratingMapper.find(new EqualCondition<>("accountIdFrom", accountIdFrom), new EqualCondition<>("accountIdDest", accountIdDest))
                 .thenCompose(ratings -> {
                     if ( ratings.size()==0)
                         throw new ResourceNotFoundException(ErrorMessages.RESOURCE_NOTFOUND_RATING);

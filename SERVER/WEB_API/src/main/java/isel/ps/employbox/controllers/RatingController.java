@@ -1,5 +1,6 @@
 package isel.ps.employbox.controllers;
 
+import isel.ps.employbox.ErrorMessages;
 import isel.ps.employbox.exceptions.BadRequestException;
 import isel.ps.employbox.model.binders.RatingBinder;
 import isel.ps.employbox.model.entities.Rating;
@@ -39,8 +40,12 @@ public class RatingController {
     }
 
     @GetMapping("/single")
-    public Mono<OutRating> getRating(@PathVariable long id){
-        CompletableFuture<OutRating> future = ratingService.getRating(id)
+    public Mono<OutRating> getRating(
+            @PathVariable long id,
+            @RequestParam(defaultValue = "0") long accountIdDest
+    ){
+        if(accountIdDest == 0) throw new BadRequestException(ErrorMessages.BAD_REQUEST_UPDATE_RATING);
+        CompletableFuture<OutRating> future = ratingService.getRating(id, accountIdDest)
                 .thenCompose(ratingBinder::bindOutput);
 
         return Mono.fromFuture(future);

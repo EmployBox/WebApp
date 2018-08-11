@@ -40,7 +40,7 @@ public class RatingControllerTests {
     private ApplicationContext context;
 
     private WebTestClient webTestClient;
-    private UserAccount userAccount;
+    private UserAccount userAccount, userAccount2;
     private Rating rating;
 
 
@@ -58,6 +58,10 @@ public class RatingControllerTests {
         List<UserAccount> userAccounts = userAccountMapper.find(new EqualCondition<>("name", "Bruno")).join();
         assertEquals(1, userAccounts.size());
         userAccount = userAccounts.get(0);
+
+        userAccounts = userAccountMapper.find(new EqualCondition<>("name", "Maria")).join();
+        assertEquals(1, userAccounts.size());
+        userAccount2 = userAccounts.get(0);
 
         DataMapper<Rating, Rating.RatingKey> commentsMapper = getMapper(Rating.class, unitOfWork);
         List<Rating> ratings = commentsMapper.find(new EqualCondition<>("accountIdFrom", userAccount.getIdentityKey())).join();
@@ -89,7 +93,8 @@ public class RatingControllerTests {
     public void testGetRating(){
         webTestClient
                 .get()
-                .uri("/accounts/"+userAccount.getIdentityKey()+"/ratings/single")
+                .uri(uriBuilder -> uriBuilder.path("/accounts/"+userAccount.getIdentityKey()+"/ratings/single")
+                        .queryParam("accountIdDest", userAccount2.getIdentityKey()).build())
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody()

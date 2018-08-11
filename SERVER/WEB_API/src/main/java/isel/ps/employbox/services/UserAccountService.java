@@ -17,7 +17,9 @@ import reactor.core.publisher.Mono;
 
 import java.security.InvalidParameterException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
@@ -158,22 +160,29 @@ public class UserAccountService {
         DataMapper<Curriculum, Long> curriculumMapper = getMapper(Curriculum.class, unit);
         CurriculumService curriculumService = new CurriculumService(this);
         DataMapper<Rating, Rating.RatingKey> ratingMapper = getMapper(Rating.class, unit);
+        CompletableFuture<List<Comment>> [] comments = new CompletableFuture[2];
+        CompletableFuture<List<Rating>> [] ratings  = new CompletableFuture[2];
 
         CompletableFuture<Void> future = getUser(id, email)
-                //TODO remove entries from other tables where user has foreign key
+                //todo possible optimization
                 .thenCompose(userAccount -> userAccount.getApplications().apply(unit)
                         .thenCompose(applications -> {
                             List<Long> applicationIds = applications.stream().map(Application::getIdentityKey).collect(Collectors.toList());
                             return applicationMapper.deleteAll(applicationIds);
                         })
-                        .thenCompose(__ ->
-                                commentMapper.find(new EqualCondition<Long>("accountIdFrom", userAccount.getIdentityKey()
-                                )
-                        ))
+                        .thenCompose(__ -> {
+                                    comments[0] = commentMapper.find(new EqualCondition<Long>("accountIdFrom", userAccount.getIdentityKey()));
+                                    comments[1] = commentMapper.find(new EqualCondition<Long>("accountIdDest", userAccount.getIdentityKey()));
+
+                                    return CompletableFuture.allOf(comments);
+                                }
+                        )
                         .thenCompose(
-                                comments -> {
-                                    List<Long> commentsIds = comments.stream().map(Comment::getIdentityKey).collect(Collectors.toList());
-                                    return commentMapper.deleteAll(commentsIds);
+                                aVoid -> {
+                                    List<Long> list = new ArrayList<>();
+                                    list.addAll( comments[0].join().stream().map(Comment::getIdentityKey).collect(Collectors.toList()));
+                                    list.addAll( comments[1].join().stream().map(Comment::getIdentityKey).collect(Collectors.toList()));
+                                    return commentMapper.deleteAll(list);
                                 }
                         )
                         .thenCompose(__ -> curriculumMapper.find(new EqualCondition<>("accountId", id)))
@@ -182,13 +191,21 @@ public class UserAccountService {
                             list.forEach(curr -> cflist.add(curriculumService.deleteCurriculum(userAccount.getIdentityKey(), curr.getIdentityKey()).toFuture()));
                             return CompletableFuture.allOf(cflist.toArray(new CompletableFuture[cflist.size()]));
                         })
-                        .thenCompose(aVoid ->
-                                ratingMapper.find(new EqualCondition<>("accountIdFrom", userAccount.getIdentityKey())
-                                )
-                        ).thenCompose(ratings -> {
-                            List<Rating.RatingKey> ratingsIds = ratings.stream().map(Rating::getIdentityKey).collect(Collectors.toList());
-                            return ratingMapper.deleteAll(ratingsIds);
-                        })
+                        .thenCompose( aVoid -> {
+                                    ratings[0] = ratingMapper.find(new EqualCondition<Long>("accountIdFrom", userAccount.getIdentityKey()));
+                                    ratings[1] = ratingMapper.find(new EqualCondition<Long>("accountIdDest", userAccount.getIdentityKey()));
+
+                                    return CompletableFuture.allOf(ratings);
+                                }
+                        )
+                        .thenCompose(
+                                aVoid -> {
+                                    Set<Rating.RatingKey> list = new HashSet<>();
+                                    list.addAll( ratings[0].join().stream().map(curr -> curr.getIdentityKey()).collect(Collectors.toList()));
+                                    list.addAll( ratings[1].join().stream().map(curr -> curr.getIdentityKey()).collect(Collectors.toList()));
+                                    return ratingMapper.deleteAll(list);
+                                }
+                        )
                         .thenCompose(aVoid -> userMapper.delete(userAccount))
                         .thenCompose(aVoid -> unit.commit()));
         return Mono.fromFuture(

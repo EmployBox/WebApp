@@ -26,6 +26,7 @@ public class ErrorMessages {
     public static final String BAD_REQUEST_ITEM_CREATION = "The item could not be created, check the body before sending the request again";
     public static final String BAD_REQUEST_ITEM_DELETION = "Item could not be deleted, check if the object your are trying to delete can be deleted";
     public static final String BAD_REQUEST_ITEM_UPDATE = "Item could not be updated, check if the object your are trying to update exists or you can update it";
+    public static final String BAD_REQUEST_UPDATE_RATING = "You tryed to update a rating without sending the ID of the rated/destiny account ";
     public static final String RESOURCE_NOTFOUND_COMPANY = "Company could not be found";
     public static final String JOB_EXPERIENCE_ITEM_CREATION = "The job experience list you tried to create with a job couldn't be added to the database";
     public static final String RESOURCE_NOTFOUND_PREVIOUS_JOB = "Previous job wasnt found for this curriculum";
