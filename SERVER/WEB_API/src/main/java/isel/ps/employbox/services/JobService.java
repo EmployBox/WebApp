@@ -29,11 +29,10 @@ import static isel.ps.employbox.services.ServiceUtils.handleExceptions;
 @Service
 public class JobService {
 
-    public CompletableFuture<CollectionPage<Job>> getAllJobs(int page, int pageSize, String address, String location, String title, Integer wage, String offerType, Integer ratingLow, Integer ratingHigh) {
+    public CompletableFuture<CollectionPage<Job>> getAllJobs(int page, int pageSize, String address, String title, Integer wage, String offerType, Integer ratingLow, Integer ratingHigh) {
         List<Condition> pairs = new ArrayList<>();
         pairs.add(new LikeCondition("address", address));
-        pairs.add(new EqualCondition<>("location", location));
-        pairs.add(new EqualCondition<>("wage", wage));
+        pairs.add(new LikeCondition("title", title));
         pairs.add(new EqualCondition<>("wage", wage));
         pairs.add(new EqualCondition<>("offerType", offerType));
         pairs.add(new Condition<>("ratingLow",">", ratingLow));

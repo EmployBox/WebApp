@@ -40,14 +40,13 @@ public class JobController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "5") int pageSize,
             @RequestParam(required = false) String address,
-            @RequestParam(required = false) String location,
             @RequestParam(required = false) String title,
             @RequestParam(required = false) Integer wage,
             @RequestParam(required = false) String type,
             @RequestParam(required = false) Integer ratingLow,
             @RequestParam(required = false) Integer ratingHigh
     ){
-        CompletableFuture<HalCollectionPage<Job>> future = jobService.getAllJobs(page, pageSize, address, location, title, wage, type, ratingLow, ratingHigh)
+        CompletableFuture<HalCollectionPage<Job>> future = jobService.getAllJobs(page, pageSize, address, title, wage, type, ratingLow, ratingHigh)
                 .thenCompose(jobCollectionPage -> jobBinder.bindOutput(jobCollectionPage, this.getClass()));
         return Mono.fromFuture(future);
     }

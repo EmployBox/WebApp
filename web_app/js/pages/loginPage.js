@@ -44,10 +44,11 @@ export default class extends React.Component {
                   onError={err => (
                     <div class='alert alert-danger' role='alert'>
                       {err.message}
-                    </div>)
-                  }
+                    </div>
+                  )}
                 />
-                : <div /> }
+                : <div />
+              }
             </div>
             <div class='col' />
           </div>

@@ -1,7 +1,7 @@
 import React from 'react'
 import { Link, withRouter } from 'react-router-dom'
 
-export default withRouter(({_embedded, history, accountTempl, companyTempl, moderatorTempl, jobTempl}) => {
+export default withRouter(({_embedded, history, accountTempl, companyTempl, moderatorTempl, jobTempl, authenticated, createJobsURL}) => {
   if (_embedded) {
     const tableRows = _embedded.items.map(item => {
       const { account } = item
@@ -27,22 +27,36 @@ export default withRouter(({_embedded, history, accountTempl, companyTempl, mode
       )
     })
 
+    const table = <table class='table table-hover'>
+      <thead>
+        <tr>
+          <th>Account</th>
+          <th>☆</th>
+          <th>Title</th>
+          <th>Opens</th>
+          <th>Location</th>
+          <th>Type</th>
+        </tr>
+      </thead>
+      <tbody>
+        {tableRows}
+      </tbody>
+    </table>
+
     return (
-      <table class='table table-hover'>
-        <thead>
-          <tr>
-            <th>Account</th>
-            <th>☆</th>
-            <th>Title</th>
-            <th>Opens</th>
-            <th>Location</th>
-            <th>Type</th>
-          </tr>
-        </thead>
-        <tbody>
-          {tableRows}
-        </tbody>
-      </table>
+      <div>
+        {authenticated
+          ? <div class='row'>
+            <div class='col'>
+              {table}
+            </div>
+            <div class='col-auto'>
+              <Link class='btn btn-success' to={createJobsURL}>New</Link>
+            </div>
+          </div>
+          : <div>{table}</div>
+        }
+      </div>
     )
   }
 
