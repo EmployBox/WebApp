@@ -6,6 +6,7 @@ import com.github.jayield.rapper.unitofwork.UnitOfWork;
 import isel.ps.employbox.ErrorMessages;
 import isel.ps.employbox.exceptions.ResourceNotFoundException;
 import isel.ps.employbox.model.binders.CollectionPage;
+import isel.ps.employbox.model.entities.Account;
 import isel.ps.employbox.model.entities.Rating;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
@@ -24,7 +25,7 @@ public class RatingService {
     }
 
     public CompletableFuture<CollectionPage<Rating>> getRatings(long accountId, int page, int pageSize) {
-        return ServiceUtils.getCollectionPageFuture(Rating.class, page, pageSize,  new EqualCondition<>("accountIdDest", accountId));
+        return ServiceUtils.getCollectionPageFuture(Rating.class, page, pageSize,  new EqualCondition<>("accountIdFrom", accountId));
     }
 
     public CompletableFuture<Rating> getRating(long accountIdFrom, long accountIdDest) {
@@ -77,7 +78,8 @@ public class RatingService {
     public Mono<Void> deleteRating(long accountIDFrom, long accountIDTo, String email) {
         UnitOfWork unitOfWork = new UnitOfWork();
         DataMapper<Rating, Rating.RatingKey> ratingMapper = getMapper(Rating.class, unitOfWork);
-        CompletableFuture<Void> future = userAccountService.getUser(accountIDFrom, email)
+        DataMapper<Account, Long> accountMapper = getMapper(Account.class, unitOfWork);
+        CompletableFuture<Void> future = accountMapper.find(new EqualCondition<Long>("accountId", accountIDFrom), new EqualCondition<>("email", email))
                 .thenCompose(user -> ratingMapper.find(new EqualCondition("accountIdFrom", accountIDFrom),
                         new EqualCondition<>("accountIdDest", accountIDTo))
                 )

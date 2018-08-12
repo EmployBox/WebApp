@@ -4,6 +4,7 @@ import com.github.jayield.rapper.mapper.DataMapper;
 import com.github.jayield.rapper.mapper.conditions.EqualCondition;
 import com.github.jayield.rapper.unitofwork.UnitOfWork;
 import isel.ps.employbox.controllers.curricula.CurriculumControllerTests;
+import isel.ps.employbox.model.entities.Account;
 import isel.ps.employbox.model.entities.Rating;
 import isel.ps.employbox.model.entities.UserAccount;
 import org.junit.After;
@@ -17,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.ApplicationContext;
 import org.springframework.restdocs.JUnitRestDocumentation;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
@@ -25,6 +27,8 @@ import java.util.List;
 import static com.github.jayield.rapper.mapper.MapperRegistry.getMapper;
 import static isel.ps.employbox.DataBaseUtils.prepareDB;
 import static junit.framework.TestCase.assertEquals;
+import static junit.framework.TestCase.assertFalse;
+import static org.junit.Assert.assertNotNull;
 import static org.springframework.restdocs.webtestclient.WebTestClientRestDocumentation.document;
 import static org.springframework.restdocs.webtestclient.WebTestClientRestDocumentation.documentationConfiguration;
 import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.springSecurity;
@@ -40,7 +44,7 @@ public class RatingControllerTests {
     private ApplicationContext context;
 
     private WebTestClient webTestClient;
-    private UserAccount userAccount, userAccount2;
+    private UserAccount userAccount, userAccount2, company1;
     private Rating rating;
 
 
@@ -62,6 +66,13 @@ public class RatingControllerTests {
         userAccounts = userAccountMapper.find(new EqualCondition<>("name", "Maria")).join();
         assertEquals(1, userAccounts.size());
         userAccount2 = userAccounts.get(0);
+
+
+        DataMapper<Account, Long> accountMapper = getMapper(Account.class, unitOfWork);
+
+        List<Account> accounts = accountMapper.find(new EqualCondition<>("name", "company1")).join();
+        assertEquals(1, accounts.size());
+        company1 = userAccounts.get(0);
 
         DataMapper<Rating, Rating.RatingKey> commentsMapper = getMapper(Rating.class, unitOfWork);
         List<Rating> ratings = commentsMapper.find(new EqualCondition<>("accountIdFrom", userAccount.getIdentityKey())).join();
@@ -87,6 +98,11 @@ public class RatingControllerTests {
                 .expectStatus().isOk()
                 .expectBody()
                 .consumeWith(document("getAllRatings"));
+
+        UnitOfWork unitOfWork = new UnitOfWork();
+        DataMapper<Rating, Rating.RatingKey> userAccountMapper = getMapper(Rating.class, unitOfWork);
+        assertNotNull(userAccountMapper.findById( new Rating.RatingKey(userAccount.getIdentityKey().longValue(), userAccount2.getIdentityKey().longValue())).join().get());
+        unitOfWork.commit().join();
     }
 
     @Test
@@ -99,5 +115,51 @@ public class RatingControllerTests {
                 .expectStatus().isOk()
                 .expectBody()
                 .consumeWith(document("getAllRatings"));
+    }
+
+    /*
+    @Test
+    @WithMockUser(username = "teste@gmail.com")
+    public void testCreateRating() throws Exception {
+
+        InRating inRating = new InRating();
+        inRating.setAccountIdFrom(userAccount.getIdentityKey());
+        inRating.setAccountIdDest(company1.getIdentityKey());
+        inRating.setAssiduity(5.0);
+        inRating.setCompetence(3.0);
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        String json = objectMapper.writeValueAsString(inRating);
+        UnitOfWork unitOfWork = new UnitOfWork();
+
+        webTestClient
+                .post()
+                .uri(uriBuilder -> uriBuilder.path("/accounts/"+userAccount.getIdentityKey()+"/ratings").queryParam("accountIdDest",company1.getIdentityKey()).build())
+                .contentType(MediaType.APPLICATION_JSON)
+                .syncBody(json)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody()
+                .consumeWith(document("createComment"));
+
+        DataMapper<Rating, Rating.RatingKey> ratingMapper = getMapper(Rating.class, unitOfWork);
+        assertTrue(ratingMapper.find( new EqualCondition<>("assiduity", 5.0)).join().size() != 0);
+        unitOfWork.commit().join();
+    }*/
+
+    @Test
+    @WithMockUser(username = "teste@gmail.com")
+    public void testDeleteRating(){
+        webTestClient
+                .delete()
+                .uri(uriBuilder -> uriBuilder.path("/accounts/" + userAccount.getIdentityKey() + "/ratings").queryParam("accountIdDest",userAccount2.getIdentityKey()).build())
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody()
+                .consumeWith(document("deleteRating"));
+        UnitOfWork unitOfWork = new UnitOfWork();
+        DataMapper<Rating, Rating.RatingKey> projectRepo = getMapper(Rating.class, unitOfWork);
+        assertFalse(projectRepo.findById( new Rating.RatingKey(rating.getIdentityKey().getAccountIdFrom(), rating.getIdentityKey().getAccountIdDest())).join().isPresent());
+        unitOfWork.commit().join();
     }
 }

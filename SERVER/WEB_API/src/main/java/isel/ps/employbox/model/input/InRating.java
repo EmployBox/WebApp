@@ -1,85 +1,94 @@
 package isel.ps.employbox.model.input;
 
 public class InRating {
-    private long accountIDFrom;
-    private long accountIDTo;
-    private float workLoad;
-    private float wage;
-    private float workEnvironment;
-    private float competence;
-    private float pontuality;
-    private float assiduity;
-    private float demeanor;
+    private long accountIdFrom;
+    private long accountIdDest;
+    private double workLoad;
+    private double wage;
+    private double workEnvironment;
+    private double competence;
+    private double pontuality;
+    private double assiduity;
+    private double demeanor;
+    private long version;
 
-    public long getAccountIDFrom() {
-        return accountIDFrom;
+    public long getAccountIdFrom() {
+        return accountIdFrom;
     }
 
-    public void setAccountIDFrom(long accountIDFrom) {
-        this.accountIDFrom = accountIDFrom;
+    public void setAccountIdFrom(long accountIDFrom) {
+        this.accountIdFrom = accountIDFrom;
     }
 
-    public long getAccountIDTo() {
-        return accountIDTo;
+    public long getAccountIdDest() {
+        return accountIdDest;
     }
 
-    public void setAccountIDTo(long accountIDTo) {
-        this.accountIDTo = accountIDTo;
+    public void setAccountIdDest(long accountIDTo) {
+        this.accountIdDest = accountIDTo;
     }
 
-    public float getWorkLoad() {
+    public double getWorkLoad() {
         return workLoad;
     }
 
-    public void setWorkLoad(float workLoad) {
+    public void setWorkLoad(double workLoad) {
         this.workLoad = workLoad;
     }
 
-    public float getWage() {
+    public double getWage() {
         return wage;
     }
 
-    public void setWage(float wage) {
+    public void setWage(double wage) {
         this.wage = wage;
     }
 
-    public float getWorkEnvironment() {
+    public double getWorkEnvironment() {
         return workEnvironment;
     }
 
-    public void setWorkEnvironment(float workEnvironment) {
+    public void setWorkEnvironment(double workEnvironment) {
         this.workEnvironment = workEnvironment;
     }
 
-    public float getCompetence() {
+    public double getCompetence() {
         return competence;
     }
 
-    public void setCompetence(float competence) {
+    public void setCompetence(double competence) {
         this.competence = competence;
     }
 
-    public float getPontuality() {
+    public double getPontuality() {
         return pontuality;
     }
 
-    public void setPontuality(float pontuality) {
+    public void setPontuality(double pontuality) {
         this.pontuality = pontuality;
     }
 
-    public float getAssiduity() {
+    public double getAssiduity() {
         return assiduity;
     }
 
-    public void setAssiduity(float assiduity) {
+    public void setAssiduity(double assiduity) {
         this.assiduity = assiduity;
     }
 
-    public float getDemeanor() {
+    public double getDemeanor() {
         return demeanor;
     }
 
-    public void setDemeanor(float demeanor) {
+    public void setDemeanor(double demeanor) {
         this.demeanor = demeanor;
+    }
+
+    public long getVersion() {
+        return version;
+    }
+
+    public void setVersion(long version) {
+        this.version = version;
     }
 }

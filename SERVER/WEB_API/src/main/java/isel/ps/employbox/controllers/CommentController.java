@@ -48,8 +48,7 @@ public class CommentController {
     public Mono<Void> updateComment(
             @PathVariable long accountId,
             @PathVariable long commentId,
-            @RequestBody InComment inComment,
-            Authentication authentication
+            @RequestBody InComment inComment
     ){
         if(accountId != inComment.getAccountIdFrom() || commentId != inComment.getCommmentId()) throw new BadRequestException(BAD_REQUEST_IDS_MISMATCH);
         return commentService.updateComment(commentBinder.bindInput(inComment));
@@ -57,12 +56,12 @@ public class CommentController {
 
     @PostMapping
     public Mono<OutComment> createComment(
-            @PathVariable long accountFromId,
-            @RequestParam long accountTo,
+            @PathVariable long accountId,
+            @RequestParam long accountIdDest,
             @RequestBody InComment comment,
             Authentication authentication
     ){
-        if(accountFromId != comment.getAccountIdFrom() || accountTo != comment.getAccountIdTo()) throw new BadRequestException(BAD_REQUEST_IDS_MISMATCH);
+        if(accountId != comment.getAccountIdFrom() || accountIdDest != comment.getAccountIdTo()) throw new BadRequestException(BAD_REQUEST_IDS_MISMATCH);
         CompletableFuture<OutComment> future = commentService.createComment(commentBinder.bindInput(comment), authentication.getName())
                 .thenCompose(commentBinder::bindOutput);
         return Mono.fromFuture(future);

@@ -17,7 +17,7 @@ import java.util.concurrent.CompletableFuture;
 import static isel.ps.employbox.ErrorMessages.BAD_REQUEST_IDS_MISMATCH;
 
 @RestController
-@RequestMapping("/accounts/{id}/ratings")
+@RequestMapping("/accounts/{accountId}/ratings")
 public class RatingController {
 
     private final RatingBinder ratingBinder;
@@ -30,22 +30,22 @@ public class RatingController {
 
     @GetMapping
     public Mono<HalCollectionPage<Rating>> getRatings(
-            @PathVariable long id,
+            @PathVariable long accountId,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "5") int pageSize
     ){
-        CompletableFuture<HalCollectionPage<Rating>> future = ratingService.getRatings(id, page, pageSize)
-                .thenCompose(ratingCollectionPage -> ratingBinder.bindOutput(ratingCollectionPage, this.getClass(), id));
+        CompletableFuture<HalCollectionPage<Rating>> future = ratingService.getRatings(accountId, page, pageSize)
+                .thenCompose(ratingCollectionPage -> ratingBinder.bindOutput(ratingCollectionPage, this.getClass(), accountId));
         return Mono.fromFuture(future);
     }
 
     @GetMapping("/single")
     public Mono<OutRating> getRating(
-            @PathVariable long id,
+            @PathVariable long accountId,
             @RequestParam(defaultValue = "0") long accountIdDest
     ){
         if(accountIdDest == 0) throw new BadRequestException(ErrorMessages.BAD_REQUEST_UPDATE_RATING);
-        CompletableFuture<OutRating> future = ratingService.getRating(id, accountIdDest)
+        CompletableFuture<OutRating> future = ratingService.getRating(accountId, accountIdDest)
                 .thenCompose(ratingBinder::bindOutput);
 
         return Mono.fromFuture(future);
@@ -53,28 +53,31 @@ public class RatingController {
 
     @PutMapping
     public Mono<Void> updateRating(
-            @PathVariable long id,
-            @RequestParam long accountTo,
+            @PathVariable long accountId,
+            @RequestParam long accountIdDest,
             @RequestBody InRating rating,
             Authentication authentication
     ){
-        if(id != rating.getAccountIDFrom() || accountTo != rating.getAccountIDTo()) throw new BadRequestException(BAD_REQUEST_IDS_MISMATCH);
+        if(accountId != rating.getAccountIdFrom() || accountIdDest != rating.getAccountIdDest()) throw new BadRequestException(BAD_REQUEST_IDS_MISMATCH);
         return ratingService.updateRating(ratingBinder.bindInput(rating), authentication.getName());
     }
 
     @PostMapping
     public Mono<Rating> createRating(
-            @PathVariable long id,
-            @RequestParam long accountTo,
+            @PathVariable long accountId,
+            @RequestParam long accountIdDest,
             @RequestBody InRating rating,
             Authentication authentication)
     {
-        if(id != rating.getAccountIDFrom() || accountTo != rating.getAccountIDTo()) throw new BadRequestException(BAD_REQUEST_IDS_MISMATCH);
+        if(accountId != rating.getAccountIdFrom() || accountIdDest != rating.getAccountIdDest()) throw new BadRequestException(BAD_REQUEST_IDS_MISMATCH);
         return ratingService.createRating( ratingBinder.bindInput(rating), authentication.getName());
     }
 
     @DeleteMapping
-    public Mono<Void> deleteRating(@PathVariable long id, @RequestParam long accountTo, Authentication authentication){
-        return ratingService.deleteRating(id, accountTo, authentication.getName());
+    public Mono<Void> deleteRating(
+            @PathVariable long accountId,
+            @RequestParam long accountIdDest,
+            Authentication authentication){
+        return ratingService.deleteRating(accountId, accountIdDest, authentication.getName());
     }
 }

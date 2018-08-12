@@ -30,8 +30,7 @@ import java.util.List;
 
 import static com.github.jayield.rapper.mapper.MapperRegistry.getMapper;
 import static isel.ps.employbox.DataBaseUtils.prepareDB;
-import static junit.framework.TestCase.assertEquals;
-import static junit.framework.TestCase.assertFalse;
+import static junit.framework.TestCase.*;
 import static org.springframework.restdocs.webtestclient.WebTestClientRestDocumentation.document;
 import static org.springframework.restdocs.webtestclient.WebTestClientRestDocumentation.documentationConfiguration;
 import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.springSecurity;
@@ -106,6 +105,33 @@ public class CommentControllerTests {
                 .expectStatus().isOk()
                 .expectBody()
                 .consumeWith(document("getAllComments"));
+    }
+
+    @Test
+    @WithMockUser(username = "teste@gmail.com")
+    public void testCreateComment() throws Exception {
+        InComment inComment = new InComment();
+        inComment.setAccountIdFrom(userAccount.getIdentityKey());
+        inComment.setAccountIdTo(userAccount2.getIdentityKey());
+        inComment.setText("HAHAHA");
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        String json = objectMapper.writeValueAsString(inComment);
+        UnitOfWork unitOfWork = new UnitOfWork();
+
+        webTestClient
+                .post()
+                .uri(uriBuilder -> uriBuilder.path("/accounts/"+userAccount.getIdentityKey()+"/comments").queryParam("accountIdDest",userAccount2.getIdentityKey()).build())
+                .contentType(MediaType.APPLICATION_JSON)
+                .syncBody(json)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody()
+                .consumeWith(document("createComment"));
+
+        DataMapper<Comment, Long> jobMapper = getMapper(Comment.class, unitOfWork);
+        assertTrue(jobMapper.find( new EqualCondition<>("text", "HAHAHA")).join().size() != 0);
+        unitOfWork.commit().join();
     }
 
     @Test
