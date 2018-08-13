@@ -2,7 +2,7 @@ package isel.ps.employbox.model.output;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import isel.ps.employbox.controllers.CommentController;
+import isel.ps.employbox.controllers.account.CommentController;
 
 import java.time.Instant;
 

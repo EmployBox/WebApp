@@ -160,8 +160,12 @@ public class UserAccountService {
         DataMapper<Curriculum, Long> curriculumMapper = getMapper(Curriculum.class, unit);
         CurriculumService curriculumService = new CurriculumService(this);
         DataMapper<Rating, Rating.RatingKey> ratingMapper = getMapper(Rating.class, unit);
+        DataMapper<Follows, Follows.FollowKey> followsMapper = getMapper(Follows.class, unit);
+
+
         CompletableFuture<List<Comment>> [] comments = new CompletableFuture[2];
         CompletableFuture<List<Rating>> [] ratings  = new CompletableFuture[2];
+        CompletableFuture<List<Follows>> [] follows  = new CompletableFuture[2];
 
         CompletableFuture<Void> future = getUser(id, email)
                 //todo possible optimization
@@ -192,6 +196,21 @@ public class UserAccountService {
                             return CompletableFuture.allOf(cflist.toArray(new CompletableFuture[cflist.size()]));
                         })
                         .thenCompose( aVoid -> {
+                                    follows[0] = followsMapper.find(new EqualCondition<Long>("accountIdFollower", userAccount.getIdentityKey()));
+                                    follows[1] = followsMapper.find(new EqualCondition<Long>("accountIdFollowed", userAccount.getIdentityKey()));
+
+                                    return CompletableFuture.allOf(follows);
+                                }
+                        )
+                        .thenCompose(
+                                aVoid -> {
+                                    Set<Follows.FollowKey> list = new HashSet<>();
+                                    list.addAll( follows[0].join().stream().map(curr -> curr.getIdentityKey()).collect(Collectors.toList()));
+                                    list.addAll( follows[1].join().stream().map(curr -> curr.getIdentityKey()).collect(Collectors.toList()));
+                                    return followsMapper.deleteAll(list);
+                                }
+                        )
+                        .thenCompose( aVoid -> {
                                     ratings[0] = ratingMapper.find(new EqualCondition<Long>("accountIdFrom", userAccount.getIdentityKey()));
                                     ratings[1] = ratingMapper.find(new EqualCondition<Long>("accountIdDest", userAccount.getIdentityKey()));
 
@@ -212,21 +231,6 @@ public class UserAccountService {
                 handleExceptions(future, unit)
         );
     }
-    /*
-    private <T,K extends DomainObject<T>> CompletableFuture<Void> deleteUserAccountAux(UserAccount userAccount, DataMapper mapper){
-        return CompletableFuture.runAsync(
-            new Thread( () -> {
-                mapper.find(new EqualCondition<>("accountIdFrom", userAccount.getIdentityKey()),
-                        new EqualCondition<>("accountIdDest", userAccount.getIdentityKey())
-                ).thenCompose(
-                        list -> {
-                            List<T> idsList = ((List)list).stream().map(t -> K.getIdentityKey(t)).collect(Collectors.toList());
-                            return mapper.deleteAll(idsList);
-                        }
-                );
-            })
-        );
-    }*/
 
     public Mono<Void> deleteApplication(long userId, long jobId,long apId, String email) {
         UnitOfWork unit = new UnitOfWork();

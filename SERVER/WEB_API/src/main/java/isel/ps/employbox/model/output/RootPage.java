@@ -2,7 +2,7 @@ package isel.ps.employbox.model.output;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import isel.ps.employbox.controllers.AccountController;
+import isel.ps.employbox.controllers.account.AccountController;
 import isel.ps.employbox.controllers.CompanyController;
 import isel.ps.employbox.controllers.JobController;
 import isel.ps.employbox.controllers.UserAccountController;

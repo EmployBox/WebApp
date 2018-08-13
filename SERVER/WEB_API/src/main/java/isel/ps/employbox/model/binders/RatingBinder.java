@@ -33,7 +33,7 @@ public class RatingBinder implements ModelBinder<Rating,OutRating,InRating> {
                 object.getWorkLoad(),
                 object.getWage(),
                 object.getWorkEnvironment(),
-                object.getCompetence(),
+                object.getCompetences(),
                 object.getPontuality(),
                 object.getAssiduity(),
                 object.getDemeanor(),

@@ -1,4 +1,4 @@
-package isel.ps.employbox.controllers;
+package isel.ps.employbox.controllers.account;
 
 import isel.ps.employbox.model.binders.AccountBinder;
 import isel.ps.employbox.model.entities.Account;
@@ -11,7 +11,7 @@ import reactor.core.publisher.Mono;
 import java.util.concurrent.CompletableFuture;
 
 @RestController
-@RequestMapping("/accounts/{id}")
+@RequestMapping("/accounts/{accountId}")
 public class FollowsController {
 
     private final AccountBinder accountBinder;
@@ -24,24 +24,24 @@ public class FollowsController {
 
     @GetMapping("/followers")
     public Mono<HalCollectionPage<Account>> getFollowers(
-            @PathVariable long id,
+            @PathVariable long accountId,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "5") int pageSize
     ){
-        CompletableFuture<HalCollectionPage<Account>> future = followService.getAccountFollowers(id, page, pageSize)
-                .thenCompose(accountCollectionPage -> accountBinder.bindOutput(accountCollectionPage, this.getClass(), id));
+        CompletableFuture<HalCollectionPage<Account>> future = followService.getAccountFollowers(accountId, page, pageSize)
+                .thenCompose(accountCollectionPage -> accountBinder.bindOutput(accountCollectionPage, this.getClass(), accountId));
         return Mono.fromFuture(future);
     }
 
     @GetMapping("/following")
     public Mono<HalCollectionPage<Account>> getFollowing(
-            @PathVariable long id,
+            @PathVariable long accountId,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "5") int pageSize
 
     ){
-        CompletableFuture<HalCollectionPage<Account>> future = followService.getAccountFolloweds(id, page, pageSize)
-                .thenCompose(accountCollectionPage -> accountBinder.bindOutput(accountCollectionPage, this.getClass(), id));
+        CompletableFuture<HalCollectionPage<Account>> future = followService.getAccountFolloweds(accountId, page, pageSize)
+                .thenCompose(accountCollectionPage -> accountBinder.bindOutput(accountCollectionPage, this.getClass(), accountId));
         return Mono.fromFuture(future);
     }
 

@@ -51,6 +51,12 @@ CREATE PROCEDURE populateDB()
 
     /*Insert Applications*/
     insert into APPLICATION(ACCOUNTID, JOBID) values (account_id2, job_id);
+
+    /*Insert Follows*/
+    insert into FOLLOWS(ACCOUNTIDFOLLOWER, ACCOUNTIDFOLLOWED) VALUES (account_id1, account_id2);
+    insert into FOLLOWS(ACCOUNTIDFOLLOWER, ACCOUNTIDFOLLOWED) VALUES (account_id1, company_id1);
+    insert into FOLLOWS(ACCOUNTIDFOLLOWER, ACCOUNTIDFOLLOWED) VALUES (account_id2, company_id2);
+
   end;
 
 create procedure deleteDB()

@@ -4,10 +4,12 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import isel.ps.employbox.controllers.CompanyController;
 import isel.ps.employbox.controllers.UserAccountController;
+import isel.ps.employbox.controllers.account.*;
 
 import java.util.HashMap;
 
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
+import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 
 public class OutAccount implements OutputDto {
     @JsonProperty
@@ -90,10 +92,63 @@ public class OutAccount implements OutputDto {
             @JsonProperty
             private Self self = new Self();
 
+            @JsonProperty
+            private Offered_jobs offered_jobs = new Offered_jobs();
+
+            @JsonProperty
+            private Comments comments = new Comments();
+
+            @JsonProperty
+            private Followers followers = new Followers();
+
+            @JsonProperty
+            private Following following = new Following();
+
+            @JsonProperty
+            private Chats chats = new Chats();
+
+            @JsonProperty
+            private Ratings ratings = new Ratings();
+
             private class Self {
                 @JsonProperty
                 final String href = HOSTNAME + accountLinks.get(accountType);
             }
+            private class Followers {
+                @JsonProperty
+                final String href = HOSTNAME + linkTo( methodOn(FollowsController.class,accountId).getFollowers(accountId, 0, 5) ).withRel("followers").getHref();
+            }
+
+            private class Offered_jobs{
+                @JsonProperty
+                final String href = HOSTNAME + linkTo(methodOn( AccountController.class, accountId).getOfferedJobs(accountId, 0, 5)).withRel("offered_jobs").getHref();
+            }
+
+            private class Comments {
+                @JsonProperty
+                final String href = HOSTNAME + linkTo( methodOn(CommentController.class, accountId).getAllComments(accountId, 0,5)).withRel("comments").getHref();
+            }
+
+            private class Ratings {
+                @JsonProperty
+                final String href = HOSTNAME + linkTo ( methodOn(RatingController.class, accountId).getRatings(accountId,0,5)).withRel("ratings").getHref();
+            }
+
+            private class Following {
+                @JsonProperty
+                final String href = HOSTNAME + linkTo( methodOn(FollowsController.class,accountId).getFollowing(accountId, 0, 5) ).withRel("following").getHref();
+            }
+
+            private class Applications {
+                @JsonProperty
+                final String href = HOSTNAME + linkTo( methodOn(UserAccountController.class).getAllApplications(accountId, 0, 5)).withRel("applications").getHref();
+            }
+
+            private class Chats {
+                @JsonProperty
+                final String href = HOSTNAME + linkTo(ChatController.class, accountId).withRel("chats").getHref();
+            }
+
         }
     }
 

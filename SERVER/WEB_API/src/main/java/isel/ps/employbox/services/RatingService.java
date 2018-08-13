@@ -53,7 +53,7 @@ public class RatingService {
                         .thenCompose(ratings -> {
                                     if (ratings.size() == 0)
                                         throw new ResourceNotFoundException(ErrorMessages.RESOURCE_NOTFOUND);
-                                    return ratingMapper.update(ratings.get(0));
+                                    return ratingMapper.update(rating);
                                 }
                         )
                         .thenCompose(aVoid -> unitOfWork.commit());

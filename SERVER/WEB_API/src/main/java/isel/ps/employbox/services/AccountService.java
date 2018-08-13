@@ -8,7 +8,7 @@ import isel.ps.employbox.exceptions.ResourceNotFoundException;
 import isel.ps.employbox.exceptions.UnauthorizedException;
 import isel.ps.employbox.model.binders.CollectionPage;
 import isel.ps.employbox.model.entities.Account;
-import org.springframework.security.crypto.password.PasswordEncoder;
+import isel.ps.employbox.model.entities.Job;
 import org.springframework.stereotype.Service;
 
 import java.security.InvalidParameterException;
@@ -16,15 +16,11 @@ import java.util.concurrent.CompletableFuture;
 
 import static com.github.jayield.rapper.mapper.MapperRegistry.getMapper;
 import static isel.ps.employbox.ErrorMessages.RESOURCE_NOTFOUND_ACCOUNT;
+import static isel.ps.employbox.services.ServiceUtils.getCollectionPageFuture;
 import static isel.ps.employbox.services.ServiceUtils.handleExceptions;
 
 @Service
 public final class AccountService {
-    private final PasswordEncoder passwordEncoder;
-
-    public AccountService(PasswordEncoder passwordEncoder) {
-        this.passwordEncoder = passwordEncoder;
-    }
 
     public CompletableFuture<CollectionPage<Account>> getAllAccounts(int page, int pageSize) {
         return ServiceUtils.getCollectionPageFuture(Account.class, page, pageSize);
@@ -46,6 +42,10 @@ public final class AccountService {
                     return account;
                 });
         return handleExceptions(future, unitOfWork);
+    }
+
+    public CompletableFuture<CollectionPage<Job>> getOfferedJob(long accountId, int page, int pageSize){
+        return getCollectionPageFuture(Job.class , page, pageSize, new EqualCondition<>("accountId", accountId));
     }
 
     public CompletableFuture<Account> getAccount(String email) {

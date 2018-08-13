@@ -6,7 +6,7 @@ public class InRating {
     private double workLoad;
     private double wage;
     private double workEnvironment;
-    private double competence;
+    private double competences;
     private double pontuality;
     private double assiduity;
     private double demeanor;
@@ -52,12 +52,12 @@ public class InRating {
         this.workEnvironment = workEnvironment;
     }
 
-    public double getCompetence() {
-        return competence;
+    public double getCompetences() {
+        return competences;
     }
 
-    public void setCompetence(double competence) {
-        this.competence = competence;
+    public void setCompetences(double competences) {
+        this.competences = competences;
     }
 
     public double getPontuality() {

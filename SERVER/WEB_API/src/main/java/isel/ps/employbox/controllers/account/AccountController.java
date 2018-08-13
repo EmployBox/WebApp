@@ -1,7 +1,9 @@
-package isel.ps.employbox.controllers;
+package isel.ps.employbox.controllers.account;
 
 import isel.ps.employbox.model.binders.AccountBinder;
+import isel.ps.employbox.model.binders.JobBinder;
 import isel.ps.employbox.model.entities.Account;
+import isel.ps.employbox.model.entities.Job;
 import isel.ps.employbox.model.output.HalCollectionPage;
 import isel.ps.employbox.model.output.OutAccount;
 import isel.ps.employbox.services.AccountService;
@@ -16,10 +18,12 @@ import java.util.concurrent.CompletableFuture;
 public class AccountController {
     private final AccountBinder accountBinder;
     private final AccountService accountService;
+    private final JobBinder jobBinder;
 
-    public AccountController(AccountBinder accountBinder, AccountService accountService) {
+    public AccountController(AccountBinder accountBinder, AccountService accountService, JobBinder jobBinder) {
         this.accountBinder = accountBinder;
         this.accountService = accountService;
+        this.jobBinder = jobBinder;
     }
 
     @GetMapping
@@ -28,6 +32,19 @@ public class AccountController {
             @RequestParam(defaultValue = "5") int pageSize
     ){
         return Mono.fromFuture(accountService.getAllAccounts(page, pageSize).thenCompose(res -> accountBinder.bindOutput(res, AccountController.class)) );
+    }
+
+    @GetMapping("/{accountId}/jobs/offered")
+    public Mono<HalCollectionPage<Job>> getOfferedJobs(
+            @PathVariable long accountId,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "5") int pageSize
+    ){
+
+        return Mono.fromFuture(
+                accountService.getOfferedJob(accountId, page, pageSize)
+                        .thenCompose( jobCollectionPage -> jobBinder.bindOutput(jobCollectionPage , this.getClass(), accountId))
+        );
     }
 
     @GetMapping("/self")
