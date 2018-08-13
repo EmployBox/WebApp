@@ -131,7 +131,7 @@ public class RatingControllerTests {
         inRating.setAccountIdFrom(userAccount.getIdentityKey());
         inRating.setAccountIdDest(company1.getIdentityKey());
         inRating.setAssiduity(5.0);
-        inRating.setCompetence(3.0);
+        inRating.setCompetences(3.0);
 
         ObjectMapper objectMapper = new ObjectMapper();
         String json = objectMapper.writeValueAsString(inRating);
@@ -153,6 +153,78 @@ public class RatingControllerTests {
     }
 
     @Test
+    @WithMockUser(username = "company1@gmail.com")
+    public void testUpdateWrongRating() throws Exception {
+        InRating inRating = new InRating();
+        inRating.setVersion( rating.getVersion());
+        inRating.setAccountIdFrom(userAccount.getIdentityKey());
+        inRating.setAccountIdDest(userAccount2.getIdentityKey());
+        inRating.setAssiduity(2.0);
+        inRating.setCompetences(1.0);
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        String json = objectMapper.writeValueAsString(inRating);
+        UnitOfWork unitOfWork = new UnitOfWork();
+
+        webTestClient
+                .put()
+                .uri(uriBuilder -> uriBuilder.path("/accounts/"+userAccount.getIdentityKey()+"/ratings").queryParam("accountIdDest",userAccount2.getIdentityKey()).build())
+                .contentType(MediaType.APPLICATION_JSON)
+                .syncBody(json)
+                .exchange()
+                .expectStatus().isUnauthorized()
+                .expectBody()
+                .consumeWith(document("updateWrongRating"));
+
+        unitOfWork.commit().join();
+    }
+
+
+    @Test
+    @WithMockUser(username = "teste@gmail.com")
+    public void testUpdateRating() throws Exception {
+        InRating inRating = new InRating();
+        inRating.setVersion( rating.getVersion());
+        inRating.setAccountIdFrom(userAccount.getIdentityKey());
+        inRating.setAccountIdDest(userAccount2.getIdentityKey());
+        inRating.setAssiduity(2.0);
+        inRating.setCompetences(1.0);
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        String json = objectMapper.writeValueAsString(inRating);
+        UnitOfWork unitOfWork = new UnitOfWork();
+
+        webTestClient
+                .put()
+                .uri(uriBuilder -> uriBuilder.path("/accounts/"+userAccount.getIdentityKey()+"/ratings").queryParam("accountIdDest",userAccount2.getIdentityKey()).build())
+                .contentType(MediaType.APPLICATION_JSON)
+                .syncBody(json)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody()
+                .consumeWith(document("updateRating"));
+
+        DataMapper<Rating, Rating.RatingKey> ratingMapper = getMapper(Rating.class, unitOfWork);
+        Rating rating = ratingMapper.find( new EqualCondition<>("accountIdFrom", userAccount.getIdentityKey()),  new EqualCondition<>("accountIdDest", userAccount2.getIdentityKey())).join().get(0);
+
+        assertEquals(2.0,rating.getAssiduity());
+        assertEquals(1.0,rating.getCompetences());
+        unitOfWork.commit().join();
+    }
+
+    @Test
+    public void testDeleteWrongRating(){
+        webTestClient
+                .delete()
+                .uri(uriBuilder -> uriBuilder.path("/accounts/" + userAccount.getIdentityKey() + "/ratings").queryParam("accountIdDest",userAccount2.getIdentityKey()).build())
+                .exchange()
+                .expectStatus().isUnauthorized()
+                .expectBody()
+                .consumeWith(document("deleteRating"));
+    }
+
+
+    @Test
     @WithMockUser(username = "teste@gmail.com")
     public void testDeleteRating(){
         webTestClient
@@ -163,8 +235,8 @@ public class RatingControllerTests {
                 .expectBody()
                 .consumeWith(document("deleteRating"));
         UnitOfWork unitOfWork = new UnitOfWork();
-        DataMapper<Rating, Rating.RatingKey> projectRepo = getMapper(Rating.class, unitOfWork);
-        assertFalse(projectRepo.findById( new Rating.RatingKey(rating.getIdentityKey().getAccountIdFrom(), rating.getIdentityKey().getAccountIdDest())).join().isPresent());
+        DataMapper<Rating, Rating.RatingKey> ratingRepo = getMapper(Rating.class, unitOfWork);
+        assertFalse(ratingRepo.findById( new Rating.RatingKey(rating.getIdentityKey().getAccountIdFrom(), rating.getIdentityKey().getAccountIdDest())).join().isPresent());
         unitOfWork.commit().join();
     }
 }

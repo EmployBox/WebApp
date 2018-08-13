@@ -56,7 +56,7 @@ public class PreviousJobService {
             PreviousJobs previousJobs,
             String email
     ) {
-        if(previousJobs.getAccountId() != pvjId)
+        if(previousJobs.getIdentityKey() != pvjId)
             throw new BadRequestException(ErrorMessages.BAD_REQUEST_IDS_MISMATCH);
         UnitOfWork unitOfWork = new UnitOfWork();
         DataMapper<PreviousJobs, Long> previousJobsMapper = MapperRegistry.getMapper(PreviousJobs.class, unitOfWork);
