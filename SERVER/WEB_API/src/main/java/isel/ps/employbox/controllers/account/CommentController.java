@@ -1,4 +1,4 @@
-package isel.ps.employbox.controllers;
+package isel.ps.employbox.controllers.account;
 
 import isel.ps.employbox.exceptions.BadRequestException;
 import isel.ps.employbox.model.binders.CommentBinder;

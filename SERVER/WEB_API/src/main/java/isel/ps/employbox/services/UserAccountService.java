@@ -212,21 +212,6 @@ public class UserAccountService {
                 handleExceptions(future, unit)
         );
     }
-    /*
-    private <T,K extends DomainObject<T>> CompletableFuture<Void> deleteUserAccountAux(UserAccount userAccount, DataMapper mapper){
-        return CompletableFuture.runAsync(
-            new Thread( () -> {
-                mapper.find(new EqualCondition<>("accountIdFrom", userAccount.getIdentityKey()),
-                        new EqualCondition<>("accountIdDest", userAccount.getIdentityKey())
-                ).thenCompose(
-                        list -> {
-                            List<T> idsList = ((List)list).stream().map(t -> K.getIdentityKey(t)).collect(Collectors.toList());
-                            return mapper.deleteAll(idsList);
-                        }
-                );
-            })
-        );
-    }*/
 
     public Mono<Void> deleteApplication(long userId, long jobId,long apId, String email) {
         UnitOfWork unit = new UnitOfWork();

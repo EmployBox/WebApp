@@ -2,7 +2,8 @@ package isel.ps.employbox.model.output;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import isel.ps.employbox.controllers.*;
+import isel.ps.employbox.controllers.UserAccountController;
+import isel.ps.employbox.controllers.account.*;
 import isel.ps.employbox.controllers.curricula.CurriculumController;
 
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
@@ -10,7 +11,7 @@ import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 
 public class OutUser implements OutputDto {
     @JsonProperty
-    private final long id;
+    private final long accountId;
 
     @JsonProperty
     private final String name;
@@ -30,8 +31,8 @@ public class OutUser implements OutputDto {
     @JsonProperty
     private final _Links _links;
 
-    public OutUser(long id, String name, String email, String photo_url, String summary, double rating) {
-        this.id = id;
+    public OutUser(long accountId, String name, String email, String photo_url, String summary, double rating) {
+        this.accountId = accountId;
         this.name = name;
         this.email = email;
         this.photo_url = photo_url;
@@ -43,12 +44,12 @@ public class OutUser implements OutputDto {
     @JsonIgnore
     @Override
     public Object getCollectionItemOutput() {
-        return new UserItemOutput(id, name, rating, summary);
+        return new UserItemOutput(accountId, name, rating, summary);
     }
 
     class UserItemOutput {
         @JsonProperty
-        private final long id;
+        private final long accountId;
         @JsonProperty
         private final String name;
         @JsonProperty
@@ -59,7 +60,7 @@ public class OutUser implements OutputDto {
         private _Links _links;
 
         UserItemOutput(long id, String name, double rating, String summary) {
-            this.id = id;
+            this.accountId = id;
             this.name = name;
             this.rating = rating;
             this.summary = summary;
@@ -72,7 +73,7 @@ public class OutUser implements OutputDto {
 
             private class Self {
                 @JsonProperty
-                final String href = HOSTNAME + linkTo( UserAccountController.class).slash(id).withSelfRel().getHref();
+                final String href = HOSTNAME + linkTo( UserAccountController.class).slash(accountId).withSelfRel().getHref();
             }
         }
     }
@@ -85,19 +86,7 @@ public class OutUser implements OutputDto {
         private Offered_jobs offered_jobs = new Offered_jobs();
 
         @JsonProperty
-        private Curricula curricula = new Curricula();
-
-        @JsonProperty
-        private Applications applications = new Applications();
-
-        @JsonProperty
-        private Chats chats = new Chats();
-
-        @JsonProperty
         private Comments comments = new Comments();
-
-        @JsonProperty
-        private Ratings ratings = new Ratings();
 
         @JsonProperty
         private Followers followers = new Followers();
@@ -105,49 +94,62 @@ public class OutUser implements OutputDto {
         @JsonProperty
         private Following following = new Following();
 
+        @JsonProperty
+        private Chats chats = new Chats();
+
+        @JsonProperty
+        private Ratings ratings = new Ratings();
+
+        @JsonProperty
+        private Applications applications = new Applications();
+
+        @JsonProperty
+        private Curricula curricula = new Curricula();
+
+
         private class Self{
             @JsonProperty
-            final String href = HOSTNAME + linkTo( UserAccountController.class).slash(id).withSelfRel().getHref();
+            final String href = HOSTNAME + linkTo( UserAccountController.class).slash(accountId).withSelfRel().getHref();
         }
 
         private class Offered_jobs{
             @JsonProperty
-            final String href = HOSTNAME + linkTo( JobController.class,id).withRel("offered_jobs").getHref();
+            final String href = HOSTNAME + linkTo(methodOn( AccountController.class, accountId).getOfferedJobs(accountId, 0, 5)).withRel("offered_jobs").getHref();
         }
 
         private class Curricula {
             @JsonProperty
-            final String href = HOSTNAME + linkTo( CurriculumController.class,id).withRel("curricula").getHref();
+            final String href = HOSTNAME + linkTo( methodOn(CurriculumController.class, accountId).getCurricula(accountId, 0, 5)).withRel("curricula").getHref();
         }
 
         private class Applications {
             @JsonProperty
-            final String href = HOSTNAME + linkTo( methodOn(UserAccountController.class).getAllApplications(id, 0, 5)).withRel("applications").getHref();
+            final String href = HOSTNAME + linkTo( methodOn(UserAccountController.class).getAllApplications(accountId, 0, 5)).withRel("applications").getHref();
         }
 
         private class Chats {
             @JsonProperty
-            final String href = HOSTNAME + linkTo( ChatController.class,id).withRel("chats").getHref();
+            final String href = HOSTNAME + linkTo(ChatController.class, accountId).withRel("chats").getHref();
         }
 
         private class Comments {
             @JsonProperty
-            final String href = HOSTNAME + linkTo( CommentController.class,id).withRel("comments").getHref();
+            final String href = HOSTNAME + linkTo( methodOn(CommentController.class, accountId).getAllComments(accountId, 0,5)).withRel("comments").getHref();
         }
 
         private class Ratings {
             @JsonProperty
-            final String href = HOSTNAME + linkTo ( RatingController.class,id).withRel("ratings").getHref();
+            final String href = HOSTNAME + linkTo ( methodOn(RatingController.class, accountId).getRatings(accountId,0,5)).withRel("ratings").getHref();
         }
 
         private class Followers {
             @JsonProperty
-            final String href = HOSTNAME + linkTo( methodOn(FollowsController.class,id).getFollowers(id, 0, 5) ).withRel("followers").getHref();
+            final String href = HOSTNAME + linkTo( methodOn(FollowsController.class, accountId).getFollowers(accountId, 0, 5) ).withRel("followers").getHref();
         }
 
         private class Following {
             @JsonProperty
-            final String href = HOSTNAME + linkTo( methodOn(FollowsController.class,id).getFollowing(id, 0, 5) ).withRel("following").getHref();
+            final String href = HOSTNAME + linkTo( methodOn(FollowsController.class, accountId).getFollowing(accountId, 0, 5) ).withRel("following").getHref();
         }
     }
 }

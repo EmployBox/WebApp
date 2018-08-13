@@ -2,7 +2,7 @@ package isel.ps.employbox.model.output;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import isel.ps.employbox.controllers.RatingController;
+import isel.ps.employbox.controllers.account.RatingController;
 
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 

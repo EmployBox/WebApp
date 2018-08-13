@@ -3,7 +3,7 @@ package isel.ps.employbox.model.output;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import isel.ps.employbox.controllers.ChatController;
+import isel.ps.employbox.controllers.account.ChatController;
 
 import java.sql.Date;
 
