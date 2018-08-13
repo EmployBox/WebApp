@@ -1,6 +1,9 @@
 import React from 'react'
+import {Route, withRouter} from 'react-router-dom'
 import HttpRequest from '../components/httpRequest'
 import URI from 'urijs'
+import URITemplate from 'urijs/src/URITemplate'
+import FollowersTable from './followers'
 
 const style = {
   width: 200,
@@ -9,23 +12,67 @@ const style = {
   borderRadius: '50%'
 }
 
-export default ({auth, match}) => (
-  <HttpRequest
-    method='GET'
-    url={URI.decode(match.params.url)}
-    authorization={auth}
-    onResult={json => (
-      <div>
-        <img style={style} src={json.photo_url} />
-        <h2>{json.name}</h2>
-        <h3>{json.summary}</h3>
-        <h3>{json.rating}</h3>
-        <button >Offered Jobs</button>
-        <button >Curricula</button>
-        <button >Aplications</button>
-        <button >Followers</button>
-        <button >Following</button>
-      </div>
-    )}
-  />
-)
+const offeredJobsTempl = new URITemplate('/account/{userUrl}/offeredJobs/{offeredJobsUrl}')
+const curriculasTempl = new URITemplate('/account/{userUrl}/curriculas/{curriculaUrl}')
+const applicationsTempl = new URITemplate('/account/{userUrl}/applications/{applicationUrl}')
+const followersTempl = new URITemplate('/account/{userUrl}/followers/{followersURL}')
+const followingTempl = new URITemplate('/account/{userUrl}/following/{followingUrl}')
+
+export default withRouter(({auth, match, history}) => {
+  const CollectionButton = ({url, title, pushTo}) => (
+    <HttpRequest url={url} authorization={auth}
+      onResult={json => (
+        <button type='button' onClick={() => history.push(pushTo)} class='btn btn-primary bg-dark'>
+          <div>
+            {json.size} {title}
+          </div>
+        </button>
+      )}
+    />
+  )
+  const FollowersTable1 = (props) => <FollowersTable auth={auth} {...props} />
+  return (
+    <HttpRequest
+      method='GET'
+      url={URI.decode(match.params.url)}
+      authorization={auth}
+      onResult={json => (
+        <div class='text-center'>
+          <img style={style} src={json.photo_url} />
+          <h2>{json.name}</h2>
+          <h3>{json.summary}</h3>
+          <h4>Rating: {json.rating}</h4>
+          <CollectionButton url={json._links.offered_jobs.href} title='Offered Jobs' pushTo={offeredJobsTempl.expand({
+            userUrl: json._links.self.href,
+            offeredJobsUrl: json._links.offered_jobs.href
+          })} />
+          <span> </span>
+          <CollectionButton url={json._links.curricula.href} title='Curriculas' pushTo={curriculasTempl.expand({
+            userUrl: json._links.self.href,
+            curriculaUrl: json._links.curricula.href
+          })} />
+          <span> </span>
+          <CollectionButton url={json._links.applications.href} title='Applications' pushTo={applicationsTempl.expand({
+            userUrl: json._links.self.href,
+            applicationUrl: json._links.applications.href
+          })} />
+          <span> </span>
+          <CollectionButton url={json._links.followers.href} title='Followers' pushTo={followersTempl.expand({
+            userUrl: json._links.self.href,
+            followersURL: json._links.followers.href
+          })} />
+          <span> </span>
+          <CollectionButton url={json._links.following.href} title='Following' pushTo={followingTempl.expand({
+            userUrl: json._links.self.href,
+            followingUrl: json._links.following.href
+          })} />
+          <Route path={`${match.path}/followers/:followersUrl`} component={FollowersTable1} />
+          <Route path={`${match.path}/applications/:applicationsUrl`} render={() => <div>Applications</div>} />
+          <Route path={`${match.path}/offeredJobs/:offeredJobsUrl`} render={() => <div>Offered Jobs</div>} />
+          <Route path={`${match.path}/curriculas/:curriculaUrl`} render={() => <div>Curriculas</div>} />
+          <Route path={`${match.path}/following/:followingUrl`} render={() => <div>Following</div>} />
+        </div>
+      )}
+    />
+  )
+})

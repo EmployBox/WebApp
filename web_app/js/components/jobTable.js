@@ -60,5 +60,15 @@ export default withRouter(({_embedded, history, accountTempl, companyTempl, mode
     )
   }
 
-  return <p>No items found for this criteria</p>
+  return (
+    <div>
+      <p>No items found for this criteria</p>
+      {authenticated
+        ? <div class='col-auto'>
+          <Link class='btn btn-success' to={createJobsURL}>New</Link>
+        </div>
+        : <div />
+      }
+    </div>
+  )
 })
