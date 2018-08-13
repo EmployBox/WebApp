@@ -6,7 +6,6 @@ import com.github.jayield.rapper.mapper.conditions.EqualCondition;
 import com.github.jayield.rapper.unitofwork.UnitOfWork;
 import isel.ps.employbox.ErrorMessages;
 import isel.ps.employbox.exceptions.BadRequestException;
-import isel.ps.employbox.exceptions.ConflictException;
 import isel.ps.employbox.exceptions.ResourceNotFoundException;
 import isel.ps.employbox.model.binders.CollectionPage;
 import isel.ps.employbox.model.entities.Curriculum;
@@ -46,7 +45,7 @@ public class ProjectService {
             String email
     ) {
         if(project.getAccountId() != accountId || project.getCurriculumId() != curriculumId)
-            throw new ConflictException(ErrorMessages.BAD_REQUEST_IDS_MISMATCH);
+            throw new BadRequestException(ErrorMessages.BAD_REQUEST_ITEM_CREATION);
         UnitOfWork unitOfWork = new UnitOfWork();
 
         DataMapper<Project, Long> projectMapper = getMapper(Project.class, unitOfWork);

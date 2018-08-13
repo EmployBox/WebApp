@@ -1,5 +1,6 @@
 package isel.ps.employbox.controllers;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.jayield.rapper.mapper.DataMapper;
 import com.github.jayield.rapper.mapper.conditions.EqualCondition;
 import com.github.jayield.rapper.unitofwork.UnitOfWork;
@@ -7,6 +8,7 @@ import isel.ps.employbox.controllers.curricula.CurriculumControllerTests;
 import isel.ps.employbox.model.entities.Account;
 import isel.ps.employbox.model.entities.Rating;
 import isel.ps.employbox.model.entities.UserAccount;
+import isel.ps.employbox.model.input.InRating;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -17,6 +19,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.ApplicationContext;
+import org.springframework.http.MediaType;
 import org.springframework.restdocs.JUnitRestDocumentation;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -28,6 +31,7 @@ import static com.github.jayield.rapper.mapper.MapperRegistry.getMapper;
 import static isel.ps.employbox.DataBaseUtils.prepareDB;
 import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.assertFalse;
+import static junit.framework.TestCase.assertTrue;
 import static org.junit.Assert.assertNotNull;
 import static org.springframework.restdocs.webtestclient.WebTestClientRestDocumentation.document;
 import static org.springframework.restdocs.webtestclient.WebTestClientRestDocumentation.documentationConfiguration;
@@ -44,7 +48,8 @@ public class RatingControllerTests {
     private ApplicationContext context;
 
     private WebTestClient webTestClient;
-    private UserAccount userAccount, userAccount2, company1;
+    private UserAccount userAccount, userAccount2;
+    private Account company1;
     private Rating rating;
 
 
@@ -72,7 +77,7 @@ public class RatingControllerTests {
 
         List<Account> accounts = accountMapper.find(new EqualCondition<>("name", "company1")).join();
         assertEquals(1, accounts.size());
-        company1 = userAccounts.get(0);
+        company1 = accounts.get(0);
 
         DataMapper<Rating, Rating.RatingKey> commentsMapper = getMapper(Rating.class, unitOfWork);
         List<Rating> ratings = commentsMapper.find(new EqualCondition<>("accountIdFrom", userAccount.getIdentityKey())).join();
@@ -117,7 +122,7 @@ public class RatingControllerTests {
                 .consumeWith(document("getAllRatings"));
     }
 
-    /*
+
     @Test
     @WithMockUser(username = "teste@gmail.com")
     public void testCreateRating() throws Exception {
@@ -145,7 +150,7 @@ public class RatingControllerTests {
         DataMapper<Rating, Rating.RatingKey> ratingMapper = getMapper(Rating.class, unitOfWork);
         assertTrue(ratingMapper.find( new EqualCondition<>("assiduity", 5.0)).join().size() != 0);
         unitOfWork.commit().join();
-    }*/
+    }
 
     @Test
     @WithMockUser(username = "teste@gmail.com")

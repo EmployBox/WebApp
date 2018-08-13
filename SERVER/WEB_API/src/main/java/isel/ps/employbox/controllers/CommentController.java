@@ -48,10 +48,11 @@ public class CommentController {
     public Mono<Void> updateComment(
             @PathVariable long accountId,
             @PathVariable long commentId,
-            @RequestBody InComment inComment
+            @RequestBody InComment inComment,
+            Authentication authentication
     ){
         if(accountId != inComment.getAccountIdFrom() || commentId != inComment.getCommmentId()) throw new BadRequestException(BAD_REQUEST_IDS_MISMATCH);
-        return commentService.updateComment(commentBinder.bindInput(inComment));
+        return commentService.updateComment(commentBinder.bindInput(inComment),authentication.getName());
     }
 
     @PostMapping

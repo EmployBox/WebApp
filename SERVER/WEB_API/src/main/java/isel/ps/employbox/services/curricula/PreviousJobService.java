@@ -7,7 +7,6 @@ import com.github.jayield.rapper.mapper.conditions.EqualCondition;
 import com.github.jayield.rapper.unitofwork.UnitOfWork;
 import isel.ps.employbox.ErrorMessages;
 import isel.ps.employbox.exceptions.BadRequestException;
-import isel.ps.employbox.exceptions.ConflictException;
 import isel.ps.employbox.model.binders.CollectionPage;
 import isel.ps.employbox.model.entities.curricula.childs.PreviousJobs;
 import isel.ps.employbox.services.ServiceUtils;
@@ -28,7 +27,7 @@ public class PreviousJobService {
 
     public CompletableFuture<CollectionPage<PreviousJobs>> getCurriculumPreviousJobs(long userId, long curriculumId, int page, int pageSize) {
         UnitOfWork unitOfWork = new UnitOfWork();
-        DataMapper<PreviousJobs, Long> previousJobsMapper = MapperRegistry.getMapper(PreviousJobs.class, unitOfWork);
+
         CompletableFuture<CollectionPage<PreviousJobs>> future = curriculumService.getCurriculum(userId, curriculumId)
                 .thenCompose(__ -> ServiceUtils.getCollectionPageFuture(PreviousJobs.class, page, pageSize, new EqualCondition<>("curriculumId", curriculumId)));
         return handleExceptions(future, unitOfWork);
@@ -41,7 +40,7 @@ public class PreviousJobService {
             String email
     ) {
         if(previousJobs.getAccountId() != accountId || previousJobs.getCurriculumId() != curriculumId)
-            throw new ConflictException(ErrorMessages.BAD_REQUEST_IDS_MISMATCH);
+            throw new BadRequestException(ErrorMessages.BAD_REQUEST_IDS_MISMATCH);
         UnitOfWork unitOfWork = new UnitOfWork();
         DataMapper<PreviousJobs, Long> previousJobsMapper = MapperRegistry.getMapper(PreviousJobs.class, unitOfWork);
         CompletableFuture<PreviousJobs> future = curriculumService.getCurriculum(accountId, curriculumId, email)

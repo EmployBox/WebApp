@@ -50,19 +50,23 @@ public class CommentService {
         return handleExceptions(future, unitOfWork);
     }
 
-    public Mono<Void> updateComment(Comment comment) {
+    public Mono<Void> updateComment(Comment comment, String email) {
         UnitOfWork unitOfWork = new UnitOfWork();
         DataMapper<Comment, Long> commentMapper = getMapper(Comment.class, unitOfWork);
 
-        CompletableFuture<Void> future = commentMapper.find(
-                new EqualCondition<>("commentId", comment.getIdentityKey()),
-                new EqualCondition<>("accountIdFrom", comment.getAccountIdFrom()),
-                new EqualCondition<>("accountIdDest", comment.getAccountIdDest())
-        ).thenCompose(commentRes -> {
-            if (commentRes.size() == 0)
-                throw new ResourceNotFoundException(ErrorMessages.RESOURCE_NOTFOUND_COMMENT);
-            return commentMapper.update(comment);
-        }).thenCompose(res -> unitOfWork.commit());
+        CompletableFuture<Void> future = accountService.getAccount(comment.getAccountIdFrom(), email)
+                .thenCompose(__ ->
+                        commentMapper.find(
+                                new EqualCondition<>("commentId", comment.getIdentityKey()),
+                                new EqualCondition<>("accountIdFrom", comment.getAccountIdFrom()),
+                                new EqualCondition<>("accountIdDest", comment.getAccountIdDest())
+                        )
+                ).thenCompose(commentRes -> {
+                    if (commentRes.size() == 0)
+                        throw new ResourceNotFoundException(ErrorMessages.RESOURCE_NOTFOUND_COMMENT);
+                    return commentMapper.update(comment);
+                }).thenCompose(res -> unitOfWork.commit());
+
         return Mono.fromFuture(
                 handleExceptions(future, unitOfWork)
         );
