@@ -44,21 +44,26 @@ export default withRouter(({_embedded, history, accountTempl, companyTempl, mode
     </table>
 
     return (
-      <div>
-        {authenticated
-          ? <div class='row'>
-            <div class='col'>
-              {table}
-            </div>
-            <div class='col-auto'>
-              <Link class='btn btn-success' to={createJobsURL}>New</Link>
-            </div>
-          </div>
-          : <div>{table}</div>
-        }
+      <div class='row'>
+        <div class='col'>
+          {table}
+        </div>
+        <div class='col-auto'>
+          <Link class='btn btn-success' to={createJobsURL}>New</Link>
+        </div>
       </div>
     )
   }
 
-  return <p>No items found for this criteria</p>
+  return (
+    <div>
+      <p>No items found for this criteria</p>
+      {authenticated
+        ? <div class='col-auto'>
+          <Link class='btn btn-success' to={createJobsURL}>New</Link>
+        </div>
+        : <div />
+      }
+    </div>
+  )
 })

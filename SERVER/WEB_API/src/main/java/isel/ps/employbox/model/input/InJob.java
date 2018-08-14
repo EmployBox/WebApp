@@ -22,6 +22,7 @@ public class InJob {
     private String offerType;
     private String country;
     private String district;
+    private String city;
     private double longitude;
     private double latitude;
     private long version;
@@ -126,5 +127,45 @@ public class InJob {
 
     public void setApplications(List<Application> applications) {
         this.applications = applications;
+    }
+
+    public String getCountry() {
+        return country;
+    }
+
+    public void setCountry(String country) {
+        this.country = country;
+    }
+
+    public String getDistrict() {
+        return district;
+    }
+
+    public void setDistrict(String district) {
+        this.district = district;
+    }
+
+    public String getCity() {
+        return city;
+    }
+
+    public void setCity(String city) {
+        this.city = city;
+    }
+
+    public double getLongitude() {
+        return longitude;
+    }
+
+    public void setLongitude(double longitude) {
+        this.longitude = longitude;
+    }
+
+    public double getLatitude() {
+        return latitude;
+    }
+
+    public void setLatitude(double latitude) {
+        this.latitude = latitude;
     }
 }
