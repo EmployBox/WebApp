@@ -30,7 +30,6 @@ export default withRouter(({auth, match, history}) => {
       )}
     />
   )
-  const FollowersTable1 = (props) => <FollowersTable auth={auth} {...props} />
   return (
     <HttpRequest
       method='GET'
@@ -66,11 +65,13 @@ export default withRouter(({auth, match, history}) => {
             userUrl: json._links.self.href,
             followingUrl: json._links.following.href
           })} />
-          <Route path={`${match.path}/followers/:followersUrl`} component={FollowersTable1} />
-          <Route path={`${match.path}/applications/:applicationsUrl`} render={() => <div>Applications</div>} />
-          <Route path={`${match.path}/offeredJobs/:offeredJobsUrl`} render={() => <div>Offered Jobs</div>} />
-          <Route path={`${match.path}/curriculas/:curriculaUrl`} render={() => <div>Curriculas</div>} />
-          <Route path={`${match.path}/following/:followingUrl`} render={() => <div>Following</div>} />
+          <Route path={`${match.path}/followers/:followersUrl`} component={(props) =>
+            <FollowersTable auth={auth} url={URI.decode(props.match.params.followersUrl)} template={followersTempl} {...props} />} />
+          <Route path={`${match.path}/applications/:applicationsUrl`} component={(props) => <ApplicationsTable auth={auth} {...props} />} />
+          <Route path={`${match.path}/offeredJobs/:offeredJobsUrl`} component={(props) => <JobsTable auth={auth} {...props} />} />
+          <Route path={`${match.path}/curriculas/:curriculaUrl`} component={(props) => <CurriculasTable auth={auth} {...props} />} />
+          <Route path={`${match.path}/following/:followingUrl`} component={(props) =>
+            <FollowersTable auth={auth} url={URI.decode(props.match.params.followingUrl)} template={followingTempl} {...props} />} />
         </div>
       )}
     />
