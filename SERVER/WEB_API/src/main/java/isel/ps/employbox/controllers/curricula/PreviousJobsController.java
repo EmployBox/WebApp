@@ -46,7 +46,7 @@ public class PreviousJobsController {
             @PathVariable long id,
             @PathVariable long cid,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "5") int pageSize
+            @RequestParam(defaultValue = "10") int pageSize
     ){
         CompletableFuture<HalCollectionPage<PreviousJobs>> future = previousJobService.getCurriculumPreviousJobs(id, cid, page, pageSize)
                 .thenCompose(previousJobsCollectionPage -> previousJobsBinder.bindOutput(previousJobsCollectionPage, this.getClass(), id, cid));

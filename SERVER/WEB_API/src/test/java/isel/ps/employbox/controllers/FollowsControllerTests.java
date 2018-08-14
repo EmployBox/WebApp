@@ -1,10 +1,12 @@
 package isel.ps.employbox.controllers;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.jayield.rapper.mapper.DataMapper;
 import com.github.jayield.rapper.mapper.conditions.EqualCondition;
 import com.github.jayield.rapper.unitofwork.UnitOfWork;
 import isel.ps.employbox.controllers.curricula.CurriculumControllerTests;
-import isel.ps.employbox.model.entities.Comment;
+import isel.ps.employbox.model.entities.Follows;
 import isel.ps.employbox.model.entities.UserAccount;
 import org.junit.After;
 import org.junit.Before;
@@ -17,15 +19,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.ApplicationContext;
 import org.springframework.restdocs.JUnitRestDocumentation;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
+import java.io.IOException;
 import java.util.List;
 
 import static com.github.jayield.rapper.mapper.MapperRegistry.getMapper;
 import static isel.ps.employbox.DataBaseUtils.prepareDB;
 import static junit.framework.TestCase.assertEquals;
-import static org.springframework.restdocs.webtestclient.WebTestClientRestDocumentation.document;
 import static org.springframework.restdocs.webtestclient.WebTestClientRestDocumentation.documentationConfiguration;
 import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.springSecurity;
 import static org.springframework.web.reactive.function.client.ExchangeFilterFunctions.basicAuthentication;
@@ -42,7 +45,7 @@ public class FollowsControllerTests {
 
     private WebTestClient webTestClient;
     private UserAccount userAccount, userAccount2;
-    private Comment comment;
+    private Follows follows;
 
 
     @Before
@@ -64,10 +67,12 @@ public class FollowsControllerTests {
         assertEquals(1, userAccounts.size());
         userAccount2 = userAccounts.get(0);
 
-        DataMapper<Comment, Long> commentsMapper = getMapper(Comment.class, unitOfWork);
-        List<Comment> comments = commentsMapper.find(new EqualCondition<>("TEXT", "FIRST COMMENT")).join();
-        assertEquals(1, comments.size());
-        comment = comments.get(0);
+
+
+        DataMapper<Follows, Follows.FollowKey> commentsMapper = getMapper(Follows.class, unitOfWork);
+        List<Follows> comments = commentsMapper.find(new EqualCondition<>("accountIdFollower", userAccount.getIdentityKey())).join();
+        assertEquals(2, comments.size());
+        follows = comments.get(0);
 
         unitOfWork.commit().join();
     }
@@ -80,13 +85,32 @@ public class FollowsControllerTests {
     }
 
     @Test
-    public void testGetAllComments(){
-        webTestClient
+    @WithMockUser(username = "teste@gmail.com")
+    public void testGetAllFollowedOrFollowerAccounts() throws IOException {
+
+        String body = new String(webTestClient
                 .get()
-                .uri("/accounts/"+userAccount.getIdentityKey()+"/comments")
+                .uri("/accounts/"+userAccount.getIdentityKey()+"/followers")
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody()
-                .consumeWith(document("getAllComments"));
+                .returnResult()
+                .getResponseBody());
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        JsonNode jsonNode = objectMapper.readTree(body);
+        assertEquals(jsonNode.get("size").asInt(),2);
+
+        body = new String(webTestClient
+                .get()
+                .uri("/accounts/"+userAccount2.getIdentityKey()+"/followers")
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody()
+                .returnResult()
+                .getResponseBody());
+
+        jsonNode = objectMapper.readTree(body);
+        assertEquals(jsonNode.get("size").asInt(),1);
     }
 }

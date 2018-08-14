@@ -76,6 +76,7 @@ public class JobService {
         UnitOfWork unitOfWork = new UnitOfWork();
         DataMapper<JobExperience, Long> jobExperienceMapper = getMapper(JobExperience.class, unitOfWork);
 
+
         CompletableFuture<JobExperience> future = jobExperienceMapper.findById( cid)
                 .thenCompose(res -> unitOfWork.commit().thenApply(aVoid -> res))
                 .thenApply(oJobExperience -> oJobExperience.orElseThrow(() -> new ResourceNotFoundException(ErrorMessages.RESOURCE_NOTFOUND)))
@@ -91,6 +92,8 @@ public class JobService {
         UnitOfWork unitOfWork = new UnitOfWork();
         DataMapper<Job, Long> jobMapper = getMapper(Job.class, unitOfWork);
         DataMapper<JobExperience, Long> jobExperienceMapper = getMapper(JobExperience.class, unitOfWork);
+        DataMapper<Application, Long> jobApplicationMapper = getMapper(Application.class, unitOfWork);
+
         CompletableFuture<Job> future = job.getAccount().getForeignObject(unitOfWork)
                 .thenApply(account -> {
                     if (!account.getEmail().equals(email))
@@ -98,15 +101,23 @@ public class JobService {
                     return account;
                 })
                 .thenCompose(account -> jobMapper.create( job))
+                .thenCompose(aVoid -> job.getApplications().apply(unitOfWork))
+                .thenCompose(applicationList -> {
+                    if (applicationList.isEmpty()) return CompletableFuture.completedFuture(null);
+                    else {
+                        applicationList.forEach(curr -> curr.setJobId(job.getIdentityKey()));
+                        return jobApplicationMapper.createAll(applicationList);
+                    }
+                })
                 .thenCompose(aVoid -> job.getExperiences().apply(unitOfWork))
                 .thenCompose(experienceList -> {
                     if (experienceList.isEmpty()) return CompletableFuture.completedFuture(null);
-
-                    experienceList.forEach(curr -> curr.setJobId(job.getIdentityKey()));
-
-                    return jobExperienceMapper.createAll(experienceList);
+                    else {
+                        experienceList.forEach(curr -> curr.setJobId(job.getIdentityKey()));
+                        return jobExperienceMapper.createAll(experienceList);
+                    }
                 })
-                .thenCompose(ignored -> unitOfWork.commit().thenApply(aVoid -> job));
+                .thenCompose(__ -> unitOfWork.commit().thenApply(aVoid -> job));
         return handleExceptions(future, unitOfWork);
     }
 

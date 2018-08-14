@@ -8,6 +8,7 @@ import com.github.jayield.rapper.annotations.Version;
 import com.github.jayield.rapper.exceptions.DataMapperException;
 import com.github.jayield.rapper.mapper.externals.Foreign;
 import com.github.jayield.rapper.unitofwork.UnitOfWork;
+import isel.ps.employbox.exceptions.ResourceNotFoundException;
 
 import java.sql.Timestamp;
 import java.util.List;
@@ -96,7 +97,7 @@ public class Job implements DomainObject<Long> {
         UnitOfWork unitOfWork = new UnitOfWork();
         this.account = new Foreign(accountId, unit -> getMapper(Account.class, unitOfWork).findById( accountId)
                 .thenCompose( res -> unitOfWork.commit().thenApply( __-> res))
-                .thenApply(account1 -> account1.orElseThrow(() -> new DataMapperException("Account not Found"))));
+                .thenApply(account1 -> account1.orElseThrow(() -> new ResourceNotFoundException("Account not Found"))));
         this.jobId = jobId;
         this.title = title;
         this.address = address;

@@ -22,6 +22,7 @@ import static isel.ps.employbox.services.ServiceUtils.handleExceptions;
 public class FollowService {
     private final AccountService accountService;
 
+
     public FollowService(AccountService accountRepo) {
         this.accountService = accountRepo;
     }
@@ -37,17 +38,37 @@ public class FollowService {
     private CompletableFuture<CollectionPage<Account>> getAccountFromFollowAux(long followId, String collumn, int page, int pageSize) {
         UnitOfWork unitOfWork = new UnitOfWork();
         DataMapper<Follows, Follows.FollowKey> followMapper = getMapper(Follows.class, unitOfWork);
+        DataMapper<Account, Long> accountMapper = getMapper(Account.class, unitOfWork);
 
-        CompletableFuture future = followMapper.find(new EqualCondition<>(collumn, followId))
-                .thenCompose(res -> unitOfWork.commit().thenApply(aVoid -> res))
-                .thenCompose(follow -> {
-                    List<Condition<Long>> pairs = new ArrayList<>();
-                    follow.forEach(curr -> pairs.add(new EqualCondition<Long>("accountId", curr.getAccountIdFollowed())));
-                    Condition[] query = pairs.stream()
-                            .filter(stringStringPair -> stringStringPair.getValue() != null)
-                            .toArray(Condition[]::new);
-                    return ServiceUtils.getCollectionPageFuture(Account.class, page, pageSize, query);
-                });
+        long [] numberOfFolloewEntries = new long[1];
+        Condition followsQuery = new EqualCondition<>(collumn, followId);
+        ArrayList<CompletableFuture<List<Account>>> accountsFutures = new ArrayList<>();
+
+        CompletableFuture future =
+                followMapper.getNumberOfEntries(followsQuery).thenCompose(
+                        numberOfEntries -> {
+                            numberOfFolloewEntries[0] = numberOfEntries;
+                            return followMapper.find(page, pageSize, followsQuery);
+                        }
+                )
+                        .thenCompose(follow -> {
+
+                            for (int i = 0; i < follow.size(); i++)
+                                if (collumn.compareTo("accountIdFollowed") == 0)
+                                    accountsFutures.add(accountMapper.find(page, pageSize, new EqualCondition<Long>("accountId", follow.get(i).getAccountIdFollowed())));
+                                else
+                                    accountsFutures.add(accountMapper.find(page, pageSize, new EqualCondition<Long>("accountId", follow.get(i).getAccountIdFollower())));
+
+                            return CompletableFuture.allOf(accountsFutures.toArray(new CompletableFuture[accountsFutures.size()]));
+                        }).thenCompose(res -> unitOfWork.commit().thenApply(aVoid -> res))
+                        .thenApply(res -> {
+                                    List<Account> accountsList = new ArrayList();
+                                    for (int i = 0; i < accountsFutures.size(); i++)
+                                        accountsList.addAll(accountsFutures.get(i).join());
+
+                                    return new CollectionPage<Account>(numberOfFolloewEntries[0], pageSize, page, accountsList);
+                                }
+                        );
         return handleExceptions(future, unitOfWork);
     }
 

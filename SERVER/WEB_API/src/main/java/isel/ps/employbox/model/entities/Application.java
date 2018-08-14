@@ -11,7 +11,7 @@ public class Application implements DomainObject<Long> {
     @Id(isIdentity = true)
     private final long applicationId;
     private final long accountId;
-    private final long jobId;
+    private long jobId;
     private final Long curriculumId;
     private final Timestamp date;
     @Version
@@ -68,6 +68,10 @@ public class Application implements DomainObject<Long> {
 
     public long getAccountId() {
         return accountId;
+    }
+
+    public void setJobId(long jobId) {
+        this.jobId = jobId;
     }
 
 }

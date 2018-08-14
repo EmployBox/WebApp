@@ -4,8 +4,10 @@ export default class {
     this.loginUrl = loginUrl
   }
 
-  authenticate (auth) {
+  authenticate (auth, json) {
     this.auth = auth
+    this.accountId = json.accountId
+    this.self = json._links.self.href
   }
 
   unAuthenticate () {

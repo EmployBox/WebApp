@@ -46,7 +46,7 @@ public class ProjectsController {
             @PathVariable long id,
             @PathVariable long cid,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "5") int pageSize
+            @RequestParam(defaultValue = "10") int pageSize
     ) {
         CompletableFuture<HalCollectionPage<Project>> future = projectService.getCurriculumProjects(cid, page, pageSize)
                 .thenCompose(projectCollectionPage -> projectBinder.bindOutput(projectCollectionPage, this.getClass(), id, cid));

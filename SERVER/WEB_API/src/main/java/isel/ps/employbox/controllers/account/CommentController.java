@@ -30,7 +30,7 @@ public class CommentController {
     public Mono<HalCollectionPage<Comment>> getAllComments(
             @PathVariable long accountId,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "5") int pageSize
+            @RequestParam(defaultValue = "10") int pageSize
     ) {
         CompletableFuture<HalCollectionPage<Comment>> future = commentService.getComments(accountId, page, pageSize)
                 .thenCompose(commentCollectionPage -> commentBinder.bindOutput(commentCollectionPage, this.getClass(), accountId));

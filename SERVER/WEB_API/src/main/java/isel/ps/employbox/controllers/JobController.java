@@ -34,11 +34,11 @@ public class JobController {
         this.jobBinder = jobBinder;
         this.jobExperienceBinder = jobExperienceBinder;
     }
-
+    //todo application
     @GetMapping
     public Mono<HalCollectionPage<Job>> getAllJobs(
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "5") int pageSize,
+            @RequestParam(defaultValue = "10") int pageSize,
             @RequestParam(required = false) String address,
             @RequestParam(required = false) String title,
             @RequestParam(required = false) Integer wage,
@@ -63,7 +63,7 @@ public class JobController {
     public Mono<HalCollectionPage<JobExperience>> getJobExperiences(
             @PathVariable long jid,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "5") int pageSize
+            @RequestParam(defaultValue = "10") int pageSize
     ) {
         CompletableFuture<HalCollectionPage<JobExperience>> future = jobService.getJobExperiences(jid, page, pageSize)
                 .thenCompose(jobExperienceCollectionPage -> jobExperienceBinder.bindOutput(jobExperienceCollectionPage, this.getClass(), jid));

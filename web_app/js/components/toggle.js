@@ -20,7 +20,7 @@ export default class extends React.Component {
     const { text, children } = this.props
     return (
       <div>
-        <button className='btn btn-primary bg-dark btn-lg btn-block' onClick={this.onClickAction}>{text}</button>
+        <button className='btn btn-primary bg-dark btn-lg btn-block text-left' onClick={this.onClickAction}>{text}</button>
         <br />
         {showing ? children : <div />}
       </div>

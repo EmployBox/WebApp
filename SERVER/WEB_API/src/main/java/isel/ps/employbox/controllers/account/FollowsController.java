@@ -26,7 +26,7 @@ public class FollowsController {
     public Mono<HalCollectionPage<Account>> getFollowers(
             @PathVariable long accountId,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "5") int pageSize
+            @RequestParam(defaultValue = "10") int pageSize
     ){
         CompletableFuture<HalCollectionPage<Account>> future = followService.getAccountFollowers(accountId, page, pageSize)
                 .thenCompose(accountCollectionPage -> accountBinder.bindOutput(accountCollectionPage, this.getClass(), accountId));
@@ -37,7 +37,7 @@ public class FollowsController {
     public Mono<HalCollectionPage<Account>> getFollowing(
             @PathVariable long accountId,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "5") int pageSize
+            @RequestParam(defaultValue = "10") int pageSize
 
     ){
         CompletableFuture<HalCollectionPage<Account>> future = followService.getAccountFolloweds(accountId, page, pageSize)

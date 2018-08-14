@@ -32,7 +32,7 @@ public class RatingController {
     public Mono<HalCollectionPage<Rating>> getRatings(
             @PathVariable long accountId,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "5") int pageSize
+            @RequestParam(defaultValue = "10") int pageSize
     ){
         CompletableFuture<HalCollectionPage<Rating>> future = ratingService.getRatings(accountId, page, pageSize)
                 .thenCompose(ratingCollectionPage -> ratingBinder.bindOutput(ratingCollectionPage, this.getClass(), accountId));
