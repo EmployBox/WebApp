@@ -38,7 +38,7 @@ public class ChatController {
             @PathVariable long id,
             @PathVariable long cid,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "5") int pageSize,
+            @RequestParam(defaultValue = "10") int pageSize,
             Authentication authentication
     ) {
         CompletableFuture<HalCollectionPage<Message>> future = chatService.getAccountChatsMessages(id, authentication.getName(), page, pageSize)

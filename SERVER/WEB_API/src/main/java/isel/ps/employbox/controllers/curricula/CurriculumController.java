@@ -33,7 +33,7 @@ public class CurriculumController {
     public Mono<HalCollectionPage<Curriculum>> getCurricula(
             @PathVariable long id,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "5") int pageSize
+            @RequestParam(defaultValue = "10") int pageSize
     ){
         CompletableFuture<HalCollectionPage<Curriculum>> future = curriculumService.getCurricula(id, page, pageSize)
                 .thenCompose(curriculumCollectionPage -> curriculumBinder.bindOutput(curriculumCollectionPage, this.getClass(), id));

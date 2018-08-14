@@ -36,7 +36,7 @@ public class UserAccountController {
     @GetMapping
     public Mono<HalCollectionPage<UserAccount>> getAllUsers(
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "5") int pageSize,
+            @RequestParam(defaultValue = "10") int pageSize,
             @RequestParam(required = false) String name,
             @RequestParam(required = false) Integer ratingLow,
             @RequestParam(required = false) Integer ratingHigh
@@ -57,7 +57,7 @@ public class UserAccountController {
     public Mono<HalCollectionPage<Application>> getAllApplications(
             @PathVariable long id,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "5") int pageSize
+            @RequestParam(defaultValue = "10") int pageSize
     ){
         CompletableFuture<HalCollectionPage<Application>> future = userAccountService.getAllApplications(id, page, pageSize)
                 .thenCompose(applicationCollectionPage -> applicationBinder.bindOutput(applicationCollectionPage, this.getClass(), id));

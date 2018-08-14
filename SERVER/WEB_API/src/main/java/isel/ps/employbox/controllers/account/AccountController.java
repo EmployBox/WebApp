@@ -29,7 +29,7 @@ public class AccountController {
     @GetMapping
     public Mono<HalCollectionPage<Account>> getAccounts(
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "5") int pageSize
+            @RequestParam(defaultValue = "10") int pageSize
     ){
         return Mono.fromFuture(accountService.getAllAccounts(page, pageSize).thenCompose(res -> accountBinder.bindOutput(res, AccountController.class)) );
     }
@@ -38,7 +38,7 @@ public class AccountController {
     public Mono<HalCollectionPage<Job>> getOfferedJobs(
             @PathVariable long accountId,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "5") int pageSize
+            @RequestParam(defaultValue = "10") int pageSize
     ){
 
         return Mono.fromFuture(

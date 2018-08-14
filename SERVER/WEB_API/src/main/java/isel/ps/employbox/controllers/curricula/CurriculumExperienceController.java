@@ -45,7 +45,7 @@ public class CurriculumExperienceController {
             @PathVariable long id,
             @PathVariable long cid,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "5") int pageSize
+            @RequestParam(defaultValue = "10") int pageSize
     ){
         CompletableFuture<HalCollectionPage<CurriculumExperience>> future = curriculumExperienceService.getCurriculumExperiences(cid, page, pageSize)
                 .thenCompose(curriculumExperienceCollectionPage -> curriculumExperienceBinder.bindOutput(curriculumExperienceCollectionPage, this.getClass(), id, cid));

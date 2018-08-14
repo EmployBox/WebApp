@@ -39,7 +39,7 @@ public class AcademicBackgroundController {
             @PathVariable long id,
             @PathVariable long cid,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "5") int pageSize
+            @RequestParam(defaultValue = "10") int pageSize
     ) {
         CompletableFuture<HalCollectionPage<AcademicBackground>> future = academicBackgroundService.getCurriculumAcademicBackgrounds(cid, page, pageSize)
                 .thenCompose(academicBackgroundCollectionPage -> academicBackgroundBinder.bindOutput(academicBackgroundCollectionPage, this.getClass(), id, cid));
