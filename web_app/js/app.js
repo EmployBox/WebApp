@@ -130,16 +130,13 @@ export default class extends Component {
                     <SignUp signUpUser={() => history.push(signUpUserTempl.expand({ url: match.params.urlUser }))}
                       signUpCompany={() => history.push(signUpCompanyTempl.expand({ url: match.params.urlCompany }))} />}
                   />
-                  <Route exact path='/create/jobs/:jobUrl' render={({ history, match }) =>
-                    <CreateJobs url={URI.decode(match.params.url)} />}
-                  />
                   <Route exact path='/login/:url' render={({ history, match }) =>
                     <LogIn url={URI.decode(match.params.url)}
                       ToLogin={(json, auth) => {
                         this.setState(oldstate => {
                           oldstate.authenticated = true
                           oldstate.self = json['_links'].self.href
-                          auther.authenticate(auth)
+                          auther.authenticate(auth, json)
                           return oldstate
                         })
                         history.push(URI.parseQuery(history.location.search).redirect || '/')
@@ -154,12 +151,13 @@ export default class extends Component {
                     />
                   )} />
                   <PrivateRoute path='/account/:url' component={Profile} />
+                  <PrivateRoute exact path='/create/jobs/:jobUrl' component={CreateJobs} />
                   <PrivateRoute exact path='/company/:url' component={Company} />
                   <PrivateRoute exact path='/account/:userUrl/followers/:followersUrl' component={FollwersTable} />
                   <Route path='/' render={({ history }) =>
-                    <center class='py-5'>
-                      <h2>Page not found</h2>
-                      <button onClick={() => history.push('/')}>home</button>
+                    <center class='py-5 alert alert-danger' role='alert'>
+                      <h2>Error 404.</h2>
+                      <p>The requested URL {history.location.pathname} was not found on web application.</p>
                     </center>
                   } />
                 </Switch>
