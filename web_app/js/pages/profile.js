@@ -4,6 +4,7 @@ import HttpRequest from '../components/httpRequest'
 import URI from 'urijs'
 import URITemplate from 'urijs/src/URITemplate'
 import FollowersTable from './followers'
+import JobsTable from './offered-jobs'
 
 const style = {
   width: 200,
