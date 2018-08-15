@@ -3,9 +3,9 @@ CREATE PROCEDURE populateDB()
   begin atomic
     declare account_id1, account_id2, company_id1, company_id2, job_id, curriculum_id bigint;
     /*Insert Users*/
-    insert into ACCOUNT(NAME, EMAIL, PASSWORD, ACCOUNTTYPE) values ('Bruno', 'teste@gmail.com', 'password', 'USR');
+    insert into ACCOUNT(NAME, EMAIL, PASSWORD, ACCOUNTTYPE, RATING) values ('Bruno', 'teste@gmail.com', 'password', 'USR', 2.0);
     set account_id1 = IDENTITY();
-    insert into ACCOUNT(NAME, EMAIL, PASSWORD, ACCOUNTTYPE) values ('Maria', 'lol@hotmail.com', 'teste123', 'USR');
+    insert into ACCOUNT(NAME, EMAIL, PASSWORD, ACCOUNTTYPE, RATING) values ('Maria', 'lol@hotmail.com', 'teste123', 'USR', 4.0);
     set account_id2 = IDENTITY();
 
     insert into USERACCOUNT(ACCOUNTID) values (account_id1);

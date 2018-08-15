@@ -45,13 +45,21 @@ public class FollowsController {
         return Mono.fromFuture(future);
     }
 
-    @PutMapping("/followers/{fid}")
-    public Mono<Void> setFollower(@PathVariable long id, @PathVariable long fid,  Authentication authentication){
-        return followService.createFollower(id, fid, authentication.getName());
+    @PutMapping("/followers")
+    public Mono<Void> setFollower(
+            @PathVariable long accountId,
+            @RequestParam long accountToBeFollowedId,
+            Authentication authentication)
+    {
+        return followService.createFollower(accountId, accountToBeFollowedId, authentication.getName());
     }
 
-    @DeleteMapping("/followers/{fid}")
-    public Mono<Void> deleteFollower(@PathVariable long id, @PathVariable long fid, Authentication authentication){
-        return followService.deleteFollower(id, fid, authentication.getName());
+    @DeleteMapping("/followers")
+    public Mono<Void> deleteFollower(
+            @PathVariable long id,
+            @RequestParam long accountToBeFollowedId,
+            Authentication authentication)
+    {
+        return followService.deleteFollower(id, accountToBeFollowedId, authentication.getName());
     }
 }

@@ -3,6 +3,7 @@ package isel.ps.employbox.services;
 import com.github.jayield.rapper.mapper.DataMapper;
 import com.github.jayield.rapper.mapper.conditions.Condition;
 import com.github.jayield.rapper.mapper.conditions.EqualCondition;
+import com.github.jayield.rapper.mapper.conditions.OrderCondition;
 import com.github.jayield.rapper.unitofwork.UnitOfWork;
 import isel.ps.employbox.ErrorMessages;
 import isel.ps.employbox.exceptions.BadRequestException;
@@ -30,13 +31,35 @@ import static isel.ps.employbox.services.ServiceUtils.handleExceptions;
 @Service
 public class UserAccountService {
 
-    public CompletableFuture<CollectionPage<UserAccount>> getAllUsers(int page, int pageSize, String name, Integer ratingLow, Integer ratingHigh) {
-        List<Condition<String>> pairs = new ArrayList<>();
-        pairs.add(new EqualCondition<>("name", name));
-        Condition[] query = pairs.stream()
-                .filter(stringStringPair -> stringStringPair.getValue() != null)
-                .toArray(Condition[]::new);
-        return ServiceUtils.getCollectionPageFuture(UserAccount.class, page, pageSize, query);
+    public CompletableFuture<CollectionPage<UserAccount>> getAllUsers(
+            int page,
+            int pageSize,
+            String name,
+            Integer ratingLow,
+            Integer ratingHigh,
+            String orderColumn,
+            String orderClause)
+    {
+        List<Condition> pairs = new ArrayList<>();
+        if(ratingLow != null && ratingHigh != null) {
+            if(ratingLow > ratingHigh)
+                throw new BadRequestException("ratingLow cannot be higher than ratingHigh");
+
+            pairs.add(new Condition<>("ratingLow", ">=", ratingLow ));
+            pairs.add(new Condition<>("ratingHigh", "<=", ratingHigh ));
+        }
+
+        if(name != null)
+            pairs.add(new EqualCondition<>("name", name));
+        if(orderColumn != null){
+            if((orderColumn.compareTo("name")==0 || orderColumn.compareTo("rating")!= 0) && !(orderClause.compareTo("ASC")==0 || orderClause.compareTo("DESC")==0))
+                throw new BadRequestException("invalid order collumn name or the order clause is not equal to ASC or DESC");
+            if(orderClause.compareTo("ASC")==0)
+                pairs.add(OrderCondition.asc(orderColumn));
+            pairs.add(OrderCondition.desc(orderColumn));
+        }
+
+        return ServiceUtils.getCollectionPageFuture(UserAccount.class, page, pageSize, pairs.toArray(new Condition[pairs.size()]));
     }
 
     public CompletableFuture<UserAccount> getUser(long id, String... email) {

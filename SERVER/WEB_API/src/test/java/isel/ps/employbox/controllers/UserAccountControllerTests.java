@@ -28,6 +28,7 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
+import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.List;
 
@@ -91,14 +92,43 @@ public class UserAccountControllerTests {
     }
 
     @Test
-    public void testGetAllUserAccounts() {
-        webTestClient
+    public void testGetAllUserAccounts() throws IOException {
+        String body = new String(webTestClient
                 .get()
-                .uri("/accounts/users")
+                .uri(uriBuilder -> uriBuilder.path("/accounts/users").queryParam("orderColumn","rating").build())
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody()
-                .consumeWith(document("getAllUserAccounts"));
+                .returnResult()
+                .getResponseBody());
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        List<String> ratings = objectMapper.readTree(body).get("_embedded").get("items").findValuesAsText("rating");
+        assertTrue( Double.valueOf(ratings.get(0)) < Double.valueOf(ratings.get(1)) );
+
+
+        body = new String(webTestClient
+                .get()
+                .uri(uriBuilder -> uriBuilder.path("/accounts/users").queryParam("orderColumn","rating").queryParam("orderClause", "DESC").build())
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody()
+                .returnResult()
+                .getResponseBody());
+
+        ratings = objectMapper.readTree(body).get("_embedded").get("items").findValuesAsText("rating");
+        assertTrue( Double.valueOf(ratings.get(0)) > Double.valueOf(ratings.get(1)) );
+
+
+        body = new String(webTestClient
+                .get()
+                .uri(uriBuilder -> uriBuilder.path("/accounts/users").build())
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody()
+                .returnResult()
+                .getResponseBody());
+        assertEquals(2, objectMapper.readTree(body).get("_embedded").get("items").size());
     }
 
     @Test
