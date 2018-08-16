@@ -8,7 +8,6 @@ import com.github.jayield.rapper.unitofwork.UnitOfWork;
 import isel.ps.employbox.controllers.curricula.CurriculumControllerTests;
 import isel.ps.employbox.model.entities.Comment;
 import isel.ps.employbox.model.entities.UserAccount;
-import isel.ps.employbox.model.entities.curricula.childs.Project;
 import isel.ps.employbox.model.input.InComment;
 import org.junit.After;
 import org.junit.Before;
@@ -30,7 +29,9 @@ import java.util.List;
 
 import static com.github.jayield.rapper.mapper.MapperRegistry.getMapper;
 import static isel.ps.employbox.DataBaseUtils.prepareDB;
-import static junit.framework.TestCase.*;
+import static junit.framework.TestCase.assertEquals;
+import static junit.framework.TestCase.assertTrue;
+import static org.junit.Assert.assertFalse;
 import static org.springframework.restdocs.webtestclient.WebTestClientRestDocumentation.document;
 import static org.springframework.restdocs.webtestclient.WebTestClientRestDocumentation.documentationConfiguration;
 import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.springSecurity;
@@ -187,7 +188,7 @@ public class CommentControllerTests {
         assertEquals(testComment.getText(), "RIGHT");
     }
 
-    
+
     @Test
     @WithMockUser(username = "teste@gmail.com")
     public void testDeleteComment(){
@@ -199,8 +200,10 @@ public class CommentControllerTests {
                 .expectBody()
                 .consumeWith(document("deleteComment"));
         UnitOfWork unitOfWork = new UnitOfWork();
-        DataMapper<Project, Long> projectRepo = getMapper(Project.class, unitOfWork);
-        assertFalse(projectRepo.findById( comment.getIdentityKey()).join().isPresent());
+        DataMapper<Comment, Long> commentRepo = getMapper(Comment.class, unitOfWork);
+        boolean cond = commentRepo.findById( comment.getIdentityKey()).join().isPresent();
         unitOfWork.commit().join();
+        assertFalse(cond);
+
     }
 }
