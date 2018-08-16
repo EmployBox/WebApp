@@ -8,6 +8,7 @@ export default class {
     this.auth = auth
     this.accountId = json.accountId
     this.self = json._links.self.href
+    this.accountType = json.accountType
   }
 
   unAuthenticate () {

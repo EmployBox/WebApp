@@ -13,14 +13,14 @@ import UserFilters from './components/userFilters'
 import UserTable from './components/userTable'
 
 import CreateJobs from './pages/createJobs'
-import SignUp from './pages/signup'
+import SignUp from './pages/signup/signup'
 import LogIn from './pages/loginPage'
 import IndexPage from './pages/indexPage'
 import SearchPage from './pages/searchPage'
-import SignUpUser from './pages/signupUser'
-import SignUpCompany from './pages/signupCompany'
-import Profile from './pages/profile'
-import Company from './pages/company'
+import SignUpUser from './pages/signup/signupUser'
+import SignUpCompany from './pages/signup/signupCompany'
+import User from './pages/profiles/user'
+import Company from './pages/profiles/company'
 
 import URI from 'urijs'
 import URITemplate from 'urijs/src/URITemplate'
@@ -91,14 +91,16 @@ export default class extends Component {
                   <Navigation navItems={
                     this.state.authenticated
                       ? [
-                        { name: 'Profile', link: accountTempl.expand({ url: this.state.self }) },
+                        {
+                          name: 'Profile',
+                          link: (auther.accountType === 'USR' ? accountTempl : companyTempl)
+                            .expand({ url: auther.self }) },
                         { name: 'About', link: '/about' },
                         {
                           name: 'Log out',
                           class: 'btn btn-outline-primary',
                           click: () => this.setState(oldstate => {
                             oldstate.authenticated = false
-                            oldstate.self = undefined
                             auther.unAuthenticate()
                             return oldstate
                           })
@@ -150,9 +152,9 @@ export default class extends Component {
                         searchTempl={searchTempl}
                       />
                     )} />
-                    <PrivateRoute path='/account/:url' component={Profile} />
-                    <PrivateRoute exact path='/create/jobs/:jobUrl' component={CreateJobs} />
+                    <PrivateRoute path='/account/:url' component={User} />
                     <PrivateRoute exact path='/company/:url' component={Company} />
+                    <PrivateRoute exact path='/create/jobs/:jobUrl' component={CreateJobs} />
                     <Route path='/' render={({ history }) =>
                       <center class='py-5 alert alert-danger' role='alert'>
                         <h2>Error 404.</h2>

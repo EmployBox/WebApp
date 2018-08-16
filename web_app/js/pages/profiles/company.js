@@ -1,5 +1,5 @@
 import React from 'react'
-import HttpRequest from '../components/httpRequest'
+import HttpRequest from '../../components/httpRequest'
 import URI from 'urijs'
 
 const style = {

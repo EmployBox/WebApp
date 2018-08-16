@@ -1,8 +1,8 @@
 import React from 'react'
 import {withRouter} from 'react-router-dom'
-import HttpRequest from '../components/httpRequest'
+import HttpRequest from '../../components/httpRequest'
 import URI from 'urijs'
-import Table from '../components/halTable'
+import Table from '../../components/halTable'
 import URITemplate from 'urijs/src/URITemplate'
 
 const accountTempl = new URITemplate('/account/{url}')
