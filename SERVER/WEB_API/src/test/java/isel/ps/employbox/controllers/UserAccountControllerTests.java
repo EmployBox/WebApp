@@ -132,14 +132,18 @@ public class UserAccountControllerTests {
     }
 
     @Test
-    public void testGetUserAccount() {
-        webTestClient
+    public void testGetUserAccount() throws IOException{
+        String body = new String(webTestClient
                 .get()
                 .uri("/accounts/users/" + userAccount.getIdentityKey())
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody()
-                .consumeWith(document("getUserAccount"));
+                .returnResult()
+                .getResponseBody());
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        assertEquals("lol@hotmail.com",objectMapper.readTree(body).findValuesAsText("email").get(0));
     }
 
     @Test

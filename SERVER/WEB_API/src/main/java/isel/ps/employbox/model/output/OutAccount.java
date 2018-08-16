@@ -116,7 +116,7 @@ public class OutAccount implements OutputDto {
             }
             private class Followers {
                 @JsonProperty
-                final String href = HOSTNAME + linkTo( methodOn(FollowsController.class,accountId).getFollowers(accountId, 0, 5,null,null)).withRel("followers").getHref();
+                final String href = HOSTNAME + linkTo( methodOn(FollowsController.class,accountId).getTheAccountsWichThisAccountIsFollower(accountId, 0, 5,null,null,0L)).withRel("followers").expand().getHref();
             }
 
             private class Offered_jobs{
@@ -136,7 +136,7 @@ public class OutAccount implements OutputDto {
 
             private class Following {
                 @JsonProperty
-                final String href = HOSTNAME + linkTo( methodOn(FollowsController.class,accountId).getFollowing(accountId, 0, 5,null,null)).withRel("following").getHref();
+                final String href = HOSTNAME + linkTo( methodOn(FollowsController.class,accountId).getTheAccountsWichThisAccountIsFollowed(accountId, 0, 5,null,null, 0L)).withRel("following").expand().getHref();
             }
 
             private class Applications {

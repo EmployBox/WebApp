@@ -1,6 +1,7 @@
 package isel.ps.employbox.controllers.account;
 
 import isel.ps.employbox.model.binders.AccountBinder;
+import isel.ps.employbox.model.binders.CollectionPage;
 import isel.ps.employbox.model.entities.Account;
 import isel.ps.employbox.model.output.HalCollectionPage;
 import isel.ps.employbox.services.FollowService;
@@ -22,35 +23,47 @@ public class FollowsController {
         this.followService = followService;
     }
 
-    @GetMapping("/followers")
-    public Mono<HalCollectionPage<Account>> getFollowers(
+    @GetMapping("/followed")
+    public Mono<HalCollectionPage<Account>> getTheAccountsWichThisAccountIsFollower(
             @PathVariable long accountId,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int pageSize,
             @RequestParam(required = false) String orderColumn,
-            @RequestParam(required = false, defaultValue = "ASC") String orderClause
+            @RequestParam(required = false, defaultValue = "ASC") String orderClause,
+            @RequestParam(required = false) Long accountToCheck
     ){
-        CompletableFuture<HalCollectionPage<Account>> future = followService.getAccountFollowers(accountId, page, pageSize, orderColumn, orderClause)
-                .thenCompose(accountCollectionPage -> accountBinder.bindOutput(accountCollectionPage, this.getClass(), accountId));
-        return Mono.fromFuture(future);
+        CompletableFuture<CollectionPage<Account>> future;
+                if(accountToCheck==null)
+                    future = followService.getAccountFollowers(accountId, page, pageSize, orderColumn, orderClause);
+                else
+                    future = followService.checkIfAccountIsFollowerOf(accountId, accountToCheck);
+
+        return Mono.fromFuture(future.thenCompose(accountCollectionPage -> accountBinder.bindOutput(accountCollectionPage, this.getClass(), accountId)));
     }
 
     @GetMapping("/following")
-    public Mono<HalCollectionPage<Account>> getFollowing(
+    public Mono<HalCollectionPage<Account>> getTheAccountsWichThisAccountIsFollowed(
             @PathVariable long accountId,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int pageSize,
             @RequestParam(required = false) String orderColumn,
-            @RequestParam(required = false, defaultValue = "ASC") String orderClause
+            @RequestParam(required = false, defaultValue = "ASC") String orderClause,
+            @RequestParam(required = false) Long accountToCheck
 
     ){
-        CompletableFuture<HalCollectionPage<Account>> future = followService.getAccountFolloweds(accountId, page, pageSize, orderColumn, orderClause)
-                .thenCompose(accountCollectionPage -> accountBinder.bindOutput(accountCollectionPage, this.getClass(), accountId));
-        return Mono.fromFuture(future);
+        CompletableFuture<CollectionPage<Account>> future;
+        if(accountToCheck==null)
+            future = followService.getAccountFolloweds(accountId, page, pageSize, orderColumn, orderClause);
+        else
+            future = followService.checkIfAccountIsFollowing(accountId, accountToCheck);
+
+        return Mono.fromFuture(future
+                .thenCompose(accountCollectionPage -> accountBinder.bindOutput(accountCollectionPage, this.getClass(), accountId))
+        );
     }
 
-    @PutMapping("/followers")
-    public Mono<Void> setFollower(
+    @PutMapping("/followed")
+    public Mono<Void> addNewFollowRelation(
             @PathVariable long accountId,
             @RequestParam long accountToBeFollowedId,
             Authentication authentication)
@@ -58,8 +71,8 @@ public class FollowsController {
         return followService.createFollower(accountId, accountToBeFollowedId, authentication.getName());
     }
 
-    @DeleteMapping("/followers")
-    public Mono<Void> deleteFollower(
+    @DeleteMapping("/followed")
+    public Mono<Void> deleteAFollowRelation(
             @PathVariable long id,
             @RequestParam long accountToBeFollowedId,
             Authentication authentication)

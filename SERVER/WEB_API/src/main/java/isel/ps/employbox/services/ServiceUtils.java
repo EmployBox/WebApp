@@ -18,9 +18,6 @@ import static com.github.jayield.rapper.mapper.MapperRegistry.getMapper;
 
 public class ServiceUtils {
 
-    private ServiceUtils() {
-    }
-
     public static <T extends DomainObject<K>, K> CompletableFuture<CollectionPage<T>> getCollectionPageFuture(
             Class<T> tClass,
             int page,
