@@ -2,7 +2,7 @@ package isel.ps.employbox.services.curricula;
 
 import com.github.jayield.rapper.DomainObject;
 import com.github.jayield.rapper.mapper.DataMapper;
-import com.github.jayield.rapper.mapper.conditions.EqualCondition;
+import com.github.jayield.rapper.mapper.conditions.EqualAndCondition;
 import com.github.jayield.rapper.unitofwork.UnitOfWork;
 import io.vertx.ext.sql.TransactionIsolation;
 import isel.ps.employbox.ErrorMessages;
@@ -88,7 +88,7 @@ public class CurriculumService {
 
     public CompletableFuture<CollectionPage<Curriculum>> getCurricula(long accountId, int page, int pageSize) {
         return userAccountService.getUser(accountId)
-                .thenCompose(userAccount -> ServiceUtils.getCollectionPageFuture(Curriculum.class, page, pageSize, new EqualCondition<>("accountId", accountId)));
+                .thenCompose(userAccount -> ServiceUtils.getCollectionPageFuture(Curriculum.class, page, pageSize, new EqualAndCondition<>("accountId", accountId)));
     }
 
     public CompletableFuture<Curriculum> getCurriculum(long userId, long cid, String... email) {

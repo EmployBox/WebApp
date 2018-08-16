@@ -3,7 +3,7 @@ package isel.ps.employbox.controllers.curricula;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.jayield.rapper.mapper.DataMapper;
-import com.github.jayield.rapper.mapper.conditions.EqualCondition;
+import com.github.jayield.rapper.mapper.conditions.EqualAndCondition;
 import com.github.jayield.rapper.unitofwork.UnitOfWork;
 import isel.ps.employbox.exceptions.ResourceNotFoundException;
 import isel.ps.employbox.model.entities.Curriculum;
@@ -65,18 +65,18 @@ public class PreviousJobsControllerTests {
                 .build();
         UnitOfWork unitOfWork = new UnitOfWork();
         DataMapper<UserAccount, Long> userAccountMapper = getMapper(UserAccount.class, unitOfWork);
-        List<UserAccount> userAccounts = userAccountMapper.find(new EqualCondition<>("name", "Bruno")).join();
+        List<UserAccount> userAccounts = userAccountMapper.find(new EqualAndCondition<>("name", "Bruno")).join();
         assertEquals(1, userAccounts.size());
         userAccount = userAccounts.get(0);
 
 
         DataMapper<Curriculum, Long> curriculumRepo = getMapper(Curriculum.class, unitOfWork);
-        List<Curriculum> curricula = curriculumRepo.find( new EqualCondition<>("title", "Engenharia Civil")).join();
+        List<Curriculum> curricula = curriculumRepo.find( new EqualAndCondition<>("title", "Engenharia Civil")).join();
         assertEquals(1, curricula.size());
         curriculum = curricula.get(0);
 
         DataMapper<PreviousJobs, Long> commentsMapper = getMapper(PreviousJobs.class, unitOfWork);
-        List<PreviousJobs> previousJobs = commentsMapper.find(new EqualCondition<>("COMPANYNAME", "ISEL")).join();
+        List<PreviousJobs> previousJobs = commentsMapper.find(new EqualAndCondition<>("COMPANYNAME", "ISEL")).join();
         assertEquals(1, previousJobs.size());
         this.previousJobs = previousJobs.get(0);
 
@@ -134,7 +134,7 @@ public class PreviousJobsControllerTests {
                 .expectBody()
                 .consumeWith(document("createProject"));
 
-        assertEquals(1, projectMapper.find( new EqualCondition<>("companyName", "old company")).join().size());
+        assertEquals(1, projectMapper.find( new EqualAndCondition<>("companyName", "old company")).join().size());
         unitOfWork.commit().join();
     }
 

@@ -1,7 +1,7 @@
 package isel.ps.employbox.services;
 
 import com.github.jayield.rapper.mapper.DataMapper;
-import com.github.jayield.rapper.mapper.conditions.EqualCondition;
+import com.github.jayield.rapper.mapper.conditions.EqualAndCondition;
 import com.github.jayield.rapper.unitofwork.UnitOfWork;
 import isel.ps.employbox.ErrorMessages;
 import isel.ps.employbox.exceptions.ResourceNotFoundException;
@@ -69,8 +69,8 @@ public class CompanyService {
 
         CompletableFuture<Void> future = accountService.getAccount(cid, email)
                 .thenCompose( account -> {
-                            follows[0] = followsMapper.find(new EqualCondition<Long>("accountIdFollower", account.getIdentityKey()));
-                            follows[1] = followsMapper.find(new EqualCondition<Long>("accountIdFollowed", account.getIdentityKey()));
+                            follows[0] = followsMapper.find(new EqualAndCondition<Long>("accountIdFollower", account.getIdentityKey()));
+                            follows[1] = followsMapper.find(new EqualAndCondition<Long>("accountIdFollowed", account.getIdentityKey()));
 
                             return CompletableFuture.allOf(follows);
                         }

@@ -1,7 +1,7 @@
 package isel.ps.employbox.services;
 
 import com.github.jayield.rapper.mapper.DataMapper;
-import com.github.jayield.rapper.mapper.conditions.EqualCondition;
+import com.github.jayield.rapper.mapper.conditions.EqualAndCondition;
 import com.github.jayield.rapper.unitofwork.UnitOfWork;
 import isel.ps.employbox.ErrorMessages;
 import isel.ps.employbox.exceptions.ResourceNotFoundException;
@@ -45,14 +45,14 @@ public final class AccountService {
     }
 
     public CompletableFuture<CollectionPage<Job>> getOfferedJob(long accountId, int page, int pageSize){
-        return getCollectionPageFuture(Job.class , page, pageSize, new EqualCondition<>("accountId", accountId));
+        return getCollectionPageFuture(Job.class , page, pageSize, new EqualAndCondition<>("accountId", accountId));
     }
 
     public CompletableFuture<Account> getAccount(String email) {
         UnitOfWork unitOfWork = new UnitOfWork();
         DataMapper<Account, Long> accountMapper = getMapper(Account.class, unitOfWork);
 
-        CompletableFuture<Account> future = accountMapper.find(new EqualCondition<String>("email", email))
+        CompletableFuture<Account> future = accountMapper.find(new EqualAndCondition<String>("email", email))
                 .thenCompose(accounts -> unitOfWork.commit().thenApply(aVoid -> accounts))
                 .thenApply(accounts -> {
                     if (accounts.size() != 1) throw new ResourceNotFoundException(RESOURCE_NOTFOUND_ACCOUNT);

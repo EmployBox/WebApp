@@ -3,7 +3,8 @@ package isel.ps.employbox.services;
 
 import com.github.jayield.rapper.mapper.DataMapper;
 import com.github.jayield.rapper.mapper.conditions.Condition;
-import com.github.jayield.rapper.mapper.conditions.EqualCondition;
+import com.github.jayield.rapper.mapper.conditions.EqualAndCondition;
+import com.github.jayield.rapper.mapper.conditions.EqualOrCondition;
 import com.github.jayield.rapper.unitofwork.UnitOfWork;
 import isel.ps.employbox.model.binders.CollectionPage;
 import isel.ps.employbox.model.entities.Account;
@@ -27,50 +28,51 @@ public class FollowService {
         this.accountService = accountRepo;
     }
 
-    public CompletableFuture<CollectionPage<Account>> getAccountFollowers(long followedAccountId, int page, int pageSize) {
-        return getAccountFromFollowAux(followedAccountId, "accountIdFollower", page, pageSize);
+    public CompletableFuture<CollectionPage<Account>> getAccountFollowers(long followedAccountId, int page, int pageSize, String orderColumn, String orderClause) {
+        return getAccountFromFollowAux(followedAccountId, "accountIdFollower", page, pageSize, orderColumn, orderClause);
     }
 
-    public CompletableFuture<CollectionPage<Account>> getAccountFolloweds(long followerAccountId, int page, int pageSize) {
-        return getAccountFromFollowAux(followerAccountId, "accountIdFollowed", page, pageSize);
+    public CompletableFuture<CollectionPage<Account>> getAccountFolloweds(long followerAccountId, int page, int pageSize, String orderColumn, String orderClause) {
+        return getAccountFromFollowAux(followerAccountId, "accountIdFollowed", page, pageSize, orderColumn, orderClause);
     }
 
-    private CompletableFuture<CollectionPage<Account>> getAccountFromFollowAux(long followId, String collumn, int page, int pageSize) {
+    private CompletableFuture<CollectionPage<Account>> getAccountFromFollowAux(long followId, String collumn, int page, int pageSize, String orderColumn, String orderClause) {
         UnitOfWork unitOfWork = new UnitOfWork();
         DataMapper<Follows, Follows.FollowKey> followMapper = getMapper(Follows.class, unitOfWork);
         DataMapper<Account, Long> accountMapper = getMapper(Account.class, unitOfWork);
 
         long [] numberOfFolloewEntries = new long[1];
-        Condition followsQuery = new EqualCondition<>(collumn, followId);
-        ArrayList<CompletableFuture<List<Account>>> accountsFutures = new ArrayList<>();
+        Condition followsQuery = new EqualAndCondition<>(collumn, followId);
 
+        //todo must
         CompletableFuture future =
                 followMapper.getNumberOfEntries(followsQuery).thenCompose(
                         numberOfEntries -> {
                             numberOfFolloewEntries[0] = numberOfEntries;
-                            return followMapper.find(page, pageSize, followsQuery);
+                            int entriesNumber = numberOfEntries.intValue();
+                            if (entriesNumber <= pageSize)
+                                entriesNumber = pageSize;
+
+                            return followMapper.find(0, entriesNumber, followsQuery);
                         }
                 )
                         .thenCompose(follow -> {
-
+                            List<Condition> conditionPairs = new ArrayList<>();
                             for (int i = 0; i < follow.size(); i++)
-                                if (collumn.compareTo("accountIdFollowed") == 0)
-                                    accountsFutures.add(accountMapper.find(page, pageSize, new EqualCondition<Long>("accountId", follow.get(i).getAccountIdFollowed())));
+                                if (collumn.compareTo("accountIdFollower") == 0)
+                                    conditionPairs.add(new EqualOrCondition<Long>("accountId", follow.get(i).getAccountIdFollowed()));
                                 else
-                                    accountsFutures.add(accountMapper.find(page, pageSize, new EqualCondition<Long>("accountId", follow.get(i).getAccountIdFollower())));
+                                    conditionPairs.add(new EqualOrCondition<Long>("accountId", follow.get(i).getAccountIdFollower()));
 
-                            return CompletableFuture.allOf(accountsFutures.toArray(new CompletableFuture[accountsFutures.size()]));
-                        }).thenCompose(res -> unitOfWork.commit().thenApply(aVoid -> res))
-                        .thenApply(res -> {
-                                    List<Account> accountsList = new ArrayList();
-                                    for (int i = 0; i < accountsFutures.size(); i++)
-                                        accountsList.addAll(accountsFutures.get(i).join());
+                            ServiceUtils.evaluateOrderClause(orderColumn, orderClause, conditionPairs);
 
-                                    return new CollectionPage<Account>(numberOfFolloewEntries[0], pageSize, page, accountsList);
-                                }
-                        );
+                            return accountMapper.find(page, pageSize, conditionPairs.toArray(new Condition[conditionPairs.size()]));
+                        }).thenCompose(accountsList -> unitOfWork.commit().thenApply(aVoid -> accountsList))
+                        .thenApply(accountsList -> new CollectionPage<Account>(numberOfFolloewEntries[0], pageSize, page, accountsList));
+
         return handleExceptions(future, unitOfWork);
     }
+
 
     public Mono<Void> createFollower(long accountToBeFollowedId, long accountToFollowId, String username) {
         UnitOfWork unitOfWork = new UnitOfWork();

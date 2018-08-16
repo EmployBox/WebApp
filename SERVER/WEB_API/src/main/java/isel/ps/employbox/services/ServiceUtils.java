@@ -6,6 +6,7 @@ import com.github.jayield.rapper.mapper.conditions.Condition;
 import com.github.jayield.rapper.mapper.conditions.OrderCondition;
 import com.github.jayield.rapper.unitofwork.UnitOfWork;
 import io.vertx.ext.sql.TransactionIsolation;
+import isel.ps.employbox.exceptions.BadRequestException;
 import isel.ps.employbox.model.binders.CollectionPage;
 
 import java.util.List;
@@ -51,5 +52,15 @@ public class ServiceUtils {
             return CompletableFuture.completedFuture(t);
         })
                 .thenCompose(voidCompletableFuture -> voidCompletableFuture);
+    }
+
+    public static void evaluateOrderClause(String orderColumn, String orderClause, List<Condition> conditionPairs) {
+        if(orderColumn != null) {
+            if (!(orderClause.compareTo("ASC") == 0 || orderClause.compareTo("DESC") == 0))
+                throw new BadRequestException("clause is not equal to ASC or DESC");
+            if (orderClause.compareTo("ASC") == 0)
+                conditionPairs.add(OrderCondition.asc(orderColumn));
+            conditionPairs.add(OrderCondition.desc(orderColumn));
+        }
     }
 }

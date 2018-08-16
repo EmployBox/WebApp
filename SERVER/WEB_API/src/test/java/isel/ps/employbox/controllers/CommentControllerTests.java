@@ -3,7 +3,7 @@ package isel.ps.employbox.controllers;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.jayield.rapper.mapper.DataMapper;
-import com.github.jayield.rapper.mapper.conditions.EqualCondition;
+import com.github.jayield.rapper.mapper.conditions.EqualAndCondition;
 import com.github.jayield.rapper.unitofwork.UnitOfWork;
 import isel.ps.employbox.controllers.curricula.CurriculumControllerTests;
 import isel.ps.employbox.model.entities.Comment;
@@ -61,16 +61,16 @@ public class CommentControllerTests {
                 .build();
         UnitOfWork unitOfWork = new UnitOfWork();
         DataMapper<UserAccount, Long> userAccountMapper = getMapper(UserAccount.class, unitOfWork);
-        List<UserAccount> userAccounts = userAccountMapper.find(new EqualCondition<>("name", "Bruno")).join();
+        List<UserAccount> userAccounts = userAccountMapper.find(new EqualAndCondition<>("name", "Bruno")).join();
         assertEquals(1, userAccounts.size());
         userAccount = userAccounts.get(0);
 
-        userAccounts = userAccountMapper.find(new EqualCondition<>("name", "Maria")).join();
+        userAccounts = userAccountMapper.find(new EqualAndCondition<>("name", "Maria")).join();
         assertEquals(1, userAccounts.size());
         userAccount2 = userAccounts.get(0);
 
         DataMapper<Comment, Long> commentsMapper = getMapper(Comment.class, unitOfWork);
-        List<Comment> comments = commentsMapper.find(new EqualCondition<>("TEXT", "FIRST COMMENT")).join();
+        List<Comment> comments = commentsMapper.find(new EqualAndCondition<>("TEXT", "FIRST COMMENT")).join();
         assertEquals(1, comments.size());
         comment = comments.get(0);
 
@@ -130,7 +130,7 @@ public class CommentControllerTests {
                 .consumeWith(document("createComment"));
 
         DataMapper<Comment, Long> jobMapper = getMapper(Comment.class, unitOfWork);
-        assertTrue(jobMapper.find( new EqualCondition<>("text", "HAHAHA")).join().size() != 0);
+        assertTrue(jobMapper.find( new EqualAndCondition<>("text", "HAHAHA")).join().size() != 0);
         unitOfWork.commit().join();
     }
 

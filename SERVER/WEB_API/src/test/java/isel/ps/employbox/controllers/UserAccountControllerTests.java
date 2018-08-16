@@ -3,7 +3,7 @@ package isel.ps.employbox.controllers;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.jayield.rapper.mapper.DataMapper;
-import com.github.jayield.rapper.mapper.conditions.EqualCondition;
+import com.github.jayield.rapper.mapper.conditions.EqualAndCondition;
 import com.github.jayield.rapper.unitofwork.UnitOfWork;
 import isel.ps.employbox.exceptions.ResourceNotFoundException;
 import isel.ps.employbox.model.entities.Application;
@@ -67,17 +67,17 @@ public class UserAccountControllerTests {
 
         UnitOfWork unitOfWork = new UnitOfWork();
         DataMapper<UserAccount, Long> userAccountRepo = getMapper(UserAccount.class, unitOfWork);
-        List<UserAccount> userAccounts = userAccountRepo.find(new EqualCondition<>("email", "lol@hotmail.com")).join();
+        List<UserAccount> userAccounts = userAccountRepo.find(new EqualAndCondition<>("email", "lol@hotmail.com")).join();
         assertEquals(1, userAccounts.size());
         userAccount = userAccounts.get(0);
 
         DataMapper<Job, Long> jobRepo = getMapper(Job.class, unitOfWork);
-        List<Job> jobs = jobRepo.find(new EqualCondition<>("title", "Great Job")).join();
+        List<Job> jobs = jobRepo.find(new EqualAndCondition<>("title", "Great Job")).join();
         assertEquals(1, jobs.size());
         jobId = jobs.get(0).getIdentityKey();
 
         DataMapper<Application, Long> applicationRepo = getMapper(Application.class, unitOfWork);
-        List<Application> applications = applicationRepo.find(new EqualCondition<>("accountId", userAccount.getIdentityKey()), new EqualCondition<>("jobId", jobId)).join();
+        List<Application> applications = applicationRepo.find(new EqualAndCondition<>("accountId", userAccount.getIdentityKey()), new EqualAndCondition<>("jobId", jobId)).join();
         assertEquals(1, applications.size());
         application = applications.get(0);
 
@@ -157,7 +157,7 @@ public class UserAccountControllerTests {
     public void testGetApplication() {
         UnitOfWork unitOfWork = new UnitOfWork();
         DataMapper<Application, Long> applicationRepo = getMapper(Application.class, unitOfWork);
-        List<Application> applications = applicationRepo.find(new EqualCondition<>("accountId", userAccount.getIdentityKey()), new EqualCondition<>("jobId", jobId)).join();
+        List<Application> applications = applicationRepo.find(new EqualAndCondition<>("accountId", userAccount.getIdentityKey()), new EqualAndCondition<>("jobId", jobId)).join();
         assertEquals(1, applications.size());
         Application application = applications.get(0);
         unitOfWork.commit().join();
@@ -194,7 +194,7 @@ public class UserAccountControllerTests {
 
         UnitOfWork unitOfWork = new UnitOfWork();
         DataMapper<UserAccount, Long> userAccountRepo = getMapper(UserAccount.class, unitOfWork);
-        assertEquals(1, userAccountRepo.find( new EqualCondition<>("email", "someEmail@hotmail.com")).join().size());
+        assertEquals(1, userAccountRepo.find( new EqualAndCondition<>("email", "someEmail@hotmail.com")).join().size());
         unitOfWork.commit().join();
 
         Logger logger = LoggerFactory.getLogger(UserAccountControllerTests.class);
@@ -223,7 +223,7 @@ public class UserAccountControllerTests {
 
         UnitOfWork unitOfWork = new UnitOfWork();
         DataMapper<Application, Long> applicationRepo = getMapper(Application.class, unitOfWork);
-        assertEquals(2, applicationRepo.find(new EqualCondition<>("accountId", userAccount.getIdentityKey()), new EqualCondition<>("jobId", jobId)).join().size());
+        assertEquals(2, applicationRepo.find(new EqualAndCondition<>("accountId", userAccount.getIdentityKey()), new EqualAndCondition<>("jobId", jobId)).join().size());
         unitOfWork.commit().join();
     }
 
@@ -388,7 +388,7 @@ public class UserAccountControllerTests {
     public void testDeleteWrongApplication() {
         UnitOfWork unitOfWork = new UnitOfWork();
         DataMapper<Application, Long> applicationRepo = getMapper(Application.class, unitOfWork);
-        List<Application> applications = applicationRepo.find(new EqualCondition<>("accountId", userAccount.getIdentityKey()), new EqualCondition<>("jobId", jobId)).join();
+        List<Application> applications = applicationRepo.find(new EqualAndCondition<>("accountId", userAccount.getIdentityKey()), new EqualAndCondition<>("jobId", jobId)).join();
         assertEquals(1, applications.size());
         Application application = applications.get(0);
         unitOfWork.commit().join();
@@ -407,7 +407,7 @@ public class UserAccountControllerTests {
     public void testDeleteApplication(){
         UnitOfWork unitOfWork = new UnitOfWork();
         DataMapper<Application, Long> applicationRepo = getMapper(Application.class, unitOfWork);
-        List<Application> applications = applicationRepo.find(new EqualCondition<>("accountId", userAccount.getIdentityKey()), new EqualCondition<>("jobId", jobId)).join();
+        List<Application> applications = applicationRepo.find(new EqualAndCondition<>("accountId", userAccount.getIdentityKey()), new EqualAndCondition<>("jobId", jobId)).join();
         assertEquals(1, applications.size());
         Application application = applications.get(0);
         unitOfWork.commit().join();
@@ -420,7 +420,7 @@ public class UserAccountControllerTests {
                 .expectBody()
                 .consumeWith(document("deleteApplication"));
 
-        assertTrue(applicationRepo.find(new EqualCondition<>("accountId", userAccount.getIdentityKey()), new EqualCondition<>("jobId", jobId)).join().isEmpty());
+        assertTrue(applicationRepo.find(new EqualAndCondition<>("accountId", userAccount.getIdentityKey()), new EqualAndCondition<>("jobId", jobId)).join().isEmpty());
         unitOfWork.commit().join();
     }
 }

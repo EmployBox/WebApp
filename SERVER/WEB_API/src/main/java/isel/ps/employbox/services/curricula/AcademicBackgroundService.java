@@ -2,7 +2,7 @@ package isel.ps.employbox.services.curricula;
 
 import com.github.jayield.rapper.mapper.DataMapper;
 import com.github.jayield.rapper.mapper.MapperRegistry;
-import com.github.jayield.rapper.mapper.conditions.EqualCondition;
+import com.github.jayield.rapper.mapper.conditions.EqualAndCondition;
 import com.github.jayield.rapper.unitofwork.UnitOfWork;
 import isel.ps.employbox.ErrorMessages;
 import isel.ps.employbox.exceptions.ConflictException;
@@ -34,7 +34,7 @@ public class AcademicBackgroundService {
         CompletableFuture<CollectionPage<AcademicBackground>> future = curriculumMapper.findById(curriculumId)
                 .thenCompose(res -> unitOfWork.commit().thenApply(aVoid -> res))
                 .thenApply(optional -> optional.orElseThrow(() -> new ResourceNotFoundException(ErrorMessages.RESOURCE_NOTFOUND_CURRICULUM)))
-                .thenCompose(curriculum -> ServiceUtils.getCollectionPageFuture(AcademicBackground.class, page, pageSize, new EqualCondition<>("curriculumId", curriculumId)));
+                .thenCompose(curriculum -> ServiceUtils.getCollectionPageFuture(AcademicBackground.class, page, pageSize, new EqualAndCondition<>("curriculumId", curriculumId)));
         return handleExceptions(future, unitOfWork);
     }
 

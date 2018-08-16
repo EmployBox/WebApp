@@ -1,7 +1,7 @@
 package isel.ps.employbox.security;
 
 import com.github.jayield.rapper.mapper.DataMapper;
-import com.github.jayield.rapper.mapper.conditions.EqualCondition;
+import com.github.jayield.rapper.mapper.conditions.EqualAndCondition;
 import com.github.jayield.rapper.unitofwork.UnitOfWork;
 import isel.ps.employbox.model.entities.Account;
 import org.springframework.security.core.GrantedAuthority;
@@ -25,7 +25,7 @@ public class RepositoryReactiveUserDetailsService implements ReactiveUserDetails
 
         return Mono.fromFuture(
                 accountMapper
-                        .find( new EqualCondition<String>("email", username))
+                        .find( new EqualAndCondition<String>("email", username))
                         .thenCompose( res -> unitOfWork.commit().thenApply( aVoid -> res))
                         .thenApply(accounts -> {
                             if (!accounts.isEmpty())

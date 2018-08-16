@@ -3,9 +3,10 @@ package isel.ps.employbox.controllers;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.jayield.rapper.mapper.DataMapper;
-import com.github.jayield.rapper.mapper.conditions.EqualCondition;
+import com.github.jayield.rapper.mapper.conditions.EqualAndCondition;
 import com.github.jayield.rapper.unitofwork.UnitOfWork;
 import isel.ps.employbox.controllers.curricula.CurriculumControllerTests;
+import isel.ps.employbox.model.entities.Company;
 import isel.ps.employbox.model.entities.Follows;
 import isel.ps.employbox.model.entities.UserAccount;
 import org.junit.After;
@@ -44,6 +45,7 @@ public class FollowsControllerTests {
     private ApplicationContext context;
 
     private WebTestClient webTestClient;
+    private Company company;
     private UserAccount userAccount, userAccount2;
     private Follows follows;
 
@@ -59,18 +61,22 @@ public class FollowsControllerTests {
                 .build();
         UnitOfWork unitOfWork = new UnitOfWork();
         DataMapper<UserAccount, Long> userAccountMapper = getMapper(UserAccount.class, unitOfWork);
-        List<UserAccount> userAccounts = userAccountMapper.find(new EqualCondition<>("name", "Bruno")).join();
+        DataMapper<Company, Long> companyMapper = getMapper(Company.class, unitOfWork);
+
+        List<UserAccount> userAccounts = userAccountMapper.find(new EqualAndCondition<>("name", "Bruno")).join();
         assertEquals(1, userAccounts.size());
         userAccount = userAccounts.get(0);
 
-        userAccounts = userAccountMapper.find(new EqualCondition<>("name", "Maria")).join();
+        userAccounts = userAccountMapper.find(new EqualAndCondition<>("name", "Maria")).join();
         assertEquals(1, userAccounts.size());
         userAccount2 = userAccounts.get(0);
 
-
+        List<Company> companys = companyMapper.find(new EqualAndCondition<>("name", "company1")).join();
+        assertEquals(1, userAccounts.size());
+        company = companys.get(0);
 
         DataMapper<Follows, Follows.FollowKey> commentsMapper = getMapper(Follows.class, unitOfWork);
-        List<Follows> comments = commentsMapper.find(new EqualCondition<>("accountIdFollower", userAccount.getIdentityKey())).join();
+        List<Follows> comments = commentsMapper.find(new EqualAndCondition<>("accountIdFollower", userAccount.getIdentityKey())).join();
         assertEquals(2, comments.size());
         follows = comments.get(0);
 
@@ -100,6 +106,34 @@ public class FollowsControllerTests {
         ObjectMapper objectMapper = new ObjectMapper();
         JsonNode jsonNode = objectMapper.readTree(body);
         assertEquals(jsonNode.get("size").asInt(),2);
+
+        body = new String(webTestClient
+                .get()
+                .uri(uriBuilder -> uriBuilder.path("/accounts/"+userAccount.getIdentityKey()+"/followers").queryParam("orderColumn","rating").queryParam("orderClause", "DESC").build())
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody()
+                .returnResult()
+                .getResponseBody());
+
+        List<String> ratings = objectMapper.readTree(body).get("_embedded").get("items").findValuesAsText("rating");
+        assertEquals("4.0", ratings.get(0));
+        assertEquals("0.0", ratings.get(1));
+
+
+        body = new String(webTestClient
+                .get()
+                .uri(uriBuilder -> uriBuilder.path("/accounts/"+company.getIdentityKey()+"/following").queryParam("orderColumn","rating").build())
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody()
+                .returnResult()
+                .getResponseBody());
+
+        ratings = objectMapper.readTree(body).get("_embedded").get("items").findValuesAsText("rating");
+        assertEquals("2.0", ratings.get(0));
+        assertEquals("4.0", ratings.get(1));
+
 
         body = new String(webTestClient
                 .get()

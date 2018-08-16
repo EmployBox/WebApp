@@ -3,7 +3,7 @@ package isel.ps.employbox.controllers;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.jayield.rapper.mapper.DataMapper;
-import com.github.jayield.rapper.mapper.conditions.EqualCondition;
+import com.github.jayield.rapper.mapper.conditions.EqualAndCondition;
 import com.github.jayield.rapper.unitofwork.UnitOfWork;
 import isel.ps.employbox.exceptions.ResourceNotFoundException;
 import isel.ps.employbox.model.entities.Company;
@@ -58,7 +58,7 @@ public class CompanyControllerTests {
                 .build();
         UnitOfWork unitOfWork = new UnitOfWork();
         DataMapper<Company, Long> companyRepo = getMapper(Company.class, unitOfWork);
-        List<Company> companies = companyRepo.find( new EqualCondition<>("email", "company2@gmail.com")).join();
+        List<Company> companies = companyRepo.find( new EqualAndCondition<>("email", "company2@gmail.com")).join();
         assertEquals(1, companies.size());
         company = companies.get(0);
         unitOfWork.commit().join();
@@ -115,7 +115,7 @@ public class CompanyControllerTests {
                 .expectBody()
                 .consumeWith(document("createCompany"));
 
-        assertTrue(companyRepo.find( new EqualCondition<>("email", "someEmail@hotmail.com")).join().size() != 0);
+        assertTrue(companyRepo.find( new EqualAndCondition<>("email", "someEmail@hotmail.com")).join().size() != 0);
         unitOfWork.commit().join();
     }
 
