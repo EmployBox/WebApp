@@ -18,6 +18,10 @@ module.exports = {
             plugins: ['react-html-attrs', 'transform-object-rest-spread']
           }
         }
+      },
+      {
+        test: /\.css$/,
+        use: [ 'style-loader', 'css-loader' ]
       }
     ]
   },
