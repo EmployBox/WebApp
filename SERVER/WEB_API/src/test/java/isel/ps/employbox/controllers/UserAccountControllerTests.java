@@ -132,6 +132,41 @@ public class UserAccountControllerTests {
     }
 
     @Test
+    public void testGetUserAccountOrderedByString() throws IOException {
+        ObjectMapper objectMapper = new ObjectMapper();
+
+        String body = new String(webTestClient
+                .get()
+                .uri(uriBuilder -> uriBuilder.path("/accounts/users")
+                        .queryParam("pageSize",10)
+                        .queryParam("orderColumn","name")
+                        .queryParam("orderClause", "ASC").build())
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody()
+                .returnResult()
+                .getResponseBody());
+
+        assertEquals(2, objectMapper.readTree(body).get("_embedded").get("items").size());
+        assertEquals("Bruno", objectMapper.readTree(body).get("_embedded").get("items").findValuesAsText("name").get(0));
+
+        body = new String(webTestClient
+                .get()
+                .uri(uriBuilder -> uriBuilder.path("/accounts/users")
+                        .queryParam("pageSize",10)
+                        .queryParam("orderColumn","name")
+                        .queryParam("orderClause", "DESC").build())
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody()
+                .returnResult()
+                .getResponseBody());
+
+        assertEquals("Maria", objectMapper.readTree(body).get("_embedded").get("items").findValuesAsText("name").get(0));
+
+    }
+
+    @Test
     public void testGetUserAccount() throws IOException{
         String body = new String(webTestClient
                 .get()
