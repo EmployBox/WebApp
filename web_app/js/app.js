@@ -21,7 +21,6 @@ import SignUpUser from './pages/signupUser'
 import SignUpCompany from './pages/signupCompany'
 import Profile from './pages/profile'
 import Company from './pages/company'
-import FollwersTable from './pages/followers'
 
 import URI from 'urijs'
 import URITemplate from 'urijs/src/URITemplate'
@@ -83,89 +82,89 @@ export default class extends Component {
   render () {
     return (
       <HttpRequest url={apiURI}
-        afterResult={json => auther.setLoginUrl(loginExpand(json))}
-        onResult={json => (
-          <div>
-            <BrowserRouter>
-              <div>
-                <Navigation navItems={
-                  this.state.authenticated
-                    ? [
-                      { name: 'Profile', link: accountTempl.expand({ url: this.state.self }) },
-                      { name: 'About', link: '/about' },
-                      {
-                        name: 'Log out',
-                        class: 'btn btn-outline-primary',
-                        click: () => this.setState(oldstate => {
-                          oldstate.authenticated = false
-                          oldstate.self = undefined
-                          auther.unAuthenticate()
-                          return oldstate
-                        })
-                      }
-                    ]
-                    : [
-                      { name: 'About', link: '/about' },
-                      { name: 'Log in', link: loginExpand(json) },
-                      {
-                        name: 'Sign up',
-                        link: signUpTempl.expand({
-                          urlUser: getLink('users', json),
-                          urlCompany: getLink('companies', json)
-                        }),
-                        class: 'btn btn-outline-primary'
-                      }
-                    ]} />
-                <Switch>
-                  <Route exact path='/' render={(props) =>
-                    <IndexPage options={this.getOptions(json)} searchTempl={searchTempl} />}
-                  />
-                  <Route exact path='/signup/user/:url' render={({ history, match }) =>
-                    <SignUpUser url={URI.decode(match.params.url)} ToLogin={() => history.push(loginExpand(json))} />}
-                  />
-                  <Route exact path='/signup/company/:url' render={({ history, match }) =>
-                    <SignUpCompany url={URI.decode(match.params.url)} ToLogin={() => history.push(loginExpand(json))} />}
-                  />
-                  <Route exact path='/signup/:urlUser/:urlCompany' render={({ history, match }) =>
-                    <SignUp signUpUser={() => history.push(signUpUserTempl.expand({ url: match.params.urlUser }))}
-                      signUpCompany={() => history.push(signUpCompanyTempl.expand({ url: match.params.urlCompany }))} />}
-                  />
-                  <Route exact path='/login/:url' render={({ history, match }) =>
-                    <LogIn url={URI.decode(match.params.url)}
-                      ToLogin={(json, auth) => {
-                        this.setState(oldstate => {
-                          oldstate.authenticated = true
-                          oldstate.self = json['_links'].self.href
-                          auther.authenticate(auth, json)
-                          return oldstate
-                        })
-                        history.push(URI.parseQuery(history.location.search).redirect || '/')
-                      }} />
-                  } />
-                  <Route exact path='/search/:url' render={({ match }) => (
-                    <SearchPage
-                      uriTemplate={new URITemplate(URI.decode(match.params.url).split('?')[0] + '{?query*}')}
-                      options={this.getOptions(json)}
-                      match={match}
-                      searchTempl={searchTempl}
+        onResult={json => {
+          auther.setLoginUrl(loginExpand(json))
+          return (
+            <div>
+              <BrowserRouter>
+                <div>
+                  <Navigation navItems={
+                    this.state.authenticated
+                      ? [
+                        { name: 'Profile', link: accountTempl.expand({ url: this.state.self }) },
+                        { name: 'About', link: '/about' },
+                        {
+                          name: 'Log out',
+                          class: 'btn btn-outline-primary',
+                          click: () => this.setState(oldstate => {
+                            oldstate.authenticated = false
+                            oldstate.self = undefined
+                            auther.unAuthenticate()
+                            return oldstate
+                          })
+                        }
+                      ]
+                      : [
+                        { name: 'About', link: '/about' },
+                        { name: 'Log in', link: loginExpand(json) },
+                        {
+                          name: 'Sign up',
+                          link: signUpTempl.expand({
+                            urlUser: getLink('users', json),
+                            urlCompany: getLink('companies', json)
+                          }),
+                          class: 'btn btn-outline-primary'
+                        }
+                      ]} />
+                  <Switch>
+                    <Route exact path='/' render={(props) =>
+                      <IndexPage options={this.getOptions(json)} searchTempl={searchTempl} />}
                     />
-                  )} />
-                  <PrivateRoute path='/account/:url' component={Profile} />
-                  <PrivateRoute exact path='/create/jobs/:jobUrl' component={CreateJobs} />
-                  <PrivateRoute exact path='/company/:url' component={Company} />
-                  <PrivateRoute exact path='/account/:userUrl/followers/:followersUrl' component={FollwersTable} />
-                  <Route path='/' render={({ history }) =>
-                    <center class='py-5 alert alert-danger' role='alert'>
-                      <h2>Error 404.</h2>
-                      <p>The requested URL {history.location.pathname} was not found on web application.</p>
-                    </center>
-                  } />
-                </Switch>
-                <Footer />
-              </div>
-            </BrowserRouter>
-          </div>
-        )}
+                    <Route exact path='/signup/user/:url' render={({ history, match }) =>
+                      <SignUpUser url={URI.decode(match.params.url)} ToLogin={() => history.push(loginExpand(json))} />}
+                    />
+                    <Route exact path='/signup/company/:url' render={({ history, match }) =>
+                      <SignUpCompany url={URI.decode(match.params.url)} ToLogin={() => history.push(loginExpand(json))} />}
+                    />
+                    <Route exact path='/signup/:urlUser/:urlCompany' render={({ history, match }) =>
+                      <SignUp signUpUser={() => history.push(signUpUserTempl.expand({ url: match.params.urlUser }))}
+                        signUpCompany={() => history.push(signUpCompanyTempl.expand({ url: match.params.urlCompany }))} />}
+                    />
+                    <Route exact path='/login/:url' render={({ history, match }) =>
+                      <LogIn url={URI.decode(match.params.url)}
+                        ToLogin={(json, auth) => {
+                          this.setState(oldstate => {
+                            oldstate.authenticated = true
+                            oldstate.self = json['_links'].self.href
+                            auther.authenticate(auth, json)
+                            return oldstate
+                          })
+                          history.push(URI.parseQuery(history.location.search).redirect || '/')
+                        }} />
+                    } />
+                    <Route exact path='/search/:url' render={({ match }) => (
+                      <SearchPage
+                        uriTemplate={new URITemplate(URI.decode(match.params.url).split('?')[0] + '{?query*}')}
+                        options={this.getOptions(json)}
+                        match={match}
+                        searchTempl={searchTempl}
+                      />
+                    )} />
+                    <PrivateRoute path='/account/:url' component={Profile} />
+                    <PrivateRoute exact path='/create/jobs/:jobUrl' component={CreateJobs} />
+                    <PrivateRoute exact path='/company/:url' component={Company} />
+                    <Route path='/' render={({ history }) =>
+                      <center class='py-5 alert alert-danger' role='alert'>
+                        <h2>Error 404.</h2>
+                        <p>The requested URL {history.location.pathname} was not found on web application.</p>
+                      </center>
+                    } />
+                  </Switch>
+                  <Footer />
+                </div>
+              </BrowserRouter>
+            </div>
+          )}}
       />
     )
   }

@@ -3,7 +3,10 @@ import {Route, withRouter} from 'react-router-dom'
 import HttpRequest from '../components/httpRequest'
 import URI from 'urijs'
 import URITemplate from 'urijs/src/URITemplate'
-import FollowersTable from './followers'
+import FollowersTable from './followersTable'
+import JobsTable from './offeredJobsTable'
+import ApplicationsTable from './applicationsTable'
+import CurriculasTable from './curriculasTable'
 
 const style = {
   width: 200,
