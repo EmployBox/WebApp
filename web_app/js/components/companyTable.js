@@ -1,35 +1,32 @@
 import React from 'react'
 import { withRouter } from 'react-router-dom'
+import Table from './halTable'
+import URI from 'urijs'
+import URITemplate from 'urijs/src/URITemplate'
 
-export default withRouter(({_embedded, history, companyTempl}) => {
-  if (_embedded) {
-    const tableRows = _embedded.items.map(item => {
-      return (
-        <tr key={item._links.self.href} onClick={() => history.push(companyTempl.expand({url: item._links.self.href}))}>
-          <td>{item.name}</td>
-          <td>{item.rating}</td>
-          <td>{item.specialization || 'Not defined'}</td>
-          <td>{item.yearFounded || 'Not defined'}</td>
-        </tr>
-      )
-    })
+const searchTemplate = new URITemplate('/search/{url}')
 
-    return (
-      <table class='table table-hover'>
-        <thead>
-          <tr>
-            <th>Name</th>
-            <th>☆</th>
-            <th>Specialization</th>
-            <th>Year Founded</th>
-          </tr>
-        </thead>
-        <tbody>
-          {tableRows}
-        </tbody>
-      </table>
-    )
-  }
-
-  return <p>No items found for this criteria</p>
-})
+export default withRouter(({json, history, match, companyTempl}) =>
+  <Table json={json} currentUrl={URI.decode(match.params.url)}
+    pushTo={url => history.push(searchTemplate.expand({url: url}))}
+    onClickRow={({rowInfo}) => history.push(companyTempl.expand({url: rowInfo.original._links.self.href}))}
+    columns={[
+      {
+        Header: 'Name',
+        accessor: 'name'
+      },
+      {
+        Header: '☆',
+        accessor: 'rating'
+      },
+      {
+        Header: 'Specialization',
+        accessor: 'specialization'
+      },
+      {
+        Header: 'Year Founded',
+        accessor: 'yearFounded'
+      }
+    ]}
+  />
+)

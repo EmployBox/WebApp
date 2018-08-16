@@ -14,12 +14,12 @@ export default ({json, columns, currentUrl, pushTo, onClickRow}) => {
         manual
         data={json._embedded.items}
         pages={json.last_page + 1}
-        defaultPageSize={Number(pageSize)}
-        page={Number(page)}
+        defaultPageSize={Number(pageSize) || 10}
+        page={Number(page) || json.current_page}
         className='-striped -highlight'
         onPageChange={pageIndex => pushTo(uri.setQuery('page', pageIndex).href())}
         onPageSizeChange={pageSize => pushTo(uri.setQuery('pageSize', pageSize).href())}
-        onSortedChange={(newSorted, column, shiftKey) => console.log(JSON.stringify(newSorted) + '---' + JSON.stringify(column) + '---' + shiftKey)}
+        onSortedChange={([{id, desc}]) => pushTo(uri.setQuery('orderColumn', id).setQuery('orderClause', desc ? 'DESC' : 'ASC').href())}
         getTdProps={(state, rowInfo, column, instance) => {
           return {
             onClick: e => onClickRow({

@@ -109,7 +109,7 @@ class SearchPage extends React.Component {
             <h3 class='text-center text-white border bg-dark'>Results</h3>
             <HttpRequest
               url={uri}
-              onResult={data => entity.render.renderTable(data)}
+              onResult={data => entity.render.renderTable({json: data})}
             />
           </div>
         </div>
