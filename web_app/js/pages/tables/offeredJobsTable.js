@@ -1,12 +1,14 @@
 import React from 'react'
-import {withRouter} from 'react-router-dom'
-import HttpRequest from '../components/httpRequest'
+import {withRouter, Link} from 'react-router-dom'
+import HttpRequest from '../../components/httpRequest'
 import URI from 'urijs'
-import Table from '../components/halTable'
+import Table from '../../components/halTable'
 import URITemplate from 'urijs/src/URITemplate'
 
 const template = new URITemplate('/account/{userUrl}/offeredJobs/{offeredJobsUrl}')
 const jobTemplate = new URITemplate('/job/{url}')
+const userTemplate = new URITemplate('/account/{url}')
+const companyTemplate = new URITemplate('/company/{url}')
 
 export default withRouter(({match, auth, history}) => (
   <HttpRequest url={URI.decode(match.params.offeredJobsUrl)}
@@ -18,9 +20,13 @@ export default withRouter(({match, auth, history}) => (
             userUrl: URI.decode(match.params.url),
             offeredJobsUrl: url
           }))}
-          onClickRow={({rowInfo}) => history.push(jobTemplate.expand({
-            url: rowInfo.original._links.self.href
-          }))}
+          onClickRow={({rowInfo, column}) => {
+            if (column.Header !== 'Name') {
+              history.push(jobTemplate.expand({
+                url: rowInfo.original._links.self.href
+              }))
+            }
+          }}
           columns={[
             {
               Header: 'Account Info',
@@ -28,7 +34,12 @@ export default withRouter(({match, auth, history}) => (
                 {
                   Header: 'Name',
                   id: 'name',
-                  accessor: i => i.account.name
+                  accessor: i => i.account.name,
+                  Cell: ({original, value}) => {
+                    return <Link to={(original.account.accountType === 'USR' ? userTemplate : companyTemplate)
+                      .expand({url: original.account._links.self.href})}>{value}
+                    </Link>
+                  }
                 },
                 {
                   Header: 'Rating',
