@@ -96,7 +96,7 @@ public class FollowsControllerTests {
 
         String body = new String(webTestClient
                 .get()
-                .uri("/accounts/"+userAccount.getIdentityKey()+"/followers")
+                .uri("/accounts/"+userAccount.getIdentityKey()+"/followed")
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody()
@@ -109,7 +109,7 @@ public class FollowsControllerTests {
 
         body = new String(webTestClient
                 .get()
-                .uri(uriBuilder -> uriBuilder.path("/accounts/"+userAccount.getIdentityKey()+"/followers").queryParam("orderColumn","rating").queryParam("orderClause", "DESC").build())
+                .uri(uriBuilder -> uriBuilder.path("/accounts/"+userAccount.getIdentityKey()+"/followed").queryParam("orderColumn","rating").queryParam("orderClause", "DESC").build())
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody()
@@ -137,7 +137,7 @@ public class FollowsControllerTests {
 
         body = new String(webTestClient
                 .get()
-                .uri("/accounts/"+userAccount2.getIdentityKey()+"/followers")
+                .uri("/accounts/"+userAccount2.getIdentityKey()+"/followed")
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody()
@@ -147,4 +147,36 @@ public class FollowsControllerTests {
         jsonNode = objectMapper.readTree(body);
         assertEquals(jsonNode.get("size").asInt(),1);
     }
+
+    @Test
+    @WithMockUser(username = "teste@gmail.com")
+    public void testCheckIfAccountsAreFollowingOrFollowers() throws IOException {
+        String body = new String(webTestClient
+                .get()
+                .uri(uriBuilder -> uriBuilder.path("/accounts/"+userAccount.getIdentityKey()+"/followed").queryParam("accountToCheck",userAccount2.getIdentityKey()).build())
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody()
+                .returnResult()
+                .getResponseBody());
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        JsonNode jsonNode = objectMapper.readTree(body);
+        assertEquals(jsonNode.get("size").asInt(),1);
+        assertEquals("Maria", objectMapper.readTree(body).get("_embedded").get("items").findValuesAsText("name").get(0));
+
+        body = new String(webTestClient
+                .get()
+                .uri(uriBuilder -> uriBuilder.path("/accounts/"+company.getIdentityKey()+"/following").queryParam("accountToCheck",userAccount2.getIdentityKey()).build())
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody()
+                .returnResult()
+                .getResponseBody());
+
+        jsonNode = objectMapper.readTree(body);
+        assertEquals(jsonNode.get("size").asInt(),1);
+        assertEquals("company1", objectMapper.readTree(body).get("_embedded").get("items").findValuesAsText("name").get(0));
+    }
+
 }

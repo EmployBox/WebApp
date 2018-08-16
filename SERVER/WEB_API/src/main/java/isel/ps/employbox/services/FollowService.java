@@ -14,6 +14,7 @@ import reactor.core.publisher.Mono;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
 import static com.github.jayield.rapper.mapper.MapperRegistry.getMapper;
@@ -94,5 +95,33 @@ public class FollowService {
         return Mono.fromFuture(
                 handleExceptions(future, unitOfWork)
         );
+    }
+
+    public CompletableFuture<CollectionPage<Account>> checkIfAccountIsFollowerOf(long accountId, long supposedFollowerAccountId) {
+        UnitOfWork unitOfWork = new UnitOfWork();
+        DataMapper<Follows, Follows.FollowKey> followMapper = getMapper(Follows.class, unitOfWork);
+        DataMapper<Account, Long> accountMapper = getMapper(Account.class, unitOfWork);
+
+        return followMapper.findById(new Follows.FollowKey(accountId, supposedFollowerAccountId))
+                .thenCompose( follows ->{
+                    if(follows.isPresent())
+                        return accountMapper.findById(supposedFollowerAccountId);
+                    else
+                        return CompletableFuture.completedFuture(Optional.empty());
+
+                })
+                .thenCompose(res -> unitOfWork.commit().thenApply(aVoid -> res))
+                .thenApply(
+                        oaccount -> {
+                            ArrayList<Account> list = new ArrayList<>();
+                            oaccount.ifPresent(list::add);
+
+                            return new CollectionPage<Account>(1, 1,0, list);
+                        }
+                );
+    }
+
+    public CompletableFuture<CollectionPage<Account>> checkIfAccountIsFollowing(long accountId, long supposedFollowingAccountId) {
+        return checkIfAccountIsFollowerOf(supposedFollowingAccountId, accountId);
     }
 }
