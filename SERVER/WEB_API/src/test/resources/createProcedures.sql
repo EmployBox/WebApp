@@ -55,7 +55,7 @@ CREATE PROCEDURE populateDB()
     /*Insert Follows*/
     insert into FOLLOWS(ACCOUNTIDFOLLOWER, ACCOUNTIDFOLLOWED) VALUES (account_id1, account_id2);
     insert into FOLLOWS(ACCOUNTIDFOLLOWER, ACCOUNTIDFOLLOWED) VALUES (account_id1, company_id1);
-    insert into FOLLOWS(ACCOUNTIDFOLLOWER, ACCOUNTIDFOLLOWED) VALUES (account_id2, company_id2);
+    insert into FOLLOWS(ACCOUNTIDFOLLOWER, ACCOUNTIDFOLLOWED) VALUES (account_id2, company_id1);
 
   end;
 

@@ -1,7 +1,7 @@
 package isel.ps.employbox.services;
 
 import com.github.jayield.rapper.mapper.DataMapper;
-import com.github.jayield.rapper.mapper.conditions.EqualCondition;
+import com.github.jayield.rapper.mapper.conditions.EqualAndCondition;
 import com.github.jayield.rapper.unitofwork.UnitOfWork;
 import isel.ps.employbox.ErrorMessages;
 import isel.ps.employbox.exceptions.BadRequestException;
@@ -28,7 +28,7 @@ public class CommentService {
 
     public CompletableFuture<CollectionPage<Comment>> getComments(long accountFromId, int page, int pageSize) {
         return accountService.getAccount(accountFromId)
-                .thenCompose(__-> ServiceUtils.getCollectionPageFuture(Comment.class, page, pageSize, new EqualCondition<>("accountIdFrom", accountFromId)));
+                .thenCompose(__-> ServiceUtils.getCollectionPageFuture(Comment.class, page, pageSize, new EqualAndCondition<>("accountIdFrom", accountFromId)));
     }
 
     public CompletableFuture<Comment> getComment(long accountIdFrom, long commentId) {
@@ -57,9 +57,9 @@ public class CommentService {
         CompletableFuture<Void> future = accountService.getAccount(comment.getAccountIdFrom(), email)
                 .thenCompose(__ ->
                         commentMapper.find(
-                                new EqualCondition<>("commentId", comment.getIdentityKey()),
-                                new EqualCondition<>("accountIdFrom", comment.getAccountIdFrom()),
-                                new EqualCondition<>("accountIdDest", comment.getAccountIdDest())
+                                new EqualAndCondition<>("commentId", comment.getIdentityKey()),
+                                new EqualAndCondition<>("accountIdFrom", comment.getAccountIdFrom()),
+                                new EqualAndCondition<>("accountIdDest", comment.getAccountIdDest())
                         )
                 ).thenCompose(commentRes -> {
                     if (commentRes.size() == 0)
@@ -91,7 +91,7 @@ public class CommentService {
         CompletableFuture<Void> future = commentMapper.findById( commentId)
                 .thenCompose(ocomment -> {
                     Comment comment = ocomment.orElseThrow(() -> new ResourceNotFoundException(ErrorMessages.RESOURCE_NOTFOUND_COMMENT));
-                    return accountMapper.find(new EqualCondition<>("email", String.valueOf(email)))
+                    return accountMapper.find(new EqualAndCondition<>("email", String.valueOf(email)))
                             .thenCompose(list -> {
                                 if (comment.getAccountIdFrom() != list.get(0).getIdentityKey())
                                     throw new UnauthorizedException(ErrorMessages.UN_AUTHORIZED);

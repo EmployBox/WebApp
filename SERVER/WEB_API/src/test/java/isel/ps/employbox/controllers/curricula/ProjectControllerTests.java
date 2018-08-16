@@ -4,7 +4,7 @@ package isel.ps.employbox.controllers.curricula;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.jayield.rapper.mapper.DataMapper;
-import com.github.jayield.rapper.mapper.conditions.EqualCondition;
+import com.github.jayield.rapper.mapper.conditions.EqualAndCondition;
 import com.github.jayield.rapper.unitofwork.UnitOfWork;
 import isel.ps.employbox.exceptions.ResourceNotFoundException;
 import isel.ps.employbox.model.entities.Curriculum;
@@ -63,17 +63,17 @@ public class ProjectControllerTests {
                 .build();
         UnitOfWork unitOfWork = new UnitOfWork();
         DataMapper<UserAccount, Long> userAccountRepo = getMapper(UserAccount.class, unitOfWork);
-        List<UserAccount> userAccounts = userAccountRepo.find( new EqualCondition<>("name", "Bruno")).join();
+        List<UserAccount> userAccounts = userAccountRepo.find( new EqualAndCondition<>("name", "Bruno")).join();
         assertEquals(1, userAccounts.size());
         userAccount = userAccounts.get(0);
 
         DataMapper<Curriculum, Long> curriculumRepo = getMapper(Curriculum.class, unitOfWork);
-        List<Curriculum> curricula = curriculumRepo.find( new EqualCondition<>("title", "Engenharia Civil")).join();
+        List<Curriculum> curricula = curriculumRepo.find( new EqualAndCondition<>("title", "Engenharia Civil")).join();
         assertEquals(1, curricula.size());
         curriculum = curricula.get(0);
 
         DataMapper<Project, Long> projectRepo = getMapper(Project.class, unitOfWork);
-        List<Project> projects = projectRepo.find( new EqualCondition<>("description", "project one")).join();
+        List<Project> projects = projectRepo.find( new EqualAndCondition<>("description", "project one")).join();
         assertEquals(1, projects.size());
         project = projects.get(0);
         unitOfWork.commit().join();
@@ -131,8 +131,8 @@ public class ProjectControllerTests {
                 .expectBody()
                 .consumeWith(document("createProject"));
 
-        assertEquals(1, projectMapper.find( new EqualCondition<>("description", "project description")).join().size());
-        assertEquals(1, projectMapper.find( new EqualCondition<>("name", "first project")).join().size());
+        assertEquals(1, projectMapper.find( new EqualAndCondition<>("description", "project description")).join().size());
+        assertEquals(1, projectMapper.find( new EqualAndCondition<>("name", "first project")).join().size());
         unitOfWork.commit().join();
     }
 

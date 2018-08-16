@@ -1,7 +1,7 @@
 package isel.ps.employbox.services;
 
 import com.github.jayield.rapper.mapper.DataMapper;
-import com.github.jayield.rapper.mapper.conditions.EqualCondition;
+import com.github.jayield.rapper.mapper.conditions.EqualAndCondition;
 import com.github.jayield.rapper.unitofwork.UnitOfWork;
 import isel.ps.employbox.ErrorMessages;
 import isel.ps.employbox.exceptions.ResourceNotFoundException;
@@ -26,13 +26,13 @@ public class RatingService {
     }
 
     public CompletableFuture<CollectionPage<Rating>> getRatings(long accountId, int page, int pageSize) {
-        return ServiceUtils.getCollectionPageFuture(Rating.class, page, pageSize,  new EqualCondition<>("accountIdFrom", accountId));
+        return ServiceUtils.getCollectionPageFuture(Rating.class, page, pageSize,  new EqualAndCondition<>("accountIdFrom", accountId));
     }
 
     public CompletableFuture<Rating> getRating(long accountIdFrom, long accountIdDest) {
         UnitOfWork unitOfWork = new UnitOfWork();
         DataMapper<Rating, Rating.RatingKey> ratingMapper = getMapper(Rating.class, unitOfWork);
-        CompletableFuture<Rating> future = ratingMapper.find(new EqualCondition<>("accountIdFrom", accountIdFrom), new EqualCondition<>("accountIdDest", accountIdDest))
+        CompletableFuture<Rating> future = ratingMapper.find(new EqualAndCondition<>("accountIdFrom", accountIdFrom), new EqualAndCondition<>("accountIdDest", accountIdDest))
                 .thenCompose(ratings -> {
                     if ( ratings.size()==0)
                         throw new ResourceNotFoundException(ErrorMessages.RESOURCE_NOTFOUND_RATING);
@@ -47,8 +47,8 @@ public class RatingService {
         DataMapper<Rating, Rating.RatingKey> ratingMapper = getMapper(Rating.class, unitOfWork);
         CompletableFuture<Void> future =
                 accountService.getAccount(rating.getAccountIdFrom(), email)//throws exceptions
-                        .thenCompose(user -> ratingMapper.find(new EqualCondition("accountIdFrom", rating.getAccountIdFrom()),
-                                new EqualCondition<>("accountIdDest", rating.getAccountIdTo()))
+                        .thenCompose(user -> ratingMapper.find(new EqualAndCondition("accountIdFrom", rating.getAccountIdFrom()),
+                                new EqualAndCondition<>("accountIdDest", rating.getAccountIdTo()))
                         )
                         .thenCompose(ratings -> {
                                     if (ratings.size() == 0)
@@ -81,12 +81,12 @@ public class RatingService {
         UnitOfWork unitOfWork = new UnitOfWork();
         DataMapper<Rating, Rating.RatingKey> ratingMapper = getMapper(Rating.class, unitOfWork);
         DataMapper<Account, Long> accountMapper = getMapper(Account.class, unitOfWork);
-        CompletableFuture<Void> future = accountMapper.find(new EqualCondition<Long>("accountId", accountIDFrom), new EqualCondition<>("email", email))
+        CompletableFuture<Void> future = accountMapper.find(new EqualAndCondition<Long>("accountId", accountIDFrom), new EqualAndCondition<>("email", email))
                 .thenCompose(user -> {
                             if (user.size() != 1)
                                     throw new UnauthorizedException(ErrorMessages.UN_AUTHORIZED);
-                                return ratingMapper.find(new EqualCondition("accountIdFrom", accountIDFrom),
-                                        new EqualCondition<>("accountIdDest", accountIDTo));
+                                return ratingMapper.find(new EqualAndCondition("accountIdFrom", accountIDFrom),
+                                        new EqualAndCondition<>("accountIdDest", accountIDTo));
                         }
                 )
                 .thenCompose(ratings -> {

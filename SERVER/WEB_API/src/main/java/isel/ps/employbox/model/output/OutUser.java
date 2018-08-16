@@ -144,12 +144,12 @@ public class OutUser implements OutputDto {
 
         private class Followers {
             @JsonProperty
-            final String href = HOSTNAME + linkTo( methodOn(FollowsController.class, accountId).getFollowers(accountId, 0, 5) ).withRel("followers").getHref();
+            final String href = HOSTNAME + linkTo( methodOn(FollowsController.class, accountId).getFollowers(accountId, 0, 5, null, null) ).withRel("followers").getHref();
         }
 
         private class Following {
             @JsonProperty
-            final String href = HOSTNAME + linkTo( methodOn(FollowsController.class, accountId).getFollowing(accountId, 0, 5) ).withRel("following").getHref();
+            final String href = HOSTNAME + linkTo( methodOn(FollowsController.class, accountId).getFollowing(accountId, 0, 5,null,null) ).withRel("following").getHref();
         }
     }
 }

@@ -2,8 +2,7 @@ package isel.ps.employbox.services;
 
 import com.github.jayield.rapper.mapper.DataMapper;
 import com.github.jayield.rapper.mapper.conditions.Condition;
-import com.github.jayield.rapper.mapper.conditions.EqualCondition;
-import com.github.jayield.rapper.mapper.conditions.OrderCondition;
+import com.github.jayield.rapper.mapper.conditions.EqualAndCondition;
 import com.github.jayield.rapper.unitofwork.UnitOfWork;
 import isel.ps.employbox.ErrorMessages;
 import isel.ps.employbox.exceptions.BadRequestException;
@@ -50,14 +49,9 @@ public class UserAccountService {
         }
 
         if(name != null)
-            pairs.add(new EqualCondition<>("name", name));
-        if(orderColumn != null){
-            if((orderColumn.compareTo("name")==0 || orderColumn.compareTo("rating")!= 0) && !(orderClause.compareTo("ASC")==0 || orderClause.compareTo("DESC")==0))
-                throw new BadRequestException("invalid order collumn name or the order clause is not equal to ASC or DESC");
-            if(orderClause.compareTo("ASC")==0)
-                pairs.add(OrderCondition.asc(orderColumn));
-            pairs.add(OrderCondition.desc(orderColumn));
-        }
+            pairs.add(new EqualAndCondition<>("name", name));
+
+        ServiceUtils.evaluateOrderClause(orderColumn, orderClause, pairs);
 
         return ServiceUtils.getCollectionPageFuture(UserAccount.class, page, pageSize, pairs.toArray(new Condition[pairs.size()]));
     }
@@ -111,8 +105,8 @@ public class UserAccountService {
         DataMapper<Application, Long> applicationMapper = getMapper(Application.class, unit);
         CompletableFuture<CollectionPage<Application>> future = userMapper.findById( accountId)
                 .thenApply(ouser -> ouser.orElseThrow(() -> new ResourceNotFoundException(ErrorMessages.RESOURCE_NOTFOUND_USER)))
-                .thenCompose(ignored -> applicationMapper.find(page, pageSize, new EqualCondition<Long>("accountId", accountId))
-                        .thenCompose(listRes -> applicationMapper.getNumberOfEntries( new EqualCondition<Long>("accountId",accountId))
+                .thenCompose(ignored -> applicationMapper.find(page, pageSize, new EqualAndCondition<Long>("accountId", accountId))
+                        .thenCompose(listRes -> applicationMapper.getNumberOfEntries( new EqualAndCondition<Long>("accountId",accountId))
                                 .thenCompose(aLong -> unit.commit().thenApply(aVoid -> aLong))
                                 .thenApply(collectionSize -> new CollectionPage<Application>(
                                         collectionSize,
@@ -198,8 +192,8 @@ public class UserAccountService {
                             return applicationMapper.deleteAll(applicationIds);
                         })
                         .thenCompose(__ -> {
-                                    comments[0] = commentMapper.find(new EqualCondition<Long>("accountIdFrom", userAccount.getIdentityKey()));
-                                    comments[1] = commentMapper.find(new EqualCondition<Long>("accountIdDest", userAccount.getIdentityKey()));
+                                    comments[0] = commentMapper.find(new EqualAndCondition<Long>("accountIdFrom", userAccount.getIdentityKey()));
+                                    comments[1] = commentMapper.find(new EqualAndCondition<Long>("accountIdDest", userAccount.getIdentityKey()));
 
                                     return CompletableFuture.allOf(comments);
                                 }
@@ -212,15 +206,15 @@ public class UserAccountService {
                                     return commentMapper.deleteAll(list);
                                 }
                         )
-                        .thenCompose(__ -> curriculumMapper.find(new EqualCondition<>("accountId", id)))
+                        .thenCompose(__ -> curriculumMapper.find(new EqualAndCondition<>("accountId", id)))
                         .thenCompose(list -> {
                             List<CompletableFuture<Void>> cflist = new ArrayList<>();
                             list.forEach(curr -> cflist.add(curriculumService.deleteCurriculum(userAccount.getIdentityKey(), curr.getIdentityKey()).toFuture()));
                             return CompletableFuture.allOf(cflist.toArray(new CompletableFuture[cflist.size()]));
                         })
                         .thenCompose( aVoid -> {
-                                    follows[0] = followsMapper.find(new EqualCondition<Long>("accountIdFollower", userAccount.getIdentityKey()));
-                                    follows[1] = followsMapper.find(new EqualCondition<Long>("accountIdFollowed", userAccount.getIdentityKey()));
+                                    follows[0] = followsMapper.find(new EqualAndCondition<Long>("accountIdFollower", userAccount.getIdentityKey()));
+                                    follows[1] = followsMapper.find(new EqualAndCondition<Long>("accountIdFollowed", userAccount.getIdentityKey()));
 
                                     return CompletableFuture.allOf(follows);
                                 }
@@ -234,8 +228,8 @@ public class UserAccountService {
                                 }
                         )
                         .thenCompose( aVoid -> {
-                                    ratings[0] = ratingMapper.find(new EqualCondition<Long>("accountIdFrom", userAccount.getIdentityKey()));
-                                    ratings[1] = ratingMapper.find(new EqualCondition<Long>("accountIdDest", userAccount.getIdentityKey()));
+                                    ratings[0] = ratingMapper.find(new EqualAndCondition<Long>("accountIdFrom", userAccount.getIdentityKey()));
+                                    ratings[1] = ratingMapper.find(new EqualAndCondition<Long>("accountIdDest", userAccount.getIdentityKey()));
 
                                     return CompletableFuture.allOf(ratings);
                                 }

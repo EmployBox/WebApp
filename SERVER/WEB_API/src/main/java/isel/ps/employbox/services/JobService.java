@@ -2,7 +2,7 @@ package isel.ps.employbox.services;
 
 import com.github.jayield.rapper.mapper.DataMapper;
 import com.github.jayield.rapper.mapper.conditions.Condition;
-import com.github.jayield.rapper.mapper.conditions.EqualCondition;
+import com.github.jayield.rapper.mapper.conditions.EqualAndCondition;
 import com.github.jayield.rapper.mapper.conditions.LikeCondition;
 import com.github.jayield.rapper.unitofwork.UnitOfWork;
 import isel.ps.employbox.ErrorMessages;
@@ -29,14 +29,24 @@ import static isel.ps.employbox.services.ServiceUtils.handleExceptions;
 @Service
 public class JobService {
 
-    public CompletableFuture<CollectionPage<Job>> getAllJobs(int page, int pageSize, String address, String title, Integer wage, String offerType, Integer ratingLow, Integer ratingHigh) {
+    public CompletableFuture<CollectionPage<Job>> getAllJobs(
+            int page,
+            int pageSize,
+            String address,
+            String title,
+            Integer wage,
+            String offerType,
+            Integer ratingLow,
+            Integer ratingHigh
+    ) {
         List<Condition> pairs = new ArrayList<>();
         pairs.add(new LikeCondition("address", address));
         pairs.add(new LikeCondition("title", title));
-        pairs.add(new EqualCondition<>("wage", wage));
-        pairs.add(new EqualCondition<>("offerType", offerType));
-        pairs.add(new Condition<>("ratingLow",">", ratingLow));
-        pairs.add(new Condition<>("ratingHigh","<", ratingHigh));
+        pairs.add(new EqualAndCondition<>("wage", wage));
+        pairs.add(new EqualAndCondition<>("offerType", offerType));
+        pairs.add(new Condition<>("ratingLow",">=", ratingLow));
+        pairs.add(new Condition<>("ratingHigh","=<", ratingHigh));
+
 
         pairs = pairs.stream()
                 .filter(stringPair -> stringPair.getValue() != null)
@@ -65,7 +75,7 @@ public class JobService {
 
     public CompletableFuture<CollectionPage<JobExperience>> getJobExperiences(long jid, int page, int pageSize) {
         List<Condition< Long>> pairs = new ArrayList<>();
-        pairs.add(new EqualCondition<>("jobId", jid));
+        pairs.add(new EqualAndCondition<>("jobId", jid));
         Condition[] query = pairs.stream()
                 .filter(stringStringPair -> stringStringPair.getValue() != null)
                 .toArray(Condition[]::new);
@@ -181,7 +191,7 @@ public class JobService {
     public Mono<Void> deleteJob(long jobId, String email) {
         UnitOfWork unitOfWork = new UnitOfWork();
         DataMapper<Account, Long> accountMapper = getMapper(Account.class, unitOfWork);
-        CompletableFuture<Void> future = accountMapper.find(new EqualCondition<String>("email", email))
+        CompletableFuture<Void> future = accountMapper.find(new EqualAndCondition<String>("email", email))
                 .thenApply(accounts -> {
                     if (accounts.isEmpty())
                         throw new UnauthorizedException(ErrorMessages.UN_AUTHORIZED);
