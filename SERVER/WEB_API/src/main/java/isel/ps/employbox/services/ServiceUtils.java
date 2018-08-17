@@ -57,7 +57,8 @@ public class ServiceUtils {
                 throw new BadRequestException("clause is not equal to ASC or DESC");
             if (orderClause.compareTo("ASC") == 0)
                 conditionPairs.add(OrderCondition.asc(orderColumn));
-            conditionPairs.add(OrderCondition.desc(orderColumn));
+            else
+                conditionPairs.add(OrderCondition.desc(orderColumn));
         }
     }
 }

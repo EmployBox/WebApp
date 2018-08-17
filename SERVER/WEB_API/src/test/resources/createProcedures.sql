@@ -1,15 +1,27 @@
 CREATE PROCEDURE populateDB()
   MODIFIES SQL DATA
   begin atomic
-    declare account_id1, account_id2, company_id1, company_id2, job_id, curriculum_id bigint;
+    declare account_id1, account_id2, account_id3,account_id4,account_id5,account_id6, company_id1, company_id2, job_id, curriculum_id bigint;
     /*Insert Users*/
     insert into ACCOUNT(NAME, EMAIL, PASSWORD, ACCOUNTTYPE, RATING) values ('Bruno', 'teste@gmail.com', 'password', 'USR', 2.0);
     set account_id1 = IDENTITY();
     insert into ACCOUNT(NAME, EMAIL, PASSWORD, ACCOUNTTYPE, RATING) values ('Maria', 'lol@hotmail.com', 'teste123', 'USR', 4.0);
     set account_id2 = IDENTITY();
+    insert into ACCOUNT(NAME, EMAIL, PASSWORD, ACCOUNTTYPE, RATING) values ('Carlos', 'carlos@gmail.com', 'password', 'USR', 2.5);
+    set account_id3 = IDENTITY();
+    insert into ACCOUNT(NAME, EMAIL, PASSWORD, ACCOUNTTYPE, RATING) values ('Dário', 'dario@hotmail.com', 'teste123', 'USR', 3.1);
+    set account_id4 = IDENTITY();
+    insert into ACCOUNT(NAME, EMAIL, PASSWORD, ACCOUNTTYPE, RATING) values ('Zacarias', 'zacarias@gmail.com', 'password', 'USR', 2.1);
+    set account_id5 = IDENTITY();
+    insert into ACCOUNT(NAME, EMAIL, PASSWORD, ACCOUNTTYPE, RATING) values ('Ana', 'ana@hotmail.com', 'teste123', 'USR', 4.6);
+    set account_id6 = IDENTITY();
 
     insert into USERACCOUNT(ACCOUNTID) values (account_id1);
     insert into USERACCOUNT(ACCOUNTID) values (account_id2);
+    insert into USERACCOUNT(ACCOUNTID) values (account_id3);
+    insert into USERACCOUNT(ACCOUNTID) values (account_id4);
+    insert into USERACCOUNT(ACCOUNTID) values (account_id5);
+    insert into USERACCOUNT(ACCOUNTID) values (account_id6);
 
     /*Insert Curricula*/
     insert into CURRICULUM(ACCOUNTID, TITLE) values (account_id1, 'Engenharia Civil');
