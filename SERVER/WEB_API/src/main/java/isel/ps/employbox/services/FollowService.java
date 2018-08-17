@@ -116,7 +116,7 @@ public class FollowService {
                             ArrayList<Account> list = new ArrayList<>();
                             oaccount.ifPresent(list::add);
 
-                            return new CollectionPage<Account>(1, 1,0, list);
+                            return new CollectionPage<Account>(list.size(), 1,0, list);
                         }
                 );
     }
