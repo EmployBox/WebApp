@@ -128,7 +128,7 @@ public class UserAccountControllerTests {
                 .expectBody()
                 .returnResult()
                 .getResponseBody());
-        assertEquals(2, objectMapper.readTree(body).get("_embedded").get("items").size());
+        assertEquals(6, objectMapper.readTree(body).get("_embedded").get("items").size());
     }
 
     @Test
@@ -138,7 +138,7 @@ public class UserAccountControllerTests {
         String body = new String(webTestClient
                 .get()
                 .uri(uriBuilder -> uriBuilder.path("/accounts/users")
-                        .queryParam("pageSize",10)
+                        .queryParam("pageSize",5)
                         .queryParam("orderColumn","name")
                         .queryParam("orderClause", "ASC").build())
                 .exchange()
@@ -147,8 +147,24 @@ public class UserAccountControllerTests {
                 .returnResult()
                 .getResponseBody());
 
-        assertEquals(2, objectMapper.readTree(body).get("_embedded").get("items").size());
-        assertEquals("Bruno", objectMapper.readTree(body).get("_embedded").get("items").findValuesAsText("name").get(0));
+        assertEquals(5, objectMapper.readTree(body).get("_embedded").get("items").size());
+        assertEquals("Ana", objectMapper.readTree(body).get("_embedded").get("items").findValuesAsText("name").get(0));
+        assertEquals("Dário", objectMapper.readTree(body).get("_embedded").get("items").findValuesAsText("name").get(3));
+
+        body = new String(webTestClient
+                .get()
+                .uri(uriBuilder -> uriBuilder.path("/accounts/users")
+                        .queryParam("pageSize",5)
+                        .queryParam("page",1)
+                        .queryParam("orderColumn","name")
+                        .queryParam("orderClause", "ASC").build())
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody()
+                .returnResult()
+                .getResponseBody());
+
+        assertEquals("Zacarias", objectMapper.readTree(body).get("_embedded").get("items").findValuesAsText("name").get(0));
 
         body = new String(webTestClient
                 .get()
@@ -162,7 +178,7 @@ public class UserAccountControllerTests {
                 .returnResult()
                 .getResponseBody());
 
-        assertEquals("Maria", objectMapper.readTree(body).get("_embedded").get("items").findValuesAsText("name").get(0));
+        assertEquals("Zacarias", objectMapper.readTree(body).get("_embedded").get("items").findValuesAsText("name").get(0));
 
     }
 
