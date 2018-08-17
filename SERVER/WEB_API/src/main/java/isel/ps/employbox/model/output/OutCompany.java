@@ -83,16 +83,6 @@ public class OutCompany implements OutputDto {
             this.yearFounded = yearFounded;
             _links = new _Links();
         }
-
-        class _Links {
-            @JsonProperty
-            private Self self = new Self();
-
-            private class Self{
-                @JsonProperty
-                final String href = HOSTNAME + linkTo(CompanyController.class).slash(accountId).withSelfRel().getHref();
-            }
-        }
     }
 
     private class _Links {
@@ -128,12 +118,12 @@ public class OutCompany implements OutputDto {
 
         private class Followers {
             @JsonProperty
-            final String href = HOSTNAME + linkTo( methodOn(FollowsController.class, accountId).getTheAccountsWichThisAccountIsFollower(accountId, 0, 5, null, null, 0L)).withRel("followers").expand().getHref();
+            final String href = HOSTNAME + linkTo( methodOn(FollowsController.class, accountId).getTheAccountsWichThisAccountIsFollower(accountId, 0, 5, null, null, null)).withRel("followers").expand().getHref();
         }
 
         private class Following {
             @JsonProperty
-            final String href = HOSTNAME + linkTo( methodOn(FollowsController.class, accountId).getTheAccountsWichThisAccountIsFollowed(accountId, 0, 5,null,null,0L) ).withRel("following").expand().getHref();
+            final String href = HOSTNAME + linkTo( methodOn(FollowsController.class, accountId).getTheAccountsWichThisAccountIsFollowed(accountId, 0, 5,null,null,null) ).withRel("following").expand().getHref();
         }
     }
 }
