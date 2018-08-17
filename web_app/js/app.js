@@ -153,7 +153,7 @@ export default class extends Component {
                       />
                     )} />
                     <PrivateRoute path='/account/:url' component={User} />
-                    <PrivateRoute exact path='/company/:url' component={Company} />
+                    <PrivateRoute path='/company/:url' component={Company} />
                     <PrivateRoute exact path='/create/jobs/:jobUrl' component={CreateJobs} />
                     <Route path='/' render={({ history }) =>
                       <center class='py-5 alert alert-danger' role='alert'>
