@@ -304,7 +304,7 @@ public class JobControllerTests {
                 .delete()
                 .uri("/jobs/" + job.getIdentityKey())
                 .exchange()
-                .expectStatus().isUnauthorized()
+                .expectStatus().isNotFound()
                 .expectBody()
                 .consumeWith(document("deleteJobWhenNotAuthenticated"));
     }
@@ -316,7 +316,7 @@ public class JobControllerTests {
                 .delete()
                 .uri("/jobs/" + job.getIdentityKey())
                 .exchange()
-                .expectStatus().isUnauthorized()
+                .expectStatus().isNotFound()
                 .expectBody()
                 .consumeWith(document("deleteWrongJob"));
     }

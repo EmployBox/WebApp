@@ -47,9 +47,12 @@ public class UserAccountService {
             pairs.add(new Condition<>("ratingLow", ">=", ratingLow ));
             pairs.add(new Condition<>("ratingHigh", "<=", ratingHigh ));
         }
+        pairs.add(new EqualAndCondition<>("name", name));
 
-        if(name != null)
-            pairs.add(new EqualAndCondition<>("name", name));
+        pairs = pairs.stream()
+                .filter(stringPair -> stringPair.getValue() != null)
+                .collect(Collectors.toList());
+
 
         ServiceUtils.evaluateOrderClause(orderColumn, orderClause, pairs);
 
@@ -171,13 +174,17 @@ public class UserAccountService {
 
     public Mono<Void> deleteUser(long id, String email) {
         UnitOfWork unit = new UnitOfWork();
+
+        CurriculumService curriculumService = new CurriculumService(this);
+        JobService jobService = new JobService();
+
         DataMapper<Application, Long> applicationMapper = getMapper(Application.class, unit);
         DataMapper<UserAccount, Long> userMapper = getMapper(UserAccount.class, unit);
         DataMapper<Comment, Long> commentMapper = getMapper(Comment.class, unit);
         DataMapper<Curriculum, Long> curriculumMapper = getMapper(Curriculum.class, unit);
-        CurriculumService curriculumService = new CurriculumService(this);
         DataMapper<Rating, Rating.RatingKey> ratingMapper = getMapper(Rating.class, unit);
         DataMapper<Follows, Follows.FollowKey> followsMapper = getMapper(Follows.class, unit);
+        DataMapper<Job, Long> jobMapper = getMapper(Job.class, unit);
 
 
         CompletableFuture<List<Comment>> [] comments = new CompletableFuture[2];
@@ -242,6 +249,12 @@ public class UserAccountService {
                                     return ratingMapper.deleteAll(list);
                                 }
                         )
+                        .thenCompose(__ -> jobMapper.find(new EqualAndCondition<>("accountId", id)))
+                        .thenCompose(list -> {
+                            List<CompletableFuture<Void>> cflist = new ArrayList<>();
+                            list.forEach(curr -> cflist.add(jobService.deleteJob(curr.getIdentityKey(), email).toFuture()));
+                            return CompletableFuture.allOf(cflist.toArray(new CompletableFuture[cflist.size()]));
+                        })
                         .thenCompose(aVoid -> userMapper.delete(userAccount))
                         .thenCompose(aVoid -> unit.commit()));
         return Mono.fromFuture(

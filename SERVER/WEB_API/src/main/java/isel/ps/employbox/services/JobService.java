@@ -6,12 +6,10 @@ import com.github.jayield.rapper.mapper.conditions.EqualAndCondition;
 import com.github.jayield.rapper.mapper.conditions.LikeCondition;
 import com.github.jayield.rapper.unitofwork.UnitOfWork;
 import isel.ps.employbox.ErrorMessages;
-import isel.ps.employbox.exceptions.BadRequestException;
 import isel.ps.employbox.exceptions.ConflictException;
 import isel.ps.employbox.exceptions.ResourceNotFoundException;
 import isel.ps.employbox.exceptions.UnauthorizedException;
 import isel.ps.employbox.model.binders.CollectionPage;
-import isel.ps.employbox.model.entities.Account;
 import isel.ps.employbox.model.entities.Application;
 import isel.ps.employbox.model.entities.Job;
 import isel.ps.employbox.model.entities.JobExperience;
@@ -37,8 +35,10 @@ public class JobService {
             Integer wage,
             String offerType,
             Integer ratingLow,
-            Integer ratingHigh
-    ) {
+            Integer ratingHigh,
+            String orderColumn,
+            String orderClause)
+    {
         List<Condition> pairs = new ArrayList<>();
         pairs.add(new LikeCondition("address", address));
         pairs.add(new LikeCondition("title", title));
@@ -51,6 +51,8 @@ public class JobService {
         pairs = pairs.stream()
                 .filter(stringPair -> stringPair.getValue() != null)
                 .collect(Collectors.toList());
+
+        ServiceUtils.evaluateOrderClause(orderColumn, orderClause, pairs);
 
         return ServiceUtils.getCollectionPageFuture(
                 Job.class,
@@ -188,59 +190,39 @@ public class JobService {
         return Mono.fromFuture(future);
     }
 
+
     public Mono<Void> deleteJob(long jobId, String email) {
         UnitOfWork unitOfWork = new UnitOfWork();
-        DataMapper<Account, Long> accountMapper = getMapper(Account.class, unitOfWork);
-        CompletableFuture<Void> future = accountMapper.find(new EqualAndCondition<String>("email", email))
-                .thenApply(accounts -> {
-                    if (accounts.isEmpty())
-                        throw new UnauthorizedException(ErrorMessages.UN_AUTHORIZED);
-                    return accounts.get(0);
-                })
-                .thenCompose(account -> deleteJobAux(unitOfWork, jobId, account))
-                .thenCompose(res -> unitOfWork.commit());
+        AccountService accountService = new AccountService();
+        DataMapper<Application, Long> applicationMapper = getMapper(Application.class, unitOfWork);
+        DataMapper<JobExperience, Long> jobExperienceMapper = getMapper(JobExperience.class, unitOfWork);
+        DataMapper<Job, Long> jobMapper = getMapper(Job.class, unitOfWork);
 
-        future = handleExceptions(future, unitOfWork);
+        CompletableFuture<Void> future = accountService.getAccount(email)
+                .thenCompose(acc -> jobMapper.find(new EqualAndCondition<>("jobId", jobId), new EqualAndCondition<>("accountId", acc.getIdentityKey())))
+                .thenApply(jobRes -> {
+                    if(jobRes.size() == 0)
+                        throw new ResourceNotFoundException(ErrorMessages.RESOURCE_NOTFOUND_JOB);
+                    return jobRes.get(0);
+                })
+                .thenCompose(job ->
+                        job.getExperiences().apply(unitOfWork)
+                                .thenApply(curriculumExperiences -> curriculumExperiences.stream().map(JobExperience::getIdentityKey).collect(Collectors.toList()))
+                                .thenCompose(jobExperienceMapper::deleteAll)
+                                .thenApply(aVoid -> job)
+                ).thenCompose(job ->
+                        job.getApplications().apply(unitOfWork)
+                                .thenApply(jobApplications -> jobApplications.stream().map(Application::getIdentityKey).collect(Collectors.toList()))
+                                .thenCompose(applicationMapper::deleteAll)
+                                .thenApply(aVoid -> job)
+                )
+                .thenAccept(job -> jobMapper.deleteById(job.getIdentityKey()))
+                .thenCompose(aVoid -> unitOfWork.commit());
+
 
         return Mono.fromFuture(future);
     }
-    //todo commit
-    private CompletableFuture<Void> deleteJobAux(UnitOfWork unitOfWork, long jobId, Account account) {
-        CompletableFuture<Void> future = getJob(jobId)
-                .thenCompose(
-                        job -> job.getAccount()
-                                .getForeignObject(unitOfWork)
-                                .thenCompose(acc -> {
-                                    if (!acc.getIdentityKey().equals(account.getIdentityKey()))
-                                        throw new BadRequestException(ErrorMessages.UN_AUTHORIZED_ID_AND_EMAIL_MISMATCH);
-                                    return executeDeleteTransaction(job);
-                                })
-                );
-        return handleExceptions(future, unitOfWork);
-    }
 
-    private CompletableFuture<Void> executeDeleteTransaction(Job job) {
-        UnitOfWork unitOfWork = new UnitOfWork();
-        DataMapper<Application, Long> applicationMapper = getMapper(Application.class, unitOfWork);
-        DataMapper<JobExperience, Long> jobExperienceMapper = getMapper(JobExperience.class, unitOfWork);
-        DataMapper<Job, Long> jobeMapper = getMapper(Job.class, unitOfWork);
-        CompletableFuture<Void> future = job.getApplications().apply(unitOfWork)
-                .thenCompose(applications -> {
-                    List<Long> applicationIds = applications.stream().map(Application::getIdentityKey).collect(Collectors.toList());
-                    return applicationMapper.deleteAll(applicationIds);
-                })
-                .thenCompose(aVoid ->
-                        job.getExperiences()
-                                .apply(unitOfWork)
-                                .thenCompose(jobExperiences -> {
-                                    List<Long> jobExpIds = jobExperiences.stream().map(JobExperience::getIdentityKey).collect(Collectors.toList());
-                                    return jobExperienceMapper.deleteAll(jobExpIds);
-                                })
-                )
-                .thenAccept(aVoid -> jobeMapper.delete( job))
-                .thenCompose(aVoid -> unitOfWork.commit());
-        return handleExceptions(future, unitOfWork);
-    }
 
     public Mono<Void> deleteJobExperience(long jxpId, long jobId, String email) {
         UnitOfWork unitOfWork = new UnitOfWork();
@@ -253,6 +235,23 @@ public class JobService {
                             return account;
                         }))
                 .thenCompose(account -> jobExperienceMapper.deleteById(jxpId))
+                .thenCompose(aVoid -> unitOfWork.commit());
+        return Mono.fromFuture(
+                handleExceptions(future, unitOfWork)
+        );
+    }
+
+    public Mono<Void> deleteJobApplication(long jappId, long jobId, String email) {
+        UnitOfWork unitOfWork = new UnitOfWork();
+        DataMapper<Application, Long> jAppMapper = getMapper(Application.class, unitOfWork);
+        CompletableFuture<Void> future = getJob(jobId)
+                .thenCompose(job -> job.getAccount().getForeignObject(unitOfWork)
+                        .thenApply(account -> {
+                            if (!account.getEmail().equals(email))
+                                throw new UnauthorizedException(ErrorMessages.UN_AUTHORIZED_ID_AND_EMAIL_MISMATCH);
+                            return account;
+                        }))
+                .thenCompose(account -> jAppMapper.deleteById(jappId))
                 .thenCompose(aVoid -> unitOfWork.commit());
         return Mono.fromFuture(
                 handleExceptions(future, unitOfWork)
