@@ -1,7 +1,7 @@
 CREATE PROCEDURE populateDB()
   MODIFIES SQL DATA
   begin atomic
-    declare account_id1, account_id2, account_id3,account_id4,account_id5,account_id6, company_id1, company_id2, job_id, curriculum_id bigint;
+    declare account_id1, account_id2, account_id3,account_id4,account_id5,account_id6, company_id1, company_id2, job_id,  job_id2,  job_id3, curriculum_id bigint;
     /*Insert Users*/
     insert into ACCOUNT(NAME, EMAIL, PASSWORD, ACCOUNTTYPE, RATING) values ('Bruno', 'teste@gmail.com', 'password', 'USR', 2.0);
     set account_id1 = IDENTITY();
@@ -52,8 +52,14 @@ CREATE PROCEDURE populateDB()
     insert into COMPANY(ACCOUNTID) values (company_id2);
 
     /*Insert Jobs*/
-    insert into JOB(TITLE, ACCOUNTID, WAGE, DESCRIPTION, OFFERTYPE) values ('Great Job', account_id1, 1, 'Sou uma oferta simpatica', 'Looking for work');
+    insert into JOB(TITLE, ACCOUNTID, WAGE, DESCRIPTION, OFFERTYPE) values ('Great Job', account_id1, 1000, 'Sou uma oferta simpatica', 'Looking for work');
     set job_id = IDENTITY();
+
+    insert into JOB(TITLE, ACCOUNTID, WAGE, DESCRIPTION, OFFERTYPE) values ('Not so Great Job', account_id2, 100, 'Sou uma moderadamente oferta simpatica', 'Looking for work');
+    set job_id2 = IDENTITY();
+
+    insert into JOB(TITLE, ACCOUNTID, WAGE, DESCRIPTION, OFFERTYPE) values ('Bad Job', account_id3, 10, 'Sou uma oferta meh', 'Looking for work');
+    set job_id3 = IDENTITY();
 
     /*Comment*/
     insert into COMMENT( ACCOUNTIDFROM, ACCOUNTIDDEST, TEXT, STATUS) values (account_id1, account_id2, 'FIRST COMMENT', 0);
