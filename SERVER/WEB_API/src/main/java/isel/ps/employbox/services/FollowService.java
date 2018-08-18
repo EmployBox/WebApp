@@ -75,22 +75,22 @@ public class FollowService {
     }
 
 
-    public Mono<Void> createFollower(long accountToBeFollowedId, long accountToFollowId, String username) {
+    public Mono<Void> createFollower(long accountId, long accountToBeFollowedId, String username) {
         UnitOfWork unitOfWork = new UnitOfWork();
         DataMapper<Follows, Follows.FollowKey> followMapper = getMapper(Follows.class, unitOfWork);
-        CompletableFuture<Void> future = accountService.getAccount(accountToFollowId, username)
-                .thenCompose(account -> followMapper.create(new Follows(accountToBeFollowedId, accountToFollowId)))
+        CompletableFuture<Void> future = accountService.getAccount(accountId, username)
+                .thenCompose(account -> followMapper.create(new Follows(accountId, accountToBeFollowedId)))
                 .thenCompose(aVoid -> unitOfWork.commit());
         return Mono.fromFuture(
                 handleExceptions(future, unitOfWork)
         );
     }
 
-    public Mono<Void> deleteFollower(long id, long fid, String username) {
+    public Mono<Void> deleteFollower(long accountId, long followedId, String username) {
         UnitOfWork unitOfWork = new UnitOfWork();
         DataMapper<Follows, Follows.FollowKey> followMapper = getMapper(Follows.class, unitOfWork);
-        CompletableFuture<Void> future = accountService.getAccount(id, username)
-                .thenCompose(account -> followMapper.deleteById(new Follows.FollowKey(id, fid)))
+        CompletableFuture<Void> future = accountService.getAccount(accountId, username)
+                .thenCompose(account -> followMapper.deleteById(new Follows.FollowKey(accountId, followedId)))
                 .thenCompose(aVoid -> unitOfWork.commit());
         return Mono.fromFuture(
                 handleExceptions(future, unitOfWork)
