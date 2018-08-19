@@ -65,10 +65,9 @@ public class FollowsController {
     @PutMapping("/followed")
     public Mono<Void> addNewFollowRelation(
             @PathVariable long accountId,
-            @RequestParam long accountToBeFollowedId,
             Authentication authentication)
     {
-        return followService.createFollower(accountId, accountToBeFollowedId, authentication.getName());
+        return followService.followNewAccount(accountId, authentication.getName());
     }
 
     @DeleteMapping("/followed")

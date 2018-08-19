@@ -54,7 +54,7 @@ public class Follows implements DomainObject<Follows.FollowKey> {
             accountIdFollower = 0;
         }
 
-        public FollowKey(long accountIdFollowed, long accountIdFollower) {
+        public FollowKey(long accountIdFollower,long accountIdFollowed) {
             super(accountIdFollowed, accountIdFollower);
             this.accountIdFollower = accountIdFollower;
             this.accountIdFollowed = accountIdFollowed;
