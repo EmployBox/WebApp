@@ -23,7 +23,7 @@ public class FollowsController {
         this.followService = followService;
     }
 
-    @GetMapping("/followed")
+    @GetMapping("/following")
     public Mono<HalCollectionPage<Account>> getTheAccountsWichThisAccountIsFollower(
             @PathVariable long accountId,
             @RequestParam(defaultValue = "0") int page,
@@ -41,7 +41,7 @@ public class FollowsController {
         return Mono.fromFuture(future.thenCompose(accountCollectionPage -> accountBinder.bindOutput(accountCollectionPage, this.getClass(), accountId)));
     }
 
-    @GetMapping("/following")
+    @GetMapping("/followed")
     public Mono<HalCollectionPage<Account>> getTheAccountsWichThisAccountIsFollowed(
             @PathVariable long accountId,
             @RequestParam(defaultValue = "0") int page,
