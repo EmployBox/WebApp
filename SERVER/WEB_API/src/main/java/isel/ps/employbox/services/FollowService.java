@@ -84,7 +84,10 @@ public class FollowService {
         CompletableFuture<Void> future = accountService.getAccount(username)
                 .thenCompose(account ->
                         followMapper.findById(new Follows.FollowKey(account.getIdentityKey(), accountToBeFollowedId))
-                                .thenAccept(follows -> follows.orElseThrow(()-> new ConflictException(ErrorMessages.ALREADY_FOLLOWED)))
+                                .thenAccept(follows -> {
+                                    if(follows.isPresent())
+                                        throw new ConflictException(ErrorMessages.ALREADY_FOLLOWED);
+                                })
                                 .thenCompose(aVoid -> followMapper.create(new Follows(account.getIdentityKey(), accountToBeFollowedId)))
                                 .thenCompose(aVoid -> unitOfWork.commit()));
         return Mono.fromFuture(
