@@ -6,6 +6,8 @@ import com.github.jayield.rapper.mapper.conditions.Condition;
 import com.github.jayield.rapper.mapper.conditions.EqualAndCondition;
 import com.github.jayield.rapper.mapper.conditions.EqualOrCondition;
 import com.github.jayield.rapper.unitofwork.UnitOfWork;
+import isel.ps.employbox.ErrorMessages;
+import isel.ps.employbox.exceptions.ConflictException;
 import isel.ps.employbox.model.binders.CollectionPage;
 import isel.ps.employbox.model.entities.Account;
 import isel.ps.employbox.model.entities.Follows;
@@ -75,12 +77,16 @@ public class FollowService {
     }
 
 
-    public Mono<Void> createFollower(long accountId, long accountToBeFollowedId, String username) {
+    public Mono<Void> followNewAccount(long accountToBeFollowedId, String username) {
         UnitOfWork unitOfWork = new UnitOfWork();
         DataMapper<Follows, Follows.FollowKey> followMapper = getMapper(Follows.class, unitOfWork);
-        CompletableFuture<Void> future = accountService.getAccount(accountId, username)
-                .thenCompose(account -> followMapper.create(new Follows(accountId, accountToBeFollowedId)))
-                .thenCompose(aVoid -> unitOfWork.commit());
+
+        CompletableFuture<Void> future = accountService.getAccount(username)
+                .thenCompose(account ->
+                        followMapper.findById(new Follows.FollowKey(account.getIdentityKey(), accountToBeFollowedId))
+                                .thenAccept(follows -> follows.orElseThrow(()-> new ConflictException(ErrorMessages.ALREADY_FOLLOWED)))
+                                .thenCompose(aVoid -> followMapper.create(new Follows(account.getIdentityKey(), accountToBeFollowedId)))
+                                .thenCompose(aVoid -> unitOfWork.commit()));
         return Mono.fromFuture(
                 handleExceptions(future, unitOfWork)
         );

@@ -26,10 +26,12 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Optional;
 
 import static com.github.jayield.rapper.mapper.MapperRegistry.getMapper;
 import static isel.ps.employbox.DataBaseUtils.prepareDB;
 import static junit.framework.TestCase.assertEquals;
+import static junit.framework.TestCase.assertTrue;
 import static org.springframework.restdocs.webtestclient.WebTestClientRestDocumentation.documentationConfiguration;
 import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.springSecurity;
 import static org.springframework.web.reactive.function.client.ExchangeFilterFunctions.basicAuthentication;
@@ -177,6 +179,28 @@ public class FollowsControllerTests {
         jsonNode = objectMapper.readTree(body);
         assertEquals(jsonNode.get("size").asInt(),1);
         assertEquals("company1", objectMapper.readTree(body).get("_embedded").get("items").findValuesAsText("name").get(0));
+    }
+
+    @Test
+    @WithMockUser(username = "teste@gmail.com")
+    public void followNewAccount() throws IOException {
+        UnitOfWork unitOfWork = new UnitOfWork();
+        DataMapper<Follows, Follows.FollowKey> followMapper = getMapper(Follows.class, unitOfWork);
+        Optional<Follows> follow = followMapper.findById(new Follows.FollowKey(userAccount2.getIdentityKey(),company.getAccountVersion() )).join();
+
+        assertTrue(!follow.isPresent());
+
+        webTestClient
+                .put()
+                .uri(uriBuilder -> uriBuilder.path("/accounts/"+company.getIdentityKey()+"/followed").build())
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody()
+                .returnResult();
+
+        follow = followMapper.findById(new Follows.FollowKey(userAccount2.getIdentityKey(),company.getIdentityKey() )).join();
+        assertTrue(follow.isPresent());
+        unitOfWork.commit().join();
     }
 
 }
