@@ -72,10 +72,9 @@ public class FollowsController {
 
     @DeleteMapping("/followed")
     public Mono<Void> deleteAFollowRelation(
-            @PathVariable long id,
-            @RequestParam long accountToBeFollowedId,
+            @PathVariable long accountId,
             Authentication authentication)
     {
-        return followService.deleteFollower(id, accountToBeFollowedId, authentication.getName());
+        return followService.deleteFollower(accountId, authentication.getName());
     }
 }
