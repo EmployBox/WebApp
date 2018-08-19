@@ -19,12 +19,12 @@ public class Follows implements DomainObject<Follows.FollowKey> {
 
     public Follows(long accountIdFollower, long accountIdFollowed, long version) {
         this.version = version;
-        followKey = new FollowKey(accountIdFollowed, accountIdFollower);
+        followKey = new FollowKey(accountIdFollower, accountIdFollowed);
     }
 
     public Follows(long accountIdFollower, long accountIdFollowed) {
         this.version = -1;
-        followKey = new FollowKey(accountIdFollowed, accountIdFollower);
+        followKey = new FollowKey(accountIdFollower, accountIdFollowed);
     }
 
     @Override
