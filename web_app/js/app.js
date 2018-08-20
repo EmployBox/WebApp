@@ -21,6 +21,7 @@ import SignUpUser from './pages/signup/signupUser'
 import SignUpCompany from './pages/signup/signupCompany'
 import User from './pages/profiles/user'
 import Company from './pages/profiles/company'
+import Job from './pages/jobPage'
 
 import URI from 'urijs'
 import URITemplate from 'urijs/src/URITemplate'
@@ -155,6 +156,7 @@ export default class extends Component {
                     <PrivateRoute path='/account/:url' component={User} />
                     <PrivateRoute path='/company/:url' component={Company} />
                     <PrivateRoute exact path='/create/jobs/:jobUrl' component={CreateJobs} />
+                    <PrivateRoute exact path='/job/:url' component={Job} />
                     <Route path='/' render={({ history }) =>
                       <center class='py-5 alert alert-danger' role='alert'>
                         <h2>Error 404.</h2>
