@@ -35,11 +35,9 @@ export default withRouter(({match, auth, history}) => (
                   Header: 'Name',
                   id: 'name',
                   accessor: i => i.account.name,
-                  Cell: ({original, value}) => {
-                    return <Link to={(original.account.accountType === 'USR' ? userTemplate : companyTemplate)
-                      .expand({url: original.account._links.self.href})}>{value}
-                    </Link>
-                  }
+                  Cell: ({original, value}) => <Link to={(original.account.accountType === 'USR' ? userTemplate : companyTemplate)
+                    .expand({url: original.account._links.self.href})}>{value}
+                  </Link>
                 },
                 {
                   Header: 'Rating',

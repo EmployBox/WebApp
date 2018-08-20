@@ -91,7 +91,7 @@ class SearchPage extends React.Component {
             <div class='container'>
               {entity.render.renderFilters(query, this.handleNewQuery)}
               <br />
-              <div class='form-group'>
+              {/* <div class='form-group'>
                 <label>Number of Results</label>
                 <select value={query.pageSize} class='form-control' onChange={(event) => { query.pageSize = event.target.value; this.setState({ query: query }) }}>
                   <option value='10'>10</option>
@@ -99,7 +99,7 @@ class SearchPage extends React.Component {
                   <option value='20'>20</option>
                   <option value='30'>30</option>
                 </select>
-              </div>
+              </div> */}
               <center>
                 <button type='submit' class={buttonClass} onClick={() => this.handleClick()}>Search</button>
               </center>
@@ -109,7 +109,7 @@ class SearchPage extends React.Component {
             <h3 class='text-center text-white border bg-dark'>Results</h3>
             <HttpRequest
               url={uri}
-              onResult={data => entity.render.renderTable(data)}
+              onResult={data => entity.render.renderTable({json: data})}
             />
           </div>
         </div>

@@ -1,69 +1,67 @@
 import React from 'react'
 import { Link, withRouter } from 'react-router-dom'
+import Table from './halTable'
+import URI from 'urijs'
+import URITemplate from 'urijs/src/URITemplate'
 
-export default withRouter(({_embedded, history, accountTempl, companyTempl, moderatorTempl, jobTempl, authenticated, createJobsURL}) => {
-  if (_embedded) {
-    const tableRows = _embedded.items.map(item => {
-      const { account } = item
+const searchTemplate = new URITemplate('/search/{url}')
 
-      let templ
-      if (account.accountType === 'USR') templ = accountTempl
-      else if (account.accountType === 'CMP') templ = companyTempl
-      else templ = moderatorTempl
-
-      let wasLinkClicked = false
-
-      return (
-        <tr key={item._links.self.href} onClick={() => { if (!wasLinkClicked) history.push(jobTempl.expand({url: item._links.self.href})) }}>
-          <td>
-            <Link to={templ.expand({url: account._links.self.href})} onClick={() => { wasLinkClicked = true }}>{account.name}</Link>
-          </td>
-          <td>{account.rating}</td>
-          <td>{item.title}</td>
-          <td>{item.offerBeginDate}</td>
-          <td>{item.address || 'Not defined'}</td>
-          <td>{item.offerType}</td>
-        </tr>
-      )
-    })
-
-    const table = <table class='table table-hover'>
-      <thead>
-        <tr>
-          <th>Account</th>
-          <th>☆</th>
-          <th>Title</th>
-          <th>Opens</th>
-          <th>Location</th>
-          <th>Type</th>
-        </tr>
-      </thead>
-      <tbody>
-        {tableRows}
-      </tbody>
-    </table>
-
-    return (
-      <div class='row'>
-        <div class='col'>
-          {table}
-        </div>
-        <div class='col-auto'>
-          <Link class='btn btn-success' to={createJobsURL}>New</Link>
-        </div>
-      </div>
-    )
-  }
-
-  return (
-    <div>
-      <p>No items found for this criteria</p>
-      {authenticated
-        ? <div class='col-auto'>
-          <Link class='btn btn-success' to={createJobsURL}>New</Link>
-        </div>
-        : <div />
-      }
+export default withRouter(({json, match, history, accountTempl, companyTempl, moderatorTempl, jobTempl, createJobsURL}) => 
+  <div class='row'>
+    <div class='col'>
+      <Table json={json} currentUrl={URI.decode(match.params.url)}
+        pushTo={url => history.push(searchTemplate.expand({url: url}))}
+        onClickRow={({rowInfo, column}) => {
+          if (column.Header !== 'Name') {
+            history.push(jobTempl.expand({url: rowInfo.original._links.self.href}))
+          }
+        }}
+        columns={[
+          {
+            Header: 'Account Info',
+            columns: [
+              {
+                Header: 'Name',
+                id: 'name',
+                accessor: i => i.account.name,
+                Cell: ({original, value}) => <Link to={(original.account.accountType === 'USR' ? accountTempl : original.account.accountType === 'CMP' ? companyTempl : moderatorTempl)
+                  .expand({url: original.account._links.self.href})}>{value}
+                </Link>
+              },
+              {
+                Header: '☆',
+                id: 'rating',
+                accessor: i => i.account.rating
+              }
+            ]
+          },
+          {
+            Header: 'Job Info',
+            columns: [
+              {
+                Header: 'Title',
+                accessor: 'title'
+              },
+              {
+                Header: 'Opens',
+                accessor: 'offerBeginDate'
+              },
+              {
+                Header: 'Location',
+                id: 'address',
+                accessor: i => i.address || 'Not defined'
+              },
+              {
+                Header: 'Type',
+                accessor: 'offerType'
+              }
+            ]
+          }
+        ]}
+      />
     </div>
-  )
-})
+    <div class='col-auto'>
+      <Link class='btn btn-success' to={createJobsURL}>New</Link>
+    </div>
+  </div>
+)

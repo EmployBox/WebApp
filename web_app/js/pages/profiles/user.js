@@ -7,6 +7,7 @@ import FollowersTable from '../tables/followersTable'
 import JobsTable from '../tables/offeredJobsTable'
 import ApplicationsTable from '../tables/applicationsTable'
 import CurriculasTable from '../tables/curriculasTable'
+import CommentBox from '../../components/CommentBox';
 
 const style = {
   width: 200,
@@ -21,7 +22,7 @@ const applicationsTempl = new URITemplate('/account/{userUrl}/applications/{appl
 const followersTempl = new URITemplate('/account/{userUrl}/followers/{followersURL}')
 const followingTempl = new URITemplate('/account/{userUrl}/following/{followingUrl}')
 
-export default withRouter(({auth, match, history}) => {
+export default withRouter(({auth, match, history, accountId}) => {
   const CollectionButton = ({url, title, pushTo}) => (
     <HttpRequest url={url} authorization={auth}
       onResult={json => (
@@ -33,6 +34,46 @@ export default withRouter(({auth, match, history}) => {
       )}
     />
   )
+  const FollowButton = class extends React.Component {
+    constructor (props) {
+      super(props)
+      this.state = {
+        text: props.follows.size === 0 ? 'Follow' : 'Following',
+        method: props.follows.size === 0 ? 'PUT' : 'DELETE',
+        flag: false
+      }
+      this.changeState = this.changeState.bind(this)
+      this.onClick = this.onClick.bind(this)
+    }
+
+    changeState (json) {
+      this.setState(oldstate => {
+        oldstate.text = oldstate.text === 'Follow' ? 'Folowing' : 'Follow'
+        oldstate.method = oldstate.method === 'PUT' ? 'DELETE' : 'PUT'
+        oldstate.flag = false
+        return oldstate
+      })
+    }
+
+    onClick () {
+      this.setState(oldstate => {
+        oldstate.flag = !oldstate.flag
+        return oldstate
+      })
+    }
+
+    render () {
+      return (<div>
+        <button class='btn btn-primary bg-dark' onClick={this.onClick} >{this.state.text}</button>
+        {this.state.flag
+          ? <HttpRequest method={this.state.method} url={this.props.url} authorization={auth}
+            afterResult={this.changeState}
+          />
+          : <div />}
+      </div>
+      )
+    }
+  }
   return (
     <HttpRequest
       method='GET'
@@ -42,6 +83,13 @@ export default withRouter(({auth, match, history}) => {
         <div class='text-center'>
           <img style={style} src={json.photo_url} />
           <h2>{json.name}</h2>
+          <HttpRequest url={new URI(json._links.followers.href.split('?')[0]).setQuery('accountToCheck', accountId).href()}
+            authorization={auth}
+            onResult={follows => <FollowButton follows={follows}
+              url={json._links.followers.href.split('?')[0]}
+            />
+            }
+          />
           <h3>{json.summary}</h3>
           <h4>Rating: {json.rating}</h4>
           <CollectionButton url={json._links.offered_jobs.href} title='Offered Jobs' pushTo={offeredJobsTempl.expand({
@@ -75,6 +123,7 @@ export default withRouter(({auth, match, history}) => {
           <Route path={`${match.path}/curriculas/:curriculaUrl`} component={(props) => <CurriculasTable auth={auth} {...props} />} />
           <Route path={`${match.path}/following/:followingUrl`} component={(props) =>
             <FollowersTable auth={auth} url={URI.decode(props.match.params.followingUrl)} template={followingTempl} {...props} />} />
+          <CommentBox url={json._links.comments.href} auth={auth} />
         </div>
       )}
     />
