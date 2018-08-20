@@ -38,7 +38,7 @@ public class CommentController {
     }
 
     @GetMapping("/{commentId}")
-    public Mono<OutComment> getComment(@PathVariable long accountId, @PathVariable long commentId, Authentication authentication){
+    public Mono<OutComment> getComment(@PathVariable long accountId, @PathVariable long commentId){
         CompletableFuture<OutComment> future = commentService.getComment(accountId, commentId)
                 .thenCompose(commentBinder::bindOutput);
         return Mono.fromFuture(future);
@@ -51,19 +51,19 @@ public class CommentController {
             @RequestBody InComment inComment,
             Authentication authentication
     ){
-        if(accountId != inComment.getAccountIdFrom() || commentId != inComment.getCommmentId()) throw new BadRequestException(BAD_REQUEST_IDS_MISMATCH);
+        if(accountId != inComment.getAccountIdTo() || commentId != inComment.getCommmentId()) throw new BadRequestException(BAD_REQUEST_IDS_MISMATCH);
         return commentService.updateComment(commentBinder.bindInput(inComment),authentication.getName());
     }
 
     @PostMapping
     public Mono<OutComment> createComment(
             @PathVariable long accountId,
-            @RequestParam long accountIdDest,
-            @RequestBody InComment comment,
+            @RequestBody InComment inComment,
             Authentication authentication
     ){
-        if(accountId != comment.getAccountIdFrom() || accountIdDest != comment.getAccountIdTo()) throw new BadRequestException(BAD_REQUEST_IDS_MISMATCH);
-        CompletableFuture<OutComment> future = commentService.createComment(commentBinder.bindInput(comment), authentication.getName())
+        if(accountId != inComment.getAccountIdTo()) throw new BadRequestException(BAD_REQUEST_IDS_MISMATCH);
+        Comment comment = commentBinder.bindInput(inComment);
+        CompletableFuture<OutComment> future = commentService.createComment(comment, authentication.getName())
                 .thenCompose(commentBinder::bindOutput);
         return Mono.fromFuture(future);
     }

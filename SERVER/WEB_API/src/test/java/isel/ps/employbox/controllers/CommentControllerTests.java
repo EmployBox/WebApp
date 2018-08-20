@@ -1,6 +1,7 @@
 package isel.ps.employbox.controllers;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.jayield.rapper.mapper.DataMapper;
 import com.github.jayield.rapper.mapper.conditions.EqualAndCondition;
@@ -25,6 +26,7 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
+import java.io.IOException;
 import java.util.List;
 
 import static com.github.jayield.rapper.mapper.MapperRegistry.getMapper;
@@ -86,14 +88,32 @@ public class CommentControllerTests {
     }
 
     @Test
-    public void testGetAllComments(){
-        webTestClient
+    public void testGetAllComments() throws IOException {
+        ObjectMapper objectMapper = new ObjectMapper();
+
+        String body = new String(webTestClient
                 .get()
                 .uri("/accounts/"+userAccount.getIdentityKey()+"/comments")
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody()
-                .consumeWith(document("getAllComments"));
+                .returnResult()
+                .getResponseBody());
+
+        JsonNode jsonNode = objectMapper.readTree(body);
+        assertEquals(0, jsonNode.findValue("size").asInt());
+
+        body = new String(webTestClient
+                .get()
+                .uri("/accounts/"+userAccount2.getIdentityKey()+"/comments")
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody()
+                .returnResult()
+                .getResponseBody());
+
+        jsonNode = objectMapper.readTree(body);
+        assertEquals(1, jsonNode.findValue("size").asInt());
     }
 
     @Test
@@ -109,11 +129,11 @@ public class CommentControllerTests {
     }
 
     @Test
-    @WithMockUser(username = "teste@gmail.com")
+    @WithMockUser(username = "lol@hotmail.com")
     public void testCreateComment() throws Exception {
         InComment inComment = new InComment();
-        inComment.setAccountIdFrom(userAccount.getIdentityKey());
-        inComment.setAccountIdTo(userAccount2.getIdentityKey());
+        inComment.setAccountIdFrom(userAccount2.getIdentityKey());
+        inComment.setAccountIdTo(userAccount.getIdentityKey());
         inComment.setText("HAHAHA");
 
         ObjectMapper objectMapper = new ObjectMapper();
@@ -122,7 +142,7 @@ public class CommentControllerTests {
 
         webTestClient
                 .post()
-                .uri(uriBuilder -> uriBuilder.path("/accounts/"+userAccount.getIdentityKey()+"/comments").queryParam("accountIdDest",userAccount2.getIdentityKey()).build())
+                .uri(uriBuilder -> uriBuilder.path("/accounts/"+userAccount.getIdentityKey()+"/comments").build())
                 .contentType(MediaType.APPLICATION_JSON)
                 .syncBody(json)
                 .exchange()
@@ -172,7 +192,7 @@ public class CommentControllerTests {
 
         webTestClient
                 .put()
-                .uri("/accounts/" + userAccount.getIdentityKey() + "/comments/" + comment.getIdentityKey())
+                .uri("/accounts/" + userAccount2.getIdentityKey() + "/comments/" + comment.getIdentityKey())
                 .contentType(MediaType.APPLICATION_JSON)
                 .syncBody(json)
                 .exchange()

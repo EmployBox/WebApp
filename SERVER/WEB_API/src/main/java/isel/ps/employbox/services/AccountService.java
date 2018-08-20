@@ -37,7 +37,7 @@ public final class AccountService {
                 .thenCompose(res -> unitOfWork.commit().thenApply(aVoid -> res))
                 .thenApply(oacc -> oacc.orElseThrow(() -> new ResourceNotFoundException(RESOURCE_NOTFOUND_ACCOUNT)))
                 .thenApply(account -> {
-                    if (email.length == 1 && !account.getEmail().equals(email[0]))
+                    if (email.length == 1 && account.getEmail().compareTo(email[0])!=0)
                         throw new UnauthorizedException(ErrorMessages.UN_AUTHORIZED_ID_AND_EMAIL_MISMATCH);
                     return account;
                 });
