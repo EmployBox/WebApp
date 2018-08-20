@@ -26,23 +26,23 @@ public class CommentService {
         this.accountService = accountService;
     }
 
-    public CompletableFuture<CollectionPage<Comment>> getComments(long accountFromId, int page, int pageSize) {
-        return accountService.getAccount(accountFromId)
-                .thenCompose(__-> ServiceUtils.getCollectionPageFuture(Comment.class, page, pageSize, new EqualAndCondition<>("accountIdFrom", accountFromId)));
+    public CompletableFuture<CollectionPage<Comment>> getComments(long accountId, int page, int pageSize) {
+        return accountService.getAccount(accountId)
+                .thenCompose(__-> ServiceUtils.getCollectionPageFuture(Comment.class, page, pageSize, new EqualAndCondition<>("accountIdDest", accountId)));
     }
 
-    public CompletableFuture<Comment> getComment(long accountIdFrom, long commentId) {
+    public CompletableFuture<Comment> getComment(long accountIdTo, long commentId) {
         UnitOfWork unitOfWork = new UnitOfWork();
         DataMapper<Account, Long> accoutnMapper = getMapper(Account.class, unitOfWork);
         DataMapper<Comment, Long> commentMapper = getMapper(Comment.class, unitOfWork);
 
 
-        CompletableFuture<Comment> future = accoutnMapper.findById(accountIdFrom)
+        CompletableFuture<Comment> future = accoutnMapper.findById(accountIdTo)
                 .thenCompose(account -> commentMapper.findById(commentId))
                 .thenCompose(res -> unitOfWork.commit().thenApply(aVoid -> res))
                 .thenApply(ocomment -> {
                             Comment comment = ocomment.orElseThrow(() -> new ResourceNotFoundException(ErrorMessages.RESOURCE_NOTFOUND_COMMENT));
-                            if (comment.getAccountIdFrom() != accountIdFrom)
+                            if (comment.getAccountIdFrom() != accountIdTo)
                                 throw new BadRequestException(ErrorMessages.BAD_REQUEST_IDS_MISMATCH);
                             return comment;
                         }
@@ -55,7 +55,7 @@ public class CommentService {
         DataMapper<Comment, Long> commentMapper = getMapper(Comment.class, unitOfWork);
 
         CompletableFuture<Void> future = accountService.getAccount(comment.getAccountIdFrom(), email)
-                .thenCompose(__ ->
+                .thenCompose(acc ->
                         commentMapper.find(
                                 new EqualAndCondition<>("commentId", comment.getIdentityKey()),
                                 new EqualAndCondition<>("accountIdFrom", comment.getAccountIdFrom()),

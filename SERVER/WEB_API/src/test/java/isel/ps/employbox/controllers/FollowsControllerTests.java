@@ -107,11 +107,11 @@ public class FollowsControllerTests {
 
         ObjectMapper objectMapper = new ObjectMapper();
         JsonNode jsonNode = objectMapper.readTree(body);
-        assertEquals(jsonNode.get("size").asInt(),2);
+        assertEquals(jsonNode.get("size").asInt(),0);
 
         body = new String(webTestClient
                 .get()
-                .uri(uriBuilder -> uriBuilder.path("/accounts/"+userAccount.getIdentityKey()+"/followed").queryParam("orderColumn","rating").queryParam("orderClause", "DESC").build())
+                .uri(uriBuilder -> uriBuilder.path("/accounts/"+userAccount.getIdentityKey()+"/following").queryParam("orderColumn","rating").queryParam("orderClause", "DESC").build())
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody()
@@ -125,7 +125,7 @@ public class FollowsControllerTests {
 
         body = new String(webTestClient
                 .get()
-                .uri(uriBuilder -> uriBuilder.path("/accounts/"+company.getIdentityKey()+"/following").queryParam("orderColumn","rating").build())
+                .uri(uriBuilder -> uriBuilder.path("/accounts/"+company.getIdentityKey()+"/followed").queryParam("orderColumn","rating").build())
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody()
@@ -139,7 +139,7 @@ public class FollowsControllerTests {
 
         body = new String(webTestClient
                 .get()
-                .uri("/accounts/"+userAccount2.getIdentityKey()+"/followed")
+                .uri("/accounts/"+userAccount2.getIdentityKey()+"/following")
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody()
@@ -152,10 +152,10 @@ public class FollowsControllerTests {
 
     @Test
     @WithMockUser(username = "teste@gmail.com")
-    public void testCheckIfAccountsAreFollowingOrFollowers() throws IOException {
+    public void testCheckIfAccountsAreFollowed() throws IOException {
         String body = new String(webTestClient
                 .get()
-                .uri(uriBuilder -> uriBuilder.path("/accounts/"+userAccount.getIdentityKey()+"/followed").queryParam("accountToCheck",userAccount2.getIdentityKey()).build())
+                .uri(uriBuilder -> uriBuilder.path("/accounts/"+userAccount.getIdentityKey()+"/following").build())
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody()
@@ -164,12 +164,12 @@ public class FollowsControllerTests {
 
         ObjectMapper objectMapper = new ObjectMapper();
         JsonNode jsonNode = objectMapper.readTree(body);
-        assertEquals(jsonNode.get("size").asInt(),1);
+        assertEquals(jsonNode.get("size").asInt(),2);
         assertEquals("Maria", objectMapper.readTree(body).get("_embedded").get("items").findValuesAsText("name").get(0));
 
         body = new String(webTestClient
                 .get()
-                .uri(uriBuilder -> uriBuilder.path("/accounts/"+company.getIdentityKey()+"/following").queryParam("accountToCheck",userAccount2.getIdentityKey()).build())
+                .uri(uriBuilder -> uriBuilder.path("/accounts/"+company.getIdentityKey()+"/following").build())
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody()
@@ -177,28 +177,57 @@ public class FollowsControllerTests {
                 .getResponseBody());
 
         jsonNode = objectMapper.readTree(body);
-        assertEquals(jsonNode.get("size").asInt(),1);
-        assertEquals("company1", objectMapper.readTree(body).get("_embedded").get("items").findValuesAsText("name").get(0));
+        assertEquals(jsonNode.get("size").asInt(),0);
     }
 
     @Test
     @WithMockUser(username = "teste@gmail.com")
-    public void followNewAccount() throws IOException {
+    public void testCheckIfAccountsAreFollowing() throws IOException {
+        String body = new String(webTestClient
+                .get()
+                .uri(uriBuilder -> uriBuilder.path("/accounts/"+company.getIdentityKey()+"/followed").build())
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody()
+                .returnResult()
+                .getResponseBody());
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        JsonNode jsonNode = objectMapper.readTree(body);
+        assertEquals(jsonNode.get("size").asInt(),2);
+        assertEquals("Bruno", objectMapper.readTree(body).get("_embedded").get("items").findValuesAsText("name").get(0));
+
+        body = new String(webTestClient
+                .get()
+                .uri(uriBuilder -> uriBuilder.path("/accounts/"+userAccount.getIdentityKey()+"/followed").build())
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody()
+                .returnResult()
+                .getResponseBody());
+
+        jsonNode = objectMapper.readTree(body);
+        assertEquals(jsonNode.get("size").asInt(),0);
+    }
+
+    @Test
+    @WithMockUser(username = "lol@hotmail.com")
+    public void followNewAccount() {
         UnitOfWork unitOfWork = new UnitOfWork();
         DataMapper<Follows, Follows.FollowKey> followMapper = getMapper(Follows.class, unitOfWork);
-        Optional<Follows> follow = followMapper.findById(new Follows.FollowKey(userAccount2.getIdentityKey(),company.getAccountVersion() )).join();
+        Optional<Follows> follow = followMapper.findById(new Follows.FollowKey(userAccount2.getIdentityKey(),userAccount.getAccountVersion() )).join();
 
         assertTrue(!follow.isPresent());
 
         webTestClient
                 .put()
-                .uri(uriBuilder -> uriBuilder.path("/accounts/"+company.getIdentityKey()+"/followed").build())
+                .uri(uriBuilder -> uriBuilder.path("/accounts/"+userAccount.getIdentityKey()+"/followed").build())
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody()
                 .returnResult();
 
-        follow = followMapper.findById(new Follows.FollowKey(userAccount2.getIdentityKey(),company.getIdentityKey() )).join();
+        follow = followMapper.findById(new Follows.FollowKey(userAccount2.getIdentityKey(),userAccount.getIdentityKey() )).join();
         assertTrue(follow.isPresent());
         unitOfWork.commit().join();
     }
