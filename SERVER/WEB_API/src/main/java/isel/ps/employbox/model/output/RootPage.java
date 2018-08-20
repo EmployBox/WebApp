@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import isel.ps.employbox.controllers.account.AccountController;
 import isel.ps.employbox.controllers.CompanyController;
-import isel.ps.employbox.controllers.JobController;
+import isel.ps.employbox.controllers.jobs.JobController;
 import isel.ps.employbox.controllers.UserAccountController;
 
 import static isel.ps.employbox.model.output.OutputDto.HOSTNAME;

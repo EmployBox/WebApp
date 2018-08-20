@@ -33,9 +33,12 @@ public class CurriculumController {
     public Mono<HalCollectionPage<Curriculum>> getCurricula(
             @PathVariable long id,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int pageSize
+            @RequestParam(defaultValue = "10") int pageSize,
+            @RequestParam(required = false) String orderColumn,
+            @RequestParam(required = false, defaultValue = "ASC") String orderClause
+
     ){
-        CompletableFuture<HalCollectionPage<Curriculum>> future = curriculumService.getCurricula(id, page, pageSize)
+        CompletableFuture<HalCollectionPage<Curriculum>> future = curriculumService.getCurricula(id, page, pageSize, orderColumn, orderClause)
                 .thenCompose(curriculumCollectionPage -> curriculumBinder.bindOutput(curriculumCollectionPage, this.getClass(), id));
         return Mono.fromFuture(future);
     }

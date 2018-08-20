@@ -1,5 +1,6 @@
 package isel.ps.employbox.controllers;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.jayield.rapper.mapper.DataMapper;
 import com.github.jayield.rapper.mapper.conditions.EqualAndCondition;
@@ -25,12 +26,12 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
+import java.io.IOException;
 import java.util.List;
 
 import static com.github.jayield.rapper.mapper.MapperRegistry.getMapper;
 import static isel.ps.employbox.DataBaseUtils.prepareDB;
 import static junit.framework.TestCase.*;
-import static org.junit.Assert.assertNotNull;
 import static org.springframework.restdocs.webtestclient.WebTestClientRestDocumentation.document;
 import static org.springframework.restdocs.webtestclient.WebTestClientRestDocumentation.documentationConfiguration;
 import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.springSecurity;
@@ -93,18 +94,23 @@ public class RatingControllerTests {
     }
 
     @Test
-    public void testGetAllRatings(){
-        webTestClient
+    public void testGetAllRatings() throws IOException {
+        String body = new String(webTestClient
                 .get()
-                .uri("/accounts/"+userAccount.getIdentityKey()+"/ratings")
+                .uri("/accounts/"+userAccount2.getIdentityKey()+"/ratings")
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody()
-                .consumeWith(document("getAllRatings"));
+                .returnResult()
+                .getResponseBody());
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        JsonNode jsonNode = objectMapper.readTree(body);
+        assertEquals(jsonNode.get("size").asInt(),1);
 
         UnitOfWork unitOfWork = new UnitOfWork();
         DataMapper<Rating, Rating.RatingKey> userAccountMapper = getMapper(Rating.class, unitOfWork);
-        assertNotNull(userAccountMapper.findById( new Rating.RatingKey(userAccount.getIdentityKey().longValue(), userAccount2.getIdentityKey().longValue())).join().get());
+        assertTrue(userAccountMapper.findById( new Rating.RatingKey(userAccount.getIdentityKey().longValue(), userAccount2.getIdentityKey().longValue())).join().isPresent());
         unitOfWork.commit().join();
     }
 
@@ -112,8 +118,8 @@ public class RatingControllerTests {
     public void testGetRating(){
         webTestClient
                 .get()
-                .uri(uriBuilder -> uriBuilder.path("/accounts/"+userAccount.getIdentityKey()+"/ratings/single")
-                        .queryParam("accountIdDest", userAccount2.getIdentityKey()).build())
+                .uri(uriBuilder -> uriBuilder.path("/accounts/"+userAccount2.getIdentityKey()+"/ratings/single")
+                        .queryParam("accountIdFrom", userAccount.getIdentityKey()).build())
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody()

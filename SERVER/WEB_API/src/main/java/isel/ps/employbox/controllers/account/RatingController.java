@@ -32,9 +32,11 @@ public class RatingController {
     public Mono<HalCollectionPage<Rating>> getRatings(
             @PathVariable long accountId,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int pageSize
+            @RequestParam(defaultValue = "10") int pageSize,
+            @RequestParam(required = false) String orderColumn,
+            @RequestParam(required = false, defaultValue = "ASC") String orderClause
     ){
-        CompletableFuture<HalCollectionPage<Rating>> future = ratingService.getRatings(accountId, page, pageSize)
+        CompletableFuture<HalCollectionPage<Rating>> future = ratingService.getRatings(accountId, page, pageSize,orderColumn, orderClause)
                 .thenCompose(ratingCollectionPage -> ratingBinder.bindOutput(ratingCollectionPage, this.getClass(), accountId));
         return Mono.fromFuture(future);
     }
@@ -42,10 +44,10 @@ public class RatingController {
     @GetMapping("/single")
     public Mono<OutRating> getRating(
             @PathVariable long accountId,
-            @RequestParam(defaultValue = "0") long accountIdDest
+            @RequestParam(defaultValue = "0") long accountIdFrom
     ){
-        if(accountIdDest == 0) throw new BadRequestException(ErrorMessages.BAD_REQUEST_UPDATE_RATING);
-        CompletableFuture<OutRating> future = ratingService.getRating(accountId, accountIdDest)
+        if(accountIdFrom == 0) throw new BadRequestException(ErrorMessages.BAD_REQUEST_UPDATE_RATING);
+        CompletableFuture<OutRating> future = ratingService.getRating(accountIdFrom, accountId)
                 .thenCompose(ratingBinder::bindOutput);
 
         return Mono.fromFuture(future);

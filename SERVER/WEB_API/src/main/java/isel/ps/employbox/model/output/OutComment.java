@@ -44,12 +44,39 @@ public class OutComment implements OutputDto {
     @JsonIgnore
     @Override
     public Object getCollectionItemOutput() {
-        return new CommentItemOutput();
+        return new CommentItemOutput(accountIdFrom, accountIdTo, commmentId, mainCommentId, datetime, text);
     }
 
     class CommentItemOutput {
         @JsonProperty
+        private final long accountIdFrom;
+
+        @JsonProperty
+        private final long accountIdTo;
+
+        @JsonProperty
+        private final long commmentId;
+
+        @JsonProperty
+        private final long mainCommentId;
+
+        @JsonProperty
+        private final Instant datetime;
+
+        @JsonProperty
+        private final String text;
+
+        @JsonProperty
         private _Links _links = new _Links();
+
+        CommentItemOutput(long accountIdFrom, long accountIdTo, long commmentId, long mainCommentId, Instant datetime, String text) {
+            this.accountIdFrom = accountIdFrom;
+            this.accountIdTo = accountIdTo;
+            this.commmentId = commmentId;
+            this.mainCommentId = mainCommentId;
+            this.datetime = datetime;
+            this.text = text;
+        }
 
         private class _Links {
             @JsonProperty

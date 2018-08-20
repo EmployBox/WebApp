@@ -1,6 +1,7 @@
 package isel.ps.employbox.services;
 
 import com.github.jayield.rapper.mapper.DataMapper;
+import com.github.jayield.rapper.mapper.conditions.Condition;
 import com.github.jayield.rapper.mapper.conditions.EqualAndCondition;
 import com.github.jayield.rapper.unitofwork.UnitOfWork;
 import isel.ps.employbox.ErrorMessages;
@@ -13,9 +14,11 @@ import isel.ps.employbox.model.entities.Comment;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
+import java.util.ArrayList;
 import java.util.concurrent.CompletableFuture;
 
 import static com.github.jayield.rapper.mapper.MapperRegistry.getMapper;
+import static isel.ps.employbox.services.ServiceUtils.getCollectionPageFuture;
 import static isel.ps.employbox.services.ServiceUtils.handleExceptions;
 
 @Service
@@ -26,9 +29,14 @@ public class CommentService {
         this.accountService = accountService;
     }
 
-    public CompletableFuture<CollectionPage<Comment>> getComments(long accountId, int page, int pageSize) {
+    public CompletableFuture<CollectionPage<Comment>> getComments(long accountId, int page, int pageSize, String orderColumn, String orderClause) {
+        ArrayList<Condition> conditions = new ArrayList<>();
+        ServiceUtils.evaluateOrderClause(orderColumn,orderClause, conditions);
+        conditions.add(new EqualAndCondition<>("accountIdDest", accountId));
+
+
         return accountService.getAccount(accountId)
-                .thenCompose(__-> ServiceUtils.getCollectionPageFuture(Comment.class, page, pageSize, new EqualAndCondition<>("accountIdDest", accountId)));
+                .thenCompose(__-> ServiceUtils.getCollectionPageFuture(Comment.class, page, pageSize, conditions.toArray(new Condition[conditions.size()])));
     }
 
     public CompletableFuture<Comment> getComment(long accountIdTo, long commentId) {
@@ -101,5 +109,13 @@ public class CommentService {
         return Mono.fromFuture(
                 handleExceptions(future, unitOfWork)
         );
+    }
+
+    public CompletableFuture<CollectionPage<Comment>> getCommentReplies(long accountId, long commentId) {
+        UnitOfWork unitOfWork = new UnitOfWork();
+
+        return getComment(accountId,commentId)
+                .thenCompose(comment -> comment.getReplies().apply(unitOfWork))
+                .thenCompose( replies -> getCollectionPageFuture(Comment.class, 0, replies.size()));
     }
 }

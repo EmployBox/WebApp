@@ -119,7 +119,7 @@ public class OutUser implements OutputDto {
 
         private class Curricula {
             @JsonProperty
-            final String href = HOSTNAME + linkTo( methodOn(CurriculumController.class, accountId).getCurricula(accountId, 0, 5)).withRel("curricula").getHref();
+            final String href = HOSTNAME + linkTo( methodOn(CurriculumController.class, accountId).getCurricula(accountId, 0, 5,null, null)).withRel("curricula").getHref();
         }
 
         private class Applications {
@@ -134,12 +134,12 @@ public class OutUser implements OutputDto {
 
         private class Comments {
             @JsonProperty
-            final String href = HOSTNAME + linkTo( methodOn(CommentController.class, accountId).getAllComments(accountId, 0,5)).withRel("comments").getHref();
+            final String href = HOSTNAME + linkTo( methodOn(CommentController.class, accountId).getAllComments(accountId, 0,5,null, null)).withRel("comments").getHref();
         }
 
         private class Ratings {
             @JsonProperty
-            final String href = HOSTNAME + linkTo ( methodOn(RatingController.class, accountId).getRatings(accountId,0,5)).withRel("ratings").getHref();
+            final String href = HOSTNAME + linkTo ( methodOn(RatingController.class, accountId).getRatings(accountId,0,5,null, null)).withRel("ratings").getHref();
         }
 
         private class Followers {
