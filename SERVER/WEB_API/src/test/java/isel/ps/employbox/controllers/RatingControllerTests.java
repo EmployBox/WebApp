@@ -106,7 +106,8 @@ public class RatingControllerTests {
 
         ObjectMapper objectMapper = new ObjectMapper();
         JsonNode jsonNode = objectMapper.readTree(body);
-        assertEquals(jsonNode.get("size").asInt(),1);
+        assertEquals(1,jsonNode.get("size").asInt());
+        assertEquals(userAccount.getIdentityKey(), Long.valueOf(jsonNode.get("_embedded").get("items").findValuesAsText("accountIDFrom").get(0)));
 
         UnitOfWork unitOfWork = new UnitOfWork();
         DataMapper<Rating, Rating.RatingKey> userAccountMapper = getMapper(Rating.class, unitOfWork);

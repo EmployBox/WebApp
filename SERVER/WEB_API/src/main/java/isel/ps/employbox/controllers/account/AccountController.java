@@ -29,20 +29,24 @@ public class AccountController {
     @GetMapping
     public Mono<HalCollectionPage<Account>> getAccounts(
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int pageSize
+            @RequestParam(defaultValue = "10") int pageSize,
+            @RequestParam(required = false) String orderColumn,
+            @RequestParam(required = false, defaultValue = "ASC") String orderClause
     ){
-        return Mono.fromFuture(accountService.getAllAccounts(page, pageSize).thenCompose(res -> accountBinder.bindOutput(res, AccountController.class)) );
+        return Mono.fromFuture(accountService.getAllAccounts(page, pageSize, orderColumn,orderClause).thenCompose(res -> accountBinder.bindOutput(res, AccountController.class)) );
     }
 
     @GetMapping("/{accountId}/jobs/offered")
     public Mono<HalCollectionPage<Job>> getOfferedJobs(
             @PathVariable long accountId,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int pageSize
+            @RequestParam(defaultValue = "10") int pageSize,
+            @RequestParam(required = false) String orderColumn,
+            @RequestParam(required = false, defaultValue = "ASC") String orderClause
     ){
 
         return Mono.fromFuture(
-                accountService.getOfferedJob(accountId, page, pageSize)
+                accountService.getOfferedJob(accountId, page, pageSize, orderColumn, orderClause)
                         .thenCompose( jobCollectionPage -> jobBinder.bindOutput(jobCollectionPage , this.getClass(), accountId))
         );
     }
