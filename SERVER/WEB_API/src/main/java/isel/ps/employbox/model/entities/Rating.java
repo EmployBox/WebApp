@@ -110,10 +110,10 @@ public class Rating implements DomainObject<Rating.RatingKey> {
             accountIdDest = 0;
         }
 
-        public RatingKey(long accountIdFollowed, long accountIdFollower) {
-            super(accountIdFollowed, accountIdFollower);
-            this.accountIdFrom = accountIdFollowed;
-            this.accountIdDest = accountIdFollower;
+        public RatingKey(long accountIdFrom, long accountIdDest) {
+            super(accountIdFrom, accountIdDest);
+            this.accountIdFrom = accountIdFrom;
+            this.accountIdDest = accountIdDest;
         }
 
         public long getAccountIdFrom() {

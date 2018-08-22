@@ -2,6 +2,7 @@ package isel.ps.employbox.services.curricula;
 
 import com.github.jayield.rapper.DomainObject;
 import com.github.jayield.rapper.mapper.DataMapper;
+import com.github.jayield.rapper.mapper.conditions.Condition;
 import com.github.jayield.rapper.mapper.conditions.EqualAndCondition;
 import com.github.jayield.rapper.unitofwork.UnitOfWork;
 import io.vertx.ext.sql.TransactionIsolation;
@@ -50,6 +51,8 @@ public class CurriculumService {
                             return CompletableFuture.allOf(list.toArray(new CompletableFuture[list.size()]));
                         })
                         .thenCompose(res -> unitOfWork.commit().thenApply(aVoid -> curriculum)));
+
+
         return handleExceptions(future, unitOfWork);
     }
 
@@ -86,9 +89,14 @@ public class CurriculumService {
         creationList.add(addChildFutureFunction(curriculum.getExperiences(), CurriculumExperience.class, curriculum, userId));
     }
 
-    public CompletableFuture<CollectionPage<Curriculum>> getCurricula(long accountId, int page, int pageSize) {
+    public CompletableFuture<CollectionPage<Curriculum>> getCurricula(long accountId, int page, int pageSize, String orderColumn, String orderClause) {
+        ArrayList<Condition> conditions = new ArrayList<>();
+        ServiceUtils.evaluateOrderClause(orderColumn,orderClause, conditions);
+        conditions.add( new EqualAndCondition<>("accountId", accountId));
+
+
         return userAccountService.getUser(accountId)
-                .thenCompose(userAccount -> ServiceUtils.getCollectionPageFuture(Curriculum.class, page, pageSize, new EqualAndCondition<>("accountId", accountId)));
+                .thenCompose(userAccount -> ServiceUtils.getCollectionPageFuture(Curriculum.class, page, pageSize, conditions.toArray(new Condition[conditions.size()])));
     }
 
     public CompletableFuture<Curriculum> getCurriculum(long userId, long cid, String... email) {

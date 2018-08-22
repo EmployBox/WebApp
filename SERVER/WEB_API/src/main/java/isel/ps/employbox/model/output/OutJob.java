@@ -3,8 +3,9 @@ package isel.ps.employbox.model.output;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import isel.ps.employbox.controllers.JobController;
+import isel.ps.employbox.controllers.jobs.JobController;
 import isel.ps.employbox.controllers.UserAccountController;
+import isel.ps.employbox.controllers.jobs.JobExperienceController;
 import isel.ps.employbox.model.output.OutAccount.AccountItemOutput;
 
 import java.sql.Timestamp;
@@ -146,7 +147,7 @@ public class OutJob implements OutputDto<OutJob.JobItemOutput> {
 
         private class Experiences {
             @JsonProperty
-            final String href = HOSTNAME + linkTo ( methodOn(JobController.class).getJobExperiences(jobId, 0,5)).withRel("experiences").getHref();
+            final String href = HOSTNAME + linkTo ( methodOn(JobExperienceController.class).getJobExperiences(jobId, 0,5)).withRel("experiences").getHref();
         }
 
         private class Applications {

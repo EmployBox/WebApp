@@ -30,9 +30,11 @@ public class CommentController {
     public Mono<HalCollectionPage<Comment>> getAllComments(
             @PathVariable long accountId,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int pageSize
+            @RequestParam(defaultValue = "10") int pageSize,
+            @RequestParam(required = false) String orderColumn,
+            @RequestParam(required = false, defaultValue = "ASC") String orderClause
     ) {
-        CompletableFuture<HalCollectionPage<Comment>> future = commentService.getComments(accountId, page, pageSize)
+        CompletableFuture<HalCollectionPage<Comment>> future = commentService.getComments(accountId, page, pageSize, orderColumn, orderClause)
                 .thenCompose(commentCollectionPage -> commentBinder.bindOutput(commentCollectionPage, this.getClass(), accountId));
         return Mono.fromFuture(future);
     }
@@ -41,6 +43,13 @@ public class CommentController {
     public Mono<OutComment> getComment(@PathVariable long accountId, @PathVariable long commentId){
         CompletableFuture<OutComment> future = commentService.getComment(accountId, commentId)
                 .thenCompose(commentBinder::bindOutput);
+        return Mono.fromFuture(future);
+    }
+
+    @GetMapping("/{commentId}/replies")
+    public Mono<HalCollectionPage<Comment>> getCommentReplies(@PathVariable long accountId, @PathVariable long commentId){
+        CompletableFuture<HalCollectionPage<Comment>> future = commentService.getCommentReplies(accountId, commentId)
+                .thenCompose(commentCollectionPage -> commentBinder.bindOutput(commentCollectionPage, this.getClass(), accountId));
         return Mono.fromFuture(future);
     }
 
