@@ -12,6 +12,7 @@ public class JobExperienceBinder implements ModelBinder<JobExperience,OutJobExpe
 
     @Override
     public CompletableFuture<OutJobExperience> bindOutput(JobExperience jobExperience) {
+        System.out.println(jobExperience);
         return CompletableFuture.completedFuture(new OutJobExperience(
                 jobExperience.getIdentityKey(),
                 jobExperience.getJobId(),

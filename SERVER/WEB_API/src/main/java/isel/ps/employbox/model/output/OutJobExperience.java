@@ -52,13 +52,14 @@ public class OutJobExperience implements OutputDto {
         private final int years;
 
         @JsonProperty
-        private _Links _links = new _Links();
+        private _Links _links;
 
         JobExperienceItemOutput() {
-            this.jobId = 0;
-            jobExperienceId = 0;
-            competence = null;
-            years = 0;
+            this.jobId = OutJobExperience.this.jobId;
+            jobExperienceId = OutJobExperience.this.jobExperienceId;
+            competence = OutJobExperience.this.competence;
+            years = OutJobExperience.this.years;
+            _links = new _Links();
         }
 
         private class _Links {
@@ -80,5 +81,16 @@ public class OutJobExperience implements OutputDto {
             @JsonProperty
             final String href = HOSTNAME + linkTo( methodOn(JobExperienceController.class).getJobExperiences(jobId, 0,5)).slash(jobExperienceId).withSelfRel().getHref();
         }
+    }
+
+    @Override
+    public String toString() {
+        return "OutJobExperience{" +
+                "jobId=" + jobId +
+                ", jobExperienceId=" + jobExperienceId +
+                ", competence='" + competence + '\'' +
+                ", years=" + years +
+                ", _links=" + _links +
+                '}';
     }
 }

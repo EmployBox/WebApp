@@ -80,7 +80,7 @@ export default withRouter(({auth, match, history, accountId}) => {
       url={URI.decode(match.params.url)}
       authorization={auth}
       onResult={json => (
-        <div class='text-center'>
+        <div class='container text-center'>
           <img style={style} src={json.photo_url} />
           <h2>{json.name}</h2>
           <HttpRequest url={new URI(json._links.followers.href.split('?')[0]).setQuery('accountToCheck', accountId).href()}

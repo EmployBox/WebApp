@@ -6,15 +6,14 @@ import com.github.jayield.rapper.annotations.Id;
 import com.github.jayield.rapper.annotations.Version;
 
 public class JobExperience implements DomainObject<Long> {
-
     @Id( isIdentity = true)
     private final long jobExperienceId;
+
     private long jobId;
     private final String competences;
     private final int years;
     @Version
     private final long version;
-
     public JobExperience(){
         jobId = -1;
         years = 0;
@@ -72,5 +71,16 @@ public class JobExperience implements DomainObject<Long> {
 
     public void setJobId(long jobId){
         this.jobId = jobId;
+    }
+
+    @Override
+    public String toString() {
+        return "JobExperience{" +
+                "jobExperienceId=" + jobExperienceId +
+                ", jobId=" + jobId +
+                ", competences='" + competences + '\'' +
+                ", years=" + years +
+                ", version=" + version +
+                '}';
     }
 }

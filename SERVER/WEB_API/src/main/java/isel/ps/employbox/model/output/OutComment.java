@@ -67,7 +67,7 @@ public class OutComment implements OutputDto {
         private final String text;
 
         @JsonProperty
-        private _Links _links = new _Links();
+        private _Links _links;
 
         CommentItemOutput(long accountIdFrom, long accountIdTo, long commmentId, long mainCommentId, Instant datetime, String text) {
             this.accountIdFrom = accountIdFrom;
@@ -76,6 +76,7 @@ public class OutComment implements OutputDto {
             this.mainCommentId = mainCommentId;
             this.datetime = datetime;
             this.text = text;
+            _links = new _Links();
         }
 
         private class _Links {
