@@ -123,7 +123,7 @@ export default withRouter(({auth, match, history, accountId}) => {
           <Route path={`${match.path}/curriculas/:curriculaUrl`} component={(props) => <CurriculasTable auth={auth} {...props} />} />
           <Route path={`${match.path}/following/:followingUrl`} component={(props) =>
             <FollowersTable auth={auth} url={URI.decode(props.match.params.followingUrl)} template={followingTempl} {...props} />} />
-          <CommentBox url={json._links.comments.href} auth={auth} />
+          <CommentBox url={json._links.comments.href} auth={auth} accountIdFrom={accountId} accountIdTo={json.accountId} />
         </div>
       )}
     />
