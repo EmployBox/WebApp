@@ -25,6 +25,7 @@ public interface ModelBinder<T extends DomainObject, O extends OutputDto, I> {
                 .collect(Collectors.toList());
 
         return CollectionUtils.listToCompletableFuture(items)
+                .thenApply(objects -> {System.out.println(objects); return objects;})
                 .thenApply(objects -> new HalCollectionPage<>(elementsPage, objects, selfController, parameters));
     }
 }

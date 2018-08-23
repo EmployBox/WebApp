@@ -114,12 +114,12 @@ public class OutUser implements OutputDto {
 
         private class Offered_jobs{
             @JsonProperty
-            final String href = HOSTNAME + linkTo(methodOn( AccountController.class, accountId).getOfferedJobs(accountId, 0, 5, null, null)).withRel("offered_jobs").getHref();
+            final String href = HOSTNAME + linkTo(methodOn( AccountController.class, accountId).getOfferedJobs(accountId, 0, 5, null, null)).withRel("offered_jobs").expand().getHref();
         }
 
         private class Curricula {
             @JsonProperty
-            final String href = HOSTNAME + linkTo( methodOn(CurriculumController.class, accountId).getCurricula(accountId, 0, 5,null, null)).withRel("curricula").getHref();
+            final String href = HOSTNAME + linkTo( methodOn(CurriculumController.class, accountId).getCurricula(accountId, 0, 5,null, null)).withRel("curricula").expand().getHref();
         }
 
         private class Applications {
@@ -134,12 +134,12 @@ public class OutUser implements OutputDto {
 
         private class Comments {
             @JsonProperty
-            final String href = HOSTNAME + linkTo( methodOn(CommentController.class, accountId).getAllComments(accountId, 0,5,null, null)).withRel("comments").getHref();
+            final String href = HOSTNAME + linkTo( methodOn(CommentController.class, accountId).getAllComments(accountId, 0,5,null, null)).withRel("comments").expand().getHref();
         }
 
         private class Ratings {
             @JsonProperty
-            final String href = HOSTNAME + linkTo ( methodOn(RatingController.class, accountId).getRatings(accountId,0,5,null, null)).withRel("ratings").getHref();
+            final String href = HOSTNAME + linkTo ( methodOn(RatingController.class, accountId).getRatings(accountId,0,5,null, null)).withRel("ratings").expand().getHref();
         }
 
         private class Followers {

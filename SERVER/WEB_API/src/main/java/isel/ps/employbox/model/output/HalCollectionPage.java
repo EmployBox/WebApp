@@ -45,6 +45,7 @@ public class HalCollectionPage<T> {
         this._links = new _Links();
         if(elementsPage.getTotalNumberOfElement() != 0)
             this._embedded = new _Embedded(embeddedItems);
+        System.out.println(embeddedItems);
     }
 
     private String getPageQueryString(int page){

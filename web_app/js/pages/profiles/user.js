@@ -80,7 +80,7 @@ export default withRouter(({auth, match, history, accountId}) => {
       url={URI.decode(match.params.url)}
       authorization={auth}
       onResult={json => (
-        <div class='text-center'>
+        <div class='container text-center'>
           <img style={style} src={json.photo_url} />
           <h2>{json.name}</h2>
           <HttpRequest url={new URI(json._links.followers.href.split('?')[0]).setQuery('accountToCheck', accountId).href()}
@@ -123,7 +123,7 @@ export default withRouter(({auth, match, history, accountId}) => {
           <Route path={`${match.path}/curriculas/:curriculaUrl`} component={(props) => <CurriculasTable auth={auth} {...props} />} />
           <Route path={`${match.path}/following/:followingUrl`} component={(props) =>
             <FollowersTable auth={auth} url={URI.decode(props.match.params.followingUrl)} template={followingTempl} {...props} />} />
-          <CommentBox url={json._links.comments.href} auth={auth} />
+          <CommentBox url={json._links.comments.href} auth={auth} accountIdFrom={accountId} accountIdTo={json.accountId} />
         </div>
       )}
     />

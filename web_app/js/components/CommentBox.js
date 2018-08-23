@@ -7,7 +7,7 @@ const CommentList = class extends React.Component {
   render () {
     return <div class='commentList'>
       {this.props.data.map(comment => (
-        <Comment author={comment.author} key={comment.id}>
+        <Comment author={comment.accountIdFrom} key={comment.commentId}>
           {comment.text}
         </Comment>
       ))}
@@ -21,9 +21,12 @@ const CommentForm = class extends React.Component {
     this.state = {
       inputs: undefined
     }
+    this.onSubmit = this.onSubmit.bind(this)
   }
 
   onSubmit (inputs) {
+    inputs.accountIdFrom = this.props.accountIdFrom
+    inputs.accountIdTo = this.props.accountIdTo
     this.setState({inputs: inputs})
   }
 
@@ -34,17 +37,18 @@ const CommentForm = class extends React.Component {
           inputData={[
             {
               type: 'textbox',
-              name: 'Comment',
+              name: 'text',
               label: 'Insert here your comment',
-              id: 'commentId'
+              id: 'textId'
             }
           ]}
           klass='form-group'
           onSubmitHandler={this.onSubmit}
         />
         {this.state.inputs
-          ? <HttpRequest method={'POST'} url={this.props.url.split('?')[0]}
-            afterResult={json => { /* TODO */ }}
+          ? <HttpRequest method={'POST'} url={this.props.url.split('?')[0]} authorization={this.props.auth}
+            body={this.state.inputs}
+            afterResult={json => { console.log('comentario enviado ' + JSON.stringify(json))/* TODO */ }}
           />
           : <div />}
       </div>)
@@ -71,7 +75,7 @@ export default class extends React.Component {
     console.log(this.state.data)
     return <div class='commentBox'>
       <h1>Comments</h1>
-      <CommentForm />
+      <CommentForm auth={this.props.auth} url={this.props.url} accountIdFrom={this.props.accountIdFrom} accountIdTo={this.props.accountIdTo} />
       <CommentList data={this.state.data} />
       {this.state.currentUrl
         ? (
@@ -80,7 +84,7 @@ export default class extends React.Component {
               afterResult={json => {
                 const {data, currentUrl} = this.state
                 this.setState({
-                  data: json._embedded ? data.push(json._embedded.items) : data,
+                  data: (json._embedded ? json._embedded.items : []).concat(data),
                   page: json.current_page + 1,
                   currentUrl: json.current_page === json.last_page ? undefined : currentUrl
                 })
@@ -99,4 +103,3 @@ export default class extends React.Component {
     </div>
   }
 }
-

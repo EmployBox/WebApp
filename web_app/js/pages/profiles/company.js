@@ -71,7 +71,7 @@ export default withRouter(({match, auth, history, accountId}) => {
   return <HttpRequest url={URI.decode(match.params.url)}
     authorization={auth}
     onResult={json => (
-      <div class='text-center'>
+      <div class='text-center container'>
         <img style={style} src={json.logoUrl} />
         <h2>{json.name}</h2>
         <HttpRequest url={new URI(json._links.followers.href.split('?')[0]).setQuery('accountToCheck', accountId).href()}
@@ -100,7 +100,7 @@ export default withRouter(({match, auth, history, accountId}) => {
         <Route path={`${match.path}/following/:followingUrl`} component={props =>
           <FollowersTable auth={auth} url={URI.decode(props.match.params.followingUrl)} template={followingTempl} {...props} />
         } />
-        <CommentBox url={json._links.comments.href} auth={auth} />
+        <CommentBox url={json._links.comments.href} auth={auth} accountIdFrom={accountId} accountIdTo={json.accountId} />
       </div>
     )}
   />
