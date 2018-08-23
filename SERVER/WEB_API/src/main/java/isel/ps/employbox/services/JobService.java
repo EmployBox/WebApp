@@ -191,8 +191,13 @@ public class JobService {
     }
 
 
-    public Mono<Void> deleteJob(long jobId, String email) {
-        UnitOfWork unitOfWork = new UnitOfWork();
+    public Mono<Void> deleteJob(long jobId, String email, UnitOfWork... unit) {
+        UnitOfWork unitOfWork;
+        if(unit.length == 0)
+            unitOfWork = new UnitOfWork();
+        else
+            unitOfWork = unit[0];
+
         AccountService accountService = new AccountService();
         DataMapper<Application, Long> applicationMapper = getMapper(Application.class, unitOfWork);
         DataMapper<JobExperience, Long> jobExperienceMapper = getMapper(JobExperience.class, unitOfWork);

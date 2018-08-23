@@ -114,7 +114,7 @@ public class OutUser implements OutputDto {
 
         private class Offered_jobs{
             @JsonProperty
-            final String href = HOSTNAME + linkTo(methodOn( AccountController.class, accountId).getOfferedJobs(accountId, 0, 5)).withRel("offered_jobs").getHref();
+            final String href = HOSTNAME + linkTo(methodOn( AccountController.class, accountId).getOfferedJobs(accountId, 0, 5, null, null)).withRel("offered_jobs").getHref();
         }
 
         private class Curricula {

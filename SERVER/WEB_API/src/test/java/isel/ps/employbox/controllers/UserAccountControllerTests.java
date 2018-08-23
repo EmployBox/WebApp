@@ -421,8 +421,6 @@ public class UserAccountControllerTests {
                 .consumeWith(document("deleteWrongUserAccount"));
     }
 
-    //todo fix
-    /*
     @Test
     @WithMockUser(username = "lol@hotmail.com")
     public void testDeleteUserAccount(){
@@ -438,7 +436,7 @@ public class UserAccountControllerTests {
         DataMapper<UserAccount, Long> userAccountMapper = getMapper(UserAccount.class, unitOfWork);
         assertFalse(userAccountMapper.findById( userAccount.getIdentityKey()).join().isPresent());
         unitOfWork.commit().join();
-    }*/
+    }
 
     @Test
     @WithMockUser
