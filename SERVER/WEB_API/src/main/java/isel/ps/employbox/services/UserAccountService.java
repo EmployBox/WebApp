@@ -53,7 +53,6 @@ public class UserAccountService {
                 .filter(stringPair -> stringPair.getValue() != null)
                 .collect(Collectors.toList());
 
-
         ServiceUtils.evaluateOrderClause(orderColumn, orderClause, pairs);
 
         return ServiceUtils.getCollectionPageFuture(UserAccount.class, page, pageSize, pairs.toArray(new Condition[pairs.size()]));
@@ -192,7 +191,6 @@ public class UserAccountService {
         CompletableFuture<List<Follows>> [] follows  = new CompletableFuture[2];
 
         CompletableFuture<Void> future = getUser(id, email)
-                //todo possible optimization
                 .thenCompose(userAccount -> userAccount.getApplications().apply(unit)
                         .thenCompose(applications -> {
                             List<Long> applicationIds = applications.stream().map(Application::getIdentityKey).collect(Collectors.toList());
@@ -252,7 +250,7 @@ public class UserAccountService {
                         .thenCompose(__ -> jobMapper.find(new EqualAndCondition<>("accountId", id)))
                         .thenCompose(list -> {
                             List<CompletableFuture<Void>> cflist = new ArrayList<>();
-                            list.forEach(curr -> cflist.add(jobService.deleteJob(curr.getIdentityKey(), email).toFuture()));
+                            list.forEach(curr -> cflist.add( jobService.deleteJob(curr.getIdentityKey(), email, unit).toFuture()) );
                             return CompletableFuture.allOf(cflist.toArray(new CompletableFuture[cflist.size()]));
                         })
                         .thenCompose(aVoid -> userMapper.delete(userAccount))
