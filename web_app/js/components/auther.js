@@ -1,6 +1,6 @@
 export default class {
   constructor (loginUrl) {
-    this.auth = undefined
+    this.auth = sessionStorage.getItem('session')
     this.loginUrl = loginUrl
   }
 
@@ -9,6 +9,7 @@ export default class {
     this.accountId = json.accountId
     this.self = json._links.self.href
     this.accountType = json.accountType
+    sessionStorage.setItem('session', auth)
   }
 
   unAuthenticate () {
