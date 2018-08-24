@@ -6,6 +6,7 @@ import URI from 'urijs'
 import URITemplate from 'urijs/src/URITemplate'
 
 const template = new URITemplate('/account/{userUrl}/curriculas/{curriculaUrl}')
+const curriculaTempl = new URITemplate('/curricula/{url}')
 
 export default withRouter(({match, history, auth}) =>
   <HttpRequest url={URI.decode(match.params.curriculaUrl)}
@@ -17,7 +18,14 @@ export default withRouter(({match, history, auth}) =>
             userUrl: URI.decode(match.params.url),
             curriculaUrl: url
           }))}
+          onClickRow={({rowInfo}) => history.push(curriculaTempl.expand({
+            url: rowInfo.original._links.self.href
+          }))}
           columns={[
+            {
+              Header: 'Title',
+              accessor: 'title'
+            }
           ]}
         />
       </div>

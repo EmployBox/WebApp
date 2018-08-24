@@ -22,11 +22,13 @@ import SignUpCompany from './pages/signup/signupCompany'
 import User from './pages/profiles/user'
 import Company from './pages/profiles/company'
 import Job from './pages/jobPage'
+import Curricula from './pages/curriculaPage'
 
 import URI from 'urijs'
 import URITemplate from 'urijs/src/URITemplate'
 import HttpRequest from './components/httpRequest'
 import { Option, Render } from './searchFormOptions'
+import CreateCurricula from './pages/createCurricula';
 
 const apiURI = 'http://localhost:8080'
 
@@ -34,6 +36,7 @@ const auther = new Auther()
 const PrivateRoute = PrivateRouter(auther)
 
 const createJobTempl = new URITemplate('/create/jobs/{url}')
+const createCurriculaTempl = new URITemplate('/create/curricula/{url}')
 const signUpUserTempl = new URITemplate('/signup/user/{url}')
 const signUpCompanyTempl = new URITemplate('/signup/company/{url}')
 const logInTempl = new URITemplate('/logIn/{url}')
@@ -42,6 +45,7 @@ const accountTempl = new URITemplate('/account/{url}')
 const searchTempl = new URITemplate('/search/{url}')
 const companyTempl = new URITemplate('/company/{url}')
 const jobTempl = new URITemplate('/job/{url}')
+const curriculaTempl = new URITemplate('/curricula/{url}')
 
 function getLink (link, hal) {
   return hal[link]['_links'].self.href
@@ -153,10 +157,16 @@ export default class extends Component {
                         searchTempl={searchTempl}
                       />
                     )} />
-                    <PrivateRoute path='/account/:url' component={User} />
+                    <PrivateRoute exact path='/create/curricula/:url' component={(props) =>
+                      <CreateCurricula curriculaTempl={curriculaTempl} {...props} />}
+                    />
+                    <PrivateRoute path='/account/:url' component={(props) =>
+                      <User createCurriculaTempl={createCurriculaTempl} {...props} />}
+                    />
                     <PrivateRoute path='/company/:url' component={Company} />
                     <PrivateRoute exact path='/create/jobs/:jobUrl' component={CreateJobs} />
                     <PrivateRoute exact path='/job/:url' component={Job} />
+                    <PrivateRoute exact path='/curricula/:url' component={Curricula} />
                     <Route path='/' render={({ history }) =>
                       <center class='py-5 alert alert-danger' role='alert'>
                         <h2>Error 404.</h2>
