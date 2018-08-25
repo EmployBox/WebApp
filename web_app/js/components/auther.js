@@ -14,6 +14,7 @@ export default class {
 
   unAuthenticate () {
     this.auth = undefined
+    sessionStorage.removeItem('session')
   }
 
   setLoginUrl (loginUrl) {
