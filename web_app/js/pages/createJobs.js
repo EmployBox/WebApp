@@ -4,11 +4,9 @@ import URI from 'urijs'
 
 import Toggle from '../components/toggle'
 import HttpRequest from '../components/httpRequest'
+import CustomSchedulingForm from '../components/customSchedulingForm'
 
-const competencesListStyle = {
-  maxHeight: '144px',
-  overflowY: 'scroll'
-}
+import competencesListStyle from '../styles/listStyle'
 
 class Competence {
   constructor (competence, year) {
@@ -35,16 +33,64 @@ export default withRouter(class extends React.Component {
       offerEndDate: '',
       competence: '',
       year: '',
-      experiences: [] // { competences: String, years: Number }
+      experiences: [], // { competences: String, years: Number }
+      contract: { type: 'Full-time', dates: [] }
+    }
+  }
+
+  getContractInfos (type) {
+    if (type === 'Full-time' || type === 'Part-time') {
+      const {dates} = this.state.contract
+      return (
+        <div>
+          <div class='form-row'>
+            <div class='form-group col-md-4'>
+              <label>Start (Optional)</label>
+              <input type='time' class='form-control' value={dates && dates[0] ? dates[0].startHour : ''} onChange={event => {
+                const {value} = event.target
+                this.setState(prevState => {
+                  const {dates} = prevState.contract
+                  return { contract: { type: prevState.contract.type, dates: [{startHour: value, endHour: dates[0] ? dates[0].endHour : ''}] } }
+                })
+              }} />
+            </div>
+            <div class='form-group col-md-4'>
+              <label>End (Optional)</label>
+              <input type='time' class='form-control' value={dates && dates[0] ? dates[0].endHour : ''} onChange={event => {
+                const {value} = event.target
+                this.setState(prevState => {
+                  const {dates} = prevState.contract
+                  return { contract: { type: prevState.contract.type, dates: [{startHour: dates[0] ? dates[0].startHour : '', endHour: value}] } }
+                })
+              }} />
+            </div>
+            <div class='form-group col-md-4'>
+              <label className='text-white'>I'm hidden</label>
+              <button type='time' class='btn btn-danger form-control' onClick={() => this.setState(prevState => {
+                return { contract: {type: prevState.contract.type} }
+              })}>Clear</button>
+            </div>
+          </div>
+        </div>
+      )
+    } else if (type === 'Custom') {
+      return (
+        <CustomSchedulingForm
+          onNewSchedule={(schedule) => {
+            this.setState(prevState => {
+              return {contract: {type: prevState.contract.type, dates: schedule}}
+            })
+          }}
+          createdSchedules={this.state.contract.dates} />
+      )
     }
   }
 
   render () {
-    console.log(URI.decode(this.props.match.params.jobUrl))
     return (
       <div class='container'>
         <br />
-        {/* <button onClick={() => console.log(this.state)}>HelloWorld</button> */}
+        {/* <button onClick={() => console.log(this.state)}>PrintState</button> */}
         <div>
           <h4 className='btn-primary bg-dark btn-lg btn-block'>Job Details</h4>
           <div class='form-row'>
@@ -134,6 +180,20 @@ export default withRouter(class extends React.Component {
             </div>
           </Toggle>
           <Toggle text='Scheduling'>
+            <div class='form-row'>
+              <div class='form-group col-md-2'>
+                <label>Contract</label>
+                <select class='form-control' value={this.state.contract.type} onChange={event => this.setState({ contract: { type: event.target.value, dates: [] } })}>
+                  <option value='Full-time'>Full-time</option>
+                  <option value='Part-time'>Part-time</option>
+                  <option value='Freelance'>Freelance</option>
+                  <option value='Custom'>Custom</option>
+                </select>
+              </div>
+              <div class='form-group col-md-10'>
+                {this.getContractInfos(this.state.contract.type)}
+              </div>
+            </div>
             <div class='form-row'>
               <div class='form-group col-md-6'>
                 <label>Open</label>
