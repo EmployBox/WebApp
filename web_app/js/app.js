@@ -28,7 +28,7 @@ import URI from 'urijs'
 import URITemplate from 'urijs/src/URITemplate'
 import HttpRequest from './components/httpRequest'
 import { Option, Render } from './searchFormOptions'
-import CreateCurricula from './pages/createCurricula';
+import CreateCurricula from './pages/createCurricula'
 
 const apiURI = 'http://localhost:8080'
 
