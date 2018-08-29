@@ -1,5 +1,5 @@
 import React, {Component} from 'react'
-import {BrowserRouter, Route, Switch} from 'react-router-dom'
+import {BrowserRouter, Route, Switch, Link} from 'react-router-dom'
 
 import Navigation from './components/navigation'
 import Footer from './components/footer'
@@ -72,8 +72,6 @@ export default class extends Component {
         jobTempl={jobTempl}
         accountTempl={accountTempl}
         companyTempl={companyTempl}
-        authenticated={this.state.authenticated}
-        createJobsURL={createJobTempl.expand({url: getLink('jobs', json)})}
       />
     )
 
@@ -93,36 +91,45 @@ export default class extends Component {
             <div>
               <BrowserRouter>
                 <div>
-                  <Navigation navItems={
-                    this.state.authenticated
-                      ? [
-                        {
-                          name: 'Profile',
-                          link: (auther.accountType === 'USR' ? accountTempl : companyTempl)
-                            .expand({ url: auther.self }) },
-                        { name: 'About', link: '/about' },
-                        {
-                          name: 'Log out',
-                          class: 'btn btn-outline-primary',
-                          click: () => this.setState(oldstate => {
-                            oldstate.authenticated = false
-                            auther.unAuthenticate()
-                            return oldstate
-                          })
-                        }
-                      ]
-                      : [
-                        { name: 'About', link: '/about' },
-                        { name: 'Log in', link: loginExpand(json) },
-                        {
-                          name: 'Sign up',
-                          link: signUpTempl.expand({
+                  <Navigation>
+                    <ul class='navbar-nav ml-auto'>
+                      <li class='nav-item'>
+                        <Link class='nav-link' to='/about'>About</Link>
+                      </li>
+                      <li class='nav-item'>
+                        <Link class='nav-link' to={createJobTempl.expand({url: getLink('jobs', json)})}>Post new Job</Link>
+                      </li>
+                      {this.state.authenticated &&
+                      <li class='nav-item dropdown'>
+                        <a class='nav-link dropdown-toggle' role='button' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false'>
+                        Account
+                        </a>
+                        <div class='dropdown-menu dropdown-menu-right' aria-labelledby='navbarDropdown'>
+                          <Link class='dropdown-item' to={(auther.accountType === 'USR' ? accountTempl : companyTempl).expand({ url: auther.self })}>Profile</Link>
+                          <div class='dropdown-divider' />
+                          <button class='dropdown-item'
+                            onClick={() => this.setState(oldstate => {
+                              oldstate.authenticated = false
+                              auther.unAuthenticate()
+                              return oldstate
+                            })}>Log out</button>
+                        </div>
+                      </li>
+                      }
+                      {!this.state.authenticated &&
+                      <li class='nav-item'>
+                        <Link class='nav-link' to={loginExpand(json)}>Log in</Link>
+                      </li>}
+                      {!this.state.authenticated &&
+                      <li class='nav-item'>
+                        <Link class='btn btn-outline-primary'
+                          to={signUpTempl.expand({
                             urlUser: getLink('users', json),
                             urlCompany: getLink('companies', json)
-                          }),
-                          class: 'btn btn-outline-primary'
-                        }
-                      ]} />
+                          })}>Sign up</Link>
+                      </li>}
+                    </ul>
+                  </Navigation>
                   <Switch>
                     <Route exact path='/' render={(props) =>
                       <IndexPage options={this.getOptions(json)} searchTempl={searchTempl} />}
