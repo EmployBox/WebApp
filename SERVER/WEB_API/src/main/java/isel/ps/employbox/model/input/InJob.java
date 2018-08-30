@@ -14,7 +14,7 @@ public class InJob {
     private long accountId;
     private List<JobExperience> experiences = Collections.emptyList();
     private List<Application> applications = Collections.emptyList();
-    private List<Schedule> schedules = Collections.emptyList();
+    private List<Schedule> contract = Collections.emptyList();
     private String address;
     private int wage;
     private String description;
@@ -171,11 +171,11 @@ public class InJob {
         this.latitude = latitude;
     }
 
-    public List<Schedule> getSchedules() {
-        return schedules;
+    public List<Schedule> getContract() {
+        return contract;
     }
 
-    public void setSchedules(List<Schedule> schedules) {
-        this.schedules = schedules;
+    public void setContract(List<Schedule> contract) {
+        this.contract = contract;
     }
 }

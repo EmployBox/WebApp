@@ -21,7 +21,7 @@ public class Schedule implements DomainObject<Long> {
     private final Instant endDate;
     private final Instant startHour;
     private final Instant endHour;
-    private final String scheduleType;
+    private final String type;
     private Long jobId;
 
     @ColumnName(name = "accountId")
@@ -39,7 +39,7 @@ public class Schedule implements DomainObject<Long> {
         this.endDate = null;
         this.startHour = null;
         this.endHour = null;
-        this.scheduleType = null;
+        this.type = null;
         this.account = null;
         this.job = null;
         this.version = 0;
@@ -69,7 +69,7 @@ public class Schedule implements DomainObject<Long> {
         this.endDate = endDate;
         this.startHour = startHour;
         this.endHour = endHour;
-        this.scheduleType = scheduleType;
+        this.type = scheduleType;
         this.version = version;
     }
 
@@ -99,8 +99,8 @@ public class Schedule implements DomainObject<Long> {
         return endHour;
     }
 
-    public String getScheduleType() {
-        return scheduleType;
+    public String getType() {
+        return type;
     }
 
     public Foreign<Account, Long> getAccount() {

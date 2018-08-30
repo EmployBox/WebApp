@@ -32,7 +32,7 @@ public class ScheduleBinder implements ModelBinder<Schedule,OutSchedule,InSchedu
                                             schedule.getEndDate(),
                                             schedule.getStartHour(),
                                             schedule.getEndHour(),
-                                            schedule.getScheduleType(),
+                                            schedule.getType(),
                                             schedule.getVersion()
                                     )
                                 )

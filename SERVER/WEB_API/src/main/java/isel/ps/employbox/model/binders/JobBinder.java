@@ -50,7 +50,7 @@ public class JobBinder implements ModelBinder<Job, OutJob, InJob> {
                 inJob.getOfferType(),
                 inJob.getApplications(),
                 inJob.getExperiences(),
-                inJob.getSchedules(),
+                inJob.getContract(),
                 inJob.getVersion()
         );
     }
