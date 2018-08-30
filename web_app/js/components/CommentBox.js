@@ -1,7 +1,7 @@
 import React from 'react'
 import HttpRequest from './httpRequest'
 import URI from 'urijs'
-import GenericForm from './genericForm'
+import GenericForm from './forms/genericForm'
 
 const CommentList = class extends React.Component {
   render () {

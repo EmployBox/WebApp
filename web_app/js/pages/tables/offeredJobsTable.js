@@ -2,7 +2,7 @@ import React from 'react'
 import {withRouter, Link} from 'react-router-dom'
 import HttpRequest from '../../components/httpRequest'
 import URI from 'urijs'
-import Table from '../../components/halTable'
+import Table from '../../components/tables/halTable'
 import URITemplate from 'urijs/src/URITemplate'
 
 const template = new URITemplate('/account/{userUrl}/offeredJobs/{offeredJobsUrl}')

@@ -1,6 +1,6 @@
 import React from 'react'
 import {withRouter} from 'react-router-dom'
-import ListForm from '../components/listForm'
+import ListForm from '../components/forms/listForm'
 import HttpRequest from '../components/httpRequest'
 import URI from 'urijs'
 

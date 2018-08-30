@@ -1,5 +1,5 @@
 import React from 'react'
-import GenericForm from '../../components/genericForm'
+import GenericForm from '../../components/forms/genericForm'
 import SignUpComponent from '../../components/signupComponent'
 
 export default ({url, ToLogin}) => (

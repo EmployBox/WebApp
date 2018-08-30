@@ -12,12 +12,17 @@ export default class extends Component {
 
   render () {
     return (
-      <form class={this.props.formKlass || 'form-group'}>
+      <form class={this.props.formKlass || 'form-group'}
+        onKeyPress={event => {
+          const code = event.keyCode || event.which
+          if (code === 13) this.buttonClick.click()
+        }}>
         {this.internalRender(this.props.inputData)}
         <div class={this.props.klass}>
           {this.props.preBtn || <div />}
           <button
             type='button'
+            ref={input => { this.buttonClick = input }}
             onClick={() => this.props.onSubmitHandler(this.state.inputs)}
             class={this.props.btnKlass || 'btn btn-primary btn-lg btn-block bg-dark'}>Submit</button>
         </div>
