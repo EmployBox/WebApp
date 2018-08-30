@@ -22,6 +22,7 @@ public class Schedule implements DomainObject<Long> {
     private final Instant startHour;
     private final Instant endHour;
     private final String scheduleType;
+    private Long jobId;
 
     @ColumnName(name = "accountId")
     private Foreign<Account,Long> account;
@@ -116,5 +117,9 @@ public class Schedule implements DomainObject<Long> {
 
     public void setAccount(Foreign<Account, Long> account) {
         this.account = account;
+    }
+
+    public void setJobId(long jobId) {
+        this.jobId = jobId;
     }
 }

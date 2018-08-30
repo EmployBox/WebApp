@@ -60,7 +60,6 @@ public class Job implements DomainObject<Long> {
             String address,
             int wage,
             String description,
-            String schedule,
             Timestamp offerBeginDate,
             Timestamp offerEndDate,
             String offerType,

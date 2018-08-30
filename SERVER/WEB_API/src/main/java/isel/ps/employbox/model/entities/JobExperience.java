@@ -14,6 +14,7 @@ public class JobExperience implements DomainObject<Long> {
     private final int years;
     @Version
     private final long version;
+
     public JobExperience(){
         jobId = -1;
         years = 0;

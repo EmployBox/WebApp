@@ -106,6 +106,7 @@ public class JobService {
         DataMapper<Job, Long> jobMapper = getMapper(Job.class, unitOfWork);
         DataMapper<JobExperience, Long> jobExperienceMapper = getMapper(JobExperience.class, unitOfWork);
         DataMapper<Application, Long> jobApplicationMapper = getMapper(Application.class, unitOfWork);
+        DataMapper<Schedule, Long> scheduleMapper = getMapper(Schedule.class, unitOfWork);
 
         CompletableFuture<Job> future = job.getAccount().getForeignObject(unitOfWork)
                 .thenApply(account -> {
@@ -128,6 +129,13 @@ public class JobService {
                     else {
                         experienceList.forEach(curr -> curr.setJobId(job.getIdentityKey()));
                         return jobExperienceMapper.createAll(experienceList);
+                    }
+                }).thenCompose(aVoid -> job.getSchedules().apply(unitOfWork))
+                .thenCompose(scheduleList -> {
+                    if (scheduleList.isEmpty()) return CompletableFuture.completedFuture(null);
+                    else {
+                        scheduleList.forEach(curr -> curr.setJobId(job.getIdentityKey()));
+                        return scheduleMapper.createAll(scheduleList);
                     }
                 })
                 .thenCompose(__ -> unitOfWork.commit().thenApply(aVoid -> job));
