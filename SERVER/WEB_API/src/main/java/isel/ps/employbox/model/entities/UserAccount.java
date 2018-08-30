@@ -3,6 +3,8 @@ package isel.ps.employbox.model.entities;
 import com.github.jayield.rapper.annotations.ColumnName;
 import com.github.jayield.rapper.annotations.Version;
 import com.github.jayield.rapper.unitofwork.UnitOfWork;
+import isel.ps.employbox.model.entities.jobs.Application;
+import isel.ps.employbox.model.entities.jobs.Job;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;

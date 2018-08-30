@@ -1,7 +1,9 @@
-package isel.ps.employbox.model.binders;
+package isel.ps.employbox.model.binders.Jobs;
 
 import com.github.jayield.rapper.unitofwork.UnitOfWork;
-import isel.ps.employbox.model.entities.Schedule;
+import isel.ps.employbox.model.binders.AccountBinder;
+import isel.ps.employbox.model.binders.ModelBinder;
+import isel.ps.employbox.model.entities.jobs.Schedule;
 import isel.ps.employbox.model.input.InSchedule;
 import isel.ps.employbox.model.output.OutSchedule;
 
@@ -28,11 +30,10 @@ public class ScheduleBinder implements ModelBinder<Schedule,OutSchedule,InSchedu
                                             schedule.getIdentityKey(),
                                             outJob,
                                             outAccount,
-                                            schedule.getStartDate(),
-                                            schedule.getEndDate(),
+                                            schedule.getDate(),
                                             schedule.getStartHour(),
                                             schedule.getEndHour(),
-                                            schedule.getType(),
+                                            schedule.getRepeats(),
                                             schedule.getVersion()
                                     )
                                 )
@@ -45,11 +46,10 @@ public class ScheduleBinder implements ModelBinder<Schedule,OutSchedule,InSchedu
                 inSchedule.getScheduleId(),
                 inSchedule.getAccountId(),
                 inSchedule.getJobId(),
-                inSchedule.getStartDate(),
-                inSchedule.getEndDate(),
+                inSchedule.getDate(),
                 inSchedule.getStartHour(),
                 inSchedule.getEndHour(),
-                inSchedule.getScheduleType(),
+                inSchedule.getRepeats(),
                 inSchedule.getVersion()
         );
     }

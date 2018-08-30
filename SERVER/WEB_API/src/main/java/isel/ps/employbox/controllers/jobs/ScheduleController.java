@@ -1,8 +1,8 @@
 package isel.ps.employbox.controllers.jobs;
 
 
-import isel.ps.employbox.model.binders.ScheduleBinder;
-import isel.ps.employbox.model.entities.Schedule;
+import isel.ps.employbox.model.binders.Jobs.ScheduleBinder;
+import isel.ps.employbox.model.entities.jobs.Schedule;
 import isel.ps.employbox.model.input.InSchedule;
 import isel.ps.employbox.model.output.HalCollectionPage;
 import isel.ps.employbox.model.output.OutSchedule;

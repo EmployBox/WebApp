@@ -1,6 +1,8 @@
-package isel.ps.employbox.model.binders;
+package isel.ps.employbox.model.binders.Jobs;
 
-import isel.ps.employbox.model.entities.JobExperience;
+import com.github.jayield.rapper.unitofwork.UnitOfWork;
+import isel.ps.employbox.model.binders.ModelBinder;
+import isel.ps.employbox.model.entities.jobs.JobExperience;
 import isel.ps.employbox.model.input.InJobExperience;
 import isel.ps.employbox.model.output.OutJobExperience;
 import org.springframework.stereotype.Component;
@@ -12,13 +14,17 @@ public class JobExperienceBinder implements ModelBinder<JobExperience,OutJobExpe
 
     @Override
     public CompletableFuture<OutJobExperience> bindOutput(JobExperience jobExperience) {
-        System.out.println(jobExperience);
-        return CompletableFuture.completedFuture(new OutJobExperience(
-                jobExperience.getIdentityKey(),
-                jobExperience.getJobId(),
-                jobExperience.getCompetences(),
-                jobExperience.getYears()
-        ));
+        UnitOfWork unitOfWork = new UnitOfWork();
+
+        return jobExperience.getJob()
+                .getForeignObject(unitOfWork)
+                .thenCompose(res -> unitOfWork.commit().thenApply(__ -> res))
+                .thenApply(job -> new OutJobExperience(
+                            jobExperience.getIdentityKey(),
+                            job.getIdentityKey(),
+                            jobExperience.getCompetences(),
+                            jobExperience.getYears()
+                ));
     }
 
     @Override

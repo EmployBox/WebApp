@@ -19,7 +19,7 @@ public class OutJob implements OutputDto<OutJob.JobItemOutput> {
     private final OutAccount _account;
 
     @JsonProperty
-    public final long jobId;
+    private final long jobId;
 
     @JsonProperty
     private final String title;
@@ -45,6 +45,9 @@ public class OutJob implements OutputDto<OutJob.JobItemOutput> {
     private final String offerType;
 
     @JsonProperty
+    private final String type;
+
+    @JsonProperty
     private final _Links _links;
 
     @JsonProperty
@@ -60,7 +63,7 @@ public class OutJob implements OutputDto<OutJob.JobItemOutput> {
             String description,
             Timestamp offerBeginDate,
             Timestamp offerEndDate,
-            String offerType)
+            String offerType, String type)
     {
         this._account = account;
         this.jobId = jobId;
@@ -71,6 +74,7 @@ public class OutJob implements OutputDto<OutJob.JobItemOutput> {
         this.offerBeginDate = offerBeginDate;
         this.offerEndDate = offerEndDate;
         this.offerType = offerType;
+        this.type = type;
         this._links = new _Links();
         _embedded = new _Embedded();
     }
@@ -78,7 +82,11 @@ public class OutJob implements OutputDto<OutJob.JobItemOutput> {
     @JsonIgnore
     @Override
     public JobItemOutput getCollectionItemOutput() {
-        return new JobItemOutput(jobId, (AccountItemOutput) _account.getCollectionItemOutput(), title, offerBeginDate, address, offerType);
+        return new JobItemOutput(jobId, (AccountItemOutput) _account.getCollectionItemOutput(), title, offerBeginDate, address, offerType, type);
+    }
+
+    public long getJobId() {
+        return this.jobId;
     }
 
     class JobItemOutput {
@@ -96,21 +104,27 @@ public class OutJob implements OutputDto<OutJob.JobItemOutput> {
         @JsonProperty
         private final String offerType;
         @JsonProperty
+        private final String type;
+        @JsonProperty
         private final _Links _links;
 
-        private JobItemOutput(long jobId, AccountItemOutput account, String title, Timestamp offerBeginDate, String address, String offerType){
+        private JobItemOutput(long jobId, AccountItemOutput account, String title, Timestamp offerBeginDate, String address, String offerType, String type){
             this.jobId = jobId;
             this.account = account;
             this.title = title;
             this.offerBeginDate = offerBeginDate;
             this.address = address;
             this.offerType = offerType;
+            this.type = type;
             this._links = new _Links();
         }
 
         class _Links {
             @JsonProperty
             private Self self = new Self();
+
+            @JsonProperty
+            private Application application = new Application();
 
             private class Self{
                 @JsonProperty

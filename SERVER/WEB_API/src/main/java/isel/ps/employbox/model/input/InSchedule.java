@@ -6,11 +6,10 @@ public class InSchedule{
     private long scheduleId;
     private long jobId;
     private long accountId;
-    private Instant startDate;
-    private Instant endDate;
+    private Instant date;
     private Instant startHour;
     private Instant endHour;
-    private String scheduleType;
+    private String repeats;
     private int version;
 
 
@@ -20,22 +19,6 @@ public class InSchedule{
 
     public void setScheduleId(long scheduleId) {
         this.scheduleId = scheduleId;
-    }
-
-    public Instant getStartDate() {
-        return startDate;
-    }
-
-    public void setStartDate(Instant startDate) {
-        this.startDate = startDate;
-    }
-
-    public Instant getEndDate() {
-        return endDate;
-    }
-
-    public void setEndDate(Instant endDate) {
-        this.endDate = endDate;
     }
 
     public Instant getStartHour() {
@@ -52,14 +35,6 @@ public class InSchedule{
 
     public void setEndHour(Instant endHour) {
         this.endHour = endHour;
-    }
-
-    public String getScheduleType() {
-        return scheduleType;
-    }
-
-    public void setScheduleType(String scheduleType) {
-        this.scheduleType = scheduleType;
     }
 
     public int getVersion() {
@@ -84,5 +59,21 @@ public class InSchedule{
 
     public void setAccountId(long accountId) {
         this.accountId = accountId;
+    }
+
+    public String getRepeats() {
+        return this.repeats;
+    }
+
+    public void setRepeats(String repeats) {
+        this.repeats = repeats;
+    }
+
+    public Instant getDate() {
+        return date;
+    }
+
+    public void setDate(Instant date) {
+        this.date = date;
     }
 }

@@ -11,6 +11,8 @@ import isel.ps.employbox.exceptions.ResourceNotFoundException;
 import isel.ps.employbox.exceptions.UnauthorizedException;
 import isel.ps.employbox.model.binders.CollectionPage;
 import isel.ps.employbox.model.entities.*;
+import isel.ps.employbox.model.entities.jobs.Application;
+import isel.ps.employbox.model.entities.jobs.Job;
 import isel.ps.employbox.services.curricula.CurriculumService;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
@@ -91,13 +93,16 @@ public class UserAccountService {
         DataMapper<Application, Long> applicationMapper = getMapper(Application.class, unit);
         CompletableFuture<Application> future = getUser(userId)
                 .thenCompose(ignored -> applicationMapper.findById(apId))
-                .thenCompose(application1 -> unit.commit().thenApply(aVoid -> application1))
                 .thenApply(oapplication -> oapplication.orElseThrow(() -> new ResourceNotFoundException(RESOURCE_NOTFOUND_APPLICATION)))
-                .thenApply(application -> {
-                    if (application.getJobId() != jobId)
-                        throw new BadRequestException(BAD_REQUEST_IDS_MISMATCH);
-                    return application;
-                });
+                .thenCompose(application ->
+                    application.getJob().getForeignObject(unit)
+                            .thenApply( job -> {
+                                if (job.getIdentityKey() != jobId)
+                                    throw new BadRequestException(BAD_REQUEST_IDS_MISMATCH);
+                                return application;
+                            })
+                )
+                .thenCompose(application1 -> unit.commit().thenApply(aVoid -> application1));
         return handleExceptions(future, unit);
     }
 
@@ -134,7 +139,6 @@ public class UserAccountService {
     }
 
     public CompletableFuture<Application> createApplication(long userId, Application application, String email) {
-        if (application.getAccountId() != userId) throw new BadRequestException(ErrorMessages.BAD_REQUEST_IDS_MISMATCH);
 
         UnitOfWork unit = new UnitOfWork();
         DataMapper<Application, Long> applicationMapper = getMapper(Application.class, unit);
@@ -160,15 +164,17 @@ public class UserAccountService {
         if(apId != application.getIdentityKey())
             throw new BadRequestException(BAD_REQUEST_IDS_MISMATCH);
 
-        UnitOfWork unit = new UnitOfWork();
-        DataMapper<Application, Long> applicationMapper = getMapper(Application.class, unit);
+        UnitOfWork unitOfWork = new UnitOfWork();
+        DataMapper<Application, Long> applicationMapper = getMapper(Application.class, unitOfWork);
 
-        CompletableFuture<Void> future = getUser(application.getAccountId(), unit, email)
-                .thenCompose(userAccount -> getApplication(application.getAccountId(), application.getJobId(), application.getIdentityKey(), unit))
-                .thenCompose(application1 -> applicationMapper.update(application)
-                        .thenCompose(aVoid -> unit.commit()));
+        CompletableFuture<Void> future = application.getAccount().getForeignObject(unitOfWork)
+                .thenCompose(userAccount -> {
+                    if (userAccount.getEmail().compareTo(email) != 0)
+                        throw new UnauthorizedException(ErrorMessages.UN_AUTHORIZED);
+                    return applicationMapper.update(application);
+                }).thenCompose(aVoid -> unitOfWork.commit());
 
-        return Mono.fromFuture(handleExceptions(future, unit));
+        return Mono.fromFuture(handleExceptions(future, unitOfWork));
     }
 
     public Mono<Void> deleteUser(long id, String email) {
@@ -177,7 +183,6 @@ public class UserAccountService {
         CurriculumService curriculumService = new CurriculumService(this);
         JobService jobService = new JobService();
 
-        DataMapper<Schedule, Long> scheduleMapper = getMapper(Schedule.class, unit);
         DataMapper<Application, Long> applicationMapper = getMapper(Application.class, unit);
         DataMapper<UserAccount, Long> userMapper = getMapper(UserAccount.class, unit);
         DataMapper<Comment, Long> commentMapper = getMapper(Comment.class, unit);

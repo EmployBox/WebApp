@@ -1,9 +1,5 @@
 package isel.ps.employbox.model.input;
 
-import isel.ps.employbox.model.entities.Application;
-import isel.ps.employbox.model.entities.JobExperience;
-import isel.ps.employbox.model.entities.Schedule;
-
 import java.sql.Timestamp;
 import java.util.Collections;
 import java.util.List;
@@ -12,13 +8,12 @@ public class InJob {
     private long jobID;
     private String title;
     private long accountId;
-    private List<JobExperience> experiences = Collections.emptyList();
-    private List<Application> applications = Collections.emptyList();
-    private List<Schedule> contract = Collections.emptyList();
+    private List<InJobExperience> experiences = Collections.emptyList();
+    private List<InApplication> applications = Collections.emptyList();
+    private List<InSchedule> schedules = Collections.emptyList();
     private String address;
     private int wage;
     private String description;
-    private String schedule;
     private Timestamp offerBeginDate;
     private Timestamp offerEndDate;
     private String offerType;
@@ -27,7 +22,9 @@ public class InJob {
     private String city;
     private double longitude;
     private double latitude;
+    private String type;
     private long version;
+
 
     public String getTitle() {
         return title;
@@ -53,11 +50,11 @@ public class InJob {
         this.accountId = accountId;
     }
 
-    public List<JobExperience> getExperiences() {
+    public List<InJobExperience> getExperiences() {
         return experiences;
     }
 
-    public void setExperiences(List<JobExperience> experiences) {
+    public void setExperiences(List<InJobExperience> experiences) {
         this.experiences = experiences;
     }
 
@@ -83,14 +80,6 @@ public class InJob {
 
     public void setDescription(String description) {
         this.description = description;
-    }
-
-    public String getSchedule() {
-        return schedule;
-    }
-
-    public void setSchedule(String schedule) {
-        this.schedule = schedule;
     }
 
     public Timestamp getOfferBeginDate() {
@@ -123,11 +112,11 @@ public class InJob {
         this.version = version;
     }
 
-    public List<Application> getApplications() {
+    public List<InApplication> getApplications() {
         return applications;
     }
 
-    public void setApplications(List<Application> applications) {
+    public void setApplications(List<InApplication> applications) {
         this.applications = applications;
     }
 
@@ -171,11 +160,19 @@ public class InJob {
         this.latitude = latitude;
     }
 
-    public List<Schedule> getContract() {
-        return contract;
+    public List<InSchedule> getSchedules() {
+        return schedules;
     }
 
-    public void setContract(List<Schedule> contract) {
-        this.contract = contract;
+    public void setSchedules(List<InSchedule> schedules) {
+        this.schedules = schedules;
+    }
+
+    public String getType() {
+        return this.type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
     }
 }

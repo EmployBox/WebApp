@@ -10,9 +10,9 @@ import isel.ps.employbox.exceptions.BadRequestException;
 import isel.ps.employbox.exceptions.ResourceNotFoundException;
 import isel.ps.employbox.exceptions.UnauthorizedException;
 import isel.ps.employbox.model.binders.CollectionPage;
-import isel.ps.employbox.model.binders.ScheduleBinder;
+import isel.ps.employbox.model.binders.Jobs.ScheduleBinder;
 import isel.ps.employbox.model.entities.Account;
-import isel.ps.employbox.model.entities.Schedule;
+import isel.ps.employbox.model.entities.jobs.Schedule;
 import isel.ps.employbox.model.input.InSchedule;
 
 import java.util.ArrayList;
@@ -62,7 +62,7 @@ public class ScheduleService {
                                 throw new ResourceNotFoundException(ErrorMessages.RESOURCE_NOTFOUND);
                             return scheduleDataMapper.update(scheduleBinder.bindInput(inSchedule));
                         }
-                );
+                ).thenCompose( res ->unitOfWork.commit().thenApply(__ -> res));
     }
 
     public CompletableFuture<Schedule> createSchedule(long jobId, String email, Schedule newSchedule) {
@@ -103,6 +103,7 @@ public class ScheduleService {
 
                                             return scheduleDataMapper.deleteById(scheduleId);
                                         }
-                                ));
+                                ))
+                .thenCompose( res ->unitOfWork.commit().thenApply(__ -> res));
     }
 }

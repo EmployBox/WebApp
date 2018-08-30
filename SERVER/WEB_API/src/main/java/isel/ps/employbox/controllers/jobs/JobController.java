@@ -1,8 +1,8 @@
 package isel.ps.employbox.controllers.jobs;
 
 import isel.ps.employbox.exceptions.BadRequestException;
-import isel.ps.employbox.model.binders.JobBinder;
-import isel.ps.employbox.model.entities.Job;
+import isel.ps.employbox.model.binders.Jobs.JobBinder;
+import isel.ps.employbox.model.entities.jobs.Job;
 import isel.ps.employbox.model.input.InJob;
 import isel.ps.employbox.model.output.HalCollectionPage;
 import isel.ps.employbox.model.output.OutJob;

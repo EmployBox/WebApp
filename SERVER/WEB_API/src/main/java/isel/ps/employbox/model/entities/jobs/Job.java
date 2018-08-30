@@ -1,4 +1,4 @@
-package isel.ps.employbox.model.entities;
+package isel.ps.employbox.model.entities.jobs;
 
 
 import com.github.jayield.rapper.DomainObject;
@@ -8,6 +8,7 @@ import com.github.jayield.rapper.annotations.Version;
 import com.github.jayield.rapper.mapper.externals.Foreign;
 import com.github.jayield.rapper.unitofwork.UnitOfWork;
 import isel.ps.employbox.exceptions.ResourceNotFoundException;
+import isel.ps.employbox.model.entities.Account;
 
 import java.sql.Timestamp;
 import java.util.List;
@@ -28,6 +29,8 @@ public class Job implements DomainObject<Long> {
     private final Timestamp offerBeginDate;
     private final Timestamp offerEndDate;
     private final String offerType;
+    private final String type;
+
     @Version
     private final long version;
     @ColumnName(name = "accountId")
@@ -52,6 +55,7 @@ public class Job implements DomainObject<Long> {
         experiences = null;
         version = 0;
         jobId = 0;
+        type = null;
     }
 
     public Job(
@@ -63,7 +67,7 @@ public class Job implements DomainObject<Long> {
             Timestamp offerBeginDate,
             Timestamp offerEndDate,
             String offerType,
-            long version
+            String type, long version
     ) {
         this.jobId = id;
         this.title = title;
@@ -73,6 +77,7 @@ public class Job implements DomainObject<Long> {
         this.offerBeginDate = offerBeginDate;
         this.offerEndDate = offerEndDate;
         this.offerType = offerType;
+        this.type = type;
         this.version = version;
     }
 
@@ -86,11 +91,13 @@ public class Job implements DomainObject<Long> {
             Timestamp offerBeginDate,
             Timestamp offerEndDate,
             String offerType,
+            String type,
             List<Application> applications,
             List<JobExperience> experiences,
             List<Schedule> schedules,
             long version
     ) {
+        this.type = type;
         UnitOfWork unitOfWork = new UnitOfWork();
         this.account = new Foreign(accountId, unit -> getMapper(Account.class, unitOfWork).findById( accountId)
                 .thenCompose( res -> unitOfWork.commit().thenApply( __-> res))
@@ -160,5 +167,9 @@ public class Job implements DomainObject<Long> {
 
     public Function<UnitOfWork, CompletableFuture<List<Schedule>>> getSchedules() {
         return schedules;
+    }
+
+    public String getType() {
+        return type;
     }
 }

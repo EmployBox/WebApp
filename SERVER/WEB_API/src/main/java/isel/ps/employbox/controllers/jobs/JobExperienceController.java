@@ -3,8 +3,8 @@ package isel.ps.employbox.controllers.jobs;
 
 import isel.ps.employbox.ErrorMessages;
 import isel.ps.employbox.exceptions.BadRequestException;
-import isel.ps.employbox.model.binders.JobExperienceBinder;
-import isel.ps.employbox.model.entities.JobExperience;
+import isel.ps.employbox.model.binders.Jobs.JobExperienceBinder;
+import isel.ps.employbox.model.entities.jobs.JobExperience;
 import isel.ps.employbox.model.input.InJobExperience;
 import isel.ps.employbox.model.output.HalCollectionPage;
 import isel.ps.employbox.model.output.OutJobExperience;
