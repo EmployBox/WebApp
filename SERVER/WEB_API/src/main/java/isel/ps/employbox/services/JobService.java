@@ -13,6 +13,7 @@ import isel.ps.employbox.model.binders.CollectionPage;
 import isel.ps.employbox.model.entities.Application;
 import isel.ps.employbox.model.entities.Job;
 import isel.ps.employbox.model.entities.JobExperience;
+import isel.ps.employbox.model.entities.Schedule;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
@@ -200,6 +201,7 @@ public class JobService {
 
         AccountService accountService = new AccountService();
         DataMapper<Application, Long> applicationMapper = getMapper(Application.class, unitOfWork);
+        DataMapper<Schedule, Long> scheduleMapper = getMapper(Schedule.class, unitOfWork);
         DataMapper<JobExperience, Long> jobExperienceMapper = getMapper(JobExperience.class, unitOfWork);
         DataMapper<Job, Long> jobMapper = getMapper(Job.class, unitOfWork);
 
@@ -210,6 +212,12 @@ public class JobService {
                         throw new ResourceNotFoundException(ErrorMessages.RESOURCE_NOTFOUND_JOB);
                     return jobRes.get(0);
                 })
+                .thenCompose(job ->
+                        job.getSchedules().apply(unitOfWork)
+                                .thenApply(schedules -> schedules.stream().map(Schedule::getIdentityKey).collect(Collectors.toList()))
+                                .thenCompose(scheduleMapper::deleteAll)
+                                .thenApply(aVoid -> job)
+                )
                 .thenCompose(job ->
                         job.getExperiences().apply(unitOfWork)
                                 .thenApply(curriculumExperiences -> curriculumExperiences.stream().map(JobExperience::getIdentityKey).collect(Collectors.toList()))

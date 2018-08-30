@@ -5,7 +5,6 @@ import com.github.jayield.rapper.DomainObject;
 import com.github.jayield.rapper.annotations.ColumnName;
 import com.github.jayield.rapper.annotations.Id;
 import com.github.jayield.rapper.annotations.Version;
-import com.github.jayield.rapper.exceptions.DataMapperException;
 import com.github.jayield.rapper.mapper.externals.Foreign;
 import com.github.jayield.rapper.unitofwork.UnitOfWork;
 import isel.ps.employbox.exceptions.ResourceNotFoundException;
@@ -26,7 +25,6 @@ public class Job implements DomainObject<Long> {
     private final String address;
     private final int wage;
     private final String description;
-    private final String schedule;
     private final Timestamp offerBeginDate;
     private final Timestamp offerEndDate;
     private final String offerType;
@@ -38,6 +36,8 @@ public class Job implements DomainObject<Long> {
     private Function<UnitOfWork, CompletableFuture<List<Application>>> applications;
     @ColumnName(foreignName = "jobId")
     private Function<UnitOfWork, CompletableFuture<List<JobExperience>>> experiences;
+    @ColumnName(foreignName = "jobId")
+    private Function<UnitOfWork, CompletableFuture<List<Schedule>>> schedules;
 
     public Job(){
         title = null;
@@ -45,7 +45,6 @@ public class Job implements DomainObject<Long> {
         address = null;
         wage = 0;
         description = null;
-        schedule = null;
         offerBeginDate = null;
         offerEndDate = null;
         offerType = null;
@@ -72,7 +71,6 @@ public class Job implements DomainObject<Long> {
         this.address = address;
         this.wage = wage;
         this.description = description;
-        this.schedule = schedule;
         this.offerBeginDate = offerBeginDate;
         this.offerEndDate = offerEndDate;
         this.offerType = offerType;
@@ -86,12 +84,12 @@ public class Job implements DomainObject<Long> {
             String address,
             int wage,
             String description,
-            String schedule,
             Timestamp offerBeginDate,
             Timestamp offerEndDate,
             String offerType,
             List<Application> applications,
             List<JobExperience> experiences,
+            List<Schedule> schedules,
             long version
     ) {
         UnitOfWork unitOfWork = new UnitOfWork();
@@ -103,12 +101,12 @@ public class Job implements DomainObject<Long> {
         this.address = address;
         this.wage = wage;
         this.description = description;
-        this.schedule = schedule;
         this.offerBeginDate = offerBeginDate;
         this.offerEndDate = offerEndDate;
         this.offerType = offerType;
         this.applications = (__)-> CompletableFuture.completedFuture(applications);
         this.experiences = (__)-> CompletableFuture.completedFuture(experiences);
+        this.schedules = (__)-> CompletableFuture.completedFuture(schedules);
         this.version = version;
     }
 
@@ -127,10 +125,6 @@ public class Job implements DomainObject<Long> {
 
     public String getDescription() {
         return description;
-    }
-
-    public String getSchedule() {
-        return schedule;
     }
 
     public Timestamp getOfferBeginDate() {
@@ -163,5 +157,9 @@ public class Job implements DomainObject<Long> {
 
     public Foreign<Account, Long> getAccount() {
         return account;
+    }
+
+    public Function<UnitOfWork, CompletableFuture<List<Schedule>>> getSchedules() {
+        return schedules;
     }
 }

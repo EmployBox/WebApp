@@ -28,7 +28,6 @@ public class JobBinder implements ModelBinder<Job, OutJob, InJob> {
                         job.getAddress(),
                         job.getWage(),
                         job.getDescription(),
-                        job.getSchedule(),
                         job.getOfferBeginDate(),
                         job.getOfferEndDate(),
                         job.getOfferType()
@@ -46,12 +45,12 @@ public class JobBinder implements ModelBinder<Job, OutJob, InJob> {
                 inJob.getAddress(),
                 inJob.getWage(),
                 inJob.getDescription(),
-                inJob.getSchedule(),
                 inJob.getOfferBeginDate(),
                 inJob.getOfferEndDate(),
                 inJob.getOfferType(),
                 inJob.getApplications(),
                 inJob.getExperiences(),
+                inJob.getSchedules(),
                 inJob.getVersion()
         );
     }

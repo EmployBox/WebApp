@@ -177,6 +177,7 @@ public class UserAccountService {
         CurriculumService curriculumService = new CurriculumService(this);
         JobService jobService = new JobService();
 
+        DataMapper<Schedule, Long> scheduleMapper = getMapper(Schedule.class, unit);
         DataMapper<Application, Long> applicationMapper = getMapper(Application.class, unit);
         DataMapper<UserAccount, Long> userMapper = getMapper(UserAccount.class, unit);
         DataMapper<Comment, Long> commentMapper = getMapper(Comment.class, unit);

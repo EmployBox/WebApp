@@ -1,4 +1,4 @@
-package isel.ps.employbox.controllers;
+package isel.ps.employbox.controllers.jobs;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;

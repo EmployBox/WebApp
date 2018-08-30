@@ -19,7 +19,7 @@ public class OutJob implements OutputDto<OutJob.JobItemOutput> {
     private final OutAccount _account;
 
     @JsonProperty
-    private final long jobId;
+    public final long jobId;
 
     @JsonProperty
     private final String title;
@@ -32,9 +32,6 @@ public class OutJob implements OutputDto<OutJob.JobItemOutput> {
 
     @JsonProperty
     private final String description;
-
-    @JsonProperty
-    private final String schedule;
 
     @JsonProperty
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy hh:mm:ss")
@@ -61,7 +58,6 @@ public class OutJob implements OutputDto<OutJob.JobItemOutput> {
             String address,
             double wage,
             String description,
-            String schedule,
             Timestamp offerBeginDate,
             Timestamp offerEndDate,
             String offerType)
@@ -72,7 +68,6 @@ public class OutJob implements OutputDto<OutJob.JobItemOutput> {
         this.address = address;
         this.wage = wage;
         this.description = description;
-        this.schedule = schedule;
         this.offerBeginDate = offerBeginDate;
         this.offerEndDate = offerEndDate;
         this.offerType = offerType;
@@ -120,6 +115,11 @@ public class OutJob implements OutputDto<OutJob.JobItemOutput> {
             private class Self{
                 @JsonProperty
                 final String href = HOSTNAME + linkTo(JobController.class).slash(jobId).withSelfRel().getHref();
+            }
+
+            private class Application{
+                @JsonProperty
+                final String href = HOSTNAME + linkTo(methodOn(UserAccountController.class).createApplication(account.accountId, jobId, null, null )).withRel("applications").getHref();
             }
         }
     }

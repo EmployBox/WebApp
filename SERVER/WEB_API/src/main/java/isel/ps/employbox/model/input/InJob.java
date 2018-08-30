@@ -2,6 +2,7 @@ package isel.ps.employbox.model.input;
 
 import isel.ps.employbox.model.entities.Application;
 import isel.ps.employbox.model.entities.JobExperience;
+import isel.ps.employbox.model.entities.Schedule;
 
 import java.sql.Timestamp;
 import java.util.Collections;
@@ -13,6 +14,7 @@ public class InJob {
     private long accountId;
     private List<JobExperience> experiences = Collections.emptyList();
     private List<Application> applications = Collections.emptyList();
+    private List<Schedule> schedules = Collections.emptyList();
     private String address;
     private int wage;
     private String description;
@@ -167,5 +169,13 @@ public class InJob {
 
     public void setLatitude(double latitude) {
         this.latitude = latitude;
+    }
+
+    public List<Schedule> getSchedules() {
+        return schedules;
+    }
+
+    public void setSchedules(List<Schedule> schedules) {
+        this.schedules = schedules;
     }
 }

@@ -116,15 +116,18 @@ public class RatingControllerTests {
     }
 
     @Test
-    public void testGetRating(){
-        webTestClient
+    @WithMockUser(username = "teste@gmail.com")
+    public void testGetRating() throws IOException {
+        String body = new String (webTestClient
                 .get()
-                .uri(uriBuilder -> uriBuilder.path("/accounts/"+userAccount2.getIdentityKey()+"/ratings/single")
-                        .queryParam("accountIdFrom", userAccount.getIdentityKey()).build())
+                .uri(uriBuilder -> uriBuilder.path("/accounts/"+userAccount2.getIdentityKey()+"/ratings/single").build())
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody()
-                .consumeWith(document("getAllRatings"));
+                .returnResult()
+                .getResponseBody());
+        ObjectMapper objectMapper = new ObjectMapper();
+        JsonNode jsonNode = objectMapper.readTree(body);
     }
 
 
@@ -144,7 +147,7 @@ public class RatingControllerTests {
 
         webTestClient
                 .post()
-                .uri(uriBuilder -> uriBuilder.path("/accounts/"+userAccount.getIdentityKey()+"/ratings").queryParam("accountIdDest",company1.getIdentityKey()).build())
+                .uri(uriBuilder -> uriBuilder.path("/accounts/"+company1.getIdentityKey()+"/ratings").build())
                 .contentType(MediaType.APPLICATION_JSON)
                 .syncBody(json)
                 .exchange()
@@ -173,7 +176,7 @@ public class RatingControllerTests {
 
         webTestClient
                 .put()
-                .uri(uriBuilder -> uriBuilder.path("/accounts/"+userAccount.getIdentityKey()+"/ratings").queryParam("accountIdDest",userAccount2.getIdentityKey()).build())
+                .uri(uriBuilder -> uriBuilder.path("/accounts/"+userAccount2.getIdentityKey()+"/ratings").build())
                 .contentType(MediaType.APPLICATION_JSON)
                 .syncBody(json)
                 .exchange()
@@ -201,7 +204,7 @@ public class RatingControllerTests {
 
         webTestClient
                 .put()
-                .uri(uriBuilder -> uriBuilder.path("/accounts/"+userAccount.getIdentityKey()+"/ratings").queryParam("accountIdDest",userAccount2.getIdentityKey()).build())
+                .uri(uriBuilder -> uriBuilder.path("/accounts/"+userAccount2.getIdentityKey()+"/ratings").build())
                 .contentType(MediaType.APPLICATION_JSON)
                 .syncBody(json)
                 .exchange()
@@ -221,7 +224,7 @@ public class RatingControllerTests {
     public void testDeleteWrongRating(){
         webTestClient
                 .delete()
-                .uri(uriBuilder -> uriBuilder.path("/accounts/" + userAccount.getIdentityKey() + "/ratings").queryParam("accountIdDest",userAccount2.getIdentityKey()).build())
+                .uri(uriBuilder -> uriBuilder.path("/accounts/" + userAccount2.getIdentityKey() + "/ratings").build())
                 .exchange()
                 .expectStatus().isUnauthorized()
                 .expectBody()
@@ -234,7 +237,7 @@ public class RatingControllerTests {
     public void testDeleteRating(){
         webTestClient
                 .delete()
-                .uri(uriBuilder -> uriBuilder.path("/accounts/" + userAccount.getIdentityKey() + "/ratings").queryParam("accountIdDest",userAccount2.getIdentityKey()).build())
+                .uri(uriBuilder -> uriBuilder.path("/accounts/" + userAccount2.getIdentityKey() + "/ratings").build())
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody()

@@ -1,30 +1,75 @@
 package isel.ps.employbox.model.entities;
 
 import com.github.jayield.rapper.DomainObject;
+import com.github.jayield.rapper.annotations.ColumnName;
 import com.github.jayield.rapper.annotations.Id;
+import com.github.jayield.rapper.annotations.Version;
+import com.github.jayield.rapper.mapper.externals.Foreign;
+import com.github.jayield.rapper.unitofwork.UnitOfWork;
+import isel.ps.employbox.exceptions.ResourceNotFoundException;
 
-import java.security.InvalidParameterException;
-import java.text.DateFormatSymbols;
-import java.util.Arrays;
-import java.util.List;
+import java.time.Instant;
+
+import static com.github.jayield.rapper.mapper.MapperRegistry.getMapper;
 
 public class Schedule implements DomainObject<Long> {
-    public static final String PARTIAL = "PARTIAL";
-    public static final String FULLTIME = "FULLTIME";
 
     @Id(isIdentity = true)
     private final long scheduleId;
 
-    private List<WorkingDay> workingDays = null;
-    private final String avaiability;
-    private final int version;
+    private final Instant startDate;
+    private final Instant endDate;
+    private final Instant startHour;
+    private final Instant endHour;
+    private final String scheduleType;
 
-    public Schedule(long scheduleId, List<WorkingDay> workingDays, String avaiability,  int version) {
+    @ColumnName(name = "accountId")
+    private Foreign<Account,Long> account;
+
+    @ColumnName(name = "jobId")
+    private Foreign<Job, Long> job;
+
+    @Version
+    private final long version;
+
+    public Schedule(){
+        this.scheduleId = 0;
+        this.startDate = null;
+        this.endDate = null;
+        this.startHour = null;
+        this.endHour = null;
+        this.scheduleType = null;
+        this.account = null;
+        this.job = null;
+        this.version = 0;
+    }
+
+    public Schedule(long scheduleId,
+                    long accountId,
+                    long jobId,
+                    Instant startDate,
+                    Instant endDate,
+                    Instant startHour,
+                    Instant endHour,
+                    String scheduleType,
+                    int version)
+    {
+        UnitOfWork unitOfWork = new UnitOfWork();
+        this.account = new Foreign(accountId, unit -> getMapper(Account.class, unitOfWork).findById( accountId)
+                .thenCompose( res -> unitOfWork.commit().thenApply( __-> res))
+                .thenApply(account1 -> account1.orElseThrow(() -> new ResourceNotFoundException("Account not Found"))));
+
+        this.job = new Foreign(accountId, unit -> getMapper(Job.class, unitOfWork).findById( jobId)
+                .thenCompose( res -> unitOfWork.commit().thenApply( __-> res))
+                .thenApply(job1 -> job1.orElseThrow(() -> new ResourceNotFoundException("Job not Found"))));
+
         this.scheduleId = scheduleId;
-        this.avaiability = avaiability;
+        this.startDate = startDate;
+        this.endDate = endDate;
+        this.startHour = startHour;
+        this.endHour = endHour;
+        this.scheduleType = scheduleType;
         this.version = version;
-        if(avaiability == PARTIAL)
-            this.workingDays = workingDays;
     }
 
     @Override
@@ -37,38 +82,39 @@ public class Schedule implements DomainObject<Long> {
         return version;
     }
 
-    class WorkingDay {
-        final List WEEK_DAYS = Arrays.asList(new DateFormatSymbols().getWeekdays());
-        final String dayName;
-        final List<AvaiabilityInterval> avaiabilityIntervals;
-
-        WorkingDay(String dayName, List<AvaiabilityInterval> avaiabilityIntervals) {
-            if(!WEEK_DAYS.contains(dayName.toUpperCase()))
-                throw new InvalidParameterException("WRONG WEEK NAME");
-
-            this.dayName = dayName;
-            this.avaiabilityIntervals = avaiabilityIntervals;
-        }
+    public Instant getStartDate() {
+        return startDate;
     }
 
-    class AvaiabilityInterval{
-        final int hourFrom;
-        final int minutesFrom;
-        final int hourTo;
-        final int minutesTo;
+    public Instant getEndDate() {
+        return endDate;
+    }
 
-        AvaiabilityInterval(int hourFrom, int minutesFrom, int hourTo, int minutesTo) {
-            if(hourFrom < 0 || hourFrom > 23 || hourTo < hourFrom || hourTo > 23 || hourTo == hourFrom && minutesFrom >= minutesTo)
-                throw new InvalidParameterException("Invalid time interval");
-            this.hourFrom = hourFrom;
-            this.minutesFrom = minutesFrom;
-            this.hourTo = hourTo;
-            this.minutesTo = minutesTo;
-        }
+    public Instant getStartHour() {
+        return startHour;
+    }
 
-        @Override
-        public String toString(){
-            return String.format("", hourFrom,":", minutesFrom, "  -  ", hourTo,":", minutesTo);
-        }
+    public Instant getEndHour() {
+        return endHour;
+    }
+
+    public String getScheduleType() {
+        return scheduleType;
+    }
+
+    public Foreign<Account, Long> getAccount() {
+        return account;
+    }
+
+    public Foreign<Job, Long> getJob() {
+        return job;
+    }
+
+    public void setJob(Foreign<Job, Long> job) {
+        this.job = job;
+    }
+
+    public void setAccount(Foreign<Account, Long> account) {
+        this.account = account;
     }
 }

@@ -75,11 +75,13 @@ CREATE PROCEDURE populateDB()
     insert into FOLLOWS(ACCOUNTIDFOLLOWER, ACCOUNTIDFOLLOWED) VALUES (account_id1, company_id1);
     insert into FOLLOWS(ACCOUNTIDFOLLOWER, ACCOUNTIDFOLLOWED) VALUES (account_id2, company_id1);
 
+    INSERT INTo SCHEDULE(JOBID, ACCOUNTID) VALUES (job_id, account_id1);
   end;
 
 create procedure deleteDB()
   MODIFIES SQL DATA
   begin atomic
+    delete from Schedule;
     delete from AcademicBackground;
     delete from Project;
     delete from PreviousJobs;

@@ -209,3 +209,19 @@ CREATE TABLE Follows (
 
   primary key (accountIdFollowed, accountIdFollower)
 );
+
+CREATE TABLE Schedule (
+  scheduleId BIGINT IDENTITY primary key,
+  jobId BIGINT,
+  accountId BIGINT,
+  scheduleType VARCHAR(25),
+  repeats VARCHAR(25),
+  startdate DATETIME,
+  enddate DATETIME,
+  starthour DATETIME,
+  endhour DATETIME,
+  version BIGINT DEFAULT 1,
+
+  FOREIGN KEY (jobId) references JOB(jobId),
+  FOREIGN KEY (accountId) REFERENCES Account(accountId)
+);

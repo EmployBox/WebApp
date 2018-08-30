@@ -1,6 +1,5 @@
 package isel.ps.employbox.controllers.account;
 
-import isel.ps.employbox.ErrorMessages;
 import isel.ps.employbox.exceptions.BadRequestException;
 import isel.ps.employbox.model.binders.RatingBinder;
 import isel.ps.employbox.model.entities.Rating;
@@ -44,10 +43,10 @@ public class RatingController {
     @GetMapping("/single")
     public Mono<OutRating> getRating(
             @PathVariable long accountId,
-            @RequestParam(defaultValue = "0") long accountIdFrom
+            Authentication authentication
     ){
-        if(accountIdFrom == 0) throw new BadRequestException(ErrorMessages.BAD_REQUEST_UPDATE_RATING);
-        CompletableFuture<OutRating> future = ratingService.getRating(accountIdFrom, accountId)
+
+        CompletableFuture<OutRating> future = ratingService.getRating( accountId, authentication.getName())
                 .thenCompose(ratingBinder::bindOutput);
 
         return Mono.fromFuture(future);
@@ -56,30 +55,27 @@ public class RatingController {
     @PutMapping
     public Mono<Void> updateRating(
             @PathVariable long accountId,
-            @RequestParam long accountIdDest,
             @RequestBody InRating rating,
             Authentication authentication
     ){
-        if(accountId != rating.getAccountIdFrom() || accountIdDest != rating.getAccountIdDest()) throw new BadRequestException(BAD_REQUEST_IDS_MISMATCH);
+        if(accountId != rating.getAccountIdDest()) throw new BadRequestException(BAD_REQUEST_IDS_MISMATCH);
         return ratingService.updateRating(ratingBinder.bindInput(rating), authentication.getName());
     }
 
     @PostMapping
     public Mono<Rating> createRating(
             @PathVariable long accountId,
-            @RequestParam long accountIdDest,
             @RequestBody InRating rating,
             Authentication authentication)
     {
-        if(accountId != rating.getAccountIdFrom() || accountIdDest != rating.getAccountIdDest()) throw new BadRequestException(BAD_REQUEST_IDS_MISMATCH);
+        if(accountId != rating.getAccountIdDest()) throw new BadRequestException(BAD_REQUEST_IDS_MISMATCH);
         return ratingService.createRating( ratingBinder.bindInput(rating), authentication.getName());
     }
 
     @DeleteMapping
     public Mono<Void> deleteRating(
             @PathVariable long accountId,
-            @RequestParam long accountIdDest,
             Authentication authentication){
-        return ratingService.deleteRating(accountId, accountIdDest, authentication.getName());
+        return ratingService.deleteRating(accountId, authentication.getName());
     }
 }

@@ -1,6 +1,7 @@
 drop procedure DELETEDB;
 drop procedure POPULATEDB;
 
+drop table Schedule;
 drop table AcademicBackground;
 drop table Project;
 drop table PreviousJobs;

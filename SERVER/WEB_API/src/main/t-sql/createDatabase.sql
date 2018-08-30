@@ -194,6 +194,22 @@ CREATE TABLE [Message](
 	FOREIGN KEY (accountId) REFERENCES Account ON DELETE CASCADE
 )
 
+CREATE TABLE [Schedule](
+  scheduleId BIGINT IDENTITY primary key,
+  jobId BIGINT,
+  accountId BIGINT,
+  scheduleType VARCHAR(25),
+  repeats VARCHAR(25),
+  startdate DATETIME,
+  enddate DATETIME,
+  starthour DATETIME,
+  endhour DATETIME,
+  version BIGINT DEFAULT(1)
+
+  FOREIGN KEY (accountId) REFERENCES Account,
+  FOREIGN KEY (jobId) REFERENCES Job
+)
+
 CREATE TABLE [Comment] (
 	commentId BIGINT identity primary key,
 	accountIdFrom BIGINT,

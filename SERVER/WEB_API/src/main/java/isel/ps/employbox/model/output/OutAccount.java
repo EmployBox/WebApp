@@ -70,7 +70,7 @@ public class OutAccount implements OutputDto {
 
     class AccountItemOutput {
         @JsonProperty
-        private final long accountId;
+        public final long accountId;
         @JsonProperty
         private final String name;
         @JsonProperty
