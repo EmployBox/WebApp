@@ -4,7 +4,7 @@ import URI from 'urijs'
 
 import Toggle from '../components/toggle'
 import HttpRequest from '../components/httpRequest'
-import CustomSchedulingForm from '../components/customSchedulingForm'
+import ContractForm from '../components/forms/contractForm'
 
 import competencesListStyle from '../styles/listStyle'
 
@@ -34,55 +34,8 @@ export default withRouter(class extends React.Component {
       competence: '',
       year: '',
       experiences: [], // { competences: String, years: Number }
-      contract: { type: 'Full-time', dates: [] }
-    }
-  }
-
-  getContractInfos (type) {
-    if (type === 'Full-time' || type === 'Part-time') {
-      const {dates} = this.state.contract
-      return (
-        <div>
-          <div class='form-row'>
-            <div class='form-group col-md-4'>
-              <label>Start (Optional)</label>
-              <input type='time' class='form-control' value={dates && dates[0] ? dates[0].startHour : ''} onChange={event => {
-                const {value} = event.target
-                this.setState(prevState => {
-                  const {dates} = prevState.contract
-                  return { contract: { type: prevState.contract.type, dates: [{startHour: value, endHour: dates[0] ? dates[0].endHour : ''}] } }
-                })
-              }} />
-            </div>
-            <div class='form-group col-md-4'>
-              <label>End (Optional)</label>
-              <input type='time' class='form-control' value={dates && dates[0] ? dates[0].endHour : ''} onChange={event => {
-                const {value} = event.target
-                this.setState(prevState => {
-                  const {dates} = prevState.contract
-                  return { contract: { type: prevState.contract.type, dates: [{startHour: dates[0] ? dates[0].startHour : '', endHour: value}] } }
-                })
-              }} />
-            </div>
-            <div class='form-group col-md-4'>
-              <label className='text-white'>I'm hidden</label>
-              <button type='time' class='btn btn-danger form-control' onClick={() => this.setState(prevState => {
-                return { contract: {type: prevState.contract.type} }
-              })}>Clear</button>
-            </div>
-          </div>
-        </div>
-      )
-    } else if (type === 'Custom') {
-      return (
-        <CustomSchedulingForm
-          onNewSchedule={(schedule) => {
-            this.setState(prevState => {
-              return {contract: {type: prevState.contract.type, dates: schedule}}
-            })
-          }}
-          createdSchedules={this.state.contract.dates} />
-      )
+      type: 'Full-time',
+      schedules: []
     }
   }
 
@@ -119,8 +72,26 @@ export default withRouter(class extends React.Component {
             <div class='form-group col-md-4'>
               <div class='card'>
                 <ul class='list-group list-group-flush' style={competencesListStyle} >
-                  {this.state.experiences.map(value => {
-                    return <li class='list-group-item'>{value.competences} - {value.years} years of experience</li>
+                  {this.state.experiences.map((value, index) => {
+                    return <li class='list-group-item'>
+                      <div class='row'>
+                        <div class='col-10'>
+                          {value.competences} - {value.years} years of experience
+                        </div>
+                        <div class='col-2'>
+                          <button class='fas fa-trash'
+                            type='button'
+                            aria-label='Close'
+                            onClick={() => {
+                              this.setState(prevState => {
+                                const newCompetences = prevState.experiences
+                                newCompetences.splice(index)
+                                return { experiences: newCompetences }
+                              })
+                            }} />
+                        </div>
+                      </div>
+                    </li>
                   })}
                 </ul>
               </div>
@@ -180,20 +151,10 @@ export default withRouter(class extends React.Component {
             </div>
           </Toggle>
           <Toggle text='Scheduling'>
-            <div class='form-row'>
-              <div class='form-group col-md-2'>
-                <label>Contract</label>
-                <select class='form-control' value={this.state.contract.type} onChange={event => this.setState({ contract: { type: event.target.value, dates: [] } })}>
-                  <option value='Full-time'>Full-time</option>
-                  <option value='Part-time'>Part-time</option>
-                  <option value='Freelance'>Freelance</option>
-                  <option value='Custom'>Custom</option>
-                </select>
-              </div>
-              <div class='form-group col-md-10'>
-                {this.getContractInfos(this.state.contract.type)}
-              </div>
-            </div>
+            <ContractForm type={this.state.type}
+              schedules={this.state.schedules}
+              onTypeChange={type => this.setState({ type: type, schedules: [] })}
+              onDatesChange={dates => this.setState({ schedules: dates })} />
             <div class='form-row'>
               <div class='form-group col-md-6'>
                 <label>Open</label>
@@ -207,15 +168,16 @@ export default withRouter(class extends React.Component {
           </Toggle>
           <center>
             <button type='submit' class='btn btn-success' onClick={() => this.setState(prev => {
-              const body = prev
+              const body = Object.assign({}, prev)
+              delete body.body
               delete body.competence
               delete body.year
               body.address = body.address + body.address2
               delete body.address2
               return { body: body }
             })}>Create</button>
-            {this.state.body
-              ? <HttpRequest
+            {this.state.body &&
+              <HttpRequest
                 method='POST'
                 url={URI.decode(this.props.match.params.jobUrl)}
                 authorization={this.props.auth}
@@ -228,8 +190,7 @@ export default withRouter(class extends React.Component {
                     {err.message}
                   </div>
                 )}
-              />
-              : <div />}
+              />}
           </center>
         </div>
       </div>

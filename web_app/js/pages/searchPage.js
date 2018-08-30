@@ -2,7 +2,7 @@ import React from 'react'
 import {withRouter} from 'react-router-dom'
 import URI from 'urijs'
 
-import SearchForm from '../components/searchForm'
+import SearchForm from '../components/forms/searchForm'
 import HttpRequest from '../components/httpRequest'
 
 function getFormOptions (url, options) {
