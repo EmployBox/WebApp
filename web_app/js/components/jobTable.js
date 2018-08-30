@@ -6,7 +6,7 @@ import URITemplate from 'urijs/src/URITemplate'
 
 const searchTemplate = new URITemplate('/search/{url}')
 
-export default withRouter(({json, match, history, accountTempl, companyTempl, moderatorTempl, jobTempl, createJobsURL}) => 
+export default withRouter(({json, match, history, accountTempl, companyTempl, moderatorTempl, jobTempl}) =>
   <div class='row'>
     <div class='col'>
       <Table json={json} currentUrl={URI.decode(match.params.url)}
@@ -59,9 +59,6 @@ export default withRouter(({json, match, history, accountTempl, companyTempl, mo
           }
         ]}
       />
-    </div>
-    <div class='col-auto'>
-      <Link class='btn btn-success' to={createJobsURL}>New</Link>
     </div>
   </div>
 )

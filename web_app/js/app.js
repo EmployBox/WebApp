@@ -1,5 +1,5 @@
 import React, {Component} from 'react'
-import {BrowserRouter, Route, Switch} from 'react-router-dom'
+import {BrowserRouter, Route, Switch, Link} from 'react-router-dom'
 
 import Navigation from './components/navigation'
 import Footer from './components/footer'
@@ -22,11 +22,13 @@ import SignUpCompany from './pages/signup/signupCompany'
 import User from './pages/profiles/user'
 import Company from './pages/profiles/company'
 import Job from './pages/jobPage'
+import Curricula from './pages/curriculaPage'
 
 import URI from 'urijs'
 import URITemplate from 'urijs/src/URITemplate'
 import HttpRequest from './components/httpRequest'
 import { Option, Render } from './searchFormOptions'
+import CreateCurricula from './pages/createCurricula'
 
 const apiURI = 'http://localhost:8080'
 
@@ -34,6 +36,7 @@ const auther = new Auther()
 const PrivateRoute = PrivateRouter(auther)
 
 const createJobTempl = new URITemplate('/create/jobs/{url}')
+const createCurriculaTempl = new URITemplate('/create/curricula/{url}')
 const signUpUserTempl = new URITemplate('/signup/user/{url}')
 const signUpCompanyTempl = new URITemplate('/signup/company/{url}')
 const logInTempl = new URITemplate('/logIn/{url}')
@@ -42,6 +45,7 @@ const accountTempl = new URITemplate('/account/{url}')
 const searchTempl = new URITemplate('/search/{url}')
 const companyTempl = new URITemplate('/company/{url}')
 const jobTempl = new URITemplate('/job/{url}')
+const curriculaTempl = new URITemplate('/curricula/{url}')
 
 function getLink (link, hal) {
   return hal[link]['_links'].self.href
@@ -55,7 +59,7 @@ export default class extends Component {
   constructor (props) {
     super(props)
     this.state = {
-      authenticated: false
+      authenticated: auther.auth || false
     }
   }
 
@@ -68,8 +72,6 @@ export default class extends Component {
         jobTempl={jobTempl}
         accountTempl={accountTempl}
         companyTempl={companyTempl}
-        authenticated={this.state.authenticated}
-        createJobsURL={createJobTempl.expand({url: getLink('jobs', json)})}
       />
     )
 
@@ -89,36 +91,45 @@ export default class extends Component {
             <div>
               <BrowserRouter>
                 <div>
-                  <Navigation navItems={
-                    this.state.authenticated
-                      ? [
-                        {
-                          name: 'Profile',
-                          link: (auther.accountType === 'USR' ? accountTempl : companyTempl)
-                            .expand({ url: auther.self }) },
-                        { name: 'About', link: '/about' },
-                        {
-                          name: 'Log out',
-                          class: 'btn btn-outline-primary',
-                          click: () => this.setState(oldstate => {
-                            oldstate.authenticated = false
-                            auther.unAuthenticate()
-                            return oldstate
-                          })
-                        }
-                      ]
-                      : [
-                        { name: 'About', link: '/about' },
-                        { name: 'Log in', link: loginExpand(json) },
-                        {
-                          name: 'Sign up',
-                          link: signUpTempl.expand({
+                  <Navigation>
+                    <ul class='navbar-nav ml-auto'>
+                      <li class='nav-item'>
+                        <Link class='nav-link' to='/about'>About</Link>
+                      </li>
+                      <li class='nav-item'>
+                        <Link class='nav-link' to={createJobTempl.expand({url: getLink('jobs', json)})}>Post new Job</Link>
+                      </li>
+                      {this.state.authenticated &&
+                      <li class='nav-item dropdown'>
+                        <a class='nav-link dropdown-toggle' role='button' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false'>
+                        Account
+                        </a>
+                        <div class='dropdown-menu dropdown-menu-right' aria-labelledby='navbarDropdown'>
+                          <Link class='dropdown-item' to={(auther.accountType === 'USR' ? accountTempl : companyTempl).expand({ url: auther.self })}>Profile</Link>
+                          <div class='dropdown-divider' />
+                          <button class='dropdown-item'
+                            onClick={() => this.setState(oldstate => {
+                              oldstate.authenticated = false
+                              auther.unAuthenticate()
+                              return oldstate
+                            })}>Log out</button>
+                        </div>
+                      </li>
+                      }
+                      {!this.state.authenticated &&
+                      <li class='nav-item'>
+                        <Link class='nav-link' to={loginExpand(json)}>Log in</Link>
+                      </li>}
+                      {!this.state.authenticated &&
+                      <li class='nav-item'>
+                        <Link class='btn btn-outline-primary'
+                          to={signUpTempl.expand({
                             urlUser: getLink('users', json),
                             urlCompany: getLink('companies', json)
-                          }),
-                          class: 'btn btn-outline-primary'
-                        }
-                      ]} />
+                          })}>Sign up</Link>
+                      </li>}
+                    </ul>
+                  </Navigation>
                   <Switch>
                     <Route exact path='/' render={(props) =>
                       <IndexPage options={this.getOptions(json)} searchTempl={searchTempl} />}
@@ -153,10 +164,16 @@ export default class extends Component {
                         searchTempl={searchTempl}
                       />
                     )} />
-                    <PrivateRoute path='/account/:url' component={User} />
+                    <PrivateRoute exact path='/create/curricula/:url' component={(props) =>
+                      <CreateCurricula curriculaTempl={curriculaTempl} {...props} />}
+                    />
+                    <PrivateRoute path='/account/:url' component={(props) =>
+                      <User createCurriculaTempl={createCurriculaTempl} {...props} />}
+                    />
                     <PrivateRoute path='/company/:url' component={Company} />
                     <PrivateRoute exact path='/create/jobs/:jobUrl' component={CreateJobs} />
                     <PrivateRoute exact path='/job/:url' component={Job} />
+                    <PrivateRoute exact path='/curricula/:url' component={Curricula} />
                     <Route path='/' render={({ history }) =>
                       <center class='py-5 alert alert-danger' role='alert'>
                         <h2>Error 404.</h2>
@@ -168,7 +185,8 @@ export default class extends Component {
                 </div>
               </BrowserRouter>
             </div>
-          )}}
+          )
+        }}
       />
     )
   }

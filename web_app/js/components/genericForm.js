@@ -12,12 +12,15 @@ export default class extends Component {
 
   render () {
     return (
-      <form class='form-group'>
+      <form class={this.props.formKlass || 'form-group'}>
         {this.internalRender(this.props.inputData)}
-        <button
-          type='button'
-          onClick={() => this.props.onSubmitHandler(this.state.inputs)}
-          class='btn btn-primary btn-lg btn-block bg-dark'>Submit</button>
+        <div class={this.props.klass}>
+          {this.props.preBtn || <div />}
+          <button
+            type='button'
+            onClick={() => this.props.onSubmitHandler(this.state.inputs)}
+            class={this.props.btnKlass || 'btn btn-primary btn-lg btn-block bg-dark'}>Submit</button>
+        </div>
       </form>
     )
   }
@@ -31,7 +34,7 @@ export default class extends Component {
   }
 
   internalRender (data) {
-    return data.map(({type, name, label, id}, key) => (
+    return data.map(({type, name, label, id, klass}, key) => (
       <div class={this.props.klass}>
         <label for={id}>{label}</label>
         <input
@@ -41,7 +44,7 @@ export default class extends Component {
           onChange={this.onChangeHandler}
           id={id}
           key={key}
-          class='form-control form-control-lg col'
+          class={klass || 'form-control form-control-lg col'}
         />
       </div>
     ))

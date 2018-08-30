@@ -22,7 +22,7 @@ const applicationsTempl = new URITemplate('/account/{userUrl}/applications/{appl
 const followersTempl = new URITemplate('/account/{userUrl}/followers/{followersURL}')
 const followingTempl = new URITemplate('/account/{userUrl}/following/{followingUrl}')
 
-export default withRouter(({auth, match, history, accountId}) => {
+export default withRouter(({auth, match, history, accountId, createCurriculaTempl}) => {
   const CollectionButton = ({url, title, pushTo}) => (
     <HttpRequest url={url} authorization={auth}
       onResult={json => (
@@ -120,7 +120,12 @@ export default withRouter(({auth, match, history, accountId}) => {
             <FollowersTable auth={auth} url={URI.decode(props.match.params.followersUrl)} template={followersTempl} {...props} />} />
           <Route path={`${match.path}/applications/:applicationsUrl`} component={(props) => <ApplicationsTable auth={auth} {...props} />} />
           <Route path={`${match.path}/offeredJobs/:offeredJobsUrl`} component={(props) => <JobsTable auth={auth} {...props} />} />
-          <Route path={`${match.path}/curriculas/:curriculaUrl`} component={(props) => <CurriculasTable auth={auth} {...props} />} />
+          <Route path={`${match.path}/curriculas/:curriculaUrl`} component={(props) =>
+            <div>
+              <CurriculasTable auth={auth} {...props} />
+              {accountId === json.accountId ? <button class='' onClick={() => history.push(createCurriculaTempl.expand({url: json._links.curricula.href.split('?')[0]}))}>New</button> : <div />}
+            </div>}
+          />
           <Route path={`${match.path}/following/:followingUrl`} component={(props) =>
             <FollowersTable auth={auth} url={URI.decode(props.match.params.followingUrl)} template={followingTempl} {...props} />} />
           <CommentBox url={json._links.comments.href} auth={auth} accountIdFrom={accountId} accountIdTo={json.accountId} />
