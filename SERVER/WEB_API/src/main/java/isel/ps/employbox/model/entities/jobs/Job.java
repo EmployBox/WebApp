@@ -8,12 +8,19 @@ import com.github.jayield.rapper.annotations.Version;
 import com.github.jayield.rapper.mapper.externals.Foreign;
 import com.github.jayield.rapper.unitofwork.UnitOfWork;
 import isel.ps.employbox.exceptions.ResourceNotFoundException;
+import isel.ps.employbox.model.binders.Jobs.ApplicationBinder;
+import isel.ps.employbox.model.binders.Jobs.JobExperienceBinder;
+import isel.ps.employbox.model.binders.Jobs.ScheduleBinder;
 import isel.ps.employbox.model.entities.Account;
+import isel.ps.employbox.model.input.InApplication;
+import isel.ps.employbox.model.input.InJobExperience;
+import isel.ps.employbox.model.input.InSchedule;
 
 import java.sql.Timestamp;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import static com.github.jayield.rapper.mapper.MapperRegistry.getMapper;
 
@@ -92,9 +99,9 @@ public class Job implements DomainObject<Long> {
             Timestamp offerEndDate,
             String offerType,
             String type,
-            List<Application> applications,
-            List<JobExperience> experiences,
-            List<Schedule> schedules,
+            List<InApplication> applications,
+            List<InJobExperience> experiences,
+            List<InSchedule> schedules,
             long version
     ) {
         this.type = type;
@@ -110,9 +117,24 @@ public class Job implements DomainObject<Long> {
         this.offerBeginDate = offerBeginDate;
         this.offerEndDate = offerEndDate;
         this.offerType = offerType;
-        this.applications = (__)-> CompletableFuture.completedFuture(applications);
-        this.experiences = (__)-> CompletableFuture.completedFuture(experiences);
-        this.schedules = (__)-> CompletableFuture.completedFuture(schedules);
+        this.applications = (__)-> {
+            ApplicationBinder applicationBinder = new ApplicationBinder();
+
+            List<Application> list = applicationBinder.bindInput(applications.stream().peek(inApplication -> inApplication.setJobId(this.jobId))).collect(Collectors.toList());
+            return CompletableFuture.completedFuture(list);
+        };
+        this.experiences = (__)-> {
+            JobExperienceBinder jobExperienceBinder = new JobExperienceBinder();
+
+            List<JobExperience> list = jobExperienceBinder.bindInput(experiences.stream().peek(inJobExperience -> inJobExperience.setJobId(this.jobId))).collect(Collectors.toList());
+            return CompletableFuture.completedFuture(list);
+        };;
+        this.schedules = (__)-> {
+            ScheduleBinder scheduleBinder = new ScheduleBinder();
+
+            List<Schedule> list = scheduleBinder.bindInput(schedules.stream().peek(inSchedule -> inSchedule.setJobId(this.jobId))).collect(Collectors.toList());
+            return CompletableFuture.completedFuture(list);
+        };;
         this.version = version;
     }
 

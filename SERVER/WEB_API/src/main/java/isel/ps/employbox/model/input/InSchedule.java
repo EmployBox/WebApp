@@ -1,14 +1,20 @@
 package isel.ps.employbox.model.input;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import java.time.Instant;
+import java.util.Date;
 
 public class InSchedule{
     private long scheduleId;
     private long jobId;
     private long accountId;
-    private Instant date;
-    private Instant startHour;
-    private Instant endHour;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
+    private Date date;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "HH:mm")
+    private Date startHour;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "HH:mm")
+    private Date endHour;
     private String repeats;
     private int version;
 
@@ -22,18 +28,18 @@ public class InSchedule{
     }
 
     public Instant getStartHour() {
-        return startHour;
+        return startHour.toInstant();
     }
 
-    public void setStartHour(Instant startHour) {
+    public void setStartHour(Date startHour) {
         this.startHour = startHour;
     }
 
     public Instant getEndHour() {
-        return endHour;
+        return endHour.toInstant();
     }
 
-    public void setEndHour(Instant endHour) {
+    public void setEndHour(Date endHour) {
         this.endHour = endHour;
     }
 
@@ -70,10 +76,10 @@ public class InSchedule{
     }
 
     public Instant getDate() {
-        return date;
+        return date.toInstant();
     }
 
-    public void setDate(Instant date) {
+    public void setDate(Date date) {
         this.date = date;
     }
 }

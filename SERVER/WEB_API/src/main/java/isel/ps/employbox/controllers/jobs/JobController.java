@@ -1,9 +1,12 @@
 package isel.ps.employbox.controllers.jobs;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.type.TypeFactory;
 import isel.ps.employbox.exceptions.BadRequestException;
 import isel.ps.employbox.model.binders.Jobs.JobBinder;
 import isel.ps.employbox.model.entities.jobs.Job;
 import isel.ps.employbox.model.input.InJob;
+import isel.ps.employbox.model.input.InSchedule;
 import isel.ps.employbox.model.output.HalCollectionPage;
 import isel.ps.employbox.model.output.OutJob;
 import isel.ps.employbox.services.JobService;
@@ -11,6 +14,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
+import java.io.IOException;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 import static isel.ps.employbox.ErrorMessages.BAD_REQUEST_IDS_MISMATCH;
@@ -34,12 +39,20 @@ public class JobController {
             @RequestParam(required = false) String title,
             @RequestParam(required = false) Integer wage,
             @RequestParam(required = false) String type,
+            @RequestParam(required = false) String offerType,
             @RequestParam(required = false) Integer ratingLow,
             @RequestParam(required = false) Integer ratingHigh,
+            @RequestParam(required = false) String schedules,
             @RequestParam(required = false) String orderColumn,
             @RequestParam(required = false, defaultValue = "ASC") String orderClause
-    ){
-        CompletableFuture<HalCollectionPage<Job>> future = jobService.getAllJobs(page, pageSize, address, title, wage, type, ratingLow, ratingHigh, orderColumn, orderClause)
+    ) throws IOException {
+        if (schedules != null) {
+            ObjectMapper objectMapper = new ObjectMapper();
+            TypeFactory typeFactory = objectMapper.getTypeFactory();
+            List<InSchedule> someClassList = objectMapper.readValue(schedules, typeFactory.constructCollectionType(List.class, InSchedule.class));
+        }
+
+        CompletableFuture<HalCollectionPage<Job>> future = jobService.getAllJobs(page, pageSize, address, title, wage, offerType, ratingLow, ratingHigh, orderColumn, orderClause, type)
                 .thenCompose(jobCollectionPage -> jobBinder.bindOutput(jobCollectionPage, this.getClass()));
 
         return Mono.fromFuture(future);

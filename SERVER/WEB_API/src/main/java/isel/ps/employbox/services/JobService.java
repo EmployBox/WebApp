@@ -38,13 +38,15 @@ public class JobService {
             Integer ratingLow,
             Integer ratingHigh,
             String orderColumn,
-            String orderClause)
+            String orderClause,
+            String type)
     {
         List<Condition> pairs = new ArrayList<>();
         pairs.add(new LikeCondition("address", address));
         pairs.add(new LikeCondition("title", title));
         pairs.add(new EqualAndCondition<>("wage", wage));
         pairs.add(new EqualAndCondition<>("offerType", offerType));
+        pairs.add(new EqualAndCondition<>("type", type));
         pairs.add(new Condition<>("ratingLow",">=", ratingLow));
         pairs.add(new Condition<>("ratingHigh","=<", ratingHigh));
 
@@ -119,11 +121,11 @@ public class JobService {
                 })
                 .thenCompose(account -> jobMapper.create( job))
                 .thenCompose(aVoid -> job.getApplications().apply(unitOfWork))
-                .thenCompose(applicationList -> jobApplicationMapper.createAll(applicationList))
+                .thenCompose(jobApplicationMapper::createAll)
                 .thenCompose(aVoid -> job.getExperiences().apply(unitOfWork))
-                .thenCompose(experienceList ->  jobExperienceMapper.createAll(experienceList))
+                .thenCompose(jobExperienceMapper::createAll)
                 .thenCompose(aVoid -> job.getSchedules().apply(unitOfWork))
-                .thenAccept(scheduleList -> scheduleMapper.createAll(scheduleList))
+                .thenAccept(scheduleMapper::createAll)
                 .thenCompose(__ -> unitOfWork.commit().thenApply(aVoid -> job));
         return handleExceptions(future, unitOfWork);
     }

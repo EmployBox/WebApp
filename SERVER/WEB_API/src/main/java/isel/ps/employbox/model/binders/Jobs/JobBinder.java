@@ -45,13 +45,13 @@ public class JobBinder implements ModelBinder<Job, OutJob, InJob> {
 
     @Override
     public Job bindInput(InJob inJob) {
-        JobExperienceBinder jobExperienceBinder = new JobExperienceBinder();
+        /*JobExperienceBinder jobExperienceBinder = new JobExperienceBinder();
         ApplicationBinder applicationBinder = new ApplicationBinder();
         ScheduleBinder scheduleBinder = new ScheduleBinder();
 
         List<JobExperience> jobExperiences = jobExperienceBinder.bindInput(inJob.getExperiences().stream()).collect(Collectors.toList());
         List<Application> applications = applicationBinder.bindInput(inJob.getApplications().stream()).collect(Collectors.toList());
-        List<Schedule> schedules = scheduleBinder.bindInput(inJob.getSchedules().stream()).collect(Collectors.toList());
+        List<Schedule> schedules = scheduleBinder.bindInput(inJob.getSchedules().stream()).collect(Collectors.toList());*/
 
         return new Job(
                 inJob.getAccountId(),
@@ -64,9 +64,9 @@ public class JobBinder implements ModelBinder<Job, OutJob, InJob> {
                 inJob.getOfferEndDate(),
                 inJob.getOfferType(),
                 inJob.getType(),
-                applications,
-                jobExperiences,
-                schedules,
+                inJob.getApplications(),
+                inJob.getExperiences(),
+                inJob.getSchedules(),
                 inJob.getVersion()
         );
     }

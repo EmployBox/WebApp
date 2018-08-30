@@ -35,7 +35,7 @@ export default withRouter(class extends React.Component {
       year: '',
       experiences: [], // { competences: String, years: Number }
       type: 'Full-time',
-      schedules: []
+      schedules: [] // {date: String, startHour: String, endHour: String, repeats: String}
     }
   }
 
@@ -43,7 +43,6 @@ export default withRouter(class extends React.Component {
     return (
       <div class='container'>
         <br />
-        {/* <button onClick={() => console.log(this.state)}>PrintState</button> */}
         <div>
           <h4 className='btn-primary bg-dark btn-lg btn-block'>Job Details</h4>
           <div class='form-row'>
