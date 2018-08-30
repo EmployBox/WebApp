@@ -20,7 +20,6 @@ export default withRouter(class extends React.Component {
     return (
       <div class='container'>
         <br />
-        <button onClick={() => console.log(this.state)}>HelloWorld</button>
         <h4 class='btn-primary bg-dark btn-lg btn-block'>Curricula</h4>
         <label>Title</label>
         <input type='text' class='form-control' value={this.state.title} onChange={event => this.setState({ title: event.target.value })} />
@@ -30,35 +29,35 @@ export default withRouter(class extends React.Component {
           row={({institution, studyArea, degreeObtained}) => `${degreeObtained} - ${studyArea} - ${institution}`}
           inputData={[
             {
-              input: 'date',
+              type: 'date',
               name: 'beginDate',
               label: 'Begin Date',
               id: 'beginDateId',
               klass: 'form-control'
             },
             {
-              input: 'date',
+              type: 'date',
               name: 'endDate',
               label: 'End Date',
               id: 'endDateId',
               klass: 'form-control'
             },
             {
-              input: 'text',
+              type: 'text',
               name: 'studyArea',
               label: 'Study Area',
               id: 'studyAreaId',
               klass: 'form-control'
             },
             {
-              input: 'text',
+              type: 'text',
               name: 'institution',
               label: 'Institution',
               id: 'institutionId',
               klass: 'form-control'
             },
             {
-              input: 'text',
+              type: 'text',
               name: 'degreeObtained',
               label: 'Degree',
               id: 'degreeObtainedId',
@@ -72,14 +71,14 @@ export default withRouter(class extends React.Component {
           row={({competence, year}) => `${competence} - ${year} years of experience`}
           inputData={[
             {
-              input: 'text',
+              type: 'text',
               name: 'competence',
               label: 'Competence',
               id: 'competenceId',
               klass: 'form-control'
             },
             {
-              input: 'number',
+              type: 'number',
               name: 'year',
               label: 'Years',
               id: 'yearId',
@@ -93,35 +92,35 @@ export default withRouter(class extends React.Component {
           row={({companyName, role}) => `${role} in ${companyName}`}
           inputData={[
             {
-              input: 'date',
+              type: 'date',
               name: 'beginDate',
               label: 'Begin Date',
               id: 'beginDateId',
               klass: 'form-control'
             },
             {
-              input: 'date',
+              type: 'date',
               name: 'endDate',
               label: 'End Date',
               id: 'endDateId',
               klass: 'form-control'
             },
             {
-              input: 'text',
+              type: 'text',
               name: 'companyName',
               label: 'Company Name',
               id: 'companyNameId',
               klass: 'form-control'
             },
             {
-              input: 'text',
+              type: 'text',
               name: 'workLoad',
               label: 'Work Load',
               id: 'workLoadId',
               klass: 'form-control'
             },
             {
-              input: 'text',
+              type: 'text',
               name: 'role',
               label: 'Role',
               id: 'roleId',
@@ -135,14 +134,14 @@ export default withRouter(class extends React.Component {
           row={({name}) => name}
           inputData={[
             {
-              input: 'text',
+              type: 'text',
               name: 'name',
               label: 'Name',
               id: 'nameId',
               klass: 'form-control'
             },
             {
-              input: 'text',
+              type: 'text',
               name: 'description',
               label: 'Description',
               id: 'descriptionId',

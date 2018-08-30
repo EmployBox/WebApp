@@ -71,10 +71,10 @@ public class OutCurriculum implements OutputDto {
         private AcademicBackgrounds academicBackgrounds = new AcademicBackgrounds();
 
         @JsonProperty
-        private PreviousJobs applications = new PreviousJobs();
+        private PreviousJobs previousJobs = new PreviousJobs();
 
         @JsonProperty
-        private CurriculumExperiences chats = new CurriculumExperiences();
+        private CurriculumExperiences experiences = new CurriculumExperiences();
 
 
         private class Self{

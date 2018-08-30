@@ -160,13 +160,14 @@ export default class extends Component {
                     <PrivateRoute exact path='/create/curricula/:url' component={(props) =>
                       <CreateCurricula curriculaTempl={curriculaTempl} {...props} />}
                     />
+                    <PrivateRoute exact path='/rate/:url' component={} />
                     <PrivateRoute path='/account/:url' component={(props) =>
                       <User createCurriculaTempl={createCurriculaTempl} {...props} />}
                     />
                     <PrivateRoute path='/company/:url' component={Company} />
                     <PrivateRoute exact path='/create/jobs/:jobUrl' component={CreateJobs} />
                     <PrivateRoute exact path='/job/:url' component={Job} />
-                    <PrivateRoute exact path='/curricula/:url' component={Curricula} />
+                    <PrivateRoute path='/curricula/:url' component={Curricula} />
                     <Route path='/' render={({ history }) =>
                       <center class='py-5 alert alert-danger' role='alert'>
                         <h2>Error 404.</h2>
