@@ -1,3 +1,12 @@
+CREATE TRIGGER schedule_trigger
+  before update ON Schedule REFERENCING NEW ROW AS NEW OLD AS OLD
+  FOR EACH ROW
+  BEGIN ATOMIC
+    BEGIN ATOMIC
+      set NEW.version = old.version +1;
+    END;
+  END;
+
 CREATE TRIGGER rating_trigger
   before update ON Rating REFERENCING NEW ROW AS NEW OLD AS OLD
 FOR EACH ROW

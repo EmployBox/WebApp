@@ -30,7 +30,6 @@ public class SecurityConfig {
         http.authorizeExchange().pathMatchers(HttpMethod.POST,"/accounts/users").permitAll();
         http.authorizeExchange().pathMatchers(HttpMethod.GET,"/accounts/users/*").permitAll();
         http.authorizeExchange().pathMatchers(HttpMethod.GET,"/accounts/users/*/applications").permitAll();
-        http.authorizeExchange().pathMatchers(HttpMethod.GET,"/accounts/*/ratings/single").permitAll();
         http.authorizeExchange().pathMatchers(HttpMethod.GET,"/accounts/users/*/jobs/*/applications/*").permitAll();
         http.authorizeExchange().pathMatchers(HttpMethod.GET,"/accounts/users/*/jobs/*/applications").permitAll();
         http.authorizeExchange().pathMatchers(HttpMethod.GET,"/accounts/users/*/curricula").permitAll();
@@ -41,6 +40,7 @@ public class SecurityConfig {
         http.authorizeExchange().pathMatchers(HttpMethod.GET, "/accounts/*/applications").permitAll();
         http.authorizeExchange().pathMatchers(HttpMethod.GET, "/accounts/*/ratings").permitAll();
         http.authorizeExchange().pathMatchers(HttpMethod.GET, "/accounts/*/comments").permitAll();
+        http.authorizeExchange().pathMatchers(HttpMethod.GET, "/jobs/*/schedules").permitAll();
         http.authorizeExchange().pathMatchers(HttpMethod.GET, "/jobs").permitAll();
         http.authorizeExchange().pathMatchers(HttpMethod.GET, "/jobs/**").permitAll();
         http.authorizeExchange().pathMatchers(HttpMethod.OPTIONS, "/**").permitAll();

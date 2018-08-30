@@ -6,6 +6,7 @@ public class InUserAccount {
     private String email;
     private String password;
     private String photo_url;
+    private long rating;
     private String summary;
     private long userVersion;
     private long accountVersion;
@@ -70,5 +71,13 @@ public class InUserAccount {
 
     public void setAccountVersion(long accountVersion) {
         this.accountVersion = accountVersion;
+    }
+
+    public long getRating() {
+        return rating;
+    }
+
+    public void setRating(long rating) {
+        this.rating = rating;
     }
 }

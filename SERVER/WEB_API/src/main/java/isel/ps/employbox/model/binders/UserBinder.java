@@ -5,7 +5,6 @@ import isel.ps.employbox.model.input.InUserAccount;
 import isel.ps.employbox.model.output.OutUser;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
-import reactor.core.publisher.Mono;
 
 import java.util.concurrent.CompletableFuture;
 
@@ -36,7 +35,7 @@ public class UserBinder implements ModelBinder<UserAccount,OutUser,InUserAccount
                 inUserAccount.getId(),
                 inUserAccount.getEmail(),
                 inUserAccount.getPassword() != null ? passwordEncoder.encode(inUserAccount.getPassword()) : null,
-                0,
+                inUserAccount.getRating(),
                 inUserAccount.getName(),
                 inUserAccount.getSummary(),
                 inUserAccount.getPhoto_url(),

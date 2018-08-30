@@ -49,15 +49,13 @@ public final class AccountService {
         return handleExceptions(future, unitOfWork);
     }
 
-    public CompletableFuture<CollectionPage<Job>> getOfferedJob(long accountId, int page, int pageSize, String orderColumn, String orderClause){
-        List<Condition> conditions = new ArrayList<>();
-        ServiceUtils.evaluateOrderClause(orderColumn, orderClause, conditions);
-        conditions.add(new EqualAndCondition<>("accountId", accountId));
-        return getCollectionPageFuture(Job.class , page, pageSize, conditions.toArray(new Condition[conditions.size()]));
-    }
+    public CompletableFuture<Account> getAccount(String email, UnitOfWork... unitOfWorkArr) {
+        UnitOfWork unitOfWork;
+        if(unitOfWorkArr.length == 0)
+         unitOfWork = new UnitOfWork();
+        else
+            unitOfWork = unitOfWorkArr[0];
 
-    public CompletableFuture<Account> getAccount(String email) {
-        UnitOfWork unitOfWork = new UnitOfWork();
         DataMapper<Account, Long> accountMapper = getMapper(Account.class, unitOfWork);
 
         CompletableFuture<Account> future = accountMapper.find(new EqualAndCondition<String>("email", email))
@@ -67,5 +65,12 @@ public final class AccountService {
                     return accounts.get(0);
                 });
         return handleExceptions(future, unitOfWork);
+    }
+
+    public CompletableFuture<CollectionPage<Job>> getOfferedJob(long accountId, int page, int pageSize, String orderColumn, String orderClause){
+        List<Condition> conditions = new ArrayList<>();
+        ServiceUtils.evaluateOrderClause(orderColumn, orderClause, conditions);
+        conditions.add(new EqualAndCondition<>("accountId", accountId));
+        return getCollectionPageFuture(Job.class , page, pageSize, conditions.toArray(new Condition[conditions.size()]));
     }
 }

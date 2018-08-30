@@ -88,13 +88,15 @@ public class ProjectControllerTests {
 
     @Test
     public void testGetAllProjects(){
-        webTestClient
+        String body = new String( webTestClient
                 .get()
                 .uri("/accounts/users/" + userAccount.getIdentityKey() + "/curricula/" + curriculum.getIdentityKey() + "/projects")
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody()
-                .consumeWith(document("getAllProjects"));
+                .returnResult()
+                .getResponseBody());
+        
     }
 
     @Test

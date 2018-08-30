@@ -20,7 +20,9 @@ export default class extends React.Component {
   }
 
   static getDerivedStateFromProps (nextProps, prevState) {
-    if (nextProps.url === prevState.url) return null
+    if (nextProps.url === prevState.url &&
+      JSON.stringify(nextProps.body) === JSON.stringify(prevState.body) &&
+      nextProps.method === prevState.method) return null
     return {
       loading: true,
       url: nextProps.url,

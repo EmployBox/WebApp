@@ -5,6 +5,7 @@ import com.github.jayield.rapper.mapper.conditions.Condition;
 import com.github.jayield.rapper.mapper.conditions.EqualAndCondition;
 import com.github.jayield.rapper.unitofwork.UnitOfWork;
 import isel.ps.employbox.ErrorMessages;
+import isel.ps.employbox.exceptions.ForbiddenException;
 import isel.ps.employbox.exceptions.ResourceNotFoundException;
 import isel.ps.employbox.exceptions.UnauthorizedException;
 import isel.ps.employbox.model.binders.CollectionPage;
@@ -35,14 +36,21 @@ public class RatingService {
         return ServiceUtils.getCollectionPageFuture(Rating.class, page, pageSize,  conditions.toArray(new Condition[conditions.size()]));
     }
 
-    public CompletableFuture<Rating> getRating(long accountIdFrom, long accountIdDest) {
+
+    public CompletableFuture<Rating> getRating(long accountIdDest, String email) {
         UnitOfWork unitOfWork = new UnitOfWork();
         DataMapper<Rating, Rating.RatingKey> ratingMapper = getMapper(Rating.class, unitOfWork);
-        CompletableFuture<Rating> future = ratingMapper.findById(new Rating.RatingKey( accountIdFrom, accountIdDest))
-                .thenCompose(ratings -> {
-                    ratings.orElseThrow(()-> new ResourceNotFoundException(ErrorMessages.RESOURCE_NOTFOUND_RATING));
-                    return  unitOfWork.commit().thenApply(__ -> ratings.get());
-                });
+
+        CompletableFuture<Rating> future =
+                accountService.getAccount(email)
+                        .thenCompose(account ->
+                                ratingMapper.findById(new Rating.RatingKey(account.getIdentityKey(), accountIdDest))
+                                        .thenCompose(ratings -> {
+                                                    ratings.orElseThrow(() -> new ResourceNotFoundException(ErrorMessages.RESOURCE_NOTFOUND_RATING));
+                                                    return unitOfWork.commit().thenApply(__ -> ratings.get());
+                                                }
+                                        )
+                        );
         return handleExceptions(future, unitOfWork);
     }
 
@@ -52,9 +60,12 @@ public class RatingService {
         DataMapper<Rating, Rating.RatingKey> ratingMapper = getMapper(Rating.class, unitOfWork);
         CompletableFuture<Void> future =
                 accountService.getAccount(rating.getAccountIdFrom(), email)//throws exceptions
-                        .thenCompose(user -> ratingMapper.find(new EqualAndCondition("accountIdFrom", rating.getAccountIdFrom()),
-                                new EqualAndCondition<>("accountIdDest", rating.getAccountIdTo()))
-                        )
+                        .thenCompose(user -> {
+                            if(user.getIdentityKey() != rating.getAccountIdFrom())
+                                throw new ForbiddenException(ErrorMessages.UN_AUTHORIZED_ID_AND_EMAIL_MISMATCH);
+                            return ratingMapper.find(new EqualAndCondition("accountIdFrom", rating.getAccountIdFrom()),
+                                    new EqualAndCondition<>("accountIdDest", rating.getAccountIdTo()));
+                        })
                         .thenCompose(ratings -> {
                                     if (ratings.size() == 0)
                                         throw new ResourceNotFoundException(ErrorMessages.RESOURCE_NOTFOUND);
@@ -67,12 +78,13 @@ public class RatingService {
         );
     }
 
+
     public Mono<Rating> createRating(Rating rating, String email) {
         UnitOfWork unitOfWork = new UnitOfWork();
         DataMapper<Rating, Rating.RatingKey> ratingMapper = getMapper(Rating.class, unitOfWork);
 
         CompletableFuture<Rating> future = CompletableFuture.allOf(
-                accountService.getAccount(rating.getAccountIdFrom(), email),
+                accountService.getAccount(email, unitOfWork),
                 accountService.getAccount(rating.getAccountIdTo())
         )
                 .thenCompose(aVoid -> ratingMapper.create(rating))
@@ -82,16 +94,16 @@ public class RatingService {
         );
     }
 
-    public Mono<Void> deleteRating(long accountIDFrom, long accountIDTo, String email) {
+    public Mono<Void> deleteRating(long accountIdDest, String email) {
         UnitOfWork unitOfWork = new UnitOfWork();
         DataMapper<Rating, Rating.RatingKey> ratingMapper = getMapper(Rating.class, unitOfWork);
         DataMapper<Account, Long> accountMapper = getMapper(Account.class, unitOfWork);
-        CompletableFuture<Void> future = accountMapper.find(new EqualAndCondition<Long>("accountId", accountIDFrom), new EqualAndCondition<>("email", email))
-                .thenCompose(user -> {
-                            if (user.size() != 1)
+        CompletableFuture<Void> future = accountMapper.find( new EqualAndCondition<>("email", email))
+                .thenCompose(account -> {
+                            if (account.size() != 1)
                                     throw new UnauthorizedException(ErrorMessages.UN_AUTHORIZED);
-                                return ratingMapper.find(new EqualAndCondition("accountIdFrom", accountIDFrom),
-                                        new EqualAndCondition<>("accountIdDest", accountIDTo));
+                                return ratingMapper.find(new EqualAndCondition("accountIdFrom", account.get(0).getIdentityKey()),
+                                        new EqualAndCondition<>("accountIdDest", accountIdDest));
                         }
                 )
                 .thenCompose(ratings -> {
