@@ -3,11 +3,12 @@ package isel.ps.employbox.controllers.jobs;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.TypeFactory;
 import isel.ps.employbox.exceptions.BadRequestException;
+import isel.ps.employbox.model.binders.jobs.ApplicationBinder;
 import isel.ps.employbox.model.binders.jobs.JobBinder;
 import isel.ps.employbox.model.entities.jobs.Job;
 import isel.ps.employbox.model.input.InJob;
 import isel.ps.employbox.model.input.InSchedule;
-import isel.ps.employbox.model.output.HalCollectionPage;
+import isel.ps.employbox.model.output.Collections.HalCollectionPage;
 import isel.ps.employbox.model.output.OutJob;
 import isel.ps.employbox.services.JobService;
 import org.springframework.security.core.Authentication;
@@ -24,10 +25,12 @@ import static isel.ps.employbox.ErrorMessages.BAD_REQUEST_IDS_MISMATCH;
 @RequestMapping("/jobs")
 public class JobController {
     private final JobService jobService;
+    private final ApplicationBinder applicationBinder;
     private final JobBinder jobBinder;
 
-    public JobController(JobService jobService, JobBinder jobBinder) {
+    public JobController(JobService jobService, ApplicationBinder applicationBinder, JobBinder jobBinder) {
         this.jobService = jobService;
+        this.applicationBinder = applicationBinder;
         this.jobBinder = jobBinder;
     }
     //todo application
@@ -91,4 +94,16 @@ public class JobController {
         return jobService.deleteJob(jid, authentication.getName());
     }
 
+    @GetMapping("/applications")
+    public Mono<HalCollectionPage> getApplication(
+            @PathVariable  long jobId,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int pageSize
+
+    ) {
+        return Mono.fromFuture(
+                jobService.getApplication(jobId, page, pageSize)
+                        .thenCompose(applicationCollectionPage -> applicationBinder.bindOutput(applicationCollectionPage, this.getClass()))
+        );
+    }
 }

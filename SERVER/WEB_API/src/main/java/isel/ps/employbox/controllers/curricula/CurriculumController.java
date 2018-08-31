@@ -4,7 +4,7 @@ import isel.ps.employbox.exceptions.BadRequestException;
 import isel.ps.employbox.model.binders.curricula.CurriculumBinder;
 import isel.ps.employbox.model.entities.Curriculum;
 import isel.ps.employbox.model.input.curricula.childs.InCurriculum;
-import isel.ps.employbox.model.output.HalCollectionPage;
+import isel.ps.employbox.model.output.Collections.HalCollectionPage;
 import isel.ps.employbox.model.output.OutCurriculum;
 import isel.ps.employbox.services.curricula.CurriculumService;
 import org.springframework.security.core.Authentication;

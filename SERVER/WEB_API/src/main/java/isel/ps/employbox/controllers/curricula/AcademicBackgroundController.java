@@ -4,7 +4,7 @@ import isel.ps.employbox.exceptions.BadRequestException;
 import isel.ps.employbox.model.binders.curricula.AcademicBackgroundBinder;
 import isel.ps.employbox.model.entities.curricula.childs.AcademicBackground;
 import isel.ps.employbox.model.input.curricula.childs.InAcademicBackground;
-import isel.ps.employbox.model.output.HalCollectionPage;
+import isel.ps.employbox.model.output.Collections.HalCollectionPage;
 import isel.ps.employbox.model.output.OutAcademicBackground;
 import isel.ps.employbox.services.curricula.AcademicBackgroundService;
 import isel.ps.employbox.services.curricula.CurriculumService;

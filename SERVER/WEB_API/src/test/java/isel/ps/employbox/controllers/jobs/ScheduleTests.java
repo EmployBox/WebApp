@@ -43,7 +43,7 @@ public class ScheduleTests {
     private static final Logger logger = LoggerFactory.getLogger(JobControllerTests.class);
     private WebTestClient webTestClient;
     private Long accountId;
-    private Job job;
+    private Job job, job2;
     private Schedule schedule;
 
     @Before
@@ -63,6 +63,10 @@ public class ScheduleTests {
         List<Job> jobs = jobMapper.find( new EqualAndCondition<>("title", "Great Job")).join();
         assertEquals(1, jobs.size());
         job = jobs.get(0);
+
+        jobs = jobMapper.find( new EqualAndCondition<>("title", "Not so Great Job")).join();
+        assertEquals(1, jobs.size());
+        job2 = jobs.get(0);
 
         List<Schedule> schedules = scheduleMapper.find(new EqualAndCondition<>("jobId", job.getIdentityKey())).join();
         assertEquals(1, schedules.size());
@@ -93,5 +97,20 @@ public class ScheduleTests {
 
         ObjectMapper objectMapper = new ObjectMapper();
         JsonNode jsonNode = objectMapper.readTree(body);
+        assertEquals(1, jsonNode.get("size").asInt());
+
+        body = new String( webTestClient
+                .get()
+                .uri("/jobs/"+job2.getIdentityKey()+"/schedules")
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody()
+                .returnResult()
+                .getResponseBody());
+
+        jsonNode = objectMapper.readTree(body);
+        assertEquals(1, jsonNode.get("size").asInt());
     }
+
+
 }

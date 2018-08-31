@@ -97,7 +97,7 @@ create table Job (
   jobId BIGINT identity primary key,
   title varchar(50) not null,
   accountId BIGINT ,
-  type varchar(25),
+  type varchar(50),
   wage INT check(wage > 0),
   description VARCHAR(50),
   offerBeginDate DATETIME DEFAULT CURRENT_DATE,

@@ -6,7 +6,7 @@ import isel.ps.employbox.exceptions.BadRequestException;
 import isel.ps.employbox.model.binders.jobs.JobExperienceBinder;
 import isel.ps.employbox.model.entities.jobs.JobExperience;
 import isel.ps.employbox.model.input.InJobExperience;
-import isel.ps.employbox.model.output.HalCollectionPage;
+import isel.ps.employbox.model.output.Collections.HalCollectionPage;
 import isel.ps.employbox.model.output.OutJobExperience;
 import isel.ps.employbox.services.JobService;
 import org.springframework.security.core.Authentication;

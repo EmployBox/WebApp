@@ -4,7 +4,7 @@ package isel.ps.employbox.controllers.jobs;
 import isel.ps.employbox.model.binders.jobs.ScheduleBinder;
 import isel.ps.employbox.model.entities.jobs.Schedule;
 import isel.ps.employbox.model.input.InSchedule;
-import isel.ps.employbox.model.output.HalCollectionPage;
+import isel.ps.employbox.model.output.Collections.HalCollectionPage;
 import isel.ps.employbox.model.output.OutSchedule;
 import isel.ps.employbox.services.ScheduleService;
 import org.springframework.security.core.Authentication;

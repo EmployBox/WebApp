@@ -76,6 +76,7 @@ CREATE PROCEDURE populateDB()
     insert into FOLLOWS(ACCOUNTIDFOLLOWER, ACCOUNTIDFOLLOWED) VALUES (account_id2, company_id1);
 
     INSERT INTo SCHEDULE(JOBID) VALUES (job_id);
+    INSERT INTo SCHEDULE(JOBID) VALUES (job_id2);
   end;
 
 create procedure deleteDB()

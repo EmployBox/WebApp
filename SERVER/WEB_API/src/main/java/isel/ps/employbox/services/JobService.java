@@ -23,6 +23,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 import static com.github.jayield.rapper.mapper.MapperRegistry.getMapper;
+import static isel.ps.employbox.services.ServiceUtils.getCollectionPageFuture;
 import static isel.ps.employbox.services.ServiceUtils.handleExceptions;
 
 @Service
@@ -266,5 +267,9 @@ public class JobService {
         return Mono.fromFuture(
                 handleExceptions(future, unitOfWork)
         );
+    }
+
+    public CompletableFuture<CollectionPage<Application>> getApplication(long jobId, int page, int pageSize ) {
+        return getCollectionPageFuture(Application.class,page,pageSize, new EqualAndCondition<>("jobId", jobId) );
     }
 }

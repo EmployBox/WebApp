@@ -3,7 +3,7 @@ package isel.ps.employbox.controllers.account;
 import isel.ps.employbox.model.binders.AccountBinder;
 import isel.ps.employbox.model.binders.CollectionPage;
 import isel.ps.employbox.model.entities.Account;
-import isel.ps.employbox.model.output.HalCollectionPage;
+import isel.ps.employbox.model.output.Collections.HalCollectionPage;
 import isel.ps.employbox.services.FollowService;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;

@@ -8,8 +8,10 @@ import com.github.jayield.rapper.unitofwork.UnitOfWork;
 import isel.ps.employbox.exceptions.ResourceNotFoundException;
 import isel.ps.employbox.model.entities.jobs.Job;
 import isel.ps.employbox.model.entities.jobs.JobExperience;
+import isel.ps.employbox.model.entities.jobs.Schedule;
 import isel.ps.employbox.model.input.InJob;
 import isel.ps.employbox.model.input.InJobExperience;
+import isel.ps.employbox.model.input.InSchedule;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -28,6 +30,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import static com.github.jayield.rapper.mapper.MapperRegistry.getMapper;
@@ -137,6 +140,28 @@ public class JobControllerTests {
         inJob.setWage(1);
         inJob.setOfferType("Looking for Worker");
         inJob.setDescription("Lavar o chão");
+        inJob.setType("Freelance" );
+
+        InJobExperience inJobExperience = new InJobExperience();
+        inJobExperience.setCompetences("C#");
+        inJobExperience.setYears((short) 2);
+
+        List<InJobExperience> experiences = new ArrayList<>();
+        experiences.add(inJobExperience);
+        inJob.setExperiences(experiences);
+
+        InSchedule inSchedule = new InSchedule();
+        inSchedule.setRepeats("Daily");
+        inSchedule.setDate(new Date(System.currentTimeMillis()));
+
+        InSchedule inSchedule2 = new InSchedule();
+        inSchedule2.setRepeats("Weekly");
+        inSchedule2.setDate(new Date(System.currentTimeMillis()));
+
+        List<InSchedule> inSchedules = new ArrayList<>();
+        inSchedules.add(inSchedule);
+        inSchedules.add(inSchedule2);
+        inJob.setSchedules(inSchedules);
 
         ObjectMapper objectMapper = new ObjectMapper();
         String json = objectMapper.writeValueAsString(inJob);
@@ -152,7 +177,12 @@ public class JobControllerTests {
                 .expectBody()
                 .consumeWith(document("createJob"));
         DataMapper<Job, Long> jobMapper = getMapper(Job.class, unitOfWork);
-        assertTrue(jobMapper.find( new EqualAndCondition<>("title", "Verrryyy gud job, come come")).join().size() != 0);
+        Job createdJob = jobMapper.find( new EqualAndCondition<>("title", "Verrryyy gud job, come come")).join().get(0);
+
+        DataMapper<JobExperience, Long> experienceMapper = getMapper(JobExperience.class, unitOfWork);
+        DataMapper<Schedule, Long> scheduleMapper = getMapper(Schedule.class, unitOfWork);
+        assertEquals(experienceMapper.find( new EqualAndCondition<>("jobId", createdJob.getIdentityKey())).join().size(), 1);
+        assertEquals(scheduleMapper.find(new EqualAndCondition<>("jobId", createdJob.getIdentityKey())).join().size(), 2);
         unitOfWork.commit().join();
     }
 

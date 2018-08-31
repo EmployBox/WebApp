@@ -4,7 +4,7 @@ import isel.ps.employbox.exceptions.BadRequestException;
 import isel.ps.employbox.model.binders.curricula.ProjectBinder;
 import isel.ps.employbox.model.entities.curricula.childs.Project;
 import isel.ps.employbox.model.input.curricula.childs.InProject;
-import isel.ps.employbox.model.output.HalCollectionPage;
+import isel.ps.employbox.model.output.Collections.HalCollectionPage;
 import isel.ps.employbox.model.output.OutProject;
 import isel.ps.employbox.services.curricula.CurriculumService;
 import isel.ps.employbox.services.curricula.ProjectService;
