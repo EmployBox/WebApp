@@ -100,13 +100,14 @@ public class JobControllerTests {
 
     @Test
     public void testGetJob(){
-        webTestClient
+        String body = new String(webTestClient
                 .get()
                 .uri("/jobs/" + job.getIdentityKey())
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody()
-                .consumeWith(document("getJob"));
+                .returnResult().getResponseBody());
+        int z = 0;
     }
 
     @Test

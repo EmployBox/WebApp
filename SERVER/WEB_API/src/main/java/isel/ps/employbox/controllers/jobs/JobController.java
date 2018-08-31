@@ -94,15 +94,15 @@ public class JobController {
         return jobService.deleteJob(jid, authentication.getName());
     }
 
-    @GetMapping("/applications")
+    @GetMapping("/{jid}/applications")
     public Mono<HalCollectionPage> getApplication(
-            @PathVariable  long jobId,
+            @PathVariable  long jid,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int pageSize
 
     ) {
         return Mono.fromFuture(
-                jobService.getApplication(jobId, page, pageSize)
+                jobService.getApplication(jid, page, pageSize)
                         .thenCompose(applicationCollectionPage -> applicationBinder.bindOutput(applicationCollectionPage, this.getClass()))
         );
     }
