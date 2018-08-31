@@ -1,19 +1,14 @@
-package isel.ps.employbox.model.binders.Jobs;
+package isel.ps.employbox.model.binders.jobs;
 
 import com.github.jayield.rapper.unitofwork.UnitOfWork;
 import isel.ps.employbox.model.binders.AccountBinder;
 import isel.ps.employbox.model.binders.ModelBinder;
-import isel.ps.employbox.model.entities.jobs.Application;
 import isel.ps.employbox.model.entities.jobs.Job;
-import isel.ps.employbox.model.entities.jobs.JobExperience;
-import isel.ps.employbox.model.entities.jobs.Schedule;
 import isel.ps.employbox.model.input.InJob;
 import isel.ps.employbox.model.output.OutJob;
 import org.springframework.stereotype.Component;
 
-import java.util.List;
 import java.util.concurrent.CompletableFuture;
-import java.util.stream.Collectors;
 
 import static isel.ps.employbox.services.ServiceUtils.handleExceptions;
 

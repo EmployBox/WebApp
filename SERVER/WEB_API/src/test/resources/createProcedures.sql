@@ -51,7 +51,7 @@ CREATE PROCEDURE populateDB()
     insert into COMPANY(ACCOUNTID) values (company_id1);
     insert into COMPANY(ACCOUNTID) values (company_id2);
 
-    /*Insert Jobs*/
+    /*Insert jobs*/
     insert into JOB(TITLE, ACCOUNTID, WAGE, DESCRIPTION, OFFERTYPE) values ('Great Job', account_id1, 1000, 'Sou uma oferta simpatica', 'Looking for work');
     set job_id = IDENTITY();
 
@@ -75,7 +75,7 @@ CREATE PROCEDURE populateDB()
     insert into FOLLOWS(ACCOUNTIDFOLLOWER, ACCOUNTIDFOLLOWED) VALUES (account_id1, company_id1);
     insert into FOLLOWS(ACCOUNTIDFOLLOWER, ACCOUNTIDFOLLOWED) VALUES (account_id2, company_id1);
 
-    INSERT INTo SCHEDULE(JOBID, ACCOUNTID) VALUES (job_id, account_id1);
+    INSERT INTo SCHEDULE(JOBID) VALUES (job_id);
   end;
 
 create procedure deleteDB()

@@ -8,7 +8,6 @@ import java.util.Date;
 public class InSchedule{
     private long scheduleId;
     private long jobId;
-    private long accountId;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     private Date date;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "HH:mm")
@@ -57,14 +56,6 @@ public class InSchedule{
 
     public void setJobId(long jobId) {
         this.jobId = jobId;
-    }
-
-    public long getAccountId() {
-        return accountId;
-    }
-
-    public void setAccountId(long accountId) {
-        this.accountId = accountId;
     }
 
     public String getRepeats() {

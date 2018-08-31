@@ -1,7 +1,7 @@
 package isel.ps.employbox.controllers;
 
 import isel.ps.employbox.exceptions.BadRequestException;
-import isel.ps.employbox.model.binders.Jobs.ApplicationBinder;
+import isel.ps.employbox.model.binders.jobs.ApplicationBinder;
 import isel.ps.employbox.model.binders.UserBinder;
 import isel.ps.employbox.model.entities.jobs.Application;
 import isel.ps.employbox.model.entities.UserAccount;

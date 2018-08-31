@@ -198,14 +198,12 @@ CREATE TABLE [Message](
 CREATE TABLE [Schedule](
   scheduleId BIGINT IDENTITY primary key,
   jobId BIGINT,
-  accountId BIGINT,
   repeats VARCHAR(25),
   date DATETIME,
   starthour DATETIME,
   endhour DATETIME,
   version BIGINT DEFAULT(1)
 
-  FOREIGN KEY (accountId) REFERENCES Account,
   FOREIGN KEY (jobId) REFERENCES Job
 )
 

@@ -1,4 +1,4 @@
-package isel.ps.employbox.model.binders.Jobs;
+package isel.ps.employbox.model.binders.jobs;
 
 import com.github.jayield.rapper.unitofwork.UnitOfWork;
 import isel.ps.employbox.model.binders.AccountBinder;

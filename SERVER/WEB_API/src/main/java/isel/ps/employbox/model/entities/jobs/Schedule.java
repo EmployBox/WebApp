@@ -14,17 +14,12 @@ import java.time.Instant;
 import static com.github.jayield.rapper.mapper.MapperRegistry.getMapper;
 
 public class Schedule implements DomainObject<Long> {
-
     @Id(isIdentity = true)
     private final long scheduleId;
-
     private final Instant date;
     private final Instant startHour;
     private final Instant endHour;
     private final String repeats;
-
-    @ColumnName(name = "accountId")
-    private Foreign<Account,Long> account;
 
     @ColumnName(name = "jobId")
     private Foreign<Job, Long> job;
@@ -36,7 +31,6 @@ public class Schedule implements DomainObject<Long> {
         this.scheduleId = 0;
         this.startHour = null;
         this.endHour = null;
-        this.account = null;
         this.job = null;
         this.version = 0;
         this.date = null;
@@ -44,7 +38,6 @@ public class Schedule implements DomainObject<Long> {
     }
 
     public Schedule(long scheduleId,
-                    long accountId,
                     long jobId,
                     Instant date,
                     Instant startHour,
@@ -55,12 +48,8 @@ public class Schedule implements DomainObject<Long> {
         this.date = date;
         this.repeats = repeats;
         UnitOfWork unitOfWork = new UnitOfWork();
-        this.account = new Foreign(accountId, unit -> getMapper(Account.class, unitOfWork).findById( accountId)
-                .thenCompose( res -> unitOfWork.commit().thenApply( __-> res))
-                .thenApply(account1 -> account1.orElseThrow(() -> new ResourceNotFoundException("Account not Found"))));
-
-        this.job = new Foreign(jobId, unit -> getMapper(Job.class, unitOfWork).findById( jobId)
-                .thenCompose( res -> unitOfWork.commit().thenApply( __-> res))
+        this.job = new Foreign<>(jobId, unit -> getMapper(Job.class, unitOfWork).findById( jobId)
+                .thenCompose( res -> unitOfWork.commit().thenApply(aVoid -> res))
                 .thenApply(job1 -> job1.orElseThrow(() -> new ResourceNotFoundException("Job not Found"))));
 
         this.scheduleId = scheduleId;
@@ -87,20 +76,12 @@ public class Schedule implements DomainObject<Long> {
         return endHour;
     }
 
-    public Foreign<Account, Long> getAccount() {
-        return account;
-    }
-
     public Foreign<Job, Long> getJob() {
         return job;
     }
 
     public void setJob(Foreign<Job, Long> job) {
         this.job = job;
-    }
-
-    public void setAccount(Foreign<Account, Long> account) {
-        this.account = account;
     }
 
     public Instant getDate() {

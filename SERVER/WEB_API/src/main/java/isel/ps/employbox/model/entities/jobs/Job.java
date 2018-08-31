@@ -1,6 +1,5 @@
 package isel.ps.employbox.model.entities.jobs;
 
-
 import com.github.jayield.rapper.DomainObject;
 import com.github.jayield.rapper.annotations.ColumnName;
 import com.github.jayield.rapper.annotations.Id;
@@ -8,9 +7,9 @@ import com.github.jayield.rapper.annotations.Version;
 import com.github.jayield.rapper.mapper.externals.Foreign;
 import com.github.jayield.rapper.unitofwork.UnitOfWork;
 import isel.ps.employbox.exceptions.ResourceNotFoundException;
-import isel.ps.employbox.model.binders.Jobs.ApplicationBinder;
-import isel.ps.employbox.model.binders.Jobs.JobExperienceBinder;
-import isel.ps.employbox.model.binders.Jobs.ScheduleBinder;
+import isel.ps.employbox.model.binders.jobs.ApplicationBinder;
+import isel.ps.employbox.model.binders.jobs.JobExperienceBinder;
+import isel.ps.employbox.model.binders.jobs.ScheduleBinder;
 import isel.ps.employbox.model.entities.Account;
 import isel.ps.employbox.model.input.InApplication;
 import isel.ps.employbox.model.input.InJobExperience;
@@ -23,7 +22,6 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static com.github.jayield.rapper.mapper.MapperRegistry.getMapper;
-
 
 public class Job implements DomainObject<Long> {
 

@@ -3,7 +3,7 @@ package isel.ps.employbox.controllers.jobs;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.TypeFactory;
 import isel.ps.employbox.exceptions.BadRequestException;
-import isel.ps.employbox.model.binders.Jobs.JobBinder;
+import isel.ps.employbox.model.binders.jobs.JobBinder;
 import isel.ps.employbox.model.entities.jobs.Job;
 import isel.ps.employbox.model.input.InJob;
 import isel.ps.employbox.model.input.InSchedule;

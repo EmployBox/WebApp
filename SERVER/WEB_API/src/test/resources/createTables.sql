@@ -213,13 +213,11 @@ CREATE TABLE Follows (
 CREATE TABLE Schedule (
   scheduleId BIGINT IDENTITY primary key,
   jobId BIGINT,
-  accountId BIGINT,
   repeats VARCHAR(25),
   date DATETIME,
   starthour DATETIME,
   endhour DATETIME,
   version BIGINT DEFAULT 1,
 
-  FOREIGN KEY (jobId) references JOB(jobId),
-  FOREIGN KEY (accountId) REFERENCES Account(accountId)
+  FOREIGN KEY (jobId) references JOB(jobId)
 );

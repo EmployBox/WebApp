@@ -22,7 +22,8 @@ export default (query, onQueryChange) => {
   }
 
   function handleChange (value, property) {
-    query[property] = value
+    if (value === '') delete query[property]
+    else query[property] = value
     onQueryChange(query)
   }
 
@@ -68,9 +69,21 @@ export default (query, onQueryChange) => {
         </div>
       </div>
       <div class='form-group'>
-        <center>
-          <button type='button' class='btn btn-secondary' data-toggle='modal' data-target='.bd-example-modal-lg'>Contract</button>
-        </center>
+        <label>Contract</label>
+        <div class='row'>
+          <div class='col'>
+            <button type='button' class='btn btn-secondary' data-toggle='modal' data-target='.bd-example-modal-lg'>{query.type || 'Not Defined'}</button>
+          </div>
+          {query.type && <div class='col'>
+            <button class='fas fa-trash'
+              type='button'
+              aria-label='Close'
+              onClick={() => {
+                handleChange('', 'type')
+                handleChange('', 'schedules')
+              }} />
+          </div>}
+        </div>
 
         <div class='modal fade bd-example-modal-lg' tabIndex='-1' role='dialog' aria-labelledby='myLargeModalLabel' aria-hidden='true'>
           <div class='modal-dialog modal-lg modal-dialog-centered' role='document'>

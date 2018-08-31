@@ -12,8 +12,6 @@ public class OutSchedule implements OutputDto<OutSchedule.ScheduleItemOutput> {
 
     private final OutJob _outJob;
 
-    private final OutAccount _outAccount;
-
     @JsonProperty
     private final long scheduleId;
 
@@ -42,7 +40,6 @@ public class OutSchedule implements OutputDto<OutSchedule.ScheduleItemOutput> {
     public OutSchedule(
             long scheduleId,
             OutJob outJob,
-            OutAccount outAccount,
             Instant date,
             Instant startHour,
             Instant endHour,
@@ -50,7 +47,6 @@ public class OutSchedule implements OutputDto<OutSchedule.ScheduleItemOutput> {
             long version)
     {
         this.scheduleId = scheduleId;
-        this._outAccount = outAccount;
         this._outJob = outJob;
         this.date = date;
         this.startHour = startHour;
@@ -119,8 +115,5 @@ public class OutSchedule implements OutputDto<OutSchedule.ScheduleItemOutput> {
 
         @JsonProperty
         private final OutJob job = _outJob;
-
-        @JsonProperty
-        private final OutAccount outAccount = _outAccount;
     }
 }

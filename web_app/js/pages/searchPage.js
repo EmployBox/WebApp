@@ -74,13 +74,11 @@ class SearchPage extends React.Component {
   }
 
   handleNewQuery (newQuery) {
-    console.log(newQuery)
     this.setState({query: newQuery})
   }
 
   render () {
     const { entity, uri, currentQuery, query } = this.state
-    console.log(uri)
     let buttonClass = 'btn btn-success'
     if (JSON.stringify(currentQuery) === JSON.stringify(query)) buttonClass = buttonClass + ' disabled'
 
