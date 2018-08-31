@@ -74,12 +74,13 @@ public class OutRating implements OutputDto {
         private final long accountIDTo;
 
         @JsonProperty
-        private final _Links _links = new _Links();
+        private final _Links _links;
 
 
         RatingsItemOutput(long accountIDFrom, long accountIDTo) {
             this.accountIDFrom = accountIDFrom;
             this.accountIDTo = accountIDTo;
+            this._links = new _Links();
         }
 
         private class _Links {

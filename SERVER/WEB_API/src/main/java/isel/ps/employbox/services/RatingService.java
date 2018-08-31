@@ -31,7 +31,7 @@ public class RatingService {
     public CompletableFuture<CollectionPage<Rating>> getRatings(long accountId, int page, int pageSize, String orderColumn, String orderClause) {
         ArrayList<Condition> conditions = new ArrayList<>();
         ServiceUtils.evaluateOrderClause(orderColumn,orderClause, conditions);
-        conditions.add( new EqualAndCondition<>("accountIdDest", accountId));
+        conditions.add( new EqualAndCondition<>("accountIdTo", accountId));
 
         return ServiceUtils.getCollectionPageFuture(Rating.class, page, pageSize,  conditions.toArray(new Condition[conditions.size()]));
     }
@@ -64,7 +64,7 @@ public class RatingService {
                             if(user.getIdentityKey() != rating.getAccountIdFrom())
                                 throw new ForbiddenException(ErrorMessages.UN_AUTHORIZED_ID_AND_EMAIL_MISMATCH);
                             return ratingMapper.find(new EqualAndCondition("accountIdFrom", rating.getAccountIdFrom()),
-                                    new EqualAndCondition<>("accountIdDest", rating.getAccountIdTo()));
+                                    new EqualAndCondition<>("accountIdTo", rating.getAccountIdTo()));
                         })
                         .thenCompose(ratings -> {
                                     if (ratings.size() == 0)

@@ -46,13 +46,23 @@ export default withRouter(class extends React.Component {
     }
   }
   render () {
-    console.log(this.props.match)
-    return this.state.inputs
-      ? <HttpRequest url={URI.decode(this.props.match.url)} authorization={this.props.auth}
-        afterResult={json => console.log('redirect to ' + JSON.stringify(json))}
+    const {type, from, accountIdDest, method} = URI.parseQuery(this.props.location.search)
+    return <div>
+      <GenericForm inputData={inputs[type]}
+        onSubmitHandler={inputs => {
+          inputs.accountIdFrom = this.props.accountId
+          inputs.accountIdDest = accountIdDest
+          this.setState({inputs: inputs})
+        }}
       />
-      : <GenericForm inputData={inputs[this.props.type]}
-        onSumitHandler={inputs => this.setState({inputs: inputs})}
-      />
+      {this.state.inputs
+        ? <HttpRequest method={method} url={URI.decode(this.props.match.params.url)}
+          authorization={this.props.auth}
+          body={this.state.inputs}
+          key={new Date().valueOf()}
+          afterResult={json => this.props.history.push(from)}
+        />
+        : <div />}
+    </div>
   }
 })

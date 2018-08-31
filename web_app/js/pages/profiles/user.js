@@ -8,9 +8,6 @@ import JobsTable from '../tables/offeredJobsTable'
 import ApplicationsTable from '../tables/applicationsTable'
 import CurriculasTable from '../tables/curriculasTable'
 import CommentBox from '../../components/CommentBox'
-import Toggle from '../../components/toggle'
-import GenericForm from '../../components/genericForm'
-import Editable from '../../components/editable'
 
 const style = {
   width: 200,
@@ -24,6 +21,7 @@ const curriculasTempl = new URITemplate('/account/{userUrl}/curriculas/{curricul
 const applicationsTempl = new URITemplate('/account/{userUrl}/applications/{applicationUrl}')
 const followersTempl = new URITemplate('/account/{userUrl}/followers/{followersURL}')
 const followingTempl = new URITemplate('/account/{userUrl}/following/{followingUrl}')
+const ratingFormTempl = new URITemplate('/rate/{url}')
 
 export default withRouter(({auth, match, history, accountId, createCurriculaTempl}) => {
   const CollectionButton = ({url, title, pushTo}) => (
@@ -97,17 +95,23 @@ export default withRouter(({auth, match, history, accountId, createCurriculaTemp
           }
           <h3>{json.summary}</h3>
           <div class='d-flex flex-row justify-content-center'>
-            <h4>Rating: {json.rating}</h4>
-            <Editable
-              text={json.rating}
-              inputData={[
-                {
-                  type: 'number',
-                  name: 'rate'
-                }
-              ]}
-              onSubmitHandler={inputs => console.log(inputs)}
-            />
+            <h4>
+              Rating: {json.rating}
+              {json.accountId === accountId ? <div />
+                : <HttpRequest url={json._links.ratings.href.split('?')[0] + '/single'}
+                  authorization={auth}
+                  onResult={ratings =>
+                    <button class='btn btn-success' onClick={() => history.push(ratingFormTempl.expand({
+                      url: json._links.ratings.href.split('?')[0]
+                    }) + `?type=user&from=${URI.encode(match.url)}&accountIdDest=${json.accountId}&method=PUT`)}>Rate this</button>
+                  }
+                  onError={() =>
+                    <button class='btn btn-success' onClick={() => history.push(ratingFormTempl.expand({
+                      url: json._links.ratings.href.split('?')[0]
+                    }) + `?type=user&from=${URI.encode(match.url)}&accountIdDest=${json.accountId}&method=POST`)}>Rate this</button>
+                  }
+                />}
+            </h4>
           </div>
           <CollectionButton url={json._links.offered_jobs.href} title='Offered Jobs' pushTo={offeredJobsTempl.expand({
             userUrl: json._links.self.href,

@@ -59,7 +59,7 @@ public class Rating implements DomainObject<Rating.RatingKey> {
     }
 
     public long getAccountIdTo() {
-        return this.ratingKey.accountIdDest;
+        return this.ratingKey.accountIdTo;
     }
 
     public double getWorkLoad() {
@@ -102,18 +102,18 @@ public class Rating implements DomainObject<Rating.RatingKey> {
 
     public static class RatingKey extends EmbeddedIdClass {
         private final long accountIdFrom;
-        private final long accountIdDest;
+        private final long accountIdTo;
 
         public RatingKey(){
             super();
             accountIdFrom = 0;
-            accountIdDest = 0;
+            accountIdTo = 0;
         }
 
         public RatingKey(long accountIdFrom, long accountIdDest) {
             super(accountIdFrom, accountIdDest);
             this.accountIdFrom = accountIdFrom;
-            this.accountIdDest = accountIdDest;
+            this.accountIdTo = accountIdDest;
         }
 
         public long getAccountIdFrom() {
@@ -121,7 +121,7 @@ public class Rating implements DomainObject<Rating.RatingKey> {
         }
 
         public long getAccountIdDest() {
-            return accountIdDest;
+            return accountIdTo;
         }
     }
 }

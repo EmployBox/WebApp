@@ -15,6 +15,7 @@ const style = {
 
 const followersTempl = new URITemplate('/company/{companyUrl}/followers/{followersUrl}')
 const followingTempl = new URITemplate('/company/{companyUrl}/following/{followingUrl}')
+const ratingFormTempl = new URITemplate('/rate/{url}')
 
 export default withRouter(({match, auth, history, accountId}) => {
   const CollectionButton = ({url, title, pushTo}) => (
@@ -83,7 +84,23 @@ export default withRouter(({match, auth, history, accountId}) => {
         />
         <h3>{json.description}</h3>
         <h3>{json.specialization}</h3>
-        <h3>Rating: {json.rating}</h3>
+        <h3>
+          Rating: {json.rating}
+          {json.accountId === accountId ? <div />
+            : <HttpRequest url={json._links.ratings.href.split('?')[0] + '/single'}
+              authorization={auth}
+              onResult={ratings =>
+                <button class='btn btn-success' onClick={() => history.push(ratingFormTempl.expand({
+                  url: json._links.ratings.href.split('?')[0]
+                }) + `?type=company&from=${URI.encode(match.url)}&accountIdDest=${json.accountId}&method=PUT`)}>Rate this</button>
+              }
+              onError={() =>
+                <button class='btn btn-success' onClick={() => history.push(ratingFormTempl.expand({
+                  url: json._links.ratings.href.split('?')[0]
+                }) + `?type=company&from=${URI.encode(match.url)}&accountIdDest=${json.accountId}&method=POST`)}>Rate this</button>
+              }
+            />}
+        </h3>
         <button class='btn btn-primary bg-dark' onClick={() => window.location.href = json.webpageUrl}>WebPage</button>
         <br />
         <CollectionButton url={json._links.followers.href} title='Followers' pushTo={followersTempl.expand({

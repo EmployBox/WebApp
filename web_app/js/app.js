@@ -23,6 +23,7 @@ import User from './pages/profiles/user'
 import Company from './pages/profiles/company'
 import Job from './pages/jobPage'
 import Curricula from './pages/curriculaPage'
+import RatingForm from './pages/ratingForm'
 
 import URI from 'urijs'
 import URITemplate from 'urijs/src/URITemplate'
@@ -167,7 +168,7 @@ export default class extends Component {
                     <PrivateRoute exact path='/create/curricula/:url' component={(props) =>
                       <CreateCurricula curriculaTempl={curriculaTempl} {...props} />}
                     />
-                    <PrivateRoute exact path='/rate/:url' component={} />
+                    <PrivateRoute path='/rate/:url' component={RatingForm} />
                     <PrivateRoute path='/account/:url' component={(props) =>
                       <User createCurriculaTempl={createCurriculaTempl} {...props} />}
                     />
