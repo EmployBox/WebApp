@@ -1,7 +1,7 @@
 import React from 'react'
 import {withRouter} from 'react-router-dom'
 import HttpRequest from '../components/httpRequest'
-import GenericForm from '../components/genericForm'
+import GenericForm from '../components/forms/genericForm'
 import URI from 'urijs'
 
 const inputs = {

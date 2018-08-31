@@ -1,7 +1,7 @@
 import React from 'react'
 import HttpRequest from '../../components/httpRequest'
 import URI from 'urijs'
-import Table from '../../components/halTable'
+import Table from '../../components/tables/halTable'
 import {withRouter} from 'react-router-dom'
 import URITemplate from 'urijs/src/URITemplate'
 
