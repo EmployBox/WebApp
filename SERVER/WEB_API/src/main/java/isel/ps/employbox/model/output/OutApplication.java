@@ -67,7 +67,7 @@ public class OutApplication implements OutputDto {
 
             private class Self {
                 @JsonProperty
-                final String href = HOSTNAME + linkTo(methodOn(JobController.class).getApplication(jobId, 0, 6)).withSelfRel().getHref();
+                final String href = HOSTNAME + linkTo(methodOn(JobController.class).getApplication(jobId, 0, 5)).withSelfRel().getHref();
             }
         }
     }

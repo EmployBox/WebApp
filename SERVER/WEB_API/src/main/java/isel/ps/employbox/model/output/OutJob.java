@@ -135,7 +135,7 @@ public class OutJob implements OutputDto<OutJob.JobItemOutput> {
 
             private class Application{
                 @JsonProperty
-                final String href = HOSTNAME + linkTo(methodOn(UserAccountController.class).createApplication(account.accountId, jobId, null, null )).withRel("apply").getHref();
+                final String href = HOSTNAME + linkTo(methodOn(JobController.class).getApplication(jobId, 0, 5)).withSelfRel().getHref();
             }
         }
     }
@@ -171,7 +171,7 @@ public class OutJob implements OutputDto<OutJob.JobItemOutput> {
 
         private class Applications {
             @JsonProperty
-            final String href = HOSTNAME + linkTo ( methodOn(UserAccountController.class).getAllApplications(_account.getAccountId(), 0,5)).withRel("applications").getHref();
+            final String href = HOSTNAME + linkTo(methodOn(JobController.class).getApplication(jobId, 0, 5)).withSelfRel().getHref();
         }
 
         private class Apply {
