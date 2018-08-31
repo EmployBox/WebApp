@@ -29,7 +29,7 @@ export default class extends React.Component {
       json: undefined,
       error: undefined,
       method: nextProps.method,
-      body: undefined
+      body: nextProps.body
     }
   }
 

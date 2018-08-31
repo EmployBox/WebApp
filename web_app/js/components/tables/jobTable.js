@@ -1,8 +1,10 @@
 import React from 'react'
 import { Link, withRouter } from 'react-router-dom'
-import Table from './halTable'
 import URI from 'urijs'
 import URITemplate from 'urijs/src/URITemplate'
+
+import Table from './halTable'
+import RequestButton from '../requestButton'
 
 const searchTemplate = new URITemplate('/search/{url}')
 
@@ -54,6 +56,11 @@ export default withRouter(({json, match, history, accountTempl, companyTempl, mo
               {
                 Header: 'Type',
                 accessor: 'offerType'
+              },
+              {
+                Cell: ({original}) => {
+                  console.log(original)
+                }
               }
             ]
           }

@@ -8,7 +8,7 @@ import isel.ps.employbox.model.entities.Chat;
 import isel.ps.employbox.model.entities.Message;
 import isel.ps.employbox.model.input.InChat;
 import isel.ps.employbox.model.input.InMessage;
-import isel.ps.employbox.model.output.HalCollectionPage;
+import isel.ps.employbox.model.output.Collections.HalCollectionPage;
 import isel.ps.employbox.model.output.OutMessage;
 import isel.ps.employbox.services.ChatService;
 import org.springframework.security.core.Authentication;

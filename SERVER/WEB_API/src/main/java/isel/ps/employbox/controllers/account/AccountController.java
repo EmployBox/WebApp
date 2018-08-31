@@ -1,10 +1,10 @@
 package isel.ps.employbox.controllers.account;
 
 import isel.ps.employbox.model.binders.AccountBinder;
-import isel.ps.employbox.model.binders.JobBinder;
+import isel.ps.employbox.model.binders.jobs.JobBinder;
 import isel.ps.employbox.model.entities.Account;
-import isel.ps.employbox.model.entities.Job;
-import isel.ps.employbox.model.output.HalCollectionPage;
+import isel.ps.employbox.model.entities.jobs.Job;
+import isel.ps.employbox.model.output.Collections.HalCollectionPage;
 import isel.ps.employbox.model.output.OutAccount;
 import isel.ps.employbox.services.AccountService;
 import org.springframework.security.core.Authentication;

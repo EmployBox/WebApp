@@ -3,7 +3,7 @@ import HttpRequest from '../components/httpRequest'
 import URI from 'urijs'
 import URITemplate from 'urijs/src/URITemplate'
 import Toggle from '../components/toggle'
-import Table from '../components/halTable'
+import Table from '../components/tables/halTable'
 import {withRouter, Link} from 'react-router-dom'
 
 const userTempl = new URITemplate('/account/{url}')

@@ -1,7 +1,9 @@
-package isel.ps.employbox.model.binders;
+package isel.ps.employbox.model.binders.jobs;
 
 import com.github.jayield.rapper.unitofwork.UnitOfWork;
-import isel.ps.employbox.model.entities.Job;
+import isel.ps.employbox.model.binders.AccountBinder;
+import isel.ps.employbox.model.binders.ModelBinder;
+import isel.ps.employbox.model.entities.jobs.Job;
 import isel.ps.employbox.model.input.InJob;
 import isel.ps.employbox.model.output.OutJob;
 import org.springframework.stereotype.Component;
@@ -30,14 +32,22 @@ public class JobBinder implements ModelBinder<Job, OutJob, InJob> {
                         job.getDescription(),
                         job.getOfferBeginDate(),
                         job.getOfferEndDate(),
-                        job.getOfferType()
-                ));
+                        job.getOfferType(),
+                        job.getType()));
 
         return handleExceptions(future, unitOfWork);
     }
 
     @Override
     public Job bindInput(InJob inJob) {
+        /*JobExperienceBinder jobExperienceBinder = new JobExperienceBinder();
+        ApplicationBinder applicationBinder = new ApplicationBinder();
+        ScheduleBinder scheduleBinder = new ScheduleBinder();
+
+        List<JobExperience> jobExperiences = jobExperienceBinder.bindInput(inJob.getExperiences().stream()).collect(Collectors.toList());
+        List<Application> applications = applicationBinder.bindInput(inJob.getApplications().stream()).collect(Collectors.toList());
+        List<Schedule> schedules = scheduleBinder.bindInput(inJob.getSchedules().stream()).collect(Collectors.toList());*/
+
         return new Job(
                 inJob.getAccountId(),
                 inJob.getJobID(),
@@ -48,6 +58,7 @@ public class JobBinder implements ModelBinder<Job, OutJob, InJob> {
                 inJob.getOfferBeginDate(),
                 inJob.getOfferEndDate(),
                 inJob.getOfferType(),
+                inJob.getType(),
                 inJob.getApplications(),
                 inJob.getExperiences(),
                 inJob.getSchedules(),

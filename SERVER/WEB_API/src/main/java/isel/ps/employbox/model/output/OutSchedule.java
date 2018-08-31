@@ -8,20 +8,15 @@ import java.time.Instant;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 
-public class OutSchedule implements OutputDto {
+public class OutSchedule implements OutputDto<OutSchedule.ScheduleItemOutput> {
 
     private final OutJob _outJob;
-
-    private final OutAccount _outAccount;
 
     @JsonProperty
     private final long scheduleId;
 
     @JsonProperty
-    private final Instant startDate;
-
-    @JsonProperty
-    private final Instant endDate;
+    private final Instant date;
 
     @JsonProperty
     private final Instant startHour;
@@ -30,7 +25,7 @@ public class OutSchedule implements OutputDto {
     private final Instant endHour;
 
     @JsonProperty
-    private final String scheduleType;
+    private final String repeats;
 
     @JsonProperty
     private final long version;
@@ -45,30 +40,26 @@ public class OutSchedule implements OutputDto {
     public OutSchedule(
             long scheduleId,
             OutJob outJob,
-            OutAccount outAccount,
-            Instant startDate,
-            Instant endDate,
+            Instant date,
             Instant startHour,
             Instant endHour,
-            String scheduleType,
+            String repeats,
             long version)
     {
         this.scheduleId = scheduleId;
-        this._outAccount = outAccount;
         this._outJob = outJob;
-        this.startDate = startDate;
-        this.endDate = endDate;
+        this.date = date;
         this.startHour = startHour;
         this.endHour = endHour;
-        this.scheduleType = scheduleType;
         this.version = version;
+        this.repeats = repeats;
         this._embedded = new _Embedded();
         this._links = new _Links();
     }
 
     @Override
-    public Object getCollectionItemOutput() {
-        return new ScheduleItemOutput(scheduleId,  startDate, endDate, startHour, endHour, scheduleType, version) ;
+    public ScheduleItemOutput getCollectionItemOutput() {
+        return new ScheduleItemOutput(scheduleId, date, startHour, endHour, repeats, version) ;
     }
 
     class ScheduleItemOutput{
@@ -76,10 +67,7 @@ public class OutSchedule implements OutputDto {
         private final long scheduleId;
 
         @JsonProperty
-        private final Instant startDate;
-
-        @JsonProperty
-        private final Instant endDate;
+        private final Instant date;
 
         @JsonProperty
         private final Instant startHour;
@@ -88,7 +76,7 @@ public class OutSchedule implements OutputDto {
         private final Instant endHour;
 
         @JsonProperty
-        private final String scheduleType;
+        private final String repeats;
 
         @JsonProperty
         private final long version;
@@ -97,19 +85,17 @@ public class OutSchedule implements OutputDto {
         private  final _Links _links = new _Links();
 
         ScheduleItemOutput(long scheduleId,
-                           Instant startDate,
-                           Instant endDate,
+                           Instant date,
                            Instant startHour,
                            Instant endHour,
-                           String scheduleType,
+                           String repeats,
                            long version)
         {
             this.scheduleId = scheduleId;
-            this.startDate = startDate;
-            this.endDate = endDate;
+            this.date = date;
             this.startHour = startHour;
             this.endHour = endHour;
-            this.scheduleType = scheduleType;
+            this.repeats = repeats;
             this.version = version;
         }
     }
@@ -121,7 +107,7 @@ public class OutSchedule implements OutputDto {
 
         private class Self {
             @JsonProperty
-            final String href = HOSTNAME + linkTo(methodOn(ScheduleController.class, _outJob.jobId).getSchedule(scheduleId)).withSelfRel().getHref();
+            final String href = HOSTNAME + linkTo(methodOn(ScheduleController.class, _outJob.getJobId()).getSchedule(scheduleId)).withSelfRel().getHref();
         }
     }
 
@@ -129,8 +115,5 @@ public class OutSchedule implements OutputDto {
 
         @JsonProperty
         private final OutJob job = _outJob;
-
-        @JsonProperty
-        private final OutAccount outAccount = _outAccount;
     }
 }

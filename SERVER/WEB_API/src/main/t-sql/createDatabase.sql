@@ -101,6 +101,7 @@ CREATE TABLE [Job](
 	title nvarchar(50) not null,
 	accountId BIGINT ,
 	schedule NVARCHAR(20),
+	[type] NVARCHAR(25),
 	wage INT check(wage > 0),
 	[description] NVARCHAR(50),
 	offerBeginDate DATETIME DEFAULT(GETDATE()),
@@ -197,16 +198,12 @@ CREATE TABLE [Message](
 CREATE TABLE [Schedule](
   scheduleId BIGINT IDENTITY primary key,
   jobId BIGINT,
-  accountId BIGINT,
-  scheduleType VARCHAR(25),
   repeats VARCHAR(25),
-  startdate DATETIME,
-  enddate DATETIME,
+  date DATETIME,
   starthour DATETIME,
   endhour DATETIME,
   version BIGINT DEFAULT(1)
 
-  FOREIGN KEY (accountId) REFERENCES Account,
   FOREIGN KEY (jobId) REFERENCES Job
 )
 

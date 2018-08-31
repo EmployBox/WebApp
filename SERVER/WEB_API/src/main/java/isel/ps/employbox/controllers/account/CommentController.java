@@ -4,7 +4,7 @@ import isel.ps.employbox.exceptions.BadRequestException;
 import isel.ps.employbox.model.binders.CommentBinder;
 import isel.ps.employbox.model.entities.Comment;
 import isel.ps.employbox.model.input.InComment;
-import isel.ps.employbox.model.output.HalCollectionPage;
+import isel.ps.employbox.model.output.Collections.HalCollectionPage;
 import isel.ps.employbox.model.output.OutComment;
 import isel.ps.employbox.services.CommentService;
 import org.springframework.security.core.Authentication;

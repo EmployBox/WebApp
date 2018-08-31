@@ -5,12 +5,12 @@ import Navigation from './components/navigation'
 import Footer from './components/footer'
 import PrivateRouter from './components/privateRoute'
 import Auther from './components/auther'
-import JobFilters from './components/jobFilters'
-import JobTable from './components/jobTable'
-import CompanyFilters from './components/companyFilters'
-import CompanyTable from './components/companyTable'
-import UserFilters from './components/userFilters'
-import UserTable from './components/userTable'
+import JobFilters from './components/filters/jobFilters'
+import JobTable from './components/tables/jobTable'
+import CompanyFilters from './components/filters/companyFilters'
+import CompanyTable from './components/tables/companyTable'
+import UserFilters from './components/filters/userFilters'
+import UserTable from './components/tables/userTable'
 
 import CreateJobs from './pages/createJobs'
 import SignUp from './pages/signup/signup'
@@ -67,14 +67,7 @@ export default class extends Component {
   getOptions (json) {
     const UserTable1 = ({...rest}) => <UserTable {...rest} accountTempl={accountTempl} />
     const CompanyTable1 = ({...rest}) => <CompanyTable {...rest} companyTempl={companyTempl} />
-    const JobTable1 = ({...rest}) => (
-      <JobTable
-        {...rest}
-        jobTempl={jobTempl}
-        accountTempl={accountTempl}
-        companyTempl={companyTempl}
-      />
-    )
+    const JobTable1 = ({...rest}) => <JobTable {...rest} jobTempl={jobTempl} accountTempl={accountTempl} companyTempl={companyTempl} />
 
     return {
       jobs: new Option('Jobs', 'Job\'s title', 'title', getLink('jobs', json), new Render(JobFilters, JobTable1)),

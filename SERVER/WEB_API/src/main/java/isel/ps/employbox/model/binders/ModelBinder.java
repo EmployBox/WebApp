@@ -2,7 +2,7 @@ package isel.ps.employbox.model.binders;
 
 import com.github.jayield.rapper.DomainObject;
 import com.github.jayield.rapper.utils.CollectionUtils;
-import isel.ps.employbox.model.output.HalCollectionPage;
+import isel.ps.employbox.model.output.Collections.HalCollectionPage;
 import isel.ps.employbox.model.output.OutputDto;
 
 import java.util.List;

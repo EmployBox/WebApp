@@ -1,5 +1,7 @@
 package isel.ps.employbox.model.input;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import java.time.Instant;
 import java.util.List;
 
@@ -9,6 +11,7 @@ public class InComment {
     private long commmentId;
     private long mainCommentId;
     private boolean status;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm")
     private Instant datetime;
     private String text;
     private List<InComment> replies;

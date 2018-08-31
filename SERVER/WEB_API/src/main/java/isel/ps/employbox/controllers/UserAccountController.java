@@ -1,13 +1,13 @@
 package isel.ps.employbox.controllers;
 
 import isel.ps.employbox.exceptions.BadRequestException;
-import isel.ps.employbox.model.binders.ApplicationBinder;
+import isel.ps.employbox.model.binders.jobs.ApplicationBinder;
 import isel.ps.employbox.model.binders.UserBinder;
-import isel.ps.employbox.model.entities.Application;
+import isel.ps.employbox.model.entities.jobs.Application;
 import isel.ps.employbox.model.entities.UserAccount;
 import isel.ps.employbox.model.input.InApplication;
 import isel.ps.employbox.model.input.InUserAccount;
-import isel.ps.employbox.model.output.HalCollectionPage;
+import isel.ps.employbox.model.output.Collections.HalCollectionPage;
 import isel.ps.employbox.model.output.OutApplication;
 import isel.ps.employbox.model.output.OutUser;
 import isel.ps.employbox.services.UserAccountService;

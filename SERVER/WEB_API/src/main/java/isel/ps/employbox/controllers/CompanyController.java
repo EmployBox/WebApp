@@ -4,7 +4,7 @@ import isel.ps.employbox.exceptions.BadRequestException;
 import isel.ps.employbox.model.binders.CompanyBinder;
 import isel.ps.employbox.model.entities.Company;
 import isel.ps.employbox.model.input.InCompany;
-import isel.ps.employbox.model.output.HalCollectionPage;
+import isel.ps.employbox.model.output.Collections.HalCollectionPage;
 import isel.ps.employbox.model.output.OutCompany;
 import isel.ps.employbox.services.CompanyService;
 import org.springframework.security.core.Authentication;

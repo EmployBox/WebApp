@@ -3,10 +3,10 @@ package isel.ps.employbox.controllers.jobs;
 
 import isel.ps.employbox.ErrorMessages;
 import isel.ps.employbox.exceptions.BadRequestException;
-import isel.ps.employbox.model.binders.JobExperienceBinder;
-import isel.ps.employbox.model.entities.JobExperience;
+import isel.ps.employbox.model.binders.jobs.JobExperienceBinder;
+import isel.ps.employbox.model.entities.jobs.JobExperience;
 import isel.ps.employbox.model.input.InJobExperience;
-import isel.ps.employbox.model.output.HalCollectionPage;
+import isel.ps.employbox.model.output.Collections.HalCollectionPage;
 import isel.ps.employbox.model.output.OutJobExperience;
 import isel.ps.employbox.services.JobService;
 import org.springframework.security.core.Authentication;

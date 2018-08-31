@@ -4,7 +4,7 @@ import isel.ps.employbox.exceptions.BadRequestException;
 import isel.ps.employbox.model.binders.curricula.CurriculumExperienceBinder;
 import isel.ps.employbox.model.entities.curricula.childs.CurriculumExperience;
 import isel.ps.employbox.model.input.curricula.childs.InCurriculumExperience;
-import isel.ps.employbox.model.output.HalCollectionPage;
+import isel.ps.employbox.model.output.Collections.HalCollectionPage;
 import isel.ps.employbox.model.output.OutCurriculumExperience;
 import isel.ps.employbox.services.curricula.CurriculumExperienceService;
 import isel.ps.employbox.services.curricula.CurriculumService;

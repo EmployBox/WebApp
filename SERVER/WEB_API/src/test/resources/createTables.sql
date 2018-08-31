@@ -97,7 +97,7 @@ create table Job (
   jobId BIGINT identity primary key,
   title varchar(50) not null,
   accountId BIGINT ,
-  schedule VARCHAR(20),
+  type varchar(50),
   wage INT check(wage > 0),
   description VARCHAR(50),
   offerBeginDate DATETIME DEFAULT CURRENT_DATE,
@@ -213,15 +213,11 @@ CREATE TABLE Follows (
 CREATE TABLE Schedule (
   scheduleId BIGINT IDENTITY primary key,
   jobId BIGINT,
-  accountId BIGINT,
-  scheduleType VARCHAR(25),
   repeats VARCHAR(25),
-  startdate DATETIME,
-  enddate DATETIME,
+  date DATETIME,
   starthour DATETIME,
   endhour DATETIME,
   version BIGINT DEFAULT 1,
 
-  FOREIGN KEY (jobId) references JOB(jobId),
-  FOREIGN KEY (accountId) REFERENCES Account(accountId)
+  FOREIGN KEY (jobId) references JOB(jobId)
 );

@@ -1,16 +1,20 @@
 package isel.ps.employbox.model.input;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import java.time.Instant;
+import java.util.Date;
 
 public class InSchedule{
     private long scheduleId;
     private long jobId;
-    private long accountId;
-    private Instant startDate;
-    private Instant endDate;
-    private Instant startHour;
-    private Instant endHour;
-    private String scheduleType;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
+    private Date date;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "HH:mm")
+    private Date startHour;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "HH:mm")
+    private Date endHour;
+    private String repeats;
     private int version;
 
 
@@ -22,44 +26,20 @@ public class InSchedule{
         this.scheduleId = scheduleId;
     }
 
-    public Instant getStartDate() {
-        return startDate;
-    }
-
-    public void setStartDate(Instant startDate) {
-        this.startDate = startDate;
-    }
-
-    public Instant getEndDate() {
-        return endDate;
-    }
-
-    public void setEndDate(Instant endDate) {
-        this.endDate = endDate;
-    }
-
     public Instant getStartHour() {
-        return startHour;
+        return startHour.toInstant();
     }
 
-    public void setStartHour(Instant startHour) {
+    public void setStartHour(Date startHour) {
         this.startHour = startHour;
     }
 
     public Instant getEndHour() {
-        return endHour;
+        return endHour.toInstant();
     }
 
-    public void setEndHour(Instant endHour) {
+    public void setEndHour(Date endHour) {
         this.endHour = endHour;
-    }
-
-    public String getScheduleType() {
-        return scheduleType;
-    }
-
-    public void setScheduleType(String scheduleType) {
-        this.scheduleType = scheduleType;
     }
 
     public int getVersion() {
@@ -78,11 +58,19 @@ public class InSchedule{
         this.jobId = jobId;
     }
 
-    public long getAccountId() {
-        return accountId;
+    public String getRepeats() {
+        return this.repeats;
     }
 
-    public void setAccountId(long accountId) {
-        this.accountId = accountId;
+    public void setRepeats(String repeats) {
+        this.repeats = repeats;
+    }
+
+    public Instant getDate() {
+        return date.toInstant();
+    }
+
+    public void setDate(Date date) {
+        this.date = date;
     }
 }

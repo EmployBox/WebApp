@@ -1,6 +1,7 @@
 package isel.ps.employbox.model.entities;
 
 import com.github.jayield.rapper.annotations.Version;
+import isel.ps.employbox.model.entities.jobs.Job;
 
 import java.util.List;
 

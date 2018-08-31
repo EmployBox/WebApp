@@ -41,6 +41,7 @@ public class SecurityConfig {
         http.authorizeExchange().pathMatchers(HttpMethod.GET, "/accounts/*/ratings").permitAll();
         http.authorizeExchange().pathMatchers(HttpMethod.GET, "/accounts/*/comments").permitAll();
         http.authorizeExchange().pathMatchers(HttpMethod.GET, "/jobs/*/schedules").permitAll();
+        http.authorizeExchange().pathMatchers(HttpMethod.GET, "/jobs/*/applications").permitAll();
         http.authorizeExchange().pathMatchers(HttpMethod.GET, "/jobs").permitAll();
         http.authorizeExchange().pathMatchers(HttpMethod.GET, "/jobs/**").permitAll();
         http.authorizeExchange().pathMatchers(HttpMethod.OPTIONS, "/**").permitAll();

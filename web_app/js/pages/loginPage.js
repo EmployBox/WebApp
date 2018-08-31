@@ -1,5 +1,5 @@
 import React from 'react'
-import GenericForm from '../components/genericForm'
+import GenericForm from '../components/forms/genericForm'
 import HttpRequest from '../components/httpRequest'
 import base64 from 'base-64'
 
