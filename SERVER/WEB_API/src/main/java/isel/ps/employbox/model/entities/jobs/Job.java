@@ -104,7 +104,7 @@ public class Job implements DomainObject<Long> {
     ) {
         this.type = type;
         UnitOfWork unitOfWork = new UnitOfWork();
-        this.account = new Foreign(accountId, unit -> getMapper(Account.class, unitOfWork).findById( accountId)
+        this.account = new Foreign<>(accountId, unit -> getMapper(Account.class, unitOfWork).findById( accountId)
                 .thenCompose( res -> unitOfWork.commit().thenApply( __-> res))
                 .thenApply(account1 -> account1.orElseThrow(() -> new ResourceNotFoundException("Account not Found"))));
         this.jobId = jobId;
@@ -115,24 +115,24 @@ public class Job implements DomainObject<Long> {
         this.offerBeginDate = offerBeginDate;
         this.offerEndDate = offerEndDate;
         this.offerType = offerType;
-        this.applications = (__)-> {
+        this.applications = ignored -> {
             ApplicationBinder applicationBinder = new ApplicationBinder();
 
             List<Application> list = applicationBinder.bindInput(applications.stream().peek(inApplication -> inApplication.setJobId(this.jobId))).collect(Collectors.toList());
             return CompletableFuture.completedFuture(list);
         };
-        this.experiences = (__)-> {
+        this.experiences = ignored -> {
             JobExperienceBinder jobExperienceBinder = new JobExperienceBinder();
 
             List<JobExperience> list = jobExperienceBinder.bindInput(experiences.stream().peek(inJobExperience -> inJobExperience.setJobId(this.jobId))).collect(Collectors.toList());
             return CompletableFuture.completedFuture(list);
-        };;
-        this.schedules = (__)-> {
+        };
+        this.schedules = ignored -> {
             ScheduleBinder scheduleBinder = new ScheduleBinder();
 
             List<Schedule> list = scheduleBinder.bindInput(schedules.stream().peek(inSchedule -> inSchedule.setJobId(this.jobId))).collect(Collectors.toList());
             return CompletableFuture.completedFuture(list);
-        };;
+        };
         this.version = version;
     }
 

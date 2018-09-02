@@ -20,6 +20,9 @@ export default class {
 
   unAuthenticate () {
     this.auth = undefined
+    this.accountId = undefined
+    this.self = undefined
+    this.accountType = undefined
     sessionStorage.removeItem('session')
   }
 

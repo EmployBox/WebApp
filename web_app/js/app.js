@@ -164,6 +164,7 @@ export default class extends Component {
                         options={this.getOptions(json)}
                         match={match}
                         searchTempl={searchTempl}
+                        auther={auther}
                       />
                     )} />
                     <PrivateRoute exact path='/create/curricula/:url' component={(props) =>

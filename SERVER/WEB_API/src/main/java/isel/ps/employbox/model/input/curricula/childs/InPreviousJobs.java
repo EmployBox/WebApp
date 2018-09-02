@@ -1,14 +1,18 @@
 package isel.ps.employbox.model.input.curricula.childs;
 
-import java.time.Instant;
+import com.fasterxml.jackson.annotation.JsonFormat;
+
+import java.util.Date;
 
 public class InPreviousJobs {
 
     private long previousJobId;
     private long accountId;
     private long curriculumId;
-    private Instant beginDate;
-    private Instant endDate;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
+    private Date beginDate;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
+    private Date endDate;
     private String companyName;
     private String workLoad;
     private String role;
@@ -46,11 +50,11 @@ public class InPreviousJobs {
         this.accountId = accountId;
     }
 
-    public Instant getBeginDate() {
+    public Date getBeginDate() {
         return beginDate;
     }
 
-    public void setBeginDate(Instant beginDate) {
+    public void setBeginDate(Date beginDate) {
         this.beginDate = beginDate;
     }
 
@@ -70,11 +74,11 @@ public class InPreviousJobs {
         this.companyName = companyName;
     }
 
-    public Instant getEndDate() {
+    public Date getEndDate() {
         return endDate;
     }
 
-    public void setEndDate(Instant endDate) {
+    public void setEndDate(Date endDate) {
         this.endDate = endDate;
     }
 

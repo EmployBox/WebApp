@@ -113,7 +113,7 @@ public class CurriculumExperienceControllerTests {
         InCurriculumExperience inCurriculumExperience = new InCurriculumExperience();
         inCurriculumExperience.setCurriculumId(curriculum.getIdentityKey());
         inCurriculumExperience.setAccountId(userAccount.getIdentityKey());
-        inCurriculumExperience.setCompetences("knows to do everything");
+        inCurriculumExperience.setCompetence("knows to do everything");
         inCurriculumExperience.setYears(3);
 
         ObjectMapper objectMapper = new ObjectMapper();
@@ -142,7 +142,7 @@ public class CurriculumExperienceControllerTests {
         inCurriculumExperience.setCurriculumExperienceId(curriculumExperience.getIdentityKey());
         inCurriculumExperience.setCurriculumId(curriculum.getIdentityKey());
         inCurriculumExperience.setAccountId(userAccount.getIdentityKey());
-        inCurriculumExperience.setCompetences("knows to do everything");
+        inCurriculumExperience.setCompetence("knows to do everything");
         inCurriculumExperience.setYears(3);
         inCurriculumExperience.setVersion(curriculumExperience.getVersion());
 
@@ -167,7 +167,7 @@ public class CurriculumExperienceControllerTests {
         inCurriculumExperience.setCurriculumExperienceId(curriculumExperience.getIdentityKey());
         inCurriculumExperience.setCurriculumId(curriculum.getIdentityKey());
         inCurriculumExperience.setAccountId(userAccount.getIdentityKey());
-        inCurriculumExperience.setCompetences("knows to do everything");
+        inCurriculumExperience.setCompetence("knows to do everything");
         inCurriculumExperience.setYears(3);
         inCurriculumExperience.setVersion(curriculumExperience.getVersion());
 

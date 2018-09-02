@@ -22,8 +22,8 @@ if object_id('dbo.[CompanyRating]') is not null
 	drop view dbo.[CompanyRating]
 go
 CREATE VIEW dbo.[CompanyRating] AS
-SELECT [workload],competences, workEnviroment, wage,tb2.ratingsAverage FROM ApiDatabase.[Rating] as tb1  inner join
-	(select AVG(([workload]+competences+workEnviroment+wage)/4) as ratingsAverage,AccountIdFrom from ApiDatabase.Rating group by ApiDatabase.Rating.AccountIdFrom)as tb2
+SELECT [workload],competence, workEnviroment, wage,tb2.ratingsAverage FROM ApiDatabase.[Rating] as tb1  inner join
+	(select AVG(([workload]+competence+workEnviroment+wage)/4) as ratingsAverage,AccountIdFrom from ApiDatabase.Rating group by ApiDatabase.Rating.AccountIdFrom)as tb2
 	on tb1.AccountIdFrom = tb2.AccountIdFrom
 go
 

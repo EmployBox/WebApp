@@ -5,7 +5,7 @@ public class InCurriculumExperience {
     private long curriculumExperienceId;
     private long accountId;
     private long curriculumId;
-    private String competences;
+    private String competence;
     private int years;
     private long version;
 
@@ -33,12 +33,12 @@ public class InCurriculumExperience {
         this.curriculumId = curriculumId;
     }
 
-    public String getCompetences() {
-        return competences;
+    public String getCompetence() {
+        return competence;
     }
 
-    public void setCompetences(String competences) {
-        this.competences = competences;
+    public void setCompetence(String competence) {
+        this.competence = competence;
     }
 
     public int getYears() {

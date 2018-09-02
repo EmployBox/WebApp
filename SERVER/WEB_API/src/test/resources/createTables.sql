@@ -114,7 +114,7 @@ CREATE TABLE CurriculumExperience(
   curriculumExperienceId BIGINT IDENTITY PRIMARY KEY,
   accountId BIGINT NOT NULL,
   curriculumId BIGINT NOT NULL,
-  competences VARCHAR(50),
+  competence VARCHAR(50),
   years SMALLINT,
   version bigint default 1,
 
@@ -125,7 +125,7 @@ CREATE TABLE CurriculumExperience(
 CREATE TABLE JobExperience(
   jobExperienceId BIGINT IDENTITY PRIMARY KEY,
   jobId BIGINT NOT NULL,
-  competences VARCHAR(50),
+  competence VARCHAR(50),
   years SMALLINT,
   version bigint default 1,
 
@@ -152,7 +152,7 @@ CREATE TABLE Rating(
   workload real DEFAULT 0.0  check (workload >= 0.0 AND workload <= 10.0),
   wage real DEFAULT 0.0 check (wage >= 0.0 AND wage <= 10.0),
   workEnviroment real DEFAULT 0.0 check (workEnviroment >= 0.0 AND workEnviroment <= 10.0),
-  competences real DEFAULT 0.0 check (competences >= 0.0 AND competences <= 10.0),
+  competence real DEFAULT 0.0 check (competence >= 0.0 AND competence <= 10.0),
   ponctuality real DEFAULT 0.0 check (ponctuality >= 0.0 AND ponctuality <= 10.0),
   assiduity real DEFAULT 0.0 check (assiduity>= 0.0 AND assiduity <= 10.0),
   demeanor real DEFAULT 0.0 check (demeanor >= 0.0 AND demeanor <= 10.0),

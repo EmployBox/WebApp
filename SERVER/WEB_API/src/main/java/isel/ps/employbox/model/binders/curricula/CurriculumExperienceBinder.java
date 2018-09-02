@@ -27,7 +27,7 @@ public class CurriculumExperienceBinder implements ModelBinder<CurriculumExperie
         return new CurriculumExperience(
                 inCurriculumExperience.getAccountId(),
                 inCurriculumExperience.getCurriculumId(),
-                inCurriculumExperience.getCompetences(),
+                inCurriculumExperience.getCompetence(),
                 inCurriculumExperience.getYears(),
                 inCurriculumExperience.getVersion(),
                 inCurriculumExperience.getCurriculumExperienceId()
