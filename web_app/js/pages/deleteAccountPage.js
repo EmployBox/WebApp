@@ -31,6 +31,7 @@ export default withRouter(class extends React.Component {
                 {type: 'password', name: 'password', label: 'Password', id: 'passID'}
               ]}
               klass='form-group'
+              btnKlass='btn btn-danger btn-lg btn-block'
               onSubmitHandler={this.onSubmit}
             />
             {this.state.auth
