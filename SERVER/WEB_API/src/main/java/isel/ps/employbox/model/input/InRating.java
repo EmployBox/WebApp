@@ -2,11 +2,11 @@ package isel.ps.employbox.model.input;
 
 public class InRating {
     private long accountIdFrom;
-    private long accountIdDest;
+    private long accountIdTo;
     private double workLoad;
     private double wage;
     private double workEnvironment;
-    private double competences;
+    private double competence;
     private double pontuality;
     private double assiduity;
     private double demeanor;
@@ -20,12 +20,12 @@ public class InRating {
         this.accountIdFrom = accountIDFrom;
     }
 
-    public long getAccountIdDest() {
-        return accountIdDest;
+    public long getAccountIdTo() {
+        return accountIdTo;
     }
 
-    public void setAccountIdDest(long accountIDTo) {
-        this.accountIdDest = accountIDTo;
+    public void setAccountIdTo(long accountIDTo) {
+        this.accountIdTo = accountIDTo;
     }
 
     public double getWorkLoad() {
@@ -52,12 +52,12 @@ public class InRating {
         this.workEnvironment = workEnvironment;
     }
 
-    public double getCompetences() {
-        return competences;
+    public double getCompetence() {
+        return competence;
     }
 
-    public void setCompetences(double competences) {
-        this.competences = competences;
+    public void setCompetence(double competence) {
+        this.competence = competence;
     }
 
     public double getPontuality() {

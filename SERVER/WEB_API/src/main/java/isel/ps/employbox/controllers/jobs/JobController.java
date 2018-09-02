@@ -33,7 +33,6 @@ public class JobController {
         this.applicationBinder = applicationBinder;
         this.jobBinder = jobBinder;
     }
-    //todo application
     @GetMapping
     public Mono<HalCollectionPage<Job>> getAllJobs(
             @RequestParam(defaultValue = "0") int page,

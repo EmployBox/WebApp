@@ -35,7 +35,8 @@ import java.util.List;
 
 import static com.github.jayield.rapper.mapper.MapperRegistry.getMapper;
 import static isel.ps.employbox.DataBaseUtils.prepareDB;
-import static junit.framework.TestCase.*;
+import static junit.framework.TestCase.assertEquals;
+import static junit.framework.TestCase.assertFalse;
 import static org.springframework.restdocs.webtestclient.WebTestClientRestDocumentation.document;
 import static org.springframework.restdocs.webtestclient.WebTestClientRestDocumentation.documentationConfiguration;
 import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.springSecurity;
@@ -107,7 +108,6 @@ public class JobControllerTests {
                 .expectStatus().isOk()
                 .expectBody()
                 .returnResult().getResponseBody());
-        int z = 0;
     }
 
     @Test
@@ -144,7 +144,7 @@ public class JobControllerTests {
         inJob.setType("Freelance" );
 
         InJobExperience inJobExperience = new InJobExperience();
-        inJobExperience.setCompetences("C#");
+        inJobExperience.setCompetence("C#");
         inJobExperience.setYears((short) 2);
 
         List<InJobExperience> experiences = new ArrayList<>();
@@ -154,10 +154,15 @@ public class JobControllerTests {
         InSchedule inSchedule = new InSchedule();
         inSchedule.setRepeats("Daily");
         inSchedule.setDate(new Date(System.currentTimeMillis()));
+        inSchedule.setStartHour(new Date(System.currentTimeMillis()));
+        inSchedule.setEndHour(new Date(System.currentTimeMillis()));
+
 
         InSchedule inSchedule2 = new InSchedule();
         inSchedule2.setRepeats("Weekly");
         inSchedule2.setDate(new Date(System.currentTimeMillis()));
+        inSchedule2.setStartHour(new Date("00:00"));
+        inSchedule2.setEndHour(new Date(System.currentTimeMillis()));
 
         List<InSchedule> inSchedules = new ArrayList<>();
         inSchedules.add(inSchedule);
@@ -192,7 +197,7 @@ public class JobControllerTests {
     public void testCreateJobExperience() throws Exception {
         InJobExperience inJobExperience = new InJobExperience();
         inJobExperience.setJobId(job.getIdentityKey());
-        inJobExperience.setCompetences("C#");
+        inJobExperience.setCompetence("C#");
         inJobExperience.setYears((short) 2);
 
         List<InJobExperience> list = new ArrayList<>();
@@ -211,7 +216,7 @@ public class JobControllerTests {
                 .expectBody()
                 .consumeWith(document("createJobExperience"));
         DataMapper<JobExperience, Long> jobExperienceMapper = getMapper(JobExperience.class, unitOfWork);
-        assertEquals(1, jobExperienceMapper.find( new EqualAndCondition<>("jobId", job.getIdentityKey()), new EqualAndCondition<>("COMPETENCES", "C#")).join().size());
+        assertEquals(1, jobExperienceMapper.find( new EqualAndCondition<>("jobId", job.getIdentityKey()), new EqualAndCondition<>("COMPETENCE", "C#")).join().size());
         unitOfWork.commit().join();
     }
 
@@ -245,7 +250,7 @@ public class JobControllerTests {
         InJobExperience inJobExperience = new InJobExperience();
         inJobExperience.setJobExperienceId(jobExperience.getIdentityKey());
         inJobExperience.setJobId(job.getIdentityKey());
-        inJobExperience.setCompetences("C#");
+        inJobExperience.setCompetence("C#");
         inJobExperience.setYears((short) 2);
 
         ObjectMapper objectMapper = new ObjectMapper();
@@ -303,7 +308,7 @@ public class JobControllerTests {
         InJobExperience inJobExperience = new InJobExperience();
         inJobExperience.setJobExperienceId(jobExperience.getIdentityKey());
         inJobExperience.setJobId(job.getIdentityKey());
-        inJobExperience.setCompetences("C#");
+        inJobExperience.setCompetence("C#");
         inJobExperience.setYears((short) 2);
         inJobExperience.setVersion(jobExperience.getVersion());
 
@@ -325,7 +330,7 @@ public class JobControllerTests {
         unitOfWork.commit().join();
 
         assertEquals((short) 2, updatedJobExperience.getYears());
-        assertEquals("C#", updatedJobExperience.getCompetences());
+        assertEquals("C#", updatedJobExperience.getCompetence());
     }
 
     @Test

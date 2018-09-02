@@ -34,13 +34,13 @@ CREATE PROCEDURE populateDB()
     insert into PROJECT(ACCOUNTID, CURRICULUMID, NAME, DESCRIPTION) values (account_id1, curriculum_id, 'project1', 'project one');
 
     /*Insert CurriculumExperience*/
-    insert into CURRICULUMEXPERIENCE(ACCOUNTID, CURRICULUMID, COMPETENCES, YEARS) values (account_id1, curriculum_id, 'Knows to do stuff', 1);
+    insert into CURRICULUMEXPERIENCE(ACCOUNTID, CURRICULUMID, COMPETENCE, YEARS) values (account_id1, curriculum_id, 'Knows to do stuff', 1);
 
     /*Insert PreviousJobs*/
     insert into PREVIOUSJOBS(ACCOUNTID, CURRICULUMID, COMPANYNAME, WORKLOAD, ROLE) values (account_id1, curriculum_id,'ISEL', 'partial', 'TEACHER' );
 
     /*Insert Rating*/
-    insert into RATING(ACCOUNTIDFROM, ACCOUNTIDDEST) values (account_id1, account_id2);
+    insert into RATING(ACCOUNTIDFROM, ACCOUNTIDTO) values (account_id1, account_id2);
 
     /*Insert Companies*/
     insert into ACCOUNT(NAME, EMAIL, PASSWORD, ACCOUNTTYPE) values ('company1', 'company1@gmail.com', '741', 'CMP');
@@ -65,7 +65,7 @@ CREATE PROCEDURE populateDB()
     insert into COMMENT( ACCOUNTIDFROM, ACCOUNTIDDEST, TEXT, STATUS) values (account_id1, account_id2, 'FIRST COMMENT', 0);
 
     /*Insert JobExperiences*/
-    insert into JOBEXPERIENCE(JOBID, COMPETENCES, YEARS) values (job_id, 'Java', 3);
+    insert into JOBEXPERIENCE(JOBID, COMPETENCE, YEARS) values (job_id, 'Java', 3);
 
     /*Insert Applications*/
     insert into APPLICATION(ACCOUNTID, JOBID) values (account_id2, job_id);

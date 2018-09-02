@@ -18,7 +18,7 @@ public class RatingBinder implements ModelBinder<Rating,OutRating,InRating> {
                 rating.getWorkLoad(),
                 rating.getWage(),
                 rating.getWorkEnviroment(),
-                rating.getCompetences(),
+                rating.getCompetence(),
                 rating.getPonctuality(),
                 rating.getAssiduity(),
                 rating.getDemeanor(),
@@ -30,11 +30,11 @@ public class RatingBinder implements ModelBinder<Rating,OutRating,InRating> {
     public Rating bindInput(InRating object) {
         return new Rating(
                 object.getAccountIdFrom(),
-                object.getAccountIdDest(),
+                object.getAccountIdTo(),
                 object.getWorkLoad(),
                 object.getWage(),
                 object.getWorkEnvironment(),
-                object.getCompetences(),
+                object.getCompetence(),
                 object.getPontuality(),
                 object.getAssiduity(),
                 object.getDemeanor(),

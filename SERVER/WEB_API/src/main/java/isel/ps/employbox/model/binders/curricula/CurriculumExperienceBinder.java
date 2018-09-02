@@ -17,7 +17,7 @@ public class CurriculumExperienceBinder implements ModelBinder<CurriculumExperie
                 curriculumExperience.getIdentityKey(),
                 curriculumExperience.getAccountId(),
                 curriculumExperience.getCurriculumId(),
-                curriculumExperience.getCompetences(),
+                curriculumExperience.getCompetence(),
                 curriculumExperience.getYears()
         ));
     }

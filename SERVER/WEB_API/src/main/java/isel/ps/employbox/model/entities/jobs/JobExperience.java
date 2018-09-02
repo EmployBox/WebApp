@@ -15,7 +15,7 @@ public class JobExperience implements DomainObject<Long> {
     @Id( isIdentity = true)
     private final long jobExperienceId;
 
-    private final String competences;
+    private final String competence;
     private final int years;
     @Version
     private final long version;
@@ -27,7 +27,7 @@ public class JobExperience implements DomainObject<Long> {
         job = null;
         years = 0;
         jobExperienceId = 0;
-        competences = null;
+        competence = null;
         version = 0;
     }
 
@@ -38,7 +38,7 @@ public class JobExperience implements DomainObject<Long> {
                 .thenApply(job1 -> job1.orElseThrow(() -> new ResourceNotFoundException("Job not Found"))));
 
         this.jobExperienceId = jobExperienceId;
-        this.competences = competences;
+        this.competence = competences;
         this.years = years;
         this.version = version;
     }
@@ -59,8 +59,8 @@ public class JobExperience implements DomainObject<Long> {
         return years;
     }
 
-    public String getCompetences() {
-        return competences;
+    public String getCompetence() {
+        return competence;
     }
 
     public Foreign<Job, Long> getJob() {

@@ -147,7 +147,7 @@ CREATE TABLE Application(
 
 CREATE TABLE Rating(
   accountIdFrom BIGINT,
-  accountIdDest BIGINT,
+  accountIdTo BIGINT,
   moderatorId BIGINT references Moderator,
   workload real DEFAULT 0.0  check (workload >= 0.0 AND workload <= 10.0),
   wage real DEFAULT 0.0 check (wage >= 0.0 AND wage <= 10.0),
@@ -159,9 +159,9 @@ CREATE TABLE Rating(
   version bigint default 1,
 
   FOREIGN KEY (accountIdFrom) REFERENCES Account(accountID),
-  FOREIGN KEY (accountIdDest) REFERENCES Account(accountID),
+  FOREIGN KEY (accountIdTo) REFERENCES Account(accountID),
 
-  PRIMARY KEY(AccountIdFrom , accountIdDest)
+  PRIMARY KEY(AccountIdFrom , accountIdTo)
 );
 
 CREATE TABLE Chat(

@@ -22,7 +22,7 @@ public class JobExperienceBinder implements ModelBinder<JobExperience,OutJobExpe
                 .thenApply(job -> new OutJobExperience(
                             jobExperience.getIdentityKey(),
                             job.getIdentityKey(),
-                            jobExperience.getCompetences(),
+                            jobExperience.getCompetence(),
                             jobExperience.getYears()
                 ));
     }
@@ -32,7 +32,7 @@ public class JobExperienceBinder implements ModelBinder<JobExperience,OutJobExpe
         return new JobExperience(
                 inJobExperience.getJobExperienceId(),
                 inJobExperience.getJobId(),
-                inJobExperience.getCompetences(),
+                inJobExperience.getCompetence(),
                 inJobExperience.getYears(),
                 inJobExperience.getVersion()
         );

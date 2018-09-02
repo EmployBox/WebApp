@@ -58,7 +58,7 @@ public class RatingController {
             @RequestBody InRating rating,
             Authentication authentication
     ){
-        if(accountId != rating.getAccountIdDest()) throw new BadRequestException(BAD_REQUEST_IDS_MISMATCH);
+        if(accountId != rating.getAccountIdTo()) throw new BadRequestException(BAD_REQUEST_IDS_MISMATCH);
         return ratingService.updateRating(ratingBinder.bindInput(rating), authentication.getName());
     }
 
@@ -68,7 +68,7 @@ public class RatingController {
             @RequestBody InRating rating,
             Authentication authentication)
     {
-        if(accountId != rating.getAccountIdDest()) throw new BadRequestException(BAD_REQUEST_IDS_MISMATCH);
+        if(accountId != rating.getAccountIdTo()) throw new BadRequestException(BAD_REQUEST_IDS_MISMATCH);
         return ratingService.createRating( ratingBinder.bindInput(rating), authentication.getName());
     }
 

@@ -43,7 +43,7 @@ public class CurriculumService {
         UnitOfWork unitOfWork = new UnitOfWork(TransactionIsolation.SERIALIZABLE);
         DataMapper<Curriculum, Long> curriculumMapper = getMapper(Curriculum.class, unitOfWork);
 
-        CompletableFuture<Curriculum> future = userAccountService.getUser(userId, email)
+        CompletableFuture<Curriculum> future = userAccountService.getUser(userId,unitOfWork, email)
                 .thenCompose(userAccount -> curriculumMapper.create(curriculum)
                         .thenCompose(aVoid -> {
                             List<CompletableFuture<Void>> list = new ArrayList<>();

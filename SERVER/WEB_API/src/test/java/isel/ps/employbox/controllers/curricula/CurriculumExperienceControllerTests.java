@@ -72,7 +72,7 @@ public class CurriculumExperienceControllerTests {
         curriculum = curricula.get(0);
 
         DataMapper<CurriculumExperience, Long> curriculumExperiencesMapper = getMapper(CurriculumExperience.class, unitOfWork);
-        List<CurriculumExperience> curriculumExperiences = curriculumExperiencesMapper.find( new EqualAndCondition<>("competences", "Knows to do stuff")).join();
+        List<CurriculumExperience> curriculumExperiences = curriculumExperiencesMapper.find( new EqualAndCondition<>("competence", "Knows to do stuff")).join();
         assertEquals(1, curriculumExperiences.size());
         curriculumExperience = curriculumExperiences.get(0);
         unitOfWork.commit().join();
@@ -130,7 +130,7 @@ public class CurriculumExperienceControllerTests {
                 .expectBody()
                 .consumeWith(document("createCurriculumExperience"));
 
-        assertEquals(1, curriculumExperienceMapper.find( new EqualAndCondition<>("competences", "knows to do everything")).join().size());
+        assertEquals(1, curriculumExperienceMapper.find( new EqualAndCondition<>("competence", "knows to do everything")).join().size());
         assertEquals(1, curriculumExperienceMapper.find( new EqualAndCondition<>("years", 3)).join().size());
         unitOfWork.commit().join();
     }
@@ -188,7 +188,7 @@ public class CurriculumExperienceControllerTests {
         DataMapper<CurriculumExperience, Long> curriculumExperienceMapper = getMapper(CurriculumExperience.class, unitOfWork);
         CurriculumExperience updatedCurriculumExperience = curriculumExperienceMapper.findById(curriculumExperience.getIdentityKey()).join().orElseThrow(() -> new ResourceNotFoundException("Curriculum not found"));
         unitOfWork.commit().join();
-        assertEquals("knows to do everything", updatedCurriculumExperience.getCompetences());
+        assertEquals("knows to do everything", updatedCurriculumExperience.getCompetence());
     }
 
     @Test

@@ -11,7 +11,7 @@ public class CurriculumExperience extends CurriculumChild implements DomainObjec
 
     private long accountId;
     private long curriculumId;
-    private final String competences;
+    private final String competence;
     private final int years;
 
     @Version
@@ -21,7 +21,7 @@ public class CurriculumExperience extends CurriculumChild implements DomainObjec
     public CurriculumExperience(){
         accountId = 0;
         curriculumId = 0;
-        competences = null;
+        competence = null;
         years = 0;
         version = 0;
         curriculumExperienceId = 0;
@@ -30,7 +30,7 @@ public class CurriculumExperience extends CurriculumChild implements DomainObjec
     public CurriculumExperience(long userId, long curriculumId, String competences, int years, long version, Long curriculumExperienceId){
         this.accountId = userId;
         this.curriculumId = curriculumId;
-        this.competences = competences;
+        this.competence = competences;
         this.years = years;
         this.version = version;
         this.curriculumExperienceId = curriculumExperienceId;
@@ -53,8 +53,8 @@ public class CurriculumExperience extends CurriculumChild implements DomainObjec
         return curriculumId;
     }
 
-    public String getCompetences() {
-        return competences;
+    public String getCompetence() {
+        return competence;
     }
 
     public int getYears() {

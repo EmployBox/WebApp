@@ -103,7 +103,7 @@ public class RatingService {
                             if (account.size() != 1)
                                     throw new UnauthorizedException(ErrorMessages.UN_AUTHORIZED);
                                 return ratingMapper.find(new EqualAndCondition("accountIdFrom", account.get(0).getIdentityKey()),
-                                        new EqualAndCondition<>("accountIdDest", accountIdDest));
+                                        new EqualAndCondition<>("accountIdTo", accountIdDest));
                         }
                 )
                 .thenCompose(ratings -> {

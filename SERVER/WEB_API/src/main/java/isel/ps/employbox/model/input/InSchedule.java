@@ -1,10 +1,12 @@
 package isel.ps.employbox.model.input;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonInclude;
 
 import java.time.Instant;
 import java.util.Date;
 
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class InSchedule{
     private long scheduleId;
     private long jobId;

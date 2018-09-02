@@ -13,7 +13,7 @@ public class Rating implements DomainObject<Rating.RatingKey> {
     private final double workLoad;
     private final double wage;
     private final double workEnviroment;
-    private final double competences;
+    private final double competence;
     private final double ponctuality;
     private final double assiduity;
     private final double demeanor;
@@ -25,7 +25,7 @@ public class Rating implements DomainObject<Rating.RatingKey> {
         workLoad = 0;
         wage = 0;
         workEnviroment = 0;
-        competences = 0;
+        competence = 0;
         ponctuality = 0;
         assiduity = 0;
         demeanor = 0;
@@ -46,7 +46,7 @@ public class Rating implements DomainObject<Rating.RatingKey> {
         this.workLoad = workLoad;
         this.wage = wage;
         this.workEnviroment = workEnvironment;
-        this.competences = competence;
+        this.competence = competence;
         this.ponctuality = pontuality;
         this.assiduity = assiduity;
         this.demeanor = demeanor;
@@ -74,8 +74,8 @@ public class Rating implements DomainObject<Rating.RatingKey> {
         return workEnviroment;
     }
 
-    public double getCompetences() {
-        return competences;
+    public double getCompetence() {
+        return competence;
     }
 
     public double getPonctuality() {
@@ -110,17 +110,17 @@ public class Rating implements DomainObject<Rating.RatingKey> {
             accountIdTo = 0;
         }
 
-        public RatingKey(long accountIdFrom, long accountIdDest) {
-            super(accountIdFrom, accountIdDest);
+        public RatingKey(long accountIdFrom, long accountIdTo) {
+            super(accountIdFrom, accountIdTo);
             this.accountIdFrom = accountIdFrom;
-            this.accountIdTo = accountIdDest;
+            this.accountIdTo = accountIdTo;
         }
 
         public long getAccountIdFrom() {
             return accountIdFrom;
         }
 
-        public long getAccountIdDest() {
+        public long getAccountIdTo() {
             return accountIdTo;
         }
     }

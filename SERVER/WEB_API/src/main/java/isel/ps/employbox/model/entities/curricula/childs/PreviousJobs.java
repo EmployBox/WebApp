@@ -5,6 +5,7 @@ import com.github.jayield.rapper.annotations.Id;
 import com.github.jayield.rapper.annotations.Version;
 
 import java.time.Instant;
+import java.util.Date;
 
 public class PreviousJobs extends CurriculumChild implements DomainObject<Long> {
 
@@ -38,8 +39,8 @@ public class PreviousJobs extends CurriculumChild implements DomainObject<Long> 
             long previousJobId,
             long userId,
             long curriculumId,
-            Instant beginDate,
-            Instant endDate,
+            Date beginDate,
+            Date endDate,
             String companyName,
             String workLoad,
             String role,
@@ -48,11 +49,17 @@ public class PreviousJobs extends CurriculumChild implements DomainObject<Long> 
         this.previousJobId = previousJobId;
         this.accountId = userId;
         this.curriculumId = curriculumId;
-        this.beginDate = beginDate;
+        if(beginDate != null)
+            this.beginDate = beginDate.toInstant();
+        else
+            this.beginDate = null;
         this.companyName = companyName;
         this.workLoad = workLoad;
         this.role = role;
-        this.endDate = endDate;
+        if(endDate != null)
+            this.endDate = endDate.toInstant();
+        else
+            this.endDate = null;
         this.version = version;
     }
 

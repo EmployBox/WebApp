@@ -65,7 +65,7 @@ public class UserAccountService {
         return getUser(id, unit, email);
     }
 
-    private CompletableFuture<UserAccount> getUser(long id, UnitOfWork unit, String... email) {
+    public CompletableFuture<UserAccount> getUser(long id, UnitOfWork unit, String... email) {
         if (email.length > 1) {
             throw new InvalidParameterException("Only 1 or 2 parameters are allowed for this method");
         }

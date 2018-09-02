@@ -137,9 +137,9 @@ public class RatingControllerTests {
 
         InRating inRating = new InRating();
         inRating.setAccountIdFrom(userAccount.getIdentityKey());
-        inRating.setAccountIdDest(company1.getIdentityKey());
+        inRating.setAccountIdTo(company1.getIdentityKey());
         inRating.setAssiduity(5.0);
-        inRating.setCompetences(3.0);
+        inRating.setCompetence(3.0);
 
         ObjectMapper objectMapper = new ObjectMapper();
         String json = objectMapper.writeValueAsString(inRating);
@@ -166,9 +166,9 @@ public class RatingControllerTests {
         InRating inRating = new InRating();
         inRating.setVersion( rating.getVersion());
         inRating.setAccountIdFrom(userAccount.getIdentityKey());
-        inRating.setAccountIdDest(userAccount2.getIdentityKey());
+        inRating.setAccountIdTo(userAccount2.getIdentityKey());
         inRating.setAssiduity(2.0);
-        inRating.setCompetences(1.0);
+        inRating.setCompetence(1.0);
 
         ObjectMapper objectMapper = new ObjectMapper();
         String json = objectMapper.writeValueAsString(inRating);
@@ -194,9 +194,9 @@ public class RatingControllerTests {
         InRating inRating = new InRating();
         inRating.setVersion( rating.getVersion());
         inRating.setAccountIdFrom(userAccount.getIdentityKey());
-        inRating.setAccountIdDest(userAccount2.getIdentityKey());
+        inRating.setAccountIdTo(userAccount2.getIdentityKey());
         inRating.setAssiduity(2.0);
-        inRating.setCompetences(1.0);
+        inRating.setCompetence(1.0);
 
         ObjectMapper objectMapper = new ObjectMapper();
         String json = objectMapper.writeValueAsString(inRating);
@@ -213,10 +213,10 @@ public class RatingControllerTests {
                 .consumeWith(document("updateRating"));
 
         DataMapper<Rating, Rating.RatingKey> ratingMapper = getMapper(Rating.class, unitOfWork);
-        Rating rating = ratingMapper.find( new EqualAndCondition<>("accountIdFrom", userAccount.getIdentityKey()),  new EqualAndCondition<>("accountIdDest", userAccount2.getIdentityKey())).join().get(0);
+        Rating rating = ratingMapper.find( new EqualAndCondition<>("accountIdFrom", userAccount.getIdentityKey()),  new EqualAndCondition<>("accountIdTo", userAccount2.getIdentityKey())).join().get(0);
 
         assertEquals(2.0,rating.getAssiduity());
-        assertEquals(1.0,rating.getCompetences());
+        assertEquals(1.0,rating.getCompetence());
         unitOfWork.commit().join();
     }
 
@@ -244,7 +244,7 @@ public class RatingControllerTests {
                 .consumeWith(document("deleteRating"));
         UnitOfWork unitOfWork = new UnitOfWork();
         DataMapper<Rating, Rating.RatingKey> ratingRepo = getMapper(Rating.class, unitOfWork);
-        assertFalse(ratingRepo.findById( new Rating.RatingKey(rating.getIdentityKey().getAccountIdFrom(), rating.getIdentityKey().getAccountIdDest())).join().isPresent());
+        assertFalse(ratingRepo.findById( new Rating.RatingKey(rating.getIdentityKey().getAccountIdFrom(), rating.getIdentityKey().getAccountIdTo())).join().isPresent());
         unitOfWork.commit().join();
     }
 }
