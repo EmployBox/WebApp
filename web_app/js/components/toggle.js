@@ -4,7 +4,7 @@ export default class extends React.Component {
   constructor (props) {
     super(props)
     this.state = {
-      showing: false
+      showing: this.props.showing || false
     }
     this.onClickAction = this.onClickAction.bind(this)
   }
@@ -15,13 +15,17 @@ export default class extends React.Component {
       return oldstate
     })
   }
+
+  componentDidUpdate (oldProps, oldState) {
+    if (oldProps.showing !== this.state.showing) (this.props.onToggle || function () {})(this.state.showing)
+  }
+
   render () {
     const { showing } = this.state
     const { text, children } = this.props
-    console.log(this.props.klass)
     return (
       <div>
-        <button className={this.props.klass ? this.props.klass : 'btn btn-primary bg-dark btn-lg btn-block text-left'}
+        <button className={this.props.klass || 'btn btn-primary bg-dark btn-lg btn-block text-left'}
           onClick={this.onClickAction}
         >{text}</button>
         <br />
