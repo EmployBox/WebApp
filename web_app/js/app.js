@@ -24,6 +24,7 @@ import Company from './pages/profiles/company'
 import Job from './pages/jobPage'
 import Curricula from './pages/curriculaPage'
 import RatingForm from './pages/ratingForm'
+import DeleteAccount from './pages/deleteAccountPage'
 
 import URI from 'urijs'
 import URITemplate from 'urijs/src/URITemplate'
@@ -47,6 +48,7 @@ const searchTempl = new URITemplate('/search/{url}')
 const companyTempl = new URITemplate('/company/{url}')
 const jobTempl = new URITemplate('/job/{url}')
 const curriculaTempl = new URITemplate('/curricula/{url}')
+const deleteAccountTempl = new URITemplate('/delete/{url}')
 
 function getLink (link, hal) {
   return hal[link]['_links'].self.href
@@ -62,6 +64,7 @@ export default class extends Component {
     this.state = {
       authenticated: auther.auth || false
     }
+    this.logout = this.logout.bind(this)
   }
 
   getOptions (json) {
@@ -74,6 +77,14 @@ export default class extends Component {
       companies: new Option('Companies', 'Company\'s name', 'name', getLink('companies', json), new Render(CompanyFilters, CompanyTable1)),
       users: new Option('Users', 'User\'s name', 'name', getLink('users', json), new Render(UserFilters, UserTable1))
     }
+  }
+
+  logout () {
+    this.setState(oldstate => {
+      oldstate.authenticated = false
+      auther.unAuthenticate()
+      return oldstate
+    })
   }
 
   render () {
@@ -100,13 +111,10 @@ export default class extends Component {
                         </a>
                         <div class='dropdown-menu dropdown-menu-right' aria-labelledby='navbarDropdown'>
                           <Link class='dropdown-item' to={(auther.accountType === 'USR' ? accountTempl : companyTempl).expand({ url: auther.self })}>Profile</Link>
+                          <Link class='dropdown-item text-danger' to={deleteAccountTempl.expand({url: auther.self})}>Delete</Link>
                           <div class='dropdown-divider' />
                           <button class='dropdown-item'
-                            onClick={() => this.setState(oldstate => {
-                              oldstate.authenticated = false
-                              auther.unAuthenticate()
-                              return oldstate
-                            })}>Log out</button>
+                            onClick={this.logout}>Log out</button>
                         </div>
                       </li>
                       }
@@ -169,6 +177,7 @@ export default class extends Component {
                     <PrivateRoute exact path='/create/jobs/:jobUrl' component={CreateJobs} />
                     <PrivateRoute exact path='/job/:url' component={Job} />
                     <PrivateRoute path='/curricula/:url' component={Curricula} />
+                    <PrivateRoute exact path='/delete/:url' component={props => <DeleteAccount logout={this.logout} {...props} />} />
                     <Route path='/' render={({ history }) =>
                       <center class='py-5 alert alert-danger' role='alert'>
                         <h2>Error 404.</h2>

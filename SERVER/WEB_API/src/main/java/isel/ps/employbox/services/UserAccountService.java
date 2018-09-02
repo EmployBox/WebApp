@@ -240,7 +240,7 @@ public class UserAccountService {
                         )
                         .thenCompose( aVoid -> {
                                     ratings[0] = ratingMapper.find(new EqualAndCondition<Long>("accountIdFrom", userAccount.getIdentityKey()));
-                                    ratings[1] = ratingMapper.find(new EqualAndCondition<Long>("accountIdDest", userAccount.getIdentityKey()));
+                                    ratings[1] = ratingMapper.find(new EqualAndCondition<Long>("accountIdTo", userAccount.getIdentityKey()));
 
                                     return CompletableFuture.allOf(ratings);
                                 }
