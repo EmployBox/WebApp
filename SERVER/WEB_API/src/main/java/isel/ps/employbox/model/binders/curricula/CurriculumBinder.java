@@ -5,12 +5,19 @@ import isel.ps.employbox.model.entities.Curriculum;
 import isel.ps.employbox.model.input.curricula.childs.InCurriculum;
 import isel.ps.employbox.model.output.OutCurriculum;
 import org.springframework.stereotype.Component;
-import reactor.core.publisher.Mono;
 
 import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
 
 @Component
 public class CurriculumBinder implements ModelBinder<Curriculum,OutCurriculum,InCurriculum> {
+    private final PreviousJobsBinder previousJobsBinder;
+    private final CurriculumExperienceBinder curriculumExperienceBinder;
+
+    public CurriculumBinder(PreviousJobsBinder previousJobsBinder, CurriculumExperienceBinder curriculumExperienceBinder) {
+        this.previousJobsBinder = previousJobsBinder;
+        this.curriculumExperienceBinder = curriculumExperienceBinder;
+    }
 
     @Override
     public CompletableFuture<OutCurriculum> bindOutput(Curriculum curriculum) {
@@ -28,29 +35,9 @@ public class CurriculumBinder implements ModelBinder<Curriculum,OutCurriculum,In
                 obj.getCurriculumId(),
                 obj.getTitle(),
                 obj.getVersion(),
-                obj.getPreviousJobs(),
+                obj.getPreviousJobs().stream().map(previousJobsBinder::bindInput).collect(Collectors.toList()),
                 obj.getAcademicBackground(),
-                obj.getExperiences(),
+                obj.getExperiences().stream().map(curriculumExperienceBinder::bindInput).collect(Collectors.toList()),
                 obj.getProjects());
     }
-
-    /*
-
-
-    public List<OutCurriculum.OutPreviousJobs> bindOutPreviousJobs(List<PreviousJobs> list){
-        return list.stream()
-                .map(curr-> new OutCurriculum.OutPreviousJobs(
-                    curr.getCompanyName(),
-                    curr.getBeginDate().toString(),
-                    curr.getEndDate().toString(),
-                    curr.getWorkLoad(),
-                    curr.getRole())
-                ).collect(Collectors.toList());
-}
-
-    public List<OutCurriculum.OutProject> bindOutProject(List<Project> list){
-        return StreamSupport.stream(list.spliterator(),false)
-                .map(curr -> new OutCurriculum.OutProject(curr.getName(),curr.getDescription()))
-                .collect(Collectors.toList());
-    }*/
 }

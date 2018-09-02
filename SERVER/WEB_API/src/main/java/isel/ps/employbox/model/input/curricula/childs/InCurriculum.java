@@ -1,8 +1,6 @@
 package isel.ps.employbox.model.input.curricula.childs;
 
 import isel.ps.employbox.model.entities.curricula.childs.AcademicBackground;
-import isel.ps.employbox.model.entities.curricula.childs.CurriculumExperience;
-import isel.ps.employbox.model.entities.curricula.childs.PreviousJobs;
 import isel.ps.employbox.model.entities.curricula.childs.Project;
 
 import java.util.Collections;
@@ -12,8 +10,8 @@ public class InCurriculum {
     private long accountId;
     private long curriculumId;
     private String title;
-    private List<CurriculumExperience> experiences = Collections.emptyList();
-    private List<PreviousJobs> previousJobs = Collections.emptyList();
+    private List<InCurriculumExperience> experiences = Collections.emptyList();
+    private List<InPreviousJobs> previousJobs = Collections.emptyList();
     private List<Project> projects = Collections.emptyList();
     private List<AcademicBackground> academicBackground = Collections.emptyList();
     private long version;
@@ -30,11 +28,11 @@ public class InCurriculum {
         return title;
     }
 
-    public List<CurriculumExperience> getExperiences() {
+    public List<InCurriculumExperience> getExperiences() {
         return experiences;
     }
 
-    public List<PreviousJobs> getPreviousJobs() {
+    public List<InPreviousJobs> getPreviousJobs() {
         return previousJobs;
     }
 
@@ -58,11 +56,11 @@ public class InCurriculum {
         this.title = title;
     }
 
-    public void setExperiences(List<CurriculumExperience> experiences) {
+    public void setExperiences(List<InCurriculumExperience> experiences) {
         this.experiences = experiences;
     }
 
-    public void setPreviousJobs(List<PreviousJobs> previousJobs) {
+    public void setPreviousJobs(List<InPreviousJobs> previousJobs) {
         this.previousJobs = previousJobs;
     }
 

@@ -68,7 +68,7 @@ export default withRouter(class extends React.Component {
         <br />
         <ListForm title='Curriculum Experiences'
           submit={inputs => this.setState({experiences: inputs})}
-          row={({competence, year}) => `${competence} - ${year} years of experience`}
+          row={({competence, years}) => `${competence} - ${years} years of experience`}
           inputData={[
             {
               type: 'text',
@@ -79,7 +79,7 @@ export default withRouter(class extends React.Component {
             },
             {
               type: 'number',
-              name: 'year',
+              name: 'years',
               label: 'Years',
               id: 'yearId',
               klass: 'form-control'

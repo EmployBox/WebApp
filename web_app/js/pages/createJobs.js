@@ -171,7 +171,7 @@ export default withRouter(class extends React.Component {
               delete body.body
               delete body.competence
               delete body.year
-              body.address = body.address + body.address2
+              body.address = body.address + ' ' + body.address2
               delete body.address2
               return { body: body }
             })}>Create</button>
