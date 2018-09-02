@@ -35,6 +35,9 @@ public class OutRating implements OutputDto {
     private final double demeanor;
 
     @JsonProperty
+    private final long version;
+
+    @JsonProperty
     private final _Links _links;
 
     public OutRating(
@@ -46,7 +49,8 @@ public class OutRating implements OutputDto {
             double competence,
             double pontuality,
             double assiduity,
-            double demeanor)
+            double demeanor,
+            long version)
     {
         this.accountIDFrom = accountIDFrom;
         this.accountIDTo = accountIDTo;
@@ -57,6 +61,7 @@ public class OutRating implements OutputDto {
         this.pontuality = pontuality;
         this.assiduity = assiduity;
         this.demeanor = demeanor;
+        this.version = version;
         this._links = new _Links();
     }
 

@@ -29,7 +29,27 @@ export default class extends React.Component {
           <div class='form-group col-md-4'>
             <div class='card'>
               <ul class='list-group list-group-flush' style={ListStyle}>
-                {this.state.inputList.map(value => <li class='list-group-item'>{this.props.row(value)}</li>)}
+                {this.state.inputList.map((value, index) => (
+                  <li class='list-group-item'>
+                    <div class='row'>
+                      <div class='col-10'>
+                        {this.props.row(value)}
+                      </div>
+                      <div class='col-2'>
+                        <button class='fas fa-trash'
+                          type='button'
+                          aria-label='Close'
+                          onClick={() => {
+                            this.setState(prevState => {
+                              const newInputList = prevState.inputList
+                              newInputList.splice(index)
+                              return { inputList: newInputList }
+                            })
+                          }} />
+                      </div>
+                    </div>
+                  </li>
+                ))}
               </ul>
             </div>
           </div>

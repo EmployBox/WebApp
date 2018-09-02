@@ -98,19 +98,23 @@ export default withRouter(({auth, match, history, accountId, createCurriculaTemp
             <h4>
               Rating: {json.rating}
               {json.accountId === accountId ? <div />
-                : <HttpRequest url={json._links.ratings.href.split('?')[0] + '/single'}
-                  authorization={auth}
-                  onResult={ratings =>
-                    <button class='btn btn-success' onClick={() => history.push(ratingFormTempl.expand({
-                      url: json._links.ratings.href.split('?')[0]
-                    }) + `?type=user&from=${URI.encode(match.url)}&accountIdDest=${json.accountId}&method=PUT`)}>Rate this</button>
-                  }
-                  onError={() =>
-                    <button class='btn btn-success' onClick={() => history.push(ratingFormTempl.expand({
-                      url: json._links.ratings.href.split('?')[0]
-                    }) + `?type=user&from=${URI.encode(match.url)}&accountIdDest=${json.accountId}&method=POST`)}>Rate this</button>
-                  }
-                />}
+                : <button class='btn btn-success' onClick={() => history.push(ratingFormTempl.expand({
+                  url: json._links.ratings.href.split('?')[0]
+                }) + `?type=user&from=${URI.encode(match.url)}&accountIdDest=${json.accountId}`)}>Rate this</button>
+              }
+              {/* // <HttpRequest url={json._links.ratings.href.split('?')[0] + '/single'}
+              //   authorization={auth}
+              //   onResult={ratings =>
+              //     <button class='btn btn-success' onClick={() => history.push(ratingFormTempl.expand({
+              //       url: json._links.ratings.href.split('?')[0]
+              //     }) + `?type=user&from=${URI.encode(match.url)}&accountIdDest=${json.accountId}&method=PUT`)}>Rate this</button>
+              //   }
+              //   onError={() =>
+              //     <button class='btn btn-success' onClick={() => history.push(ratingFormTempl.expand({
+              //       url: json._links.ratings.href.split('?')[0]
+              //     }) + `?type=user&from=${URI.encode(match.url)}&accountIdDest=${json.accountId}&method=POST`)}>Rate this</button>
+              //   }
+              // />} */}
             </h4>
           </div>
           <CollectionButton url={json._links.offered_jobs.href} title='Offered Jobs' pushTo={offeredJobsTempl.expand({

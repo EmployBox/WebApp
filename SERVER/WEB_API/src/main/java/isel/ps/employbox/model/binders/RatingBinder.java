@@ -21,7 +21,8 @@ public class RatingBinder implements ModelBinder<Rating,OutRating,InRating> {
                 rating.getCompetences(),
                 rating.getPonctuality(),
                 rating.getAssiduity(),
-                rating.getDemeanor()
+                rating.getDemeanor(),
+                rating.getVersion()
         ));
     }
 

@@ -46,12 +46,13 @@ export default withRouter(class extends React.Component {
     }
   }
   render () {
-    const {type, from, accountIdDest, method} = URI.parseQuery(this.props.location.search)
-    return <div>
+    const {type, from, accountIdDest} = URI.parseQuery(this.props.location.search)
+    const Form = ({method, res}) => <div>
       <GenericForm inputData={inputs[type]}
         onSubmitHandler={inputs => {
           inputs.accountIdFrom = this.props.accountId
           inputs.accountIdDest = accountIdDest
+          if (method === 'PUT') inputs.version = res.version
           this.setState({inputs: inputs})
         }}
       />
@@ -63,6 +64,13 @@ export default withRouter(class extends React.Component {
           afterResult={json => this.props.history.push(from)}
         />
         : <div />}
+    </div>
+    return <div>
+      <HttpRequest url={URI.decode(this.props.match.params.url) + '/single'}
+        authorization={this.props.auth}
+        onResult={res => <Form method='PUT' res={res} />}
+        onError={() => <Form method='POST' />}
+      />
     </div>
   }
 })
