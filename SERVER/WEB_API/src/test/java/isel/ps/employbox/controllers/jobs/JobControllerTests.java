@@ -29,8 +29,8 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
+import java.sql.Timestamp;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import static com.github.jayield.rapper.mapper.MapperRegistry.getMapper;
@@ -153,16 +153,16 @@ public class JobControllerTests {
 
         InSchedule inSchedule = new InSchedule();
         inSchedule.setRepeats("Daily");
-        inSchedule.setDate(new Date(System.currentTimeMillis()));
-        inSchedule.setStartHour(new Date(System.currentTimeMillis()));
-        inSchedule.setEndHour(new Date(System.currentTimeMillis()));
+        inSchedule.setDate(Timestamp.valueOf("2013-10-10 10:49:29.10000"));
+        inSchedule.setStartHour(Timestamp.valueOf("2013-10-10 10:49:29.10000"));
+        inSchedule.setEndHour(Timestamp.valueOf("2013-10-10 11:49:29.10000"));
 
 
         InSchedule inSchedule2 = new InSchedule();
         inSchedule2.setRepeats("Weekly");
-        inSchedule2.setDate(new Date(System.currentTimeMillis()));
-        inSchedule2.setStartHour(new Date("00:00"));
-        inSchedule2.setEndHour(new Date(System.currentTimeMillis()));
+        inSchedule2.setDate(Timestamp.valueOf("2013-10-10 10:49:29.10000"));
+        inSchedule2.setStartHour(Timestamp.valueOf("2013-10-10 10:49:29.10000"));
+        inSchedule2.setEndHour(Timestamp.valueOf("2013-10-10 11:49:29.10000"));
 
         List<InSchedule> inSchedules = new ArrayList<>();
         inSchedules.add(inSchedule);

@@ -1,21 +1,14 @@
 package isel.ps.employbox.model.input;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonInclude;
+import java.sql.Timestamp;
 
-import java.time.Instant;
-import java.util.Date;
-
-@JsonInclude(JsonInclude.Include.NON_NULL)
 public class InSchedule{
     private long scheduleId;
     private long jobId;
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
-    private Date date;
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "HH:mm")
-    private Date startHour;
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "HH:mm")
-    private Date endHour;
+    private Timestamp date;
+    private Timestamp startHour;
+    private Timestamp endHour;
+
     private String repeats;
     private int version;
 
@@ -28,19 +21,19 @@ public class InSchedule{
         this.scheduleId = scheduleId;
     }
 
-    public Instant getStartHour() {
-        return startHour.toInstant();
+    public Timestamp getStartHour() {
+        return startHour;
     }
 
-    public void setStartHour(Date startHour) {
+    public void setStartHour(Timestamp startHour) {
         this.startHour = startHour;
     }
 
-    public Instant getEndHour() {
-        return endHour.toInstant();
+    public Timestamp getEndHour() {
+        return endHour;
     }
 
-    public void setEndHour(Date endHour) {
+    public void setEndHour(Timestamp endHour) {
         this.endHour = endHour;
     }
 
@@ -68,11 +61,11 @@ public class InSchedule{
         this.repeats = repeats;
     }
 
-    public Instant getDate() {
-        return date.toInstant();
+    public Timestamp getDate() {
+        return date;
     }
 
-    public void setDate(Date date) {
+    public void setDate(Timestamp date) {
         this.date = date;
     }
 }

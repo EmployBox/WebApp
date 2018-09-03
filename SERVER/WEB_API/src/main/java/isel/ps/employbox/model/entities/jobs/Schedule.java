@@ -7,8 +7,8 @@ import com.github.jayield.rapper.annotations.Version;
 import com.github.jayield.rapper.mapper.externals.Foreign;
 import com.github.jayield.rapper.unitofwork.UnitOfWork;
 import isel.ps.employbox.exceptions.ResourceNotFoundException;
-import isel.ps.employbox.model.entities.Account;
 
+import java.sql.Timestamp;
 import java.time.Instant;
 
 import static com.github.jayield.rapper.mapper.MapperRegistry.getMapper;
@@ -39,13 +39,12 @@ public class Schedule implements DomainObject<Long> {
 
     public Schedule(long scheduleId,
                     long jobId,
-                    Instant date,
-                    Instant startHour,
-                    Instant endHour,
+                    Timestamp date,
+                    Timestamp startHour,
+                    Timestamp endHour,
                     String repeats,
                     int version)
     {
-        this.date = date;
         this.repeats = repeats;
         UnitOfWork unitOfWork = new UnitOfWork();
         this.job = new Foreign<>(jobId, unit -> getMapper(Job.class, unitOfWork).findById( jobId)
@@ -53,8 +52,18 @@ public class Schedule implements DomainObject<Long> {
                 .thenApply(job1 -> job1.orElseThrow(() -> new ResourceNotFoundException("Job not Found"))));
 
         this.scheduleId = scheduleId;
-        this.startHour = startHour;
-        this.endHour = endHour;
+        if(date != null)
+            this.date = date.toInstant();
+        else
+            this.date = null;
+        if(startHour != null)
+            this.startHour = startHour.toInstant();
+        else
+            this.startHour = null;
+        if(endHour != null)
+            this.endHour = endHour.toInstant();
+        else
+            this.endHour = null;
         this.version = version;
     }
 

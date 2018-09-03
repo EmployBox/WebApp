@@ -1,12 +1,12 @@
 package isel.ps.employbox.model.input.curricula.childs;
 
-import java.time.Instant;
+import java.sql.Timestamp;
 
 public class InAcademicBackground {
     private long accountId;
     private long curriculumId;
-    private Instant beginDate;
-    private Instant endDate;
+    private Timestamp beginDate;
+    private Timestamp endDate;
     private String studyArea;
     private String institution;
     private String degreeObtained;
@@ -29,19 +29,19 @@ public class InAcademicBackground {
         this.curriculumId = curriculumId;
     }
 
-    public Instant getBeginDate() {
+    public Timestamp getBeginDate() {
         return beginDate;
     }
 
-    public void setBeginDate(Instant beginDate) {
+    public void setBeginDate(Timestamp beginDate) {
         this.beginDate = beginDate;
     }
 
-    public Instant getEndDate() {
+    public Timestamp getEndDate() {
         return endDate;
     }
 
-    public void setEndDate(Instant endDate) {
+    public void setEndDate(Timestamp endDate) {
         this.endDate = endDate;
     }
 

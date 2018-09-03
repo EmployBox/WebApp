@@ -4,6 +4,7 @@ import com.github.jayield.rapper.DomainObject;
 import com.github.jayield.rapper.annotations.Id;
 import com.github.jayield.rapper.annotations.Version;
 
+import java.sql.Timestamp;
 import java.time.Instant;
 
 public class AcademicBackground extends CurriculumChild implements DomainObject<Long> {
@@ -31,11 +32,27 @@ public class AcademicBackground extends CurriculumChild implements DomainObject<
         academicBackgroundKey = 0;
     }
 
-    public AcademicBackground(long userId, long curriculumId, Instant beginDate, Instant endDate, String studyArea, String institution, String degreeObtained, long version, long academicBackgroundKey) {
+    public AcademicBackground(
+            long userId,
+            long curriculumId,
+            Timestamp beginDate,
+            Timestamp endDate,
+            String studyArea,
+            String institution,
+            String degreeObtained,
+            long version,
+            long academicBackgroundKey) {
         this.accountId = userId;
         this.curriculumId = curriculumId;
-        this.beginDate = beginDate;
-        this.endDate = endDate;
+        if(beginDate != null)
+            this.beginDate = beginDate.toInstant();
+        else
+            this.beginDate = null;
+        if(endDate != null)
+            this.endDate = endDate.toInstant();
+        else
+            this.endDate = null;
+
         this.studyArea = studyArea;
         this.institution = institution;
         this.degreeObtained = degreeObtained;
