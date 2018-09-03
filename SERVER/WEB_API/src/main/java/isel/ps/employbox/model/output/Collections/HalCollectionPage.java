@@ -38,6 +38,7 @@ public class HalCollectionPage<T> {
             Class selfController,
             Object ... parameters)
     {
+        this.page_size = elementsPage.pageSize;
         this.size = elementsPage.getTotalNumberOfElement();
         this.current_page = elementsPage.getCurrentPage();
         this.last_page = elementsPage.getLastPageNumber();
@@ -47,12 +48,10 @@ public class HalCollectionPage<T> {
         this._links = new _Links();
         if(elementsPage.getTotalNumberOfElement() != 0)
             this._embedded = new _Embedded(embeddedItems);
-        System.out.println(embeddedItems);
-        this.page_size = elementsPage.pageSize;
     }
 
     private String getPageQueryString(int page, int pageSize){
-        return String.format("?page=%d+&pageSize=%d+", page);
+        return String.format("?page=%d&pageSize=%d", page, pageSize);
     }
 
 
