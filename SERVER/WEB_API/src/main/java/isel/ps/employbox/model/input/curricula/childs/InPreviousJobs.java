@@ -2,6 +2,7 @@ package isel.ps.employbox.model.input.curricula.childs;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 
+import java.sql.Timestamp;
 import java.util.Date;
 
 public class InPreviousJobs {
@@ -10,9 +11,9 @@ public class InPreviousJobs {
     private long accountId;
     private long curriculumId;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
-    private Date beginDate;
+    private Timestamp beginDate;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
-    private Date endDate;
+    private Timestamp endDate;
     private String companyName;
     private String workLoad;
     private String role;
@@ -54,7 +55,7 @@ public class InPreviousJobs {
         return beginDate;
     }
 
-    public void setBeginDate(Date beginDate) {
+    public void setBeginDate(Timestamp beginDate) {
         this.beginDate = beginDate;
     }
 
@@ -78,7 +79,7 @@ public class InPreviousJobs {
         return endDate;
     }
 
-    public void setEndDate(Date endDate) {
+    public void setEndDate(Timestamp endDate) {
         this.endDate = endDate;
     }
 

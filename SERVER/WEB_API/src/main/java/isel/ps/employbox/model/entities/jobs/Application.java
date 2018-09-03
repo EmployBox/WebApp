@@ -10,6 +10,7 @@ import isel.ps.employbox.exceptions.ResourceNotFoundException;
 import isel.ps.employbox.model.entities.Account;
 
 import java.sql.Timestamp;
+import java.time.Instant;
 
 import static com.github.jayield.rapper.mapper.MapperRegistry.getMapper;
 
@@ -18,7 +19,7 @@ public class Application implements DomainObject<Long> {
     @Id(isIdentity = true)
     private final long applicationId;
     private final Long curriculumId;
-    private final Timestamp date;
+    private final Instant date;
 
     @Version
     private final long version;
@@ -38,12 +39,21 @@ public class Application implements DomainObject<Long> {
         applicationId = 0;
     }
 
-    public Application(long applicationId, long accountId, long jobId, Long curriculumId, Timestamp date, long version) {
+    public Application(
+            long applicationId,
+            long accountId,
+            long jobId,
+            Long curriculumId,
+            Timestamp date,
+            long version) {
         UnitOfWork unitOfWork = new UnitOfWork();
 
         this.applicationId = applicationId;
         this.curriculumId = curriculumId;
-        this.date = date;
+        if(date != null)
+            this.date = date.toInstant();
+        else this.date = null;
+
         this.version = version;
 
         this.account = new Foreign(accountId, unit -> getMapper(Account.class, unitOfWork).findById( accountId)
@@ -64,7 +74,7 @@ public class Application implements DomainObject<Long> {
         return version;
     }
 
-    public Timestamp getDate() {
+    public Instant getDate() {
         return date;
     }
 

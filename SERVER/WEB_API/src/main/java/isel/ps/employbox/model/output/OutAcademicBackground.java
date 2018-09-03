@@ -6,7 +6,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import isel.ps.employbox.controllers.curricula.AcademicBackgroundController;
 
-import java.sql.Timestamp;
+import java.time.Instant;
 
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
@@ -30,11 +30,11 @@ public class OutAcademicBackground implements OutputDto {
 
     @JsonProperty
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
-    private final Timestamp beginDate;
+    private final Instant beginDate;
 
     @JsonProperty
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
-    private final Timestamp endDate;
+    private final Instant endDate;
 
     @JsonProperty
     private final _Links link = new _Links();
@@ -46,8 +46,8 @@ public class OutAcademicBackground implements OutputDto {
             String institution,
             String degree,
             String studyArea,
-            Timestamp beginDate,
-            Timestamp endDate
+            Instant beginDate,
+            Instant endDate
     ) {
         this.academicBackgroundId = academicBackgroundId;
         this.institution = institution;

@@ -3,7 +3,8 @@ package isel.ps.employbox.model.entities;
 import com.github.jayield.rapper.DomainObject;
 import com.github.jayield.rapper.annotations.Id;
 
-import java.sql.Date;
+import java.sql.Timestamp;
+import java.time.Instant;
 
 public class Message implements DomainObject<Long> {
 
@@ -14,7 +15,7 @@ public class Message implements DomainObject<Long> {
     private final long version;
     private final long chatId;
     private final String text;
-    private final Date date;
+    private final Instant date;
 
     public Message(){
         accountId = 0;
@@ -25,7 +26,7 @@ public class Message implements DomainObject<Long> {
         date = null;
     }
 
-    public Message(long accountId, long messageId, long chatId, String text, Date date, long version) {
+    public Message(long accountId, long messageId, long chatId, String text, Instant date, long version) {
         this.accountId = accountId;
         this.chatId = chatId;
         this.date = date;
@@ -34,10 +35,13 @@ public class Message implements DomainObject<Long> {
         this.version = version;
     }
 
-    public Message(long accountId, long chatId, String text, Date date) {
+    public Message(long accountId, long chatId, String text, Timestamp date) {
         this.accountId = accountId;
         this.chatId = chatId;
-        this.date = date;
+        if(date != null)
+            this.date = date.toInstant();
+        else
+            this.date = null;
         this.text = text;
         this.messageId = -1;
         this.version = -1;
@@ -56,7 +60,7 @@ public class Message implements DomainObject<Long> {
         return text;
     }
 
-    public Date getDate() {
+    public Instant getDate() {
         return date;
     }
 

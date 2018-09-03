@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import isel.ps.employbox.controllers.account.ChatController;
 
-import java.sql.Date;
+import java.time.Instant;
 
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
@@ -23,7 +23,7 @@ public class OutMessage implements OutputDto {
 
     @JsonProperty
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy hh:mm:ss")
-    private final Date date;
+    private final Instant date;
 
     @JsonProperty
     private final String text;
@@ -31,7 +31,7 @@ public class OutMessage implements OutputDto {
     @JsonProperty
     private final _Links _links;
 
-    public OutMessage(long accountId, long messageId, long chadId, Date date, String text) {
+    public OutMessage(long accountId, long messageId, long chadId, Instant date, String text) {
         this.messageId = messageId;
         this.chatId = chadId;
         this.date = date;

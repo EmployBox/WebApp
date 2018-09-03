@@ -6,6 +6,7 @@ import com.github.jayield.rapper.annotations.Id;
 import com.github.jayield.rapper.annotations.Version;
 import com.github.jayield.rapper.unitofwork.UnitOfWork;
 
+import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -65,7 +66,7 @@ public class Comment implements DomainObject<Long> {
             long accountIdFrom,
             long accountIdTo,
             Long parentCommendID,
-            Instant date,
+            Timestamp date,
             String text,
             boolean status,
             long version)
@@ -74,7 +75,10 @@ public class Comment implements DomainObject<Long> {
         this.accountIdFrom = accountIdFrom;
         this.accountIdDest = accountIdTo;
         this.mainCommentId = parentCommendID;
-        this.datetime = date;
+        if(date != null)
+            this.datetime = date.toInstant();
+        else
+            this.datetime = null;
         this.text = text;
         this.status = status;
         this.replies = null;

@@ -2,7 +2,7 @@ package isel.ps.employbox.model.input;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 
-import java.time.Instant;
+import java.sql.Timestamp;
 import java.util.List;
 
 public class InComment {
@@ -12,7 +12,7 @@ public class InComment {
     private long mainCommentId;
     private boolean status;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm")
-    private Instant datetime;
+    private Timestamp datetime;
     private String text;
     private List<InComment> replies;
     private long version;
@@ -50,11 +50,11 @@ public class InComment {
         this.mainCommentId = mainCommentId;
     }
 
-    public Instant getDatetime() {
+    public Timestamp getDatetime() {
         return datetime;
     }
 
-    public void setDatetime(Instant datetime) {
+    public void setDatetime(Timestamp datetime) {
         this.datetime = datetime;
     }
 

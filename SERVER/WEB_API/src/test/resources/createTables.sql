@@ -137,7 +137,7 @@ CREATE TABLE Application(
   accountId BIGINT,
   curriculumId BIGINT,
   jobId BIGINT,
-  datetime datetime default CURRENT_DATE,
+  date datetime default CURRENT_DATE,
   version bigint default 1,
 
   FOREIGN KEY (accountId) REFERENCES Account,

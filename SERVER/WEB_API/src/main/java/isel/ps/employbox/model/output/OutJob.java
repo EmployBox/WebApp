@@ -8,7 +8,7 @@ import isel.ps.employbox.controllers.UserAccountController;
 import isel.ps.employbox.controllers.jobs.JobExperienceController;
 import isel.ps.employbox.model.output.OutAccount.AccountItemOutput;
 
-import java.sql.Timestamp;
+import java.time.Instant;
 
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
@@ -35,11 +35,11 @@ public class OutJob implements OutputDto<OutJob.JobItemOutput> {
 
     @JsonProperty
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy hh:mm:ss")
-    private final Timestamp offerBeginDate;
+    private final Instant offerBeginDate;
 
     @JsonProperty
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy hh:mm:ss")
-    private final Timestamp offerEndDate;
+    private final Instant offerEndDate;
 
     @JsonProperty
     private final String offerType;
@@ -61,8 +61,8 @@ public class OutJob implements OutputDto<OutJob.JobItemOutput> {
             String address,
             double wage,
             String description,
-            Timestamp offerBeginDate,
-            Timestamp offerEndDate,
+            Instant offerBeginDate,
+            Instant offerEndDate,
             String offerType, String type)
     {
         this._account = account;
@@ -98,7 +98,7 @@ public class OutJob implements OutputDto<OutJob.JobItemOutput> {
         private final String title;
         @JsonProperty
         @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy hh:mm:ss")
-        private final Timestamp offerBeginDate;
+        private final Instant offerBeginDate;
         @JsonProperty
         private final String address;
         @JsonProperty
@@ -108,7 +108,7 @@ public class OutJob implements OutputDto<OutJob.JobItemOutput> {
         @JsonProperty
         private final _Links _links;
 
-        private JobItemOutput(long jobId, AccountItemOutput account, String title, Timestamp offerBeginDate, String address, String offerType, String type){
+        private JobItemOutput(long jobId, AccountItemOutput account, String title, Instant offerBeginDate, String address, String offerType, String type){
             this.jobId = jobId;
             this.account = account;
             this.title = title;

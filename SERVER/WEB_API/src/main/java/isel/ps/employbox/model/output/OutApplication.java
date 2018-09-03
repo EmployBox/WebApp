@@ -6,7 +6,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import isel.ps.employbox.controllers.UserAccountController;
 import isel.ps.employbox.controllers.jobs.JobController;
 
-import java.sql.Timestamp;
+import java.time.Instant;
 
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
@@ -31,7 +31,7 @@ public class OutApplication implements OutputDto {
 
     @JsonProperty
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy hh:mm:ss")
-    private final Timestamp date;
+    private final Instant date;
 
     @JsonProperty
     private final _Links _links;
@@ -39,7 +39,7 @@ public class OutApplication implements OutputDto {
     @JsonProperty
     private final _Embedded _embedded;
 
-    public OutApplication(OutJob outJob, OutAccount outAccount, long applicationId, Long curriculumId, Timestamp date) {
+    public OutApplication(OutJob outJob, OutAccount outAccount, long applicationId, Long curriculumId, Instant date) {
         _outJob = outJob;
         _outAccount = outAccount;
         this.applicationId = applicationId;

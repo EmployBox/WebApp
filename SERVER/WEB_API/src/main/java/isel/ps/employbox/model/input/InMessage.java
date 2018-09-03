@@ -1,12 +1,12 @@
 package isel.ps.employbox.model.input;
 
-import java.sql.Date;
+import java.sql.Timestamp;
 
 public class InMessage {
     private long accountId;
     private long messageId;
     private long chatId;
-    private Date date;
+    private Timestamp date;
     private String text;
 
     public long getChatId() {
@@ -17,11 +17,11 @@ public class InMessage {
         this.chatId = chatId;
     }
 
-    public Date getDate() {
+    public Timestamp getDate() {
         return date;
     }
 
-    public void setDate(Date date) {
+    public void setDate(Timestamp date) {
         this.date = date;
     }
 

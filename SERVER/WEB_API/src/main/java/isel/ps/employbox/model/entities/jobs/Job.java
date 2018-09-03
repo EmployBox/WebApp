@@ -16,6 +16,7 @@ import isel.ps.employbox.model.input.InJobExperience;
 import isel.ps.employbox.model.input.InSchedule;
 
 import java.sql.Timestamp;
+import java.time.Instant;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
@@ -31,8 +32,8 @@ public class Job implements DomainObject<Long> {
     private final String address;
     private final int wage;
     private final String description;
-    private final Timestamp offerBeginDate;
-    private final Timestamp offerEndDate;
+    private final Instant offerBeginDate;
+    private final Instant offerEndDate;
     private final String offerType;
     private final String type;
 
@@ -69,8 +70,8 @@ public class Job implements DomainObject<Long> {
             String address,
             int wage,
             String description,
-            Timestamp offerBeginDate,
-            Timestamp offerEndDate,
+            Instant offerBeginDate,
+            Instant offerEndDate,
             String offerType,
             String type, long version
     ) {
@@ -112,8 +113,14 @@ public class Job implements DomainObject<Long> {
         this.address = address;
         this.wage = wage;
         this.description = description;
-        this.offerBeginDate = offerBeginDate;
-        this.offerEndDate = offerEndDate;
+        if(offerBeginDate != null)
+            this.offerBeginDate = offerBeginDate.toInstant();
+        else this.offerBeginDate = null;
+
+        if(offerEndDate != null)
+            this.offerEndDate = offerEndDate.toInstant();
+        else
+            this.offerEndDate = null;
         this.offerType = offerType;
         this.applications = ignored -> {
             ApplicationBinder applicationBinder = new ApplicationBinder();
@@ -153,11 +160,11 @@ public class Job implements DomainObject<Long> {
         return description;
     }
 
-    public Timestamp getOfferBeginDate() {
+    public Instant getOfferBeginDate() {
         return offerBeginDate;
     }
 
-    public Timestamp getOfferEndDate() {
+    public Instant getOfferEndDate() {
         return offerEndDate;
     }
 
