@@ -21,6 +21,8 @@ public class HalCollectionPage<T> {
     @JsonProperty
     private final long size;
     @JsonProperty
+    private final int page_size;
+    @JsonProperty
     private final int current_page;
     @JsonProperty
     private final long last_page;
@@ -46,10 +48,11 @@ public class HalCollectionPage<T> {
         if(elementsPage.getTotalNumberOfElement() != 0)
             this._embedded = new _Embedded(embeddedItems);
         System.out.println(embeddedItems);
+        this.page_size = elementsPage.pageSize;
     }
 
-    private String getPageQueryString(int page){
-        return String.format("?page=%d", page);
+    private String getPageQueryString(int page, int pageSize){
+        return String.format("?page=%d+&pageSize=%d+", page);
     }
 
 
@@ -94,27 +97,27 @@ public class HalCollectionPage<T> {
 
         private class Self{
             @JsonProperty
-            final String href = HOSTNAME + linkTo(selfController, parameters).slash(getPageQueryString(current_page)).withSelfRel().getHref();
+            final String href = HOSTNAME + linkTo(selfController, parameters).slash(getPageQueryString(current_page, page_size)).withSelfRel().getHref();
         }
 
         private class Next{
             @JsonProperty
-            final String href = HOSTNAME + linkTo(selfController, parameters).slash(getPageQueryString(current_page + 1)).withRel(Link.REL_NEXT).getHref();
+            final String href = HOSTNAME + linkTo(selfController, parameters).slash(getPageQueryString(current_page + 1, page_size)).withRel(Link.REL_NEXT).getHref();
         }
 
         private class Prev{
             @JsonProperty
-            final String href = HOSTNAME + linkTo(selfController, parameters).slash(getPageQueryString(current_page - 1)).withRel(Link.REL_PREVIOUS).getHref();
+            final String href = HOSTNAME + linkTo(selfController, parameters).slash(getPageQueryString(current_page - 1, page_size)).withRel(Link.REL_PREVIOUS).getHref();
         }
 
         private class First{
             @JsonProperty
-            final String href = HOSTNAME + linkTo(selfController, parameters).slash(getPageQueryString(0)).withSelfRel().getHref();
+            final String href = HOSTNAME + linkTo(selfController, parameters).slash(getPageQueryString(0, page_size)).withSelfRel().getHref();
         }
 
         private class Last {
             @JsonProperty
-            final String href = HOSTNAME + linkTo(selfController, parameters).slash(getPageQueryString(elementsPage.getLastPageNumber())).withRel(Link.REL_LAST).getHref();
+            final String href = HOSTNAME + linkTo(selfController, parameters).slash(getPageQueryString(elementsPage.getLastPageNumber(), page_size)).withRel(Link.REL_LAST).getHref();
         }
     }
 }
