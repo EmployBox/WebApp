@@ -1,8 +1,5 @@
 package isel.ps.employbox.model.input.curricula.childs;
 
-import isel.ps.employbox.model.entities.curricula.childs.AcademicBackground;
-import isel.ps.employbox.model.entities.curricula.childs.Project;
-
 import java.util.Collections;
 import java.util.List;
 
@@ -12,8 +9,8 @@ public class InCurriculum {
     private String title;
     private List<InCurriculumExperience> experiences = Collections.emptyList();
     private List<InPreviousJobs> previousJobs = Collections.emptyList();
-    private List<Project> projects = Collections.emptyList();
-    private List<AcademicBackground> academicBackground = Collections.emptyList();
+    private List<InProject> projects = Collections.emptyList();
+    private List<InAcademicBackground> academicBackground = Collections.emptyList();
     private long version;
 
     public long getAccountId() {
@@ -36,11 +33,11 @@ public class InCurriculum {
         return previousJobs;
     }
 
-    public List<Project> getProjects() {
+    public List<InProject> getProjects() {
         return projects;
     }
 
-    public List<AcademicBackground> getAcademicBackground() {
+    public List<InAcademicBackground> getAcademicBackground() {
         return academicBackground;
     }
 
@@ -64,11 +61,11 @@ public class InCurriculum {
         this.previousJobs = previousJobs;
     }
 
-    public void setProjects(List<Project> projects) {
+    public void setProjects(List<InProject> projects) {
         this.projects = projects;
     }
 
-    public void setAcademicBackground(List<AcademicBackground> academicBackground) {
+    public void setAcademicBackground(List<InAcademicBackground> academicBackground) {
         this.academicBackground = academicBackground;
     }
 

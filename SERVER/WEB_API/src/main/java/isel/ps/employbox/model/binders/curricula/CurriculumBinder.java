@@ -7,7 +7,6 @@ import isel.ps.employbox.model.output.OutCurriculum;
 import org.springframework.stereotype.Component;
 
 import java.util.concurrent.CompletableFuture;
-import java.util.stream.Collectors;
 
 @Component
 public class CurriculumBinder implements ModelBinder<Curriculum,OutCurriculum,InCurriculum> {
@@ -35,9 +34,9 @@ public class CurriculumBinder implements ModelBinder<Curriculum,OutCurriculum,In
                 obj.getCurriculumId(),
                 obj.getTitle(),
                 obj.getVersion(),
-                obj.getPreviousJobs().stream().map(previousJobsBinder::bindInput).collect(Collectors.toList()),
+                obj.getPreviousJobs(),
                 obj.getAcademicBackground(),
-                obj.getExperiences().stream().map(curriculumExperienceBinder::bindInput).collect(Collectors.toList()),
+                obj.getExperiences(),
                 obj.getProjects());
     }
 }

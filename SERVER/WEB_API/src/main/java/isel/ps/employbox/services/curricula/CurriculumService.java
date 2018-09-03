@@ -5,7 +5,6 @@ import com.github.jayield.rapper.mapper.DataMapper;
 import com.github.jayield.rapper.mapper.conditions.Condition;
 import com.github.jayield.rapper.mapper.conditions.EqualAndCondition;
 import com.github.jayield.rapper.unitofwork.UnitOfWork;
-import io.vertx.ext.sql.TransactionIsolation;
 import isel.ps.employbox.ErrorMessages;
 import isel.ps.employbox.exceptions.BadRequestException;
 import isel.ps.employbox.exceptions.ConflictException;
@@ -22,7 +21,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static com.github.jayield.rapper.mapper.MapperRegistry.getMapper;
@@ -40,53 +38,26 @@ public class CurriculumService {
         if (curriculum.getAccountId() != userId)
             throw new BadRequestException(ErrorMessages.BAD_REQUEST_IDS_MISMATCH);
 
-        UnitOfWork unitOfWork = new UnitOfWork(TransactionIsolation.SERIALIZABLE);
+        UnitOfWork unitOfWork = new UnitOfWork();
         DataMapper<Curriculum, Long> curriculumMapper = getMapper(Curriculum.class, unitOfWork);
+        DataMapper<Project, Long> projectMapper = getMapper(Project.class, unitOfWork);
+        DataMapper<AcademicBackground, Long> academicBackgoundMappper = getMapper(AcademicBackground.class, unitOfWork);
+        DataMapper<CurriculumExperience, Long> curriculumExperienceMapper = getMapper(CurriculumExperience.class, unitOfWork);
+        DataMapper<PreviousJobs, Long> previousJobsMapper = getMapper(PreviousJobs.class, unitOfWork);
 
         CompletableFuture<Curriculum> future = userAccountService.getUser(userId,unitOfWork, email)
-                .thenCompose(userAccount -> curriculumMapper.create(curriculum)
-                        .thenCompose(aVoid -> {
-                            List<CompletableFuture<Void>> list = new ArrayList<>();
-                            populateChildList(list, curriculum, userId);
-                            return CompletableFuture.allOf(list.toArray(new CompletableFuture[list.size()]));
-                        })
-                        .thenCompose(res -> unitOfWork.commit().thenApply(aVoid -> curriculum)));
-
+                .thenCompose(userAccount -> curriculumMapper.create(curriculum))
+                .thenCompose(aVoid -> curriculum.getExperiences().apply(unitOfWork))
+                .thenCompose(curriculumExperienceMapper::createAll)
+                .thenCompose(aVoid -> curriculum.getAcademicBackground().apply(unitOfWork))
+                .thenCompose(academicBackgoundMappper::createAll)
+                .thenCompose(aVoid -> curriculum.getPreviousJobs().apply(unitOfWork))
+                .thenAccept(previousJobsMapper::createAll)
+                .thenCompose(aVoid -> curriculum.getProjects().apply(unitOfWork))
+                .thenAccept(projectMapper::createAll)
+                .thenCompose(res -> unitOfWork.commit().thenApply(aVoid -> curriculum));
 
         return handleExceptions(future, unitOfWork);
-    }
-
-    private <T extends CurriculumChild & DomainObject<K>, K> CompletableFuture<Void> addChildFutureFunction(
-            Function<UnitOfWork, CompletableFuture<List<T>>> function,
-            Class<T> tClass,
-            Curriculum curriculum,
-            long userId
-    ) {
-        UnitOfWork unitOfWork = new UnitOfWork();
-        DataMapper<T, K> mapper = getMapper(tClass, unitOfWork);
-
-        CompletableFuture<Void> future1 = function.apply(unitOfWork)
-                .thenApply(tList -> {
-                    tList.forEach(t -> {
-                        t.setAccountId(userId);
-                        t.setCurriculumId(curriculum.getIdentityKey());
-                    });
-                    return tList;
-                })
-                .thenCompose(list -> {
-                    if (list.isEmpty()) return CompletableFuture.completedFuture(null);
-                    return mapper.createAll(list);
-                })
-                .thenCompose(aVoid -> unitOfWork.commit());
-
-        return handleExceptions(future1, unitOfWork);
-    }
-
-    private void populateChildList(List<CompletableFuture<Void>> creationList, Curriculum curriculum, long userId) {
-        creationList.add(addChildFutureFunction(curriculum.getPreviousJobs(), PreviousJobs.class, curriculum, userId));
-        creationList.add(addChildFutureFunction(curriculum.getAcademicBackground(), AcademicBackground.class, curriculum, userId));
-        creationList.add(addChildFutureFunction(curriculum.getProjects(), Project.class, curriculum, userId));
-        creationList.add(addChildFutureFunction(curriculum.getExperiences(), CurriculumExperience.class, curriculum, userId));
     }
 
     public CompletableFuture<CollectionPage<Curriculum>> getCurricula(long accountId, int page, int pageSize, String orderColumn, String orderClause) {

@@ -5,14 +5,23 @@ import com.github.jayield.rapper.annotations.ColumnName;
 import com.github.jayield.rapper.annotations.Id;
 import com.github.jayield.rapper.annotations.Version;
 import com.github.jayield.rapper.unitofwork.UnitOfWork;
+import isel.ps.employbox.model.binders.curricula.AcademicBackgroundBinder;
+import isel.ps.employbox.model.binders.curricula.CurriculumExperienceBinder;
+import isel.ps.employbox.model.binders.curricula.PreviousJobsBinder;
+import isel.ps.employbox.model.binders.curricula.ProjectBinder;
 import isel.ps.employbox.model.entities.curricula.childs.AcademicBackground;
 import isel.ps.employbox.model.entities.curricula.childs.CurriculumExperience;
 import isel.ps.employbox.model.entities.curricula.childs.PreviousJobs;
 import isel.ps.employbox.model.entities.curricula.childs.Project;
+import isel.ps.employbox.model.input.curricula.childs.InAcademicBackground;
+import isel.ps.employbox.model.input.curricula.childs.InCurriculumExperience;
+import isel.ps.employbox.model.input.curricula.childs.InPreviousJobs;
+import isel.ps.employbox.model.input.curricula.childs.InProject;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 public class Curriculum implements DomainObject<Long> {
     @Id(isIdentity = true)
@@ -57,18 +66,38 @@ public class Curriculum implements DomainObject<Long> {
             long curriculumId,
             String title,
             long version,
-            List<PreviousJobs> previousJobsList,
-            List<AcademicBackground> academicBackgroundList,
-            List<CurriculumExperience> experiencesList,
-            List<Project> projectsList
+            List<InPreviousJobs> previousJobs,
+            List<InAcademicBackground> academicBackgroundList,
+            List<InCurriculumExperience> experiences,
+            List<InProject> projects
     ) {
         this.accountId = accountId;
         this.curriculumId = curriculumId;
         this.title = title;
-        this.previousJobs = (__) -> CompletableFuture.completedFuture(previousJobsList);
-        this.academicBackground = (__) -> CompletableFuture.completedFuture(academicBackgroundList);
-        this.experiences = (__) -> CompletableFuture.completedFuture(experiencesList);
-        this.projects = (__) -> CompletableFuture.completedFuture(projectsList);
+        this.previousJobs = ignored -> {
+            PreviousJobsBinder previousJobsBinder = new PreviousJobsBinder();
+
+            List<PreviousJobs> list = previousJobsBinder.bindInput(previousJobs.stream().peek(inPrevious -> inPrevious.setCurriculumId(this.curriculumId))).collect(Collectors.toList());
+            return CompletableFuture.completedFuture(list);
+        };
+        this.experiences = ignored -> {
+            CurriculumExperienceBinder curriculumExperienceBinder = new CurriculumExperienceBinder();
+
+            List<CurriculumExperience> list = curriculumExperienceBinder.bindInput(experiences.stream().peek(inJobExperience -> inJobExperience.setCurriculumId(this.curriculumId))).collect(Collectors.toList());
+            return CompletableFuture.completedFuture(list);
+        };
+        this.projects = ignored -> {
+            ProjectBinder projectBinder = new ProjectBinder();
+
+            List<Project> list = projectBinder.bindInput(projects.stream().peek(inSchedule -> inSchedule.setCurriculumId(this.curriculumId))).collect(Collectors.toList());
+            return CompletableFuture.completedFuture(list);
+        };
+        this.academicBackground = ignored -> {
+            AcademicBackgroundBinder academicBackgroundBinder = new AcademicBackgroundBinder();
+
+            List<AcademicBackground> list = academicBackgroundBinder.bindInput(academicBackgroundList.stream().peek(inSchedule -> inSchedule.setCurriculumId(this.curriculumId))).collect(Collectors.toList());
+            return CompletableFuture.completedFuture(list);
+        };
         this.version = version;
     }
 

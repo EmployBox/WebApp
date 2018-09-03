@@ -8,7 +8,9 @@ import com.github.jayield.rapper.unitofwork.UnitOfWork;
 import isel.ps.employbox.exceptions.ResourceNotFoundException;
 import isel.ps.employbox.model.entities.Curriculum;
 import isel.ps.employbox.model.entities.UserAccount;
+import isel.ps.employbox.model.entities.curricula.childs.Project;
 import isel.ps.employbox.model.input.curricula.childs.InCurriculum;
+import isel.ps.employbox.model.input.curricula.childs.InProject;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -25,6 +27,7 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static com.github.jayield.rapper.mapper.MapperRegistry.getMapper;
@@ -108,10 +111,20 @@ public class CurriculumControllerTests {
         inCurriculum.setAccountId(userAccount.getIdentityKey());
         inCurriculum.setTitle("Verrryyy gud curriculum");
 
+        InProject inProject = new InProject();
+        inProject.setDescription("ello");
+        inProject.setName("proj");
+        inProject.setAccountId(userAccount.getIdentityKey());
+
+        List<InProject> projects = new ArrayList<>();
+        projects.add(inProject);
+        inCurriculum.setProjects(projects);
+
         ObjectMapper objectMapper = new ObjectMapper();
         String json = objectMapper.writeValueAsString(inCurriculum);
         UnitOfWork unitOfWork = new UnitOfWork();
         DataMapper<Curriculum, Long> curriculumMapper = getMapper(Curriculum.class, unitOfWork);
+        DataMapper<Project, Long> projectMapper = getMapper(Project.class, unitOfWork);
         webTestClient
                 .post()
                 .uri("/accounts/users/" + userAccount.getIdentityKey() + "/curricula")
@@ -123,6 +136,7 @@ public class CurriculumControllerTests {
                 .consumeWith(document("createCurriculum"));
 
         assertEquals(1, curriculumMapper.find(new EqualAndCondition<>("title", "Verrryyy gud curriculum")).join().size());
+        assertEquals(1, projectMapper.find(new EqualAndCondition<>("name", "proj")).join().size());
         unitOfWork.commit().join();
     }
 
