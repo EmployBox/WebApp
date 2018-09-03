@@ -3,8 +3,10 @@ package isel.ps.employbox.model.output;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import isel.ps.employbox.controllers.CompanyController;
-import isel.ps.employbox.controllers.UserAccountController;
+import isel.ps.employbox.controllers.UserAccountControllers.UserAccountController;
 import isel.ps.employbox.controllers.account.*;
+import isel.ps.employbox.controllers.account.FollowsControllers.FollowedController;
+import isel.ps.employbox.controllers.account.FollowsControllers.FollowingController;
 
 import java.util.HashMap;
 
@@ -116,17 +118,17 @@ public class OutAccount implements OutputDto {
             }
             private class Followers {
                 @JsonProperty
-                final String href = HOSTNAME + linkTo( methodOn(FollowsController.class,accountId).getTheAccountsWichThisAccountIsFollowed(accountId, 0, 5,null,null,null)).withRel("followers").expand().getHref();
+                final String href = HOSTNAME + linkTo( methodOn(FollowedController.class,accountId).getTheAccountsWichThisAccountIsFollowed(accountId, 0, 5,null,null,null)).withRel("followers").expand().getHref();
             }
             
             private class Following {
                 @JsonProperty
-                final String href = HOSTNAME + linkTo( methodOn(FollowsController.class,accountId).getTheAccountsWichThisAccountIsFollower(accountId, 0, 5,null,null, null)).withRel("following").expand().getHref();
+                final String href = HOSTNAME + linkTo( methodOn(FollowingController.class,accountId).getTheAccountsWichThisAccountIsFollower(accountId, 0, 5,null,null, null)).withRel("following").expand().getHref();
             }
 
             private class Offered_jobs{
                 @JsonProperty
-                final String href = HOSTNAME + linkTo(methodOn( AccountController.class, accountId).getOfferedJobs(accountId, 0, 5, null, null)).withRel("offered_jobs").expand().getHref();
+                final String href = HOSTNAME + linkTo(methodOn( AccountJobController.class, accountId).getOfferedJobs(accountId, 0, 5, null, null)).withRel("offered_jobs").expand().getHref();
             }
 
             private class Comments {

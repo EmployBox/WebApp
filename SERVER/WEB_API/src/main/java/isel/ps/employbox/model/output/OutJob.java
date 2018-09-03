@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import isel.ps.employbox.controllers.jobs.JobController;
-import isel.ps.employbox.controllers.UserAccountController;
+import isel.ps.employbox.controllers.UserAccountControllers.UserAccountController;
 import isel.ps.employbox.controllers.jobs.JobExperienceController;
 import isel.ps.employbox.model.output.OutAccount.AccountItemOutput;
 

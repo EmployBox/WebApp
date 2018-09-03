@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import isel.ps.employbox.controllers.account.AccountController;
 import isel.ps.employbox.controllers.CompanyController;
 import isel.ps.employbox.controllers.jobs.JobController;
-import isel.ps.employbox.controllers.UserAccountController;
+import isel.ps.employbox.controllers.UserAccountControllers.UserAccountController;
 
 import static isel.ps.employbox.model.output.OutputDto.HOSTNAME;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;

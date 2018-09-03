@@ -3,12 +3,14 @@ package isel.ps.employbox.controllers.account;
 import isel.ps.employbox.model.binders.AccountBinder;
 import isel.ps.employbox.model.binders.jobs.JobBinder;
 import isel.ps.employbox.model.entities.Account;
-import isel.ps.employbox.model.entities.jobs.Job;
 import isel.ps.employbox.model.output.Collections.HalCollectionPage;
 import isel.ps.employbox.model.output.OutAccount;
 import isel.ps.employbox.services.AccountService;
 import org.springframework.security.core.Authentication;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
 
 import java.util.concurrent.CompletableFuture;
@@ -36,20 +38,6 @@ public class AccountController {
         return Mono.fromFuture(accountService.getAllAccounts(page, pageSize, orderColumn,orderClause).thenCompose(res -> accountBinder.bindOutput(res, AccountController.class)) );
     }
 
-    @GetMapping("/{accountId}/jobs/offered")
-    public Mono<HalCollectionPage<Job>> getOfferedJobs(
-            @PathVariable long accountId,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int pageSize,
-            @RequestParam(required = false) String orderColumn,
-            @RequestParam(required = false, defaultValue = "ASC") String orderClause
-    ){
-
-        return Mono.fromFuture(
-                accountService.getOfferedJob(accountId, page, pageSize, orderColumn, orderClause)
-                        .thenCompose( jobCollectionPage -> jobBinder.bindOutput(jobCollectionPage , this.getClass(), accountId))
-        );
-    }
 
     @GetMapping("/self")
     public Mono<OutAccount> getAccount(Authentication authentication){

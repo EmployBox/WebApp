@@ -1,4 +1,4 @@
-package isel.ps.employbox.controllers.account;
+package isel.ps.employbox.controllers.account.FollowsControllers;
 
 import isel.ps.employbox.model.binders.AccountBinder;
 import isel.ps.employbox.model.binders.CollectionPage;
@@ -12,36 +12,17 @@ import reactor.core.publisher.Mono;
 import java.util.concurrent.CompletableFuture;
 
 @RestController
-@RequestMapping("/accounts/{accountId}")
-public class FollowsController {
-
+@RequestMapping("/accounts/{accountId}/followed")
+public class FollowedController {
     private final AccountBinder accountBinder;
     private final FollowService followService;
 
-    public FollowsController(AccountBinder accountBinder, FollowService followService) {
+    public FollowedController(AccountBinder accountBinder, FollowService followService) {
         this.accountBinder = accountBinder;
         this.followService = followService;
     }
 
-    @GetMapping("/following")
-    public Mono<HalCollectionPage<Account>> getTheAccountsWichThisAccountIsFollower(
-            @PathVariable long accountId,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int pageSize,
-            @RequestParam(required = false) String orderColumn,
-            @RequestParam(required = false, defaultValue = "ASC") String orderClause,
-            @RequestParam(required = false) Long accountToCheck
-    ){
-        CompletableFuture<CollectionPage<Account>> future;
-                if(accountToCheck==null)
-                    future = followService.getAccountFollowers(accountId, page, pageSize, orderColumn, orderClause);
-                else
-                    future = followService.checkIfAccountIsFollowerOf(accountId, accountToCheck);
-
-        return Mono.fromFuture(future.thenCompose(accountCollectionPage -> accountBinder.bindOutput(accountCollectionPage, this.getClass(), accountId)));
-    }
-
-    @GetMapping("/followed")
+    @GetMapping
     public Mono<HalCollectionPage<Account>> getTheAccountsWichThisAccountIsFollowed(
             @PathVariable long accountId,
             @RequestParam(defaultValue = "0") int page,
@@ -62,7 +43,7 @@ public class FollowsController {
         );
     }
 
-    @PutMapping("/followed")
+    @PutMapping
     public Mono<Void> addNewFollowRelation(
             @PathVariable long accountId,
             Authentication authentication)
@@ -70,7 +51,7 @@ public class FollowsController {
         return followService.followNewAccount(accountId, authentication.getName());
     }
 
-    @DeleteMapping("/followed")
+    @DeleteMapping
     public Mono<Void> deleteAFollowRelation(
             @PathVariable long accountId,
             Authentication authentication)

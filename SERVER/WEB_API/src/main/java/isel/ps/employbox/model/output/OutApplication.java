@@ -3,7 +3,7 @@ package isel.ps.employbox.model.output;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import isel.ps.employbox.controllers.UserAccountController;
+import isel.ps.employbox.controllers.UserAccountControllers.UserJobApplicationController;
 import isel.ps.employbox.controllers.jobs.JobController;
 
 import java.time.Instant;
@@ -87,7 +87,7 @@ public class OutApplication implements OutputDto {
 
         private class Self {
             @JsonProperty
-            final String href = HOSTNAME + linkTo(methodOn(UserAccountController.class).getApplication(accountId, jobId, applicationId)).withSelfRel().getHref();
+            final String href = HOSTNAME + linkTo(methodOn(UserJobApplicationController.class).getApplication(accountId, jobId, applicationId)).withSelfRel().getHref();
         }
     }
 

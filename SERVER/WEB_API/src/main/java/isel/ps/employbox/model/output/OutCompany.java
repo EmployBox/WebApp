@@ -4,7 +4,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import isel.ps.employbox.controllers.CompanyController;
 import isel.ps.employbox.controllers.account.CommentController;
-import isel.ps.employbox.controllers.account.FollowsController;
+import isel.ps.employbox.controllers.account.FollowsControllers.FollowedController;
+import isel.ps.employbox.controllers.account.FollowsControllers.FollowingController;
 import isel.ps.employbox.controllers.account.RatingController;
 
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
@@ -118,12 +119,12 @@ public class OutCompany implements OutputDto {
 
         private class Followers {
             @JsonProperty
-            final String href = HOSTNAME + linkTo( methodOn(FollowsController.class, accountId).getTheAccountsWichThisAccountIsFollowed(accountId, 0, 5, null, null, null)).withRel("followers").expand().getHref();
+            final String href = HOSTNAME + linkTo( methodOn(FollowedController.class, accountId).getTheAccountsWichThisAccountIsFollowed(accountId, 0, 5, null, null, null)).withRel("followers").expand().getHref();
         }
         
         private class Following {
             @JsonProperty
-            final String href = HOSTNAME + linkTo( methodOn(FollowsController.class, accountId).getTheAccountsWichThisAccountIsFollower(accountId, 0, 5,null,null,null) ).withRel("following").expand().getHref();
+            final String href = HOSTNAME + linkTo( methodOn(FollowingController.class, accountId).getTheAccountsWichThisAccountIsFollower(accountId, 0, 5,null,null,null) ).withRel("following").expand().getHref();
         }
     }
 }

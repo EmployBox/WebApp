@@ -1,4 +1,4 @@
-package isel.ps.employbox.controllers;
+package isel.ps.employbox.controllers.UserAccountControllers;
 
 import isel.ps.employbox.exceptions.BadRequestException;
 import isel.ps.employbox.model.binders.jobs.ApplicationBinder;
@@ -68,16 +68,6 @@ public class UserAccountController {
         return Mono.fromFuture(future);
     }
 
-    @GetMapping("/{id}/jobs/{jid}/applications/{apId}")
-    public Mono<OutApplication> getApplication(
-            @PathVariable long id,
-            @PathVariable long jid,
-            @PathVariable long apId
-    ){
-        CompletableFuture<OutApplication> future = userAccountService.getApplication(id, jid, apId)
-                .thenCompose(applicationBinder::bindOutput);
-        return Mono.fromFuture(future);
-    }
 
     @PostMapping
     public Mono<OutUser> createUser( @RequestBody InUserAccount inUserAccount){
