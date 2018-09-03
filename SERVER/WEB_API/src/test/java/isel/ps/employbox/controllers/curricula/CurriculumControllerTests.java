@@ -114,7 +114,6 @@ public class CurriculumControllerTests {
         InProject inProject = new InProject();
         inProject.setDescription("ello");
         inProject.setName("proj");
-        inProject.setAccountId(userAccount.getIdentityKey());
 
         List<InProject> projects = new ArrayList<>();
         projects.add(inProject);

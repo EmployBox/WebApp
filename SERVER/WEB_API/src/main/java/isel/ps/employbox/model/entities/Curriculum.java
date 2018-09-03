@@ -77,25 +77,46 @@ public class Curriculum implements DomainObject<Long> {
         this.previousJobs = ignored -> {
             PreviousJobsBinder previousJobsBinder = new PreviousJobsBinder();
 
-            List<PreviousJobs> list = previousJobsBinder.bindInput(previousJobs.stream().peek(inPrevious -> inPrevious.setCurriculumId(this.curriculumId))).collect(Collectors.toList());
+            List<PreviousJobs> list = previousJobsBinder.bindInput(previousJobs.stream()
+                    .peek(inPrevious -> {
+                        inPrevious.setCurriculumId(this.curriculumId);
+                        inPrevious.setAccountId(accountId);
+                    })).collect(Collectors.toList());
             return CompletableFuture.completedFuture(list);
         };
+
         this.experiences = ignored -> {
             CurriculumExperienceBinder curriculumExperienceBinder = new CurriculumExperienceBinder();
 
-            List<CurriculumExperience> list = curriculumExperienceBinder.bindInput(experiences.stream().peek(inJobExperience -> inJobExperience.setCurriculumId(this.curriculumId))).collect(Collectors.toList());
+            List<CurriculumExperience> list = curriculumExperienceBinder.bindInput(experiences.stream()
+                    .peek(inJobExperience -> {
+                                inJobExperience.setCurriculumId(this.curriculumId);
+                                inJobExperience.setAccountId(accountId);
+                            }
+                    )).collect(Collectors.toList());
             return CompletableFuture.completedFuture(list);
         };
         this.projects = ignored -> {
             ProjectBinder projectBinder = new ProjectBinder();
 
-            List<Project> list = projectBinder.bindInput(projects.stream().peek(inSchedule -> inSchedule.setCurriculumId(this.curriculumId))).collect(Collectors.toList());
+            List<Project> list = projectBinder.bindInput(projects.stream()
+                    .peek(inProject -> {
+                        inProject.setCurriculumId(this.curriculumId);
+                        inProject.setAccountId(accountId);
+                    })
+            ).collect(Collectors.toList());
             return CompletableFuture.completedFuture(list);
         };
         this.academicBackground = ignored -> {
             AcademicBackgroundBinder academicBackgroundBinder = new AcademicBackgroundBinder();
 
-            List<AcademicBackground> list = academicBackgroundBinder.bindInput(academicBackgroundList.stream().peek(inSchedule -> inSchedule.setCurriculumId(this.curriculumId))).collect(Collectors.toList());
+            List<AcademicBackground> list = academicBackgroundBinder
+                    .bindInput(academicBackgroundList.stream()
+                            .peek(inAcademicBackground -> {
+                                inAcademicBackground.setCurriculumId(this.curriculumId);
+                                inAcademicBackground.setAccountId(this.accountId);
+                            })
+                    ).collect(Collectors.toList());
             return CompletableFuture.completedFuture(list);
         };
         this.version = version;
