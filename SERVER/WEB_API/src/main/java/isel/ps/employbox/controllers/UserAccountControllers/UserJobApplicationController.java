@@ -38,11 +38,11 @@ public class UserJobApplicationController {
 
     @PostMapping
     public Mono<OutApplication> createApplication(@PathVariable long id, @PathVariable long jid,  @RequestBody InApplication inApplication, Authentication authentication){
-        if(id != inApplication.getAccountId() || jid != inApplication.getJobId())
+        if(jid != inApplication.getJobId())
             throw new BadRequestException(BAD_REQUEST_IDS_MISMATCH);
         Application application = applicationBinder.bindInput(inApplication);
 
-        CompletableFuture<OutApplication> future = userAccountService.createApplication(id, application, authentication.getName())
+        CompletableFuture<OutApplication> future = userAccountService.createApplication(inApplication.getAccountId(), application, authentication.getName())
                 .thenCompose(applicationBinder::bindOutput);
         return Mono.fromFuture(future);
     }
