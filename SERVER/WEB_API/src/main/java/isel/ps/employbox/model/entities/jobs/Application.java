@@ -19,7 +19,7 @@ public class Application implements DomainObject<Long> {
     @Id(isIdentity = true)
     private final long applicationId;
     private final Long curriculumId;
-    private final Instant date;
+    private final Instant datetime;
 
     @Version
     private final long version;
@@ -34,7 +34,7 @@ public class Application implements DomainObject<Long> {
         account = null;
         job = null;
         curriculumId = null;
-        date = null;
+        datetime = null;
         version = 0;
         applicationId = 0;
     }
@@ -51,8 +51,8 @@ public class Application implements DomainObject<Long> {
         this.applicationId = applicationId;
         this.curriculumId = curriculumId;
         if(date != null)
-            this.date = date.toInstant();
-        else this.date = null;
+            this.datetime = date.toInstant();
+        else this.datetime = null;
 
         this.version = version;
 
@@ -75,7 +75,7 @@ public class Application implements DomainObject<Long> {
     }
 
     public Instant getDate() {
-        return date;
+        return datetime;
     }
 
     public Long getCurriculumId() {

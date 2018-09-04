@@ -36,7 +36,7 @@ export default class extends React.Component {
                         {this.props.row(value)}
                       </div>
                       <div class='col-2'>
-                        <button class='fas fa-trash'
+                        <button class='fas fa-trash btn btn-light'
                           type='button'
                           aria-label='Close'
                           onClick={() => {
