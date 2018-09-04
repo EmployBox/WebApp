@@ -82,12 +82,33 @@ public class RatingService {
     public Mono<Rating> createRating(Rating rating, String email) {
         UnitOfWork unitOfWork = new UnitOfWork();
         DataMapper<Rating, Rating.RatingKey> ratingMapper = getMapper(Rating.class, unitOfWork);
+        DataMapper<Account, Long> accountMapper = getMapper(Account.class, unitOfWork);
+        Account[] account = new Account[1];
 
         CompletableFuture<Rating> future = CompletableFuture.allOf(
-                accountService.getAccount(email, unitOfWork),
-                accountService.getAccount(rating.getAccountIdTo())
+                accountService.getAccount(email, unitOfWork).thenAccept( acc -> {
+                    if(acc.getIdentityKey() != rating.getAccountIdFrom())
+                        throw new UnauthorizedException(ErrorMessages.UN_AUTHORIZED_ID_AND_EMAIL_MISMATCH);
+                }),
+                accountService.getAccount(rating.getAccountIdTo()).thenAccept(acc -> account[0] = acc)
         )
                 .thenCompose(aVoid -> ratingMapper.create(rating))
+                .thenCompose(aVoid -> ratingMapper.find( new EqualAndCondition<>("accountIdTo", account[0].getIdentityKey())))
+                .thenCompose( list -> {
+                    int [] ratingAverage = new int[1];
+                    list.forEach( curr ->
+                        ratingAverage[0] += (curr.getAssiduity()
+                                + curr.getCompetence()
+                                + curr.getDemeanor()
+                                + curr.getWage()
+                                + curr.getPonctuality()
+                                + curr.getWorkLoad()
+                                + curr.getWorkEnviroment()) / 7
+                    );
+                    ratingAverage[0] /= list.size();
+                    account[0].rating = ratingAverage[0];
+                    return accountMapper.update(account[0]);
+                })
                 .thenCompose(res -> unitOfWork.commit().thenApply(aVoid -> rating));
         return Mono.fromFuture(
                 handleExceptions(future, unitOfWork)
