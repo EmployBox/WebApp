@@ -3,8 +3,8 @@ package isel.ps.employbox.model.output;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import isel.ps.employbox.controllers.UserAccountControllers.UserJobApplicationController;
 import isel.ps.employbox.controllers.jobs.JobController;
-import isel.ps.employbox.controllers.UserAccountControllers.UserAccountController;
 import isel.ps.employbox.controllers.jobs.JobExperienceController;
 import isel.ps.employbox.model.output.OutAccount.AccountItemOutput;
 
@@ -142,7 +142,7 @@ public class OutJob implements OutputDto<OutJob.JobItemOutput> {
 
             private class Apply {
                 @JsonProperty
-                final String href = HOSTNAME + linkTo(methodOn(UserAccountController.class).createApplication(_account.getAccountId(), jobId, null, null)).withRel("apply").getHref();
+                final String href = HOSTNAME + linkTo(methodOn(UserJobApplicationController.class).createApplication(_account.getAccountId(), jobId, null, null)).withRel("apply").getHref();
             }
         }
     }
@@ -183,7 +183,7 @@ public class OutJob implements OutputDto<OutJob.JobItemOutput> {
 
         private class Apply {
             @JsonProperty
-            final String href = HOSTNAME + linkTo(methodOn(UserAccountController.class).createApplication(_account.getAccountId(), jobId, null, null)).withRel("apply").getHref();
+            final String href = HOSTNAME + linkTo(methodOn(UserJobApplicationController.class).createApplication(_account.getAccountId(), jobId, null, null)).withRel("apply").getHref();
         }
     }
 }

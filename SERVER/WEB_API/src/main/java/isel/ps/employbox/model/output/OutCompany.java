@@ -3,6 +3,7 @@ package isel.ps.employbox.model.output;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import isel.ps.employbox.controllers.CompanyController;
+import isel.ps.employbox.controllers.account.AccountJobController;
 import isel.ps.employbox.controllers.account.CommentController;
 import isel.ps.employbox.controllers.account.FollowsControllers.FollowedController;
 import isel.ps.employbox.controllers.account.FollowsControllers.FollowingController;
@@ -102,6 +103,9 @@ public class OutCompany implements OutputDto {
         @JsonProperty
         private Following following = new Following();
 
+        @JsonProperty
+        private Offered_jobs offered_jobs = new Offered_jobs();
+
         private class Self {
             @JsonProperty
             final String href = HOSTNAME + linkTo(CompanyController.class).slash(accountId).withSelfRel().getHref();
@@ -125,6 +129,11 @@ public class OutCompany implements OutputDto {
         private class Following {
             @JsonProperty
             final String href = HOSTNAME + linkTo( methodOn(FollowingController.class, accountId).getTheAccountsWichThisAccountIsFollower(accountId, 0, 5,null,null,null) ).withRel("following").expand().getHref();
+        }
+
+        private class Offered_jobs{
+            @JsonProperty
+            final String href = HOSTNAME + linkTo(methodOn( AccountJobController.class, accountId).getOfferedJobs(accountId, 0, 5, null, null)).withRel("offered_jobs").expand().getHref();
         }
     }
 }

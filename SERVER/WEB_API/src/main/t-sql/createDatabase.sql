@@ -145,7 +145,7 @@ CREATE TABLE [Application](
 	accountId BIGINT,
 	curriculumId BIGINT,
 	jobId BIGINT,
-	[datetime] datetime default(GETDATE()),
+	[date] datetime default(GETDATE()),
 	[version] rowversion,
 
 	FOREIGN KEY (accountId) REFERENCES Account,

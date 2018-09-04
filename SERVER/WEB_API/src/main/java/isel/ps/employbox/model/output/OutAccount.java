@@ -4,9 +4,13 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import isel.ps.employbox.controllers.CompanyController;
 import isel.ps.employbox.controllers.UserAccountControllers.UserAccountController;
-import isel.ps.employbox.controllers.account.*;
+import isel.ps.employbox.controllers.UserAccountControllers.UserAllApplicationsController;
+import isel.ps.employbox.controllers.account.AccountJobController;
+import isel.ps.employbox.controllers.account.ChatController;
+import isel.ps.employbox.controllers.account.CommentController;
 import isel.ps.employbox.controllers.account.FollowsControllers.FollowedController;
 import isel.ps.employbox.controllers.account.FollowsControllers.FollowingController;
+import isel.ps.employbox.controllers.account.RatingController;
 
 import java.util.HashMap;
 
@@ -144,7 +148,7 @@ public class OutAccount implements OutputDto {
 
             private class Applications {
                 @JsonProperty
-                final String href = HOSTNAME + linkTo( methodOn(UserAccountController.class).getAllApplications(accountId, 0, 5)).withRel("applications").getHref();
+                final String href = HOSTNAME + linkTo( methodOn(UserAllApplicationsController.class).getAllApplications(accountId, 0, 5)).withRel("applications").getHref();
             }
 
             private class Chats {
