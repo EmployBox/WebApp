@@ -5,7 +5,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import isel.ps.employbox.controllers.curricula.*;
 
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
-import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 
 public class OutCurriculum implements OutputDto {
 
@@ -34,18 +33,21 @@ public class OutCurriculum implements OutputDto {
     @JsonIgnore
     @Override
     public CurriculumItemOutput getCollectionItemOutput() {
-        return new CurriculumItemOutput(title);
+        return new CurriculumItemOutput(title, curriculumId);
     }
 
     class CurriculumItemOutput {
         @JsonProperty
         private String title;
+        @JsonProperty
+        private final long curriculumId;
 
         @JsonProperty
         private final _Links _links;
 
-        private CurriculumItemOutput(String title){
+        private CurriculumItemOutput(String title, long curriculumId){
             this.title = title;
+            this.curriculumId = curriculumId;
             this._links = new _Links();
         }
 

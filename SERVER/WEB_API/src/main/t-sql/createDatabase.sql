@@ -49,7 +49,7 @@ CREATE TABLE [Curriculum](
 	accountId BIGINT references [UserAccount],
 	curriculumId BIGINT identity primary key,
 	title nvarchar(50),
-    [version] rowversion
+  [version] rowversion
 )
 
 CREATE TABLE [Project] (
@@ -145,7 +145,7 @@ CREATE TABLE [Application](
 	accountId BIGINT,
 	curriculumId BIGINT,
 	jobId BIGINT,
-	[date] datetime default(GETDATE()),
+	[datetime] datetime default(GETDATE()),
 	[version] rowversion,
 
 	FOREIGN KEY (accountId) REFERENCES Account,

@@ -59,7 +59,7 @@ export default withRouter(({json, match, history, accountTempl, companyTempl, mo
               },
               {
                 Cell: ({original}) => {
-                  return <ApplyButton auther={auther} job={original} />
+                  return original.offerType === 'Looking for Worker' && <ApplyButton auther={auther} job={original} />
                 }
               }
             ]

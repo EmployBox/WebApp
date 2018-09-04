@@ -10,7 +10,7 @@ import competencesListStyle from '../styles/listStyle'
 
 class Competence {
   constructor (competence, year) {
-    this.competences = competence
+    this.competence = competence
     this.years = year
   }
 }
@@ -33,7 +33,7 @@ export default withRouter(class extends React.Component {
       offerEndDate: '',
       competence: '',
       year: '',
-      experiences: [], // { competences: String, years: Number }
+      experiences: [], // { competence: String, years: Number }
       type: 'Full-time',
       schedules: [] // {date: String, startHour: String, endHour: String, repeats: String}
     }
@@ -75,7 +75,7 @@ export default withRouter(class extends React.Component {
                     return <li class='list-group-item'>
                       <div class='row'>
                         <div class='col-10'>
-                          {value.competences} - {value.years} years of experience
+                          {value.competence} - {value.years} years of experience
                         </div>
                         <div class='col-2'>
                           <button class='fas fa-trash'
