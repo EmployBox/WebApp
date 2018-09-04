@@ -4,8 +4,10 @@ public class ErrorMessages {
 
 
 
+
     private ErrorMessages() {
     }
+    public static final String ALREADY_EXISTS = "This relation/item already exists";
     public static final String ALREADY_FOLLOWED = "The follow relation already exists";
     public static final String BAD_REQUEST_IDS_MISMATCH = "Given ids do not match with the ones passed in the body";
     public static final String UN_AUTHORIZED_ID_AND_EMAIL_MISMATCH = "Account authenticated is not allowed to user this resource";

@@ -5,10 +5,7 @@ import com.github.jayield.rapper.mapper.conditions.Condition;
 import com.github.jayield.rapper.mapper.conditions.EqualAndCondition;
 import com.github.jayield.rapper.unitofwork.UnitOfWork;
 import isel.ps.employbox.ErrorMessages;
-import isel.ps.employbox.exceptions.BadRequestException;
-import isel.ps.employbox.exceptions.ConflictException;
-import isel.ps.employbox.exceptions.ResourceNotFoundException;
-import isel.ps.employbox.exceptions.UnauthorizedException;
+import isel.ps.employbox.exceptions.*;
 import isel.ps.employbox.model.binders.CollectionPage;
 import isel.ps.employbox.model.entities.*;
 import isel.ps.employbox.model.entities.jobs.Application;
@@ -143,8 +140,15 @@ public class UserAccountService {
         UnitOfWork unit = new UnitOfWork();
         DataMapper<Application, Long> applicationMapper = getMapper(Application.class, unit);
         AccountService accountService = new AccountService();
-        CompletableFuture<Application> future  =accountService.getAccount(userId, email)
-                .thenCompose(userAccount -> applicationMapper.create( application))
+        CompletableFuture<Application> future  = accountService.getAccount(userId, email)
+                .thenCompose( userAccount -> applicationMapper.find(new EqualAndCondition<>("accountId", userAccount.getIdentityKey()),
+                        new EqualAndCondition<>("jobId", application.getJob().getForeignKey())
+                        ).thenAccept(list -> {
+                            if(list.size() != 0)
+                                throw new ForbiddenException(ErrorMessages.ALREADY_EXISTS);
+                        })
+                )
+                .thenCompose(aVoid -> applicationMapper.create( application))
                 .thenCompose(aVoid -> unit.commit())
                 .thenApply(res -> application);
         return handleExceptions(future, unit);

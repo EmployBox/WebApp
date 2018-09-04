@@ -25,7 +25,6 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
-import java.sql.SQLException;
 import java.util.List;
 
 import static com.github.jayield.rapper.mapper.MapperRegistry.getMapper;
@@ -48,7 +47,7 @@ public class CompanyControllerTests {
     private Company company;
 
     @Before
-    public void setUp() throws SQLException {
+    public void setUp() {
         prepareDB();
         webTestClient = WebTestClient.bindToApplicationContext(context)
                 .apply(springSecurity())

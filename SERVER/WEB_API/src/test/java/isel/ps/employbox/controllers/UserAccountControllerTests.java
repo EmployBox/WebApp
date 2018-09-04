@@ -52,7 +52,7 @@ public class UserAccountControllerTests {
     private static final Logger logger = LoggerFactory.getLogger(UserAccountControllerTests.class);
     private WebTestClient webTestClient;
     private UserAccount userAccount;
-    private long jobId;
+    private long jobId, jobId2;
     private Application application;
 
     @Before
@@ -75,6 +75,10 @@ public class UserAccountControllerTests {
         List<Job> jobs = jobRepo.find(new EqualAndCondition<>("title", "Great Job")).join();
         assertEquals(1, jobs.size());
         jobId = jobs.get(0).getIdentityKey();
+
+        jobs = jobRepo.find(new EqualAndCondition<>("title", "Not so Great Job")).join();
+        assertEquals(1, jobs.size());
+        jobId2 = jobs.get(0).getIdentityKey();
 
         DataMapper<Application, Long> applicationRepo = getMapper(Application.class, unitOfWork);
         List<Application> applications = applicationRepo.find(new EqualAndCondition<>("accountId", userAccount.getIdentityKey()), new EqualAndCondition<>("jobId", jobId)).join();
@@ -261,14 +265,14 @@ public class UserAccountControllerTests {
     public void testCreateApplication() throws Exception {
         InApplication inApplication = new InApplication();
         inApplication.setAccountId(userAccount.getIdentityKey());
-        inApplication.setJobId(jobId);
+        inApplication.setJobId(jobId2);
 
         ObjectMapper objectMapper = new ObjectMapper();
         String json = objectMapper.writeValueAsString(inApplication);
 
         webTestClient
                 .post()
-                .uri("/accounts/users/" + userAccount.getIdentityKey() + "/jobs/" + jobId + "/applications")
+                .uri("/accounts/users/" + userAccount.getIdentityKey() + "/jobs/" + jobId2 + "/applications")
                 .contentType(MediaType.APPLICATION_JSON)
                 .syncBody(json)
                 .exchange()
@@ -278,7 +282,7 @@ public class UserAccountControllerTests {
 
         UnitOfWork unitOfWork = new UnitOfWork();
         DataMapper<Application, Long> applicationRepo = getMapper(Application.class, unitOfWork);
-        assertEquals(2, applicationRepo.find(new EqualAndCondition<>("accountId", userAccount.getIdentityKey()), new EqualAndCondition<>("jobId", jobId)).join().size());
+        assertEquals(1, applicationRepo.find(new EqualAndCondition<>("accountId", userAccount.getIdentityKey()), new EqualAndCondition<>("jobId", jobId2)).join().size());
         unitOfWork.commit().join();
     }
 

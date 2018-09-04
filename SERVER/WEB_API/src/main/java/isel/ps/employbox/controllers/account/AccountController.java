@@ -1,7 +1,6 @@
 package isel.ps.employbox.controllers.account;
 
 import isel.ps.employbox.model.binders.AccountBinder;
-import isel.ps.employbox.model.binders.jobs.JobBinder;
 import isel.ps.employbox.model.entities.Account;
 import isel.ps.employbox.model.output.Collections.HalCollectionPage;
 import isel.ps.employbox.model.output.OutAccount;
@@ -20,12 +19,10 @@ import java.util.concurrent.CompletableFuture;
 public class AccountController {
     private final AccountBinder accountBinder;
     private final AccountService accountService;
-    private final JobBinder jobBinder;
 
-    public AccountController(AccountBinder accountBinder, AccountService accountService, JobBinder jobBinder) {
+    public AccountController(AccountBinder accountBinder, AccountService accountService) {
         this.accountBinder = accountBinder;
         this.accountService = accountService;
-        this.jobBinder = jobBinder;
     }
 
     @GetMapping
