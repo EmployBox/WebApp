@@ -56,11 +56,11 @@ public class Application implements DomainObject<Long> {
 
         this.version = version;
 
-        this.account = new Foreign(accountId, unit -> getMapper(Account.class, unitOfWork).findById( accountId)
+        this.account = new Foreign<>(accountId, unit -> getMapper(Account.class, unitOfWork).findById( accountId)
                 .thenCompose( res -> unitOfWork.commit().thenApply( __-> res))
                 .thenApply(account1 -> account1.orElseThrow(() -> new ResourceNotFoundException("Account not Found"))));
 
-        this.job = new Foreign(jobId, unit -> getMapper(Job.class, unitOfWork).findById( jobId)
+        this.job = new Foreign<>(jobId, unit -> getMapper(Job.class, unitOfWork).findById( jobId)
                 .thenCompose( res -> unitOfWork.commit().thenApply( __-> res))
                 .thenApply(job1 -> job1.orElseThrow(() -> new ResourceNotFoundException("Job not Found"))));
     }
