@@ -138,11 +138,12 @@ public class UserAccountService {
         return handleExceptions(future, unit);
     }
 
-    public CompletableFuture<Application> createApplication(long userId, Application application, String email) {
+    public CompletableFuture<Application> createApplication( long userId, Application application, String email) {
 
         UnitOfWork unit = new UnitOfWork();
         DataMapper<Application, Long> applicationMapper = getMapper(Application.class, unit);
-        CompletableFuture<Application> future = getUser(userId, email)
+        AccountService accountService = new AccountService();
+        CompletableFuture<Application> future  =accountService.getAccount(userId, email)
                 .thenCompose(userAccount -> applicationMapper.create( application))
                 .thenCompose(aVoid -> unit.commit())
                 .thenApply(res -> application);
