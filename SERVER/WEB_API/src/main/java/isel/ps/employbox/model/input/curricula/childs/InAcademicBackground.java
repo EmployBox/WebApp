@@ -1,11 +1,15 @@
 package isel.ps.employbox.model.input.curricula.childs;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import java.sql.Timestamp;
 
 public class InAcademicBackground {
     private long accountId;
     private long curriculumId;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm")
     private Timestamp beginDate;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm")
     private Timestamp endDate;
     private String studyArea;
     private String institution;

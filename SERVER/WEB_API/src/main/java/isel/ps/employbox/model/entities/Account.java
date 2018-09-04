@@ -11,10 +11,7 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
 
-import static isel.ps.employbox.model.entities.Role.DEFAULT;
-
 public class Account implements DomainObject<Long> {
-    private static final Role role = DEFAULT;
 
     @Id(isIdentity =  true)
     protected long accountId;
@@ -22,7 +19,7 @@ public class Account implements DomainObject<Long> {
     protected final String email;
     protected final String password;
     protected final String accountType;
-    protected final double rating;
+    public double rating;
     @Version
     private final long version;
 
