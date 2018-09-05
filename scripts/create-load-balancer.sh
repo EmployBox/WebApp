@@ -19,3 +19,5 @@ gcloud compute ssh $vmName --command "sudo mv nginx.conf /etc/systemd/system/ngi
 gcloud compute ssh $vmName --command "sudo systemctl enable nginx"
 gcloud compute ssh $vmName --command "sudo systemctl start nginx"
 gcloud compute ssh $vmName --command "sudo setsebool -P httpd_can_network_connect 1"
+
+#Disabled SELinux see https://www.tecmint.com/disable-selinux-temporarily-permanently-in-centos-rhel-fedora/ for more information

@@ -5,9 +5,10 @@ After=syslog.target
 [Service]
 User=spring
 Type=idle
-ExecStart=/usr/bin/java -jar /var/spring/web_api.jar --server.port=8080 --spring.profiles.active=gcp
+ExecStart=/usr/bin/java -Dvertx.disableFileCPResolving=true -jar /var/spring/web_api.jar --server.port=8080 --spring.profiles.active=gcp
 SuccessExitStatus=143
 Restart=always
+Environment="DB_CONNECTION_STRING=jdbc:postgresql://google/ps-api-database?useSSL=false&socketFactoryArg=psg15-1718v-1534010601683:europe-west2:ps-api-database&socketFactory=com.google.cloud.sql.postgres.SocketFactory%;postgres%;123"
 
 [Install]
 WantedBy=multi-user.target
