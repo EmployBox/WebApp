@@ -5,7 +5,7 @@ export default class extends Component {
   constructor (props) {
     super(props)
     this.state = {
-      inputs: {}
+      inputs: this.props.inputData.reduce((acc, curr) => { acc[curr.name] = curr.value; return acc }, {})
     }
     this.onChangeHandler = this.onChangeHandler.bind(this)
   }
@@ -39,17 +39,17 @@ export default class extends Component {
   }
 
   internalRender (data) {
-    return data.map(({type, name, label, id, klass}, key) => (
+    return data.map(({label, id, value, name, klass, ...rest}, key) => (
       <div class={this.props.klass}>
         <label for={id}>{label}</label>
         <input
-          type={type}
-          name={name}
-          placeholder={name}
-          onChange={this.onChangeHandler}
-          id={id}
-          key={key}
           class={klass || 'form-control form-control-lg col'}
+          onChange={this.onChangeHandler}
+          key={key}
+          id={id}
+          name={name}
+          value={this.state.inputs[name]}
+          {...rest}
         />
       </div>
     ))
