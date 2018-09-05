@@ -98,7 +98,7 @@ export default withRouter(class extends React.Component {
                 new TabConfig(
                   json._links.offered_jobs.href,
                   'Offered Jobs',
-                  (props) => <JobsTable auth={auth} {...props} />,
+                  (props) => <JobsTable auth={auth} {...props} remove={accountId === json.accountId} />,
                   offeredJobsTempl.expand({
                     userUrl: json._links.self.href,
                     offeredJobsUrl: json._links.offered_jobs.href
@@ -109,7 +109,7 @@ export default withRouter(class extends React.Component {
                   json._links.curricula.href,
                   'Curriculas',
                   (props) => <div>
-                    <CurriculasTable auth={auth} {...props} />
+                    <CurriculasTable auth={auth} {...props} remove={accountId === json.accountId} />
                     {accountId === json.accountId ? <button class='btn btn-success btn-lg' onClick={() => history.push(createCurriculaTempl.expand({url: json._links.curricula.href.split('?')[0]}))}>New</button> : <div />}
                   </div>,
                   curriculasTempl.expand({
@@ -121,7 +121,7 @@ export default withRouter(class extends React.Component {
                 new TabConfig(
                   json._links.applications.href,
                   'Applications',
-                  (props) => <ApplicationsTable auth={auth} {...props} />,
+                  (props) => <ApplicationsTable auth={auth} remove={accountId === json.accountId} {...props} />,
                   applicationsTempl.expand({
                     userUrl: json._links.self.href,
                     applicationUrl: json._links.applications.href
