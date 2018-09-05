@@ -10,58 +10,82 @@ const jobTemplate = new URITemplate('/job/{url}')
 const userTemplate = new URITemplate('/account/{url}')
 const companyTemplate = new URITemplate('/company/{url}')
 
-export default withRouter(({match, auth, history}) => (
-  <HttpRequest url={URI.decode(match.params.offeredJobsUrl)}
-    authorization={auth}
-    onResult={json =>
-      <div class='container'>
-        <Table json={json} currentUrl={URI.decode(match.params.offeredJobsUrl)}
-          pushTo={url => history.push(template.expand({
-            userUrl: URI.decode(match.params.url),
-            offeredJobsUrl: url
-          }))}
-          onClickRow={({rowInfo, column}) => {
-            if (column.Header !== 'Name') {
-              history.push(jobTemplate.expand({
-                url: rowInfo.original._links.self.href
-              }))
-            }
-          }}
-          columns={[
-            {
-              Header: 'Account Info',
-              columns: [
-                {
-                  Header: 'Name',
-                  id: 'name',
-                  accessor: i => i.account.name,
-                  Cell: ({original, value}) => <Link to={(original.account.accountType === 'USR' ? userTemplate : companyTemplate)
-                    .expand({url: original.account._links.self.href})}>{value}
-                  </Link>
-                },
-                {
-                  Header: 'Rating',
-                  id: 'rating',
-                  accessor: i => i.account.rating
-                }
-              ]
-            },
-            {
-              Header: 'Job Info',
-              columns: [
-                {
-                  Header: 'Title',
-                  accessor: 'title'
-                },
-                {
-                  Header: 'Type',
-                  accessor: 'offerType'
-                }
-              ]
-            }
-          ]}
-        />
-      </div>
+export default withRouter(class extends React.Component {
+  constructor (props) {
+    super(props)
+    this.state = {
+      deleteUrl: undefined,
+      changeKey: new Date().valueOf()
     }
-  />
-))
+  }
+
+  render () {
+    const {match, auth, history, remove} = this.props
+    const columns = [
+      {
+        Header: 'Account Info',
+        columns: [
+          {
+            Header: 'Name',
+            id: 'name',
+            accessor: i => i.account.name,
+            Cell: ({original, value}) => <Link to={(original.account.accountType === 'USR' ? userTemplate : companyTemplate)
+              .expand({url: original.account._links.self.href})}>{value}
+            </Link>
+          },
+          {
+            Header: 'Rating',
+            id: 'rating',
+            accessor: i => i.account.rating
+          }
+        ]
+      },
+      {
+        Header: 'Job Info',
+        columns: [
+          {
+            Header: 'Title',
+            accessor: 'title'
+          },
+          {
+            Header: 'Type',
+            accessor: 'offerType'
+          }
+        ]
+      }
+    ]
+    remove && columns.push({
+      Header: 'Remove',
+      Cell: (row) => <button class='fas fa-trash btn btn-light'
+        type='button'
+        aria-label='Close'
+        onClick={() => this.setState({deleteUrl: row.original._links.self.href})} />
+    })
+    return <div>
+      <HttpRequest url={URI.decode(match.params.offeredJobsUrl)} key={this.state.changeKey}
+        authorization={auth}
+        onResult={json =>
+          <div class='container'>
+            <Table json={json} currentUrl={URI.decode(match.params.offeredJobsUrl)}
+              pushTo={url => history.push(template.expand({
+                userUrl: URI.decode(match.params.url),
+                offeredJobsUrl: url
+              }))}
+              onClickRow={({rowInfo, column}) => {
+                if (!(column.Header === 'Name' || column.Header === 'Remove')) {
+                  history.push(jobTemplate.expand({
+                    url: rowInfo.original._links.self.href
+                  }))
+                }
+              }}
+              columns={columns}
+            />
+          </div>
+        }
+      />
+      {this.state.deleteUrl && <HttpRequest method='DELETE' url={this.state.deleteUrl} authorization={auth} afterResult={json => {
+        this.setState({deleteUrl: undefined, changeKey: new Date().valueOf()})
+      }} />}
+    </div>
+  }
+})

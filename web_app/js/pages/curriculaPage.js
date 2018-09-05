@@ -7,6 +7,7 @@ import AcademicTable from './tables/academicTable'
 import ExperiencesTable from './tables/experiencesTable'
 import PreviuosJobsTable from './tables/previuosJobsTable'
 import ProjectsTable from './tables/projectsTable'
+import TabRoute, { TabConfig } from '../components/tabRoute';
 
 const academicTempl = new URITemplate('/curricula/{curriculaUrl}/academic/{academicUrl}')
 const experiencesTempl = new URITemplate('/curricula/{curriculaUrl}/experiences/{experiencesUrl}')
@@ -31,42 +32,50 @@ export default withRouter(({auth, history, match}) => {
     onResult={json =>
       <div class='container'>
         <h4 class='text-center'>Title: {json.title}</h4>
-        <CollectionButton url={json._links.academicBackgrounds.href} title='Academic Background' pushTo={
-          academicTempl.expand({
-            curriculaUrl: curriculaUrl,
-            academicUrl: json._links.academicBackgrounds.href
-          })
-        } />
-        <CollectionButton url={json._links.experiences.href} title='Experiences' pushTo={
-          experiencesTempl.expand({
-            curriculaUrl: curriculaUrl,
-            experiencesUrl: json._links.experiences.href
-          })
-        } />
-        <CollectionButton url={json._links.previousJobs.href} title='Previous Jobs' pushTo={
-          previuosJobsTempl.expand({
-            curriculaUrl: curriculaUrl,
-            previousJobsUrl: json._links.previousJobs.href
-          })
-        } />
-        <CollectionButton url={json._links.projects.href} title='Projects' pushTo={
-          projectsTempl.expand({
-            curriculaUrl: curriculaUrl,
-            projectsUrl: json._links.projects.href
-          })
-        } />
-        <Route path={`${match.path}/academic/:academicUrl`} component={props =>
-          <AcademicTable auth={auth} {...props} />
-        } />
-        <Route path={`${match.path}/experiences/:experiencesUrl`} component={props =>
-          <ExperiencesTable auth={auth} {...props} />
-        } />
-        <Route path={`${match.path}/previousJobs/:previuosJobsUrl`} component={props =>
-          <PreviuosJobsTable auth={auth} {...props} />
-        } />
-        <Route path={`${match.path}/projects/:projectsUrl`} component={props =>
-          <ProjectsTable auth={auth} {...props} />
-        } />
+        <TabRoute auth={auth}
+          tabConfigs={[
+            new TabConfig(
+              json._links.academicBackgrounds.href,
+              'Academic Background',
+              props => <AcademicTable auth={auth} {...props} />,
+              academicTempl.expand({
+                curriculaUrl: curriculaUrl,
+                academicUrl: json._links.academicBackgrounds.href
+              }),
+              '/academic/:academicUrl'
+            ),
+            new TabConfig(
+              json._links.experiences.href,
+              'Experiences',
+              props => <ExperiencesTable auth={auth} {...props} />,
+              experiencesTempl.expand({
+                curriculaUrl: curriculaUrl,
+                experiencesUrl: json._links.experiences.href
+              }),
+              '/experiences/:experiencesUrl'
+            ),
+            new TabConfig(
+              json._links.previousJobs.href,
+              'Previous Jobs',
+              props => <PreviuosJobsTable auth={auth} {...props} />,
+              previuosJobsTempl.expand({
+                curriculaUrl: curriculaUrl,
+                previousJobsUrl: json._links.previousJobs.href
+              }),
+              '/previousJobs/:previuosJobsUrl'
+            ),
+            new TabConfig(
+              json._links.projects.href,
+              'Projects',
+              props => <ProjectsTable auth={auth} {...props} />,
+              projectsTempl.expand({
+                curriculaUrl: curriculaUrl,
+                projectsUrl: json._links.projects.href
+              }),
+              '/projects/:projectsUrl'
+            )
+          ]}
+        />
       </div>
     }
   />

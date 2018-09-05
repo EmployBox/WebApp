@@ -78,7 +78,7 @@ export default withRouter(class extends React.Component {
                           {value.competence} - {value.years} years of experience
                         </div>
                         <div class='col-2'>
-                          <button class='fas fa-trash'
+                          <button class='fas fa-trash btn btn-light'
                             type='button'
                             aria-label='Close'
                             onClick={() => {

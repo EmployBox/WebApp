@@ -5,6 +5,7 @@ import URI from 'urijs'
 import FollowersTable from '../tables/followersTable'
 import URITemplate from 'urijs/src/URITemplate'
 import CommentBox from '../../components/CommentBox'
+import TabRoute, {TabConfig} from '../../components/tabRoute'
 
 const style = {
   width: 200,
@@ -18,17 +19,6 @@ const followingTempl = new URITemplate('/company/{companyUrl}/following/{followi
 const ratingFormTempl = new URITemplate('/rate/{url}')
 
 export default withRouter(({match, auth, history, accountId}) => {
-  const CollectionButton = ({url, title, pushTo}) => (
-    <HttpRequest url={url} authorization={auth}
-      onResult={json => (
-        <button type='button' onClick={() => history.push(pushTo)} class='btn btn-primary bg-dark'>
-          <div>
-            {json.size} {title}
-          </div>
-        </button>
-      )}
-    />
-  )
   const FollowButton = class extends React.Component {
     constructor (props) {
       super(props)
@@ -90,36 +80,33 @@ export default withRouter(({match, auth, history, accountId}) => {
             : <button class='btn btn-success' onClick={() => history.push(ratingFormTempl.expand({
               url: json._links.ratings.href.split('?')[0]
             }) + `?type=company&from=${URI.encode(match.url)}&accountIdDest=${json.accountId}`)}>Rate this</button>}
-          {/* <HttpRequest url={json._links.ratings.href.split('?')[0] + '/single'}
-          authorization={auth}
-          onResult={ratings =>
-            <button class='btn btn-success' onClick={() => history.push(ratingFormTempl.expand({
-              url: json._links.ratings.href.split('?')[0]
-            }) + `?type=company&from=${URI.encode(match.url)}&accountIdDest=${json.accountId}&method=PUT`)}>Rate this</button>
-          }
-          onError={() =>
-            <button class='btn btn-success' onClick={() => history.push(ratingFormTempl.expand({
-              url: json._links.ratings.href.split('?')[0]
-            }) + `?type=company&from=${URI.encode(match.url)}&accountIdDest=${json.accountId}&method=POST`)}>Rate this</button>
-          }
-        /> */}
         </h3>
         <button class='btn btn-primary bg-dark' onClick={() => window.location.href = json.webpageUrl}>WebPage</button>
         <br />
-        <CollectionButton url={json._links.followers.href} title='Followers' pushTo={followersTempl.expand({
-          companyUrl: json._links.self.href,
-          followersUrl: json._links.followers.href
-        })} />
-        <CollectionButton url={json._links.following.href} title='Following' pushTo={followingTempl.expand({
-          companyUrl: json._links.self.href,
-          followingUrl: json._links.following.href
-        })} />
-        <Route path={`${match.path}/followers/:followersUrl`} component={props =>
-          <FollowersTable auth={auth} url={URI.decode(props.match.params.followersUrl)} template={followersTempl} {...props} />
-        } />
-        <Route path={`${match.path}/following/:followingUrl`} component={props =>
-          <FollowersTable auth={auth} url={URI.decode(props.match.params.followingUrl)} template={followingTempl} {...props} />
-        } />
+        <TabRoute auth={auth}
+          tabConfigs={[
+            new TabConfig(
+              json._links.followers.href,
+              'Followers',
+              props => <FollowersTable auth={auth} url={URI.decode(props.match.params.followersUrl)} template={followersTempl} {...props} />,
+              followersTempl.expand({
+                companyUrl: json._links.self.href,
+                followersUrl: json._links.followers.href
+              }),
+              '/followers/:followersUrl'
+            ),
+            new TabConfig(
+              json._links.following.href,
+              'Following',
+              props => <FollowersTable auth={auth} url={URI.decode(props.match.params.followingUrl)} template={followingTempl} {...props} />,
+              followingTempl.expand({
+                companyUrl: json._links.self.href,
+                followingUrl: json._links.following.href
+              }),
+              '/following/:followingUrl'
+            )
+          ]}
+        />
         <CommentBox url={json._links.comments.href} auth={auth} accountIdFrom={accountId} accountIdTo={json.accountId} />
       </div>
     )}
