@@ -10,7 +10,7 @@ public class InRating {
     private double pontuality;
     private double assiduity;
     private double demeanor;
-    private String type;
+    private String accountType;
     private long version;
 
     public long getAccountIdFrom() {
@@ -93,11 +93,11 @@ public class InRating {
         this.version = version;
     }
 
-    public String getType() {
-        return type;
+    public String getAccountType() {
+        return accountType;
     }
 
-    public void setType(String type) {
-        this.type = type;
+    public void setAccountType(String accountType) {
+        this.accountType = accountType;
     }
 }

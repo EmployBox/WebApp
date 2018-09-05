@@ -101,7 +101,7 @@ CREATE TABLE [Job](
 	title nvarchar(50) not null,
 	accountId BIGINT ,
 	schedule NVARCHAR(20),
-	[type] NVARCHAR(25),
+	[accountType] NVARCHAR(25),
 	wage INT check(wage > 0),
 	[description] NVARCHAR(50),
 	offerBeginDate DATETIME DEFAULT(GETDATE()),

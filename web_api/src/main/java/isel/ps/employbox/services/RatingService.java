@@ -15,7 +15,9 @@ import isel.ps.employbox.model.entities.Rating;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
+import javax.xml.crypto.Data;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 import static com.github.jayield.rapper.mapper.MapperRegistry.getMapper;
@@ -55,10 +57,12 @@ public class RatingService {
         return handleExceptions(future, unitOfWork);
     }
 
-    public Mono<Void> updateRating(Rating rating, String email) {
+    public Mono<Void> updateRating(String accountType, Rating rating, String email) {
 
         UnitOfWork unitOfWork = new UnitOfWork();
         DataMapper<Rating, Rating.RatingKey> ratingMapper = getMapper(Rating.class, unitOfWork);
+        DataMapper<Account, Long> accountMapper = getMapper(Account.class, unitOfWork);
+
         CompletableFuture<Void> future =
                 accountService.getAccount(rating.getAccountIdFrom(), email)//throws exceptions
                         .thenCompose(user -> {
@@ -70,23 +74,26 @@ public class RatingService {
                         .thenCompose(ratings -> {
                                     if (ratings.size() == 0)
                                         throw new ResourceNotFoundException(ErrorMessages.RESOURCE_NOTFOUND);
-                                    return ratingMapper.update(rating);
+                                    return ratingMapper.update(rating).thenCompose( aVoid -> accountMapper.find( new EqualAndCondition<>("accountId", rating.getAccountIdTo())));
                                 }
                         )
+                        .thenCompose( account ->
+                            ratingMapper.find(new EqualAndCondition<>("accountIdTo", rating.getAccountIdTo()))
+                                .thenCompose( list -> updateAccountRating(list, accountType, account.get(0), accountMapper))
+                        )
                         .thenCompose(aVoid -> unitOfWork.commit());
+
         return Mono.fromFuture(
                 handleExceptions(future, unitOfWork)
         );
     }
 
 
-    public Mono<Rating> createRating(Rating rating,String ratingType, String email) {
+    public Mono<Rating> createRating(Rating rating,String accountType, String email) {
         UnitOfWork unitOfWork = new UnitOfWork();
         DataMapper<Rating, Rating.RatingKey> ratingMapper = getMapper(Rating.class, unitOfWork);
         DataMapper<Account, Long> accountMapper = getMapper(Account.class, unitOfWork);
         Account[] account = new Account[1];
-        if(ratingType == null)
-            throw new BadRequestException(ErrorMessages.INVALID_ACCOUNT_TYPE_IN_RATING);
 
         CompletableFuture<Rating> future = CompletableFuture.allOf(
                 accountService.getAccount(email, unitOfWork).thenAccept( acc -> {
@@ -97,31 +104,38 @@ public class RatingService {
         )
                 .thenCompose(aVoid -> ratingMapper.create(rating))
                 .thenCompose(aVoid -> ratingMapper.find( new EqualAndCondition<>("accountIdTo", account[0].getIdentityKey())))
-                .thenCompose( list -> {
-                    int [] ratingAverage = new int[1];
-                    list.forEach( curr -> {
-                                if (ratingType.compareTo("USR") == 0)
-                                    ratingAverage[0] += (curr.getAssiduity()
-                                            + curr.getCompetence()
-                                            + curr.getDemeanor()
-                                            + curr.getPonctuality()) / 4;
-                                else if(ratingType.compareTo("CMP") == 0)
-                                    ratingAverage[0] += (
-                                            + curr.getWage()
-                                            + curr.getWorkLoad()
-                                            + curr.getWorkEnviroment()) / 3;
-                                else throw new BadRequestException(ErrorMessages.INVALID_ACCOUNT_TYPE_IN_RATING);
-                            }
-                    );
-                    ratingAverage[0] /= list.size();
-                    account[0].rating = ratingAverage[0];
-                    return accountMapper.update(account[0]);
-                })
+                .thenCompose(list -> updateAccountRating(list, accountType, account[0], accountMapper))
                 .thenCompose(res -> unitOfWork.commit().thenApply(aVoid -> rating));
         return Mono.fromFuture(
                 handleExceptions(future, unitOfWork)
         );
     }
+
+    private CompletableFuture<Void> updateAccountRating(List<Rating> list, String accountType,Account account, DataMapper<Account,Long> accountMapper){
+        double [] ratingAverage = new double[1];
+
+        if(accountType == null)
+            throw new BadRequestException(ErrorMessages.INVALID_ACCOUNT_TYPE_IN_RATING);
+
+        list.forEach(curr -> {
+                    if (accountType.compareTo("USR") == 0)
+                        ratingAverage[0] += (curr.getAssiduity()
+                                + curr.getCompetence()
+                                + curr.getDemeanor()
+                                + curr.getPonctuality()) / 4;
+                    else if (accountType.compareTo("CMP") == 0)
+                        ratingAverage[0] += (
+                                +curr.getWage()
+                                        + curr.getWorkLoad()
+                                        + curr.getWorkEnviroment()) / 3;
+                    else throw new BadRequestException(ErrorMessages.INVALID_ACCOUNT_TYPE_IN_RATING);
+                }
+        );
+        ratingAverage[0] /= list.size();
+        account.rating = ratingAverage[0];
+        return accountMapper.update(account);
+    }
+
 
     public Mono<Void> deleteRating(long accountIdDest, String email) {
         UnitOfWork unitOfWork = new UnitOfWork();
