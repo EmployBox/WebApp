@@ -12,7 +12,7 @@ do
     echo "CONFIGURING AND INSTALLING WEB API"
     gcloud compute ssh $vmName --command "sudo useradd spring"
     gcloud compute ssh $vmName --command "sudo mkdir /var/spring"
-    gcloud compute scp ../build/libs/web_api.jar $vmName:~
+    gcloud compute scp ../web_api/build/libs/web_api.jar $vmName:~
     gcloud compute ssh $vmName --command "sudo mv web_api.jar /var/spring"
     gcloud compute ssh $vmName --command "sudo chown spring:spring /var/spring"
 
@@ -20,4 +20,7 @@ do
     gcloud compute ssh $vmName --command "sudo mv spring.service /etc/systemd/system/spring.service"
     gcloud compute ssh $vmName --command "sudo systemctl enable spring"
     gcloud compute ssh $vmName --command "sudo systemctl start spring"
+
+    gcloud compute scp conf/DB_CONNECTION_STRING.sh $vmName:~
+    gcloud compute ssh $vmName --command "sudo mv DB_CONNECTION_STRING.sh /etc/profile.d"
 done
