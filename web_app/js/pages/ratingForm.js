@@ -8,33 +8,40 @@ const inputs = {
   user: [
     {
       type: 'number',
-      name: 'competences'
+      name: 'competence',
+      label: 'Competence'
     },
     {
       type: 'number',
-      name: 'pontuality'
+      name: 'pontuality',
+      label: 'Punctuality'
     },
     {
       type: 'number',
-      name: 'assiduity'
+      name: 'assiduity',
+      label: 'Assiduity'
     },
     {
       type: 'number',
-      name: 'demeanor'
+      name: 'demeanor',
+      label: 'Demeanor'
     }
   ],
   company: [
     {
       type: 'number',
-      name: 'workLoad'
+      name: 'workLoad',
+      label: 'Work Load'
     },
     {
       type: 'number',
-      name: 'wage'
+      name: 'wage',
+      label: 'Wage'
     },
     {
       type: 'number',
-      name: 'workEnvironment'
+      name: 'workEnvironment',
+      label: 'Work Environment'
     }
   ]
 }
@@ -47,11 +54,12 @@ export default withRouter(class extends React.Component {
   }
   render () {
     const {type, from, accountIdDest} = URI.parseQuery(this.props.location.search)
-    const Form = ({method, res}) => <div>
-      <GenericForm inputData={inputs[type]}
+    const Form = ({method, res}) => <div class='container'>
+      <GenericForm inputData={inputs[type].map(input => ({ ...input, value: res && res[input.name], max: 10, min: 0 }))}
         onSubmitHandler={inputs => {
           inputs.accountIdFrom = this.props.accountId
-          inputs.accountIdDest = accountIdDest
+          inputs.accountIdTo = accountIdDest
+          inputs.type = type === 'user' ? 'USR' : 'CMP'
           if (method === 'PUT') inputs.version = res.version
           this.setState({inputs: inputs})
         }}
