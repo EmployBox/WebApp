@@ -13,10 +13,12 @@ public class Rating implements DomainObject<Rating.RatingKey> {
     private final double workLoad;
     private final double wage;
     private final double workEnviroment;
+
     private final double competence;
     private final double ponctuality;
     private final double assiduity;
     private final double demeanor;
+
     @Version
     private final long version;
 

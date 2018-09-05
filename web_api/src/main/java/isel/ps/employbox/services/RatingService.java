@@ -5,6 +5,7 @@ import com.github.jayield.rapper.mapper.conditions.Condition;
 import com.github.jayield.rapper.mapper.conditions.EqualAndCondition;
 import com.github.jayield.rapper.unitofwork.UnitOfWork;
 import isel.ps.employbox.ErrorMessages;
+import isel.ps.employbox.exceptions.BadRequestException;
 import isel.ps.employbox.exceptions.ForbiddenException;
 import isel.ps.employbox.exceptions.ResourceNotFoundException;
 import isel.ps.employbox.exceptions.UnauthorizedException;
@@ -79,7 +80,7 @@ public class RatingService {
     }
 
 
-    public Mono<Rating> createRating(Rating rating, String email) {
+    public Mono<Rating> createRating(Rating rating,String ratingType, String email) {
         UnitOfWork unitOfWork = new UnitOfWork();
         DataMapper<Rating, Rating.RatingKey> ratingMapper = getMapper(Rating.class, unitOfWork);
         DataMapper<Account, Long> accountMapper = getMapper(Account.class, unitOfWork);
@@ -96,14 +97,19 @@ public class RatingService {
                 .thenCompose(aVoid -> ratingMapper.find( new EqualAndCondition<>("accountIdTo", account[0].getIdentityKey())))
                 .thenCompose( list -> {
                     int [] ratingAverage = new int[1];
-                    list.forEach( curr ->
-                        ratingAverage[0] += (curr.getAssiduity()
-                                + curr.getCompetence()
-                                + curr.getDemeanor()
-                                + curr.getWage()
-                                + curr.getPonctuality()
-                                + curr.getWorkLoad()
-                                + curr.getWorkEnviroment()) / 7
+                    list.forEach( curr -> {
+                                if (ratingType.compareTo("USR") == 0)
+                                    ratingAverage[0] += (curr.getAssiduity()
+                                            + curr.getCompetence()
+                                            + curr.getDemeanor()
+                                            + curr.getPonctuality()) / 4;
+                                else if(ratingType.compareTo("CMP") == 0)
+                                    ratingAverage[0] += (
+                                            + curr.getWage()
+                                            + curr.getWorkLoad()
+                                            + curr.getWorkEnviroment()) / 3;
+                                else throw new BadRequestException(ErrorMessages.INVALID_ACCOUNT_TYPE_IN_RATING);
+                            }
                     );
                     ratingAverage[0] /= list.size();
                     account[0].rating = ratingAverage[0];

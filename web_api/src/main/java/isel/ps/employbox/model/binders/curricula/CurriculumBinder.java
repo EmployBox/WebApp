@@ -10,13 +10,6 @@ import java.util.concurrent.CompletableFuture;
 
 @Component
 public class CurriculumBinder implements ModelBinder<Curriculum,OutCurriculum,InCurriculum> {
-    private final PreviousJobsBinder previousJobsBinder;
-    private final CurriculumExperienceBinder curriculumExperienceBinder;
-
-    public CurriculumBinder(PreviousJobsBinder previousJobsBinder, CurriculumExperienceBinder curriculumExperienceBinder) {
-        this.previousJobsBinder = previousJobsBinder;
-        this.curriculumExperienceBinder = curriculumExperienceBinder;
-    }
 
     @Override
     public CompletableFuture<OutCurriculum> bindOutput(Curriculum curriculum) {

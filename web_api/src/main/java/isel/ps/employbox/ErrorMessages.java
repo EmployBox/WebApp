@@ -4,9 +4,9 @@ public class ErrorMessages {
 
 
 
-
     private ErrorMessages() {
     }
+    public static final String INVALID_ACCOUNT_TYPE_IN_RATING = "The account type provided to this rating is invalid";
     public static final String ALREADY_EXISTS = "This relation/item already exists";
     public static final String ALREADY_FOLLOWED = "The follow relation already exists";
     public static final String BAD_REQUEST_IDS_MISMATCH = "Given ids do not match with the ones passed in the body";
