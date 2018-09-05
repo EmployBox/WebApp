@@ -71,6 +71,6 @@ public class CurriculumController {
 
     @DeleteMapping("/{cid}")
     public Mono<Void> deleteCurriculum( @PathVariable long id, @PathVariable long cid, Authentication authentication){
-        return curriculumService.deleteCurriculum(id, cid, authentication.getName());
+        return curriculumService.deleteCurriculum(id, cid,null, authentication.getName());
     }
 }

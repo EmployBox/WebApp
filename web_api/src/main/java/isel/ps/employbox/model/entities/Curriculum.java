@@ -13,10 +13,12 @@ import isel.ps.employbox.model.entities.curricula.childs.AcademicBackground;
 import isel.ps.employbox.model.entities.curricula.childs.CurriculumExperience;
 import isel.ps.employbox.model.entities.curricula.childs.PreviousJobs;
 import isel.ps.employbox.model.entities.curricula.childs.Project;
+import isel.ps.employbox.model.entities.jobs.Application;
 import isel.ps.employbox.model.input.curricula.childs.InAcademicBackground;
 import isel.ps.employbox.model.input.curricula.childs.InCurriculumExperience;
 import isel.ps.employbox.model.input.curricula.childs.InPreviousJobs;
 import isel.ps.employbox.model.input.curricula.childs.InProject;
+import org.springframework.boot.logging.LoggingSystemProperties;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -38,6 +40,8 @@ public class Curriculum implements DomainObject<Long> {
     private final Function<UnitOfWork, CompletableFuture<List<Project>>> projects;
     @ColumnName(foreignName = "curriculumId" )
     private final Function<UnitOfWork, CompletableFuture<List<CurriculumExperience>>> experiences;
+    @ColumnName(foreignName = "curriculumId" )
+    private final Function<UnitOfWork, CompletableFuture<List<Application>>> applications;
 
     public Curriculum(){
         accountId = 0;
@@ -45,6 +49,7 @@ public class Curriculum implements DomainObject<Long> {
         version = 0;
         previousJobs = null;
         academicBackground = null;
+        applications = null;
         projects = null;
         experiences = null;
         curriculumId = 0;
@@ -56,6 +61,7 @@ public class Curriculum implements DomainObject<Long> {
         this.title= title;
         this.previousJobs = null;
         this.academicBackground = null;
+        this.applications = null;
         this.projects = null;
         this.experiences = null;
         this.version = version;
@@ -119,6 +125,7 @@ public class Curriculum implements DomainObject<Long> {
                     ).collect(Collectors.toList());
             return CompletableFuture.completedFuture(list);
         };
+        this.applications = null;
         this.version = version;
     }
 
@@ -155,4 +162,7 @@ public class Curriculum implements DomainObject<Long> {
         return experiences;
     }
 
+    public Function<UnitOfWork, CompletableFuture<List<Application>>> getApplications() {
+        return applications;
+    }
 }

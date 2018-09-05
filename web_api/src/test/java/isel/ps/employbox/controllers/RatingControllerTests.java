@@ -140,6 +140,7 @@ public class RatingControllerTests {
         inRating.setAccountIdTo(company1.getIdentityKey());
         inRating.setAssiduity(5.0);
         inRating.setCompetence(3.0);
+        inRating.setType("USR");
 
         ObjectMapper objectMapper = new ObjectMapper();
         String json = objectMapper.writeValueAsString(inRating);

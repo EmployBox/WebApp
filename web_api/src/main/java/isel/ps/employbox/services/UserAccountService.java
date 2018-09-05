@@ -225,7 +225,7 @@ public class UserAccountService {
                         .thenCompose(__ -> curriculumMapper.find(new EqualAndCondition<>("accountId", id)))
                         .thenCompose(list -> {
                             List<CompletableFuture<Void>> cflist = new ArrayList<>();
-                            list.forEach(curr -> cflist.add(curriculumService.deleteCurriculum(userAccount.getIdentityKey(), curr.getIdentityKey()).toFuture()));
+                            list.forEach(curr -> cflist.add(curriculumService.deleteCurriculum(userAccount.getIdentityKey(), curr.getIdentityKey(), unit).toFuture()));
                             return CompletableFuture.allOf(cflist.toArray(new CompletableFuture[cflist.size()]));
                         })
                         .thenCompose( aVoid -> {

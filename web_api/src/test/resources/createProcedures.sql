@@ -1,7 +1,7 @@
 CREATE PROCEDURE populateDB()
   MODIFIES SQL DATA
   begin atomic
-    declare account_id1, account_id2, account_id3,account_id4,account_id5,account_id6, company_id1, company_id2, job_id,  job_id2,  job_id3, curriculum_id bigint;
+    declare account_id1, account_id2, account_id3,account_id4,account_id5,account_id6, company_id1, company_id2, job_id,  job_id2,  job_id3, curriculum_id,curriculum_id2, curriculum_id3 bigint;
     /*Insert Users*/
     insert into ACCOUNT(NAME, EMAIL, PASSWORD, ACCOUNTTYPE, RATING) values ('Bruno', 'teste@gmail.com', 'password', 'USR', 2.0);
     set account_id1 = IDENTITY();
@@ -24,6 +24,13 @@ CREATE PROCEDURE populateDB()
     insert into USERACCOUNT(ACCOUNTID) values (account_id6);
 
     /*Insert Curricula*/
+    insert into CURRICULUM(ACCOUNTID, TITLE) values (account_id3, 'Engenharia Ambiente');
+    set curriculum_id3 = IDENTITY();
+
+    insert into CURRICULUM(ACCOUNTID, TITLE) values (account_id2, 'Engenharia Informatica');
+    set curriculum_id2 = IDENTITY();
+
+
     insert into CURRICULUM(ACCOUNTID, TITLE) values (account_id1, 'Engenharia Civil');
     set curriculum_id = IDENTITY();
 
@@ -68,7 +75,7 @@ CREATE PROCEDURE populateDB()
     insert into JOBEXPERIENCE(JOBID, COMPETENCE, YEARS) values (job_id, 'Java', 3);
 
     /*Insert Applications*/
-    insert into APPLICATION(ACCOUNTID, JOBID) values (account_id2, job_id);
+    insert into APPLICATION(ACCOUNTID, JOBID, CURRICULUMID) values (account_id2, job_id2, curriculum_id2);
 
     /*Insert Follows*/
     insert into FOLLOWS(ACCOUNTIDFOLLOWER, ACCOUNTIDFOLLOWED) VALUES (account_id1, account_id2);
@@ -87,7 +94,6 @@ create procedure deleteDB()
     delete from Project;
     delete from PreviousJobs;
     delete from CurriculumExperience;
-    delete from Curriculum;
     delete from Comment;
     delete from Follows;
     delete from Rating;
@@ -99,6 +105,7 @@ create procedure deleteDB()
     delete from Moderator;
     delete from Company;
     delete from Job;
+    delete from Curriculum;
     delete from UserAccount;
     delete from Account;
   end;

@@ -12,6 +12,7 @@ import isel.ps.employbox.exceptions.ResourceNotFoundException;
 import isel.ps.employbox.model.binders.CollectionPage;
 import isel.ps.employbox.model.entities.Curriculum;
 import isel.ps.employbox.model.entities.curricula.childs.*;
+import isel.ps.employbox.model.entities.jobs.Application;
 import isel.ps.employbox.services.ServiceUtils;
 import isel.ps.employbox.services.UserAccountService;
 import org.springframework.stereotype.Service;
@@ -97,16 +98,23 @@ public class CurriculumService {
         );
     }
 
-    public Mono<Void> deleteCurriculum(long userId, long cid, String... email) {
+    public Mono<Void> deleteCurriculum(long userId, long cid,UnitOfWork unit, String... email) {
         List<Curriculum> curriculum = new ArrayList<>(1);
 
-        UnitOfWork unitOfWork = new UnitOfWork();
+        UnitOfWork unitOfWork;
+        if(unit != null)
+            unitOfWork = unit;
+        else
+            unitOfWork = new UnitOfWork();
 
         DataMapper<AcademicBackground, Long> academicBackgroundMapper = getMapper(AcademicBackground.class, unitOfWork);
         DataMapper<Project, Long> projectMapper = getMapper(Project.class, unitOfWork);
         DataMapper<PreviousJobs, Long> previousJobsMapper = getMapper(PreviousJobs.class, unitOfWork);
         DataMapper<CurriculumExperience, Long> curriculumExperienceMapper = getMapper(CurriculumExperience.class, unitOfWork);
         DataMapper<Curriculum, Long> curriculumMapper = getMapper(Curriculum.class, unitOfWork);
+        DataMapper<Application, Long> applicationsMapper = getMapper(Application.class, unitOfWork);
+
+
 
         CompletableFuture<Void> future = getCurriculum(userId, cid, email)
                 .thenAccept(curriculum1 -> curriculum.add(0, curriculum1))
@@ -123,6 +131,11 @@ public class CurriculumService {
                         curriculum.get(0).getPreviousJobs().apply(unitOfWork)
                                 .thenApply(previousJobs -> previousJobs.stream().map(PreviousJobs::getIdentityKey).collect(Collectors.toList()))
                                 .thenCompose(previousJobsMapper::deleteAll)
+                )
+                .thenCompose(aVoid ->
+                        curriculum.get(0).getApplications().apply(unitOfWork)
+                                .thenApply(applications -> applications.stream().map(Application::getIdentityKey).collect(Collectors.toList()))
+                                .thenCompose(applicationsMapper::deleteAll)
                 )
                 .thenCompose(aVoid ->
                         curriculum.get(0).getExperiences().apply(unitOfWork)

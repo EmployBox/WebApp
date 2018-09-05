@@ -36,6 +36,10 @@ public class OutCurriculum implements OutputDto {
         return new CurriculumItemOutput(title, curriculumId);
     }
 
+    public Long getCurriculumId() {
+        return curriculumId;
+    }
+
     class CurriculumItemOutput {
         @JsonProperty
         private String title;

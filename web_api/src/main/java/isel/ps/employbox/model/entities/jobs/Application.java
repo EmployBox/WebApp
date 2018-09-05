@@ -8,6 +8,7 @@ import com.github.jayield.rapper.mapper.externals.Foreign;
 import com.github.jayield.rapper.unitofwork.UnitOfWork;
 import isel.ps.employbox.exceptions.ResourceNotFoundException;
 import isel.ps.employbox.model.entities.Account;
+import isel.ps.employbox.model.entities.Curriculum;
 
 import java.sql.Timestamp;
 import java.time.Instant;
@@ -18,7 +19,6 @@ public class Application implements DomainObject<Long> {
 
     @Id(isIdentity = true)
     private final long applicationId;
-    private final Long curriculumId;
     private final Instant datetime;
 
     @Version
@@ -30,10 +30,13 @@ public class Application implements DomainObject<Long> {
     @ColumnName(name = "accountId")
     private final Foreign<Account,Long> account;
 
+    @ColumnName(name = "curriculumId")
+    private final Foreign<Curriculum,Long> curriculum;
+
     public Application(){
         account = null;
         job = null;
-        curriculumId = null;
+        curriculum = null;
         datetime = null;
         version = 0;
         applicationId = 0;
@@ -43,13 +46,12 @@ public class Application implements DomainObject<Long> {
             long applicationId,
             long accountId,
             long jobId,
-            Long curriculumId,
+            long curriculumId,
             Timestamp datetime,
             long version) {
         UnitOfWork unitOfWork = new UnitOfWork();
 
         this.applicationId = applicationId;
-        this.curriculumId = curriculumId;
         if(datetime != null)
             this.datetime = datetime.toInstant();
         else this.datetime = null;
@@ -63,6 +65,10 @@ public class Application implements DomainObject<Long> {
         this.job = new Foreign<>(jobId, unit -> getMapper(Job.class, unitOfWork).findById( jobId)
                 .thenCompose( res -> unitOfWork.commit().thenApply( __-> res))
                 .thenApply(job1 -> job1.orElseThrow(() -> new ResourceNotFoundException("Job not Found"))));
+
+        this.curriculum = new Foreign<>(curriculumId, unit -> getMapper(Curriculum.class, unitOfWork).findById( curriculumId)
+                .thenCompose( res -> unitOfWork.commit().thenApply( __-> res))
+                .thenApply(curriculum -> curriculum.orElseThrow(() -> new ResourceNotFoundException("Curriculum not Found"))));
     }
 
     @Override
@@ -78,16 +84,15 @@ public class Application implements DomainObject<Long> {
         return datetime;
     }
 
-    public Long getCurriculumId() {
-        return curriculumId;
-    }
-
-
     public Foreign<Job, Long> getJob() {
         return job;
     }
 
     public Foreign<Account, Long> getAccount() {
         return account;
+    }
+
+    public Foreign<Curriculum, Long> getCurriculum() {
+        return curriculum;
     }
 }

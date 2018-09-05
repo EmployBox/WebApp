@@ -85,6 +85,8 @@ public class RatingService {
         DataMapper<Rating, Rating.RatingKey> ratingMapper = getMapper(Rating.class, unitOfWork);
         DataMapper<Account, Long> accountMapper = getMapper(Account.class, unitOfWork);
         Account[] account = new Account[1];
+        if(ratingType == null)
+            throw new BadRequestException(ErrorMessages.INVALID_ACCOUNT_TYPE_IN_RATING);
 
         CompletableFuture<Rating> future = CompletableFuture.allOf(
                 accountService.getAccount(email, unitOfWork).thenAccept( acc -> {

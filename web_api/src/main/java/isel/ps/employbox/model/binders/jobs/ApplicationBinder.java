@@ -3,6 +3,7 @@ package isel.ps.employbox.model.binders.jobs;
 import com.github.jayield.rapper.unitofwork.UnitOfWork;
 import isel.ps.employbox.model.binders.AccountBinder;
 import isel.ps.employbox.model.binders.ModelBinder;
+import isel.ps.employbox.model.binders.curricula.CurriculumBinder;
 import isel.ps.employbox.model.entities.jobs.Application;
 import isel.ps.employbox.model.input.InApplication;
 import isel.ps.employbox.model.output.OutApplication;
@@ -18,6 +19,7 @@ public class ApplicationBinder implements ModelBinder<Application,OutApplication
         UnitOfWork unitOfWork = new UnitOfWork();
         AccountBinder accountBinder = new AccountBinder();
         JobBinder jobBinder = new JobBinder();
+        CurriculumBinder curriculumBinder = new CurriculumBinder();
 
 
         return application.getAccount()
@@ -27,15 +29,19 @@ public class ApplicationBinder implements ModelBinder<Application,OutApplication
                         application.getJob()
                                 .getForeignObject(unitOfWork)
                                 .thenCompose(jobBinder::bindOutput)
-                                .thenCompose(outJob -> unitOfWork.commit().thenApply(aVoid -> outJob))
-                                .thenApply(outJob ->
-
+                                .thenCompose(outJob ->
+                                        application.getCurriculum()
+                                                    .getForeignObject(unitOfWork)
+                                                    .thenCompose(curriculumBinder::bindOutput)
+                                                    .thenApply( outCurriculum ->
                                         new OutApplication(
-                                                outJob, outAccount,
+                                                outCurriculum,
+                                                outJob,
+                                                outAccount,
                                                 application.getIdentityKey(),
-                                                application.getCurriculumId(),
                                                 application.getDatetime())
-                                ));
+                                ))
+                .thenCompose(res -> unitOfWork.commit().thenApply(aVoid -> res)));
     }
 
     @Override

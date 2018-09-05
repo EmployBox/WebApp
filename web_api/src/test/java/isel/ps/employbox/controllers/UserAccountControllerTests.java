@@ -6,6 +6,7 @@ import com.github.jayield.rapper.mapper.DataMapper;
 import com.github.jayield.rapper.mapper.conditions.EqualAndCondition;
 import com.github.jayield.rapper.unitofwork.UnitOfWork;
 import isel.ps.employbox.exceptions.ResourceNotFoundException;
+import isel.ps.employbox.model.entities.Curriculum;
 import isel.ps.employbox.model.entities.UserAccount;
 import isel.ps.employbox.model.entities.jobs.Application;
 import isel.ps.employbox.model.entities.jobs.Job;
@@ -51,9 +52,10 @@ public class UserAccountControllerTests {
 
     private static final Logger logger = LoggerFactory.getLogger(UserAccountControllerTests.class);
     private WebTestClient webTestClient;
-    private UserAccount userAccount;
-    private long jobId, jobId2;
+    private UserAccount userAccount2, userAccount3;
+    private long jobId, jobId2, jobId3;
     private Application application;
+    private Curriculum curriculum, curriculum3;
 
     @Before
     public void setUp() {
@@ -69,7 +71,11 @@ public class UserAccountControllerTests {
         DataMapper<UserAccount, Long> userAccountRepo = getMapper(UserAccount.class, unitOfWork);
         List<UserAccount> userAccounts = userAccountRepo.find(new EqualAndCondition<>("email", "lol@hotmail.com")).join();
         assertEquals(1, userAccounts.size());
-        userAccount = userAccounts.get(0);
+        userAccount2 = userAccounts.get(0);
+
+        userAccounts = userAccountRepo.find(new EqualAndCondition<>("email", "carlos@gmail.com")).join();
+        assertEquals(1, userAccounts.size());
+        userAccount3 = userAccounts.get(0);
 
         DataMapper<Job, Long> jobRepo = getMapper(Job.class, unitOfWork);
         List<Job> jobs = jobRepo.find(new EqualAndCondition<>("title", "Great Job")).join();
@@ -80,10 +86,23 @@ public class UserAccountControllerTests {
         assertEquals(1, jobs.size());
         jobId2 = jobs.get(0).getIdentityKey();
 
+        jobs = jobRepo.find(new EqualAndCondition<>("title", "Not so Great Job")).join();
+        assertEquals(1, jobs.size());
+        jobId3 = jobs.get(0).getIdentityKey();
+
         DataMapper<Application, Long> applicationRepo = getMapper(Application.class, unitOfWork);
-        List<Application> applications = applicationRepo.find(new EqualAndCondition<>("accountId", userAccount.getIdentityKey()), new EqualAndCondition<>("jobId", jobId)).join();
+        List<Application> applications = applicationRepo.find(
+                new EqualAndCondition<>("accountId", userAccount2.getIdentityKey()),
+                new EqualAndCondition<>("jobId", jobId2)).join();
         assertEquals(1, applications.size());
         application = applications.get(0);
+
+
+        DataMapper<Curriculum, Long> curriculumRepo= getMapper(Curriculum.class, unitOfWork);
+        List<Curriculum> curricula = curriculumRepo.find().join();
+        assertEquals(3, curricula.size());
+        curriculum = curricula.get(0);
+        curriculum3 = curricula.get(0);
 
         unitOfWork.commit().join();
     }
@@ -190,7 +209,7 @@ public class UserAccountControllerTests {
     public void testGetUserAccount() throws IOException{
         String body = new String(webTestClient
                 .get()
-                .uri("/accounts/users/" + userAccount.getIdentityKey())
+                .uri("/accounts/users/" + userAccount2.getIdentityKey())
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody()
@@ -203,27 +222,29 @@ public class UserAccountControllerTests {
 
     @Test
     public void testGetAllApplications() {
-        webTestClient
+        String body = new String(webTestClient
                 .get()
-                .uri("/accounts/users/" + userAccount.getIdentityKey() + "/applications")
+                .uri("/accounts/users/" + userAccount2.getIdentityKey() + "/applications")
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody()
-                .consumeWith(document("getAllApplications"));
+                .returnResult()
+                .getResponseBody());
+        int x = 0;
     }
 
     @Test
     public void testGetApplication() {
         UnitOfWork unitOfWork = new UnitOfWork();
         DataMapper<Application, Long> applicationRepo = getMapper(Application.class, unitOfWork);
-        List<Application> applications = applicationRepo.find(new EqualAndCondition<>("accountId", userAccount.getIdentityKey()), new EqualAndCondition<>("jobId", jobId)).join();
+        List<Application> applications = applicationRepo.find(new EqualAndCondition<>("accountId", userAccount2.getIdentityKey()), new EqualAndCondition<>("jobId", jobId2)).join();
         assertEquals(1, applications.size());
         Application application = applications.get(0);
         unitOfWork.commit().join();
 
         webTestClient
                 .get()
-                .uri("/accounts/users/" + userAccount.getIdentityKey() + "/jobs/" + jobId + "/applications/" + application.getIdentityKey())
+                .uri("/accounts/users/" + userAccount2.getIdentityKey() + "/jobs/" + jobId2 + "/applications/" + application.getIdentityKey())
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody()
@@ -261,18 +282,19 @@ public class UserAccountControllerTests {
     }
 
     @Test
-    @WithMockUser(username =  "lol@hotmail.com")
+    @WithMockUser(username =  "carlos@gmail.com")
     public void testCreateApplication() throws Exception {
         InApplication inApplication = new InApplication();
-        inApplication.setAccountId(userAccount.getIdentityKey());
-        inApplication.setJobId(jobId2);
+        inApplication.setAccountId(userAccount3.getIdentityKey());
+        inApplication.setJobId(jobId3);
+        inApplication.setCurriculumId(curriculum3.getIdentityKey());
 
         ObjectMapper objectMapper = new ObjectMapper();
         String json = objectMapper.writeValueAsString(inApplication);
 
         webTestClient
                 .post()
-                .uri("/accounts/users/" + userAccount.getIdentityKey() + "/jobs/" + jobId2 + "/applications")
+                .uri("/accounts/users/" + userAccount3.getIdentityKey() + "/jobs/" + jobId3 + "/applications")
                 .contentType(MediaType.APPLICATION_JSON)
                 .syncBody(json)
                 .exchange()
@@ -282,7 +304,7 @@ public class UserAccountControllerTests {
 
         UnitOfWork unitOfWork = new UnitOfWork();
         DataMapper<Application, Long> applicationRepo = getMapper(Application.class, unitOfWork);
-        assertEquals(1, applicationRepo.find(new EqualAndCondition<>("accountId", userAccount.getIdentityKey()), new EqualAndCondition<>("jobId", jobId2)).join().size());
+        assertEquals(1, applicationRepo.find(new EqualAndCondition<>("accountId", userAccount3.getIdentityKey()), new EqualAndCondition<>("jobId", jobId3)).join().size());
         unitOfWork.commit().join();
     }
 
@@ -290,7 +312,7 @@ public class UserAccountControllerTests {
     @WithMockUser(username = "teste@gmail.com")
     public void testUpdateWrongUserAccount() throws JsonProcessingException {
         InUserAccount inUserAccount = new InUserAccount();
-        inUserAccount.setId(userAccount.getIdentityKey());
+        inUserAccount.setId(userAccount2.getIdentityKey());
         inUserAccount.setEmail("someEmail@hotmail.com");
         inUserAccount.setName("Manuel");
         inUserAccount.setPassword("1234");
@@ -301,7 +323,7 @@ public class UserAccountControllerTests {
 
         webTestClient
                 .put()
-                .uri("/accounts/users/" + userAccount.getIdentityKey())
+                .uri("/accounts/users/" + userAccount2.getIdentityKey())
                 .contentType(MediaType.APPLICATION_JSON)
                 .syncBody(json)
                 .exchange()
@@ -316,7 +338,7 @@ public class UserAccountControllerTests {
         Timestamp timestamp = Timestamp.valueOf("2013-10-10 10:49:29.10000");
         InApplication inApplication = new InApplication();
         inApplication.setApplicationId(application.getIdentityKey());
-        inApplication.setAccountId(userAccount.getIdentityKey());
+        inApplication.setAccountId(userAccount2.getIdentityKey());
         inApplication.setJobId(jobId);
         inApplication.setDate(timestamp);
 
@@ -325,7 +347,7 @@ public class UserAccountControllerTests {
 
         webTestClient
                 .put()
-                .uri("/accounts/users/" + userAccount.getIdentityKey() + "/jobs/" + jobId + "/applications/" + application.getIdentityKey())
+                .uri("/accounts/users/" + userAccount2.getIdentityKey() + "/jobs/" + jobId + "/applications/" + application.getIdentityKey())
                 .contentType(MediaType.APPLICATION_JSON)
                 .syncBody(json)
                 .exchange()
@@ -338,20 +360,20 @@ public class UserAccountControllerTests {
     @WithMockUser(username = "lol@hotmail.com")
     public void testUpdateUserAccount() throws JsonProcessingException {
         InUserAccount inUserAccount = new InUserAccount();
-        inUserAccount.setId(userAccount.getIdentityKey());
+        inUserAccount.setId(userAccount2.getIdentityKey());
         inUserAccount.setEmail("someEmail@hotmail.com");
         inUserAccount.setName("Manuel");
         inUserAccount.setPassword("1234");
         inUserAccount.setSummary("Sou um tipo simpatico");
-        inUserAccount.setUserVersion(userAccount.getVersion());
-        inUserAccount.setAccountVersion(userAccount.getAccountVersion());
+        inUserAccount.setUserVersion(userAccount2.getVersion());
+        inUserAccount.setAccountVersion(userAccount2.getAccountVersion());
 
         ObjectMapper objectMapper = new ObjectMapper();
         String json = objectMapper.writeValueAsString(inUserAccount);
 
         webTestClient
                 .put()
-                .uri("/accounts/users/" + userAccount.getIdentityKey())
+                .uri("/accounts/users/" + userAccount2.getIdentityKey())
                 .contentType(MediaType.APPLICATION_JSON)
                 .syncBody(json)
                 .exchange()
@@ -361,7 +383,7 @@ public class UserAccountControllerTests {
 
         UnitOfWork unitOfWork = new UnitOfWork();
         DataMapper<UserAccount, Long> userAccountRepo = getMapper(UserAccount.class, unitOfWork);
-        UserAccount userAccount = userAccountRepo.findById( this.userAccount.getIdentityKey()).join().orElseThrow(() -> new ResourceNotFoundException("UserAccount not found"));
+        UserAccount userAccount = userAccountRepo.findById( this.userAccount2.getIdentityKey()).join().orElseThrow(() -> new ResourceNotFoundException("UserAccount not found"));
         unitOfWork.commit().join();
         assertEquals("Sou um tipo simpatico", userAccount.getSummary());
         assertEquals("Manuel", userAccount.getName());
@@ -374,17 +396,18 @@ public class UserAccountControllerTests {
         Timestamp timestamp = Timestamp.valueOf("2013-10-10 10:49:29.10000");
         InApplication inApplication = new InApplication();
         inApplication.setApplicationId(application.getIdentityKey());
-        inApplication.setAccountId(userAccount.getIdentityKey());
-        inApplication.setJobId(jobId);
+        inApplication.setAccountId(userAccount2.getIdentityKey());
+        inApplication.setJobId(jobId2);
         inApplication.setDate(timestamp);
         inApplication.setVersion(application.getVersion());
+        inApplication.setCurriculumId(curriculum.getIdentityKey());
 
         ObjectMapper objectMapper = new ObjectMapper();
         String json = objectMapper.writeValueAsString(inApplication);
 
         webTestClient
                 .put()
-                .uri("/accounts/users/" + userAccount.getIdentityKey() + "/jobs/"+ jobId + "/applications/" + application.getIdentityKey())
+                .uri("/accounts/users/" + userAccount2.getIdentityKey() + "/jobs/"+ jobId2 + "/applications/" + application.getIdentityKey())
                 .contentType(MediaType.APPLICATION_JSON)
                 .syncBody(json)
                 .exchange()
@@ -406,7 +429,7 @@ public class UserAccountControllerTests {
     public void testDeleteUserAccountWhenNotAuthenticated() {
         webTestClient
                 .delete()
-                .uri("/accounts/users/" + userAccount.getIdentityKey())
+                .uri("/accounts/users/" + userAccount2.getIdentityKey())
                 .exchange()
                 .expectStatus().isUnauthorized()
                 .expectBody()
@@ -418,7 +441,7 @@ public class UserAccountControllerTests {
     public void testDeleteWrongUserAccount() {
         webTestClient
                 .delete()
-                .uri("/accounts/users/" + userAccount.getIdentityKey())
+                .uri("/accounts/users/" + userAccount2.getIdentityKey())
                 .exchange()
                 .expectStatus().isUnauthorized()
                 .expectBody()
@@ -430,7 +453,7 @@ public class UserAccountControllerTests {
     public void testDeleteUserAccount(){
         webTestClient
                 .delete()
-                .uri("/accounts/users/" + userAccount.getIdentityKey())
+                .uri("/accounts/users/" + userAccount2.getIdentityKey())
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody()
@@ -438,7 +461,7 @@ public class UserAccountControllerTests {
 
         UnitOfWork unitOfWork = new UnitOfWork();
         DataMapper<UserAccount, Long> userAccountMapper = getMapper(UserAccount.class, unitOfWork);
-        assertFalse(userAccountMapper.findById( userAccount.getIdentityKey()).join().isPresent());
+        assertFalse(userAccountMapper.findById( userAccount2.getIdentityKey()).join().isPresent());
         unitOfWork.commit().join();
     }
 
@@ -447,14 +470,14 @@ public class UserAccountControllerTests {
     public void testDeleteWrongApplication() {
         UnitOfWork unitOfWork = new UnitOfWork();
         DataMapper<Application, Long> applicationRepo = getMapper(Application.class, unitOfWork);
-        List<Application> applications = applicationRepo.find(new EqualAndCondition<>("accountId", userAccount.getIdentityKey()), new EqualAndCondition<>("jobId", jobId)).join();
+        List<Application> applications = applicationRepo.find(new EqualAndCondition<>("accountId", userAccount2.getIdentityKey()), new EqualAndCondition<>("jobId", jobId2)).join();
         assertEquals(1, applications.size());
         Application application = applications.get(0);
         unitOfWork.commit().join();
 
         webTestClient
                 .delete()
-                .uri("/accounts/users/" + userAccount.getIdentityKey() + "/jobs/" + jobId + "/applications/" + application.getIdentityKey())
+                .uri("/accounts/users/" + userAccount2.getIdentityKey() + "/jobs/" + jobId2 + "/applications/" + application.getIdentityKey())
                 .exchange()
                 .expectStatus().isUnauthorized()
                 .expectBody()
@@ -466,20 +489,20 @@ public class UserAccountControllerTests {
     public void testDeleteApplication(){
         UnitOfWork unitOfWork = new UnitOfWork();
         DataMapper<Application, Long> applicationRepo = getMapper(Application.class, unitOfWork);
-        List<Application> applications = applicationRepo.find(new EqualAndCondition<>("accountId", userAccount.getIdentityKey()), new EqualAndCondition<>("jobId", jobId)).join();
+        List<Application> applications = applicationRepo.find(new EqualAndCondition<>("accountId", userAccount2.getIdentityKey()), new EqualAndCondition<>("jobId", jobId2)).join();
         assertEquals(1, applications.size());
         Application application = applications.get(0);
         unitOfWork.commit().join();
 
         webTestClient
                 .delete()
-                .uri("/accounts/users/" + userAccount.getIdentityKey() + "/jobs/" + jobId + "/applications/" + application.getIdentityKey())
+                .uri("/accounts/users/" + userAccount2.getIdentityKey() + "/jobs/" + jobId2 + "/applications/" + application.getIdentityKey())
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody()
                 .consumeWith(document("deleteApplication"));
 
-        assertTrue(applicationRepo.find(new EqualAndCondition<>("accountId", userAccount.getIdentityKey()), new EqualAndCondition<>("jobId", jobId)).join().isEmpty());
+        assertTrue(applicationRepo.find(new EqualAndCondition<>("accountId", userAccount2.getIdentityKey()), new EqualAndCondition<>("jobId", jobId2)).join().isEmpty());
         unitOfWork.commit().join();
     }
 }

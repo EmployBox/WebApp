@@ -17,6 +17,8 @@ public class OutApplication implements OutputDto {
 
     private final OutAccount _outAccount;
 
+    private final OutCurriculum _outCurriculum;
+
     @JsonProperty
     private final long applicationId;
 
@@ -39,13 +41,20 @@ public class OutApplication implements OutputDto {
     @JsonProperty
     private final _Embedded _embedded;
 
-    public OutApplication(OutJob outJob, OutAccount outAccount, long applicationId, Long curriculumId, Instant date) {
-        _outJob = outJob;
-        _outAccount = outAccount;
+    public OutApplication(
+            OutCurriculum outCurriculum,
+            OutJob outJob,
+            OutAccount outAccount,
+            long applicationId,
+            Instant date)
+    {
+        this._outCurriculum = outCurriculum;
+        this._outJob = outJob;
+        this._outAccount = outAccount;
         this.applicationId = applicationId;
         this.accountId = outAccount.getAccountId();
+        this.curriculumId = outCurriculum.getCurriculumId();
         this.jobId = outJob.getJobId();
-        this.curriculumId = curriculumId;
         this.date = date;
         this._links = new _Links();
         this._embedded = new _Embedded();
@@ -54,12 +63,20 @@ public class OutApplication implements OutputDto {
     @JsonIgnore
     @Override
     public Object getCollectionItemOutput() {
-        return new ApplicationItemOutput();
+        return new ApplicationItemOutput(_embedded);
     }
 
     class ApplicationItemOutput {
+
         @JsonProperty
         private final _Links _links = new _Links();
+
+        @JsonProperty
+        private final _Embedded _embedded;
+
+        ApplicationItemOutput(_Embedded embedded) {
+            this._embedded = embedded;
+        }
 
         private class _Links {
             @JsonProperty
@@ -77,8 +94,10 @@ public class OutApplication implements OutputDto {
         private final OutAccount account = _outAccount;
 
         @JsonProperty
-        private final OutJob outJob = _outJob;
+        private final OutJob job = _outJob;
 
+        @JsonProperty
+        private final OutCurriculum curriculum = _outCurriculum;
     }
 
     private class _Links {
