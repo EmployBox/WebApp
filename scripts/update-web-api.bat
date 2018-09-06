@@ -11,12 +11,14 @@ REM done
 
 SETLOCAL ENABLEDELAYEDEXPANSION
 
+cd ../web_api/build/libs
+
 set vms=2
 for /l %%x in (1, 1, %vms%) do (
    set vmName=web-api-%%x
    echo Updating !vmName!
    
-   gcloud compute scp ../build/libs/web_api.jar !vmName!
+   gcloud compute scp web_api.jar !vmName!
    gcloud compute ssh !vmName! --command "sudo mv web_api.jar /var/spring"
    gcloud compute ssh !vmName! --command "sudo systemctl restart spring"
 )

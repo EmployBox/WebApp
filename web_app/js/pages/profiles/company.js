@@ -63,7 +63,7 @@ export default withRouter(({match, auth, history, accountId}) => {
     authorization={auth}
     onResult={json => (
       <div class='text-center container'>
-        <img style={style} src={json.logoUrl} />
+        <img style={style} src={json.logoUrl || 'https://openjobs.me/assets/ico-company-default-96f4ffcb9967f09089dae7656368a5ec5489cd028f5236192e21095006cc86e1.png'} />
         <h2>{json.name}</h2>
         <HttpRequest url={new URI(json._links.followers.href.split('?')[0]).setQuery('accountToCheck', accountId).href()}
           authorization={auth}
@@ -76,8 +76,8 @@ export default withRouter(({match, auth, history, accountId}) => {
         <h3>{json.specialization}</h3>
         <h3>
           Rating: {json.rating}
-          {json.accountId === accountId ? <div />
-            : <button class='btn btn-success' onClick={() => history.push(ratingFormTempl.expand({
+          {json.accountId !== accountId &&
+            <button class='btn btn-success' onClick={() => history.push(ratingFormTempl.expand({
               url: json._links.ratings.href.split('?')[0]
             }) + `?type=company&from=${URI.encode(match.url)}&accountIdDest=${json.accountId}`)}>Rate this</button>}
         </h3>
