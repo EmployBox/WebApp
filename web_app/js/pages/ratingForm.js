@@ -59,7 +59,7 @@ export default withRouter(class extends React.Component {
         onSubmitHandler={inputs => {
           inputs.accountIdFrom = this.props.accountId
           inputs.accountIdTo = accountIdDest
-          inputs.type = type === 'user' ? 'USR' : 'CMP'
+          inputs.accountType = type === 'user' ? 'USR' : 'CMP'
           if (method === 'PUT') inputs.version = res.version
           this.setState({inputs: inputs})
         }}

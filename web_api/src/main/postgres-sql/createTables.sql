@@ -53,7 +53,7 @@ CREATE TABLE Project (
 	description VARCHAR(50),
 	version BIGINT DEFAULT(1)
 
-	FOREIGN KEY (curriculumId) REFERENCES curriculum,
+	FOREIGN KEY (curriculumId); REFERENCES curriculum,
 	FOREIGN KEY (accountId) REFERENCES Account
 )
 
@@ -127,7 +127,7 @@ CREATE TABLE CurriculumExperience(
 	years SMALLINT,
 	version BIGINT DEFAULT(1)
 
-	FOREIGN KEY (curriculumId) REFERENCES Curriculum,
+	FOREIGN KEY (curriculumId); REFERENCES Curriculum,
 	FOREIGN KEY (accountId) REFERENCES Account
 )
 
@@ -140,7 +140,7 @@ CREATE TABLE JobExperience(
 	years SMALLINT,
 	version BIGINT DEFAULT(1)
 
-	FOREIGN KEY (jobId) REFERENCES Job
+	FOREIGN KEY (jobId); REFERENCES Job
 )
 
 CREATE SEQUENCE Application_seq;
@@ -184,7 +184,7 @@ CREATE TABLE Chat(
 	accountIdSecond BIGINT,
 	version BIGINT DEFAULT(1)
 
-	FOREIGN KEY (accountIdFirst) REFERENCES Account(accountID),
+	FOREIGN KEY (accountIdFirst); REFERENCES Account(accountID),
 	FOREIGN KEY (accountIdSecond) REFERENCES Account(accountID),
 	UNIQUE (AccountIdFirst, AccountIdSecond)
 )
@@ -215,7 +215,7 @@ CREATE TABLE Schedule(
   endhour TIMESTAMP(3),
   version BIGINT DEFAULT(1)
 
-  FOREIGN KEY (jobId) REFERENCES Job
+  FOREIGN KEY (jobId); REFERENCES Job
 )
 
 CREATE SEQUENCE Comment_seq;
@@ -230,7 +230,7 @@ CREATE TABLE Comment (
 	status boolean,
 	version BIGINT
 
-	FOREIGN KEY (accountIdFrom) REFERENCES Account(accountID),
+	FOREIGN KEY (accountIdFrom); REFERENCES Account(accountID),
 	FOREIGN KEY (accountIdDest) REFERENCES Account(accountID),
 	FOREIGN KEY (MainCommentId) REFERENCES Comment(commentId),
 )

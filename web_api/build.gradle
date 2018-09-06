@@ -54,6 +54,9 @@ dependencies {
     //testCompile group: 'org.springframework.restdocs', name: 'spring-restdocs-mockmvc', version: '2.0.1.RELEASE'
     testCompile group: 'org.springframework.restdocs', name: 'spring-restdocs-webtestclient', version: '2.0.1.RELEASE'
     testRuntime group: 'org.hsqldb', name: 'hsqldb', version: '2.4.0'
+    // https://mvnrepository.com/artifact/org.postgresql/postgresql
+    compile group: 'org.postgresql', name: 'postgresql', version: '42.2.5'
+
 
     compile fileTree(dir: 'vendor/main', include: '*.jar')
     testCompile fileTree(dir: 'vendor/main', include: '*.jar')

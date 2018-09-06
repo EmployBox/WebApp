@@ -126,8 +126,6 @@ public class RatingControllerTests {
                 .expectBody()
                 .returnResult()
                 .getResponseBody());
-        ObjectMapper objectMapper = new ObjectMapper();
-        JsonNode jsonNode = objectMapper.readTree(body);
     }
 
 
@@ -225,7 +223,9 @@ public class RatingControllerTests {
         assertEquals(2.0,rating.getAssiduity());
         assertEquals(1.0,rating.getCompetence());
 
-        Account account = accountMapper.find(new EqualAndCondition<>("accountId", userAccount.getIdentityKey())).join().get(0);
+        Account account = accountMapper.find(new EqualAndCondition<>("accountId", userAccount2.getIdentityKey())).join().get(0);
+        // (1+2+5+5) / 4
+        assertEquals(3.25, account.rating);
         unitOfWork.commit().join();
     }
 

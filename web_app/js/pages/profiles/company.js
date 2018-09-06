@@ -6,6 +6,7 @@ import FollowersTable from '../tables/followersTable'
 import URITemplate from 'urijs/src/URITemplate'
 import CommentBox from '../../components/CommentBox'
 import TabRoute, {TabConfig} from '../../components/tabRoute'
+import JobsTable from '../tables/offeredJobsTable'
 
 const style = {
   width: 200,
@@ -14,9 +15,10 @@ const style = {
   borderRadius: '50%'
 }
 
-const followersTempl = new URITemplate('/company/{companyUrl}/followers/{followersUrl}')
-const followingTempl = new URITemplate('/company/{companyUrl}/following/{followingUrl}')
+const followersTempl = new URITemplate('/company/{userUrl}/followers/{followersUrl}')
+const followingTempl = new URITemplate('/company/{userUrl}/following/{followingUrl}')
 const ratingFormTempl = new URITemplate('/rate/{url}')
+const offeredJobsTempl = new URITemplate('/company/{userUrl}/offeredJobs/{offeredJobsUrl}')
 
 export default withRouter(({match, auth, history, accountId}) => {
   const FollowButton = class extends React.Component {

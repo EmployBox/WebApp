@@ -5,7 +5,6 @@ import URI from 'urijs'
 import Table from '../../components/tables/halTable'
 import URITemplate from 'urijs/src/URITemplate'
 
-const template = new URITemplate('/account/{userUrl}/offeredJobs/{offeredJobsUrl}')
 const jobTemplate = new URITemplate('/job/{url}')
 const userTemplate = new URITemplate('/account/{url}')
 const companyTemplate = new URITemplate('/company/{url}')
@@ -20,7 +19,7 @@ export default withRouter(class extends React.Component {
   }
 
   render () {
-    const {match, auth, history, remove} = this.props
+    const {match, auth, history, remove, template} = this.props
     const columns = [
       {
         Header: 'Account Info',

@@ -2,11 +2,13 @@ package isel.ps.employbox.model.output;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import isel.ps.employbox.controllers.account.AccountController;
 import isel.ps.employbox.controllers.account.CommentController;
 
 import java.time.Instant;
 
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
+import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 
 public class OutComment implements OutputDto {
 
@@ -76,27 +78,33 @@ public class OutComment implements OutputDto {
             this.mainCommentId = mainCommentId;
             this.datetime = datetime;
             this.text = text;
-            _links = new _Links();
-        }
-
-        private class _Links {
-            @JsonProperty
-            private _Links.Self self = new _Links.Self();
-
-            private class Self {
-                @JsonProperty
-                final String href = HOSTNAME + linkTo (CommentController.class, accountIdFrom).slash(commmentId).withSelfRel().getHref();
-            }
+            this._links = new _Links();
         }
     }
 
     private class _Links {
         @JsonProperty
-        private Self self = new Self();
+        private _Links.Self self = new _Links.Self();
+
+        @JsonProperty
+        private _Links.account_from account_from = new _Links.account_from();
+
+        @JsonProperty
+        private _Links.account_dest account_dest = new _Links.account_dest();
 
         private class Self {
             @JsonProperty
             final String href = HOSTNAME + linkTo (CommentController.class, accountIdFrom).slash(commmentId).withSelfRel().getHref();
+        }
+
+        private class account_from {
+            @JsonProperty
+            final String href = HOSTNAME + linkTo(methodOn(AccountController.class).getAccount(accountIdFrom)).withSelfRel().getHref();
+        }
+
+        private class account_dest {
+            @JsonProperty
+            final String href = HOSTNAME + linkTo(methodOn(AccountController.class).getAccount(accountIdTo)).withSelfRel().getHref();
         }
     }
 }
