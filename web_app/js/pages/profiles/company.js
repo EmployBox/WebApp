@@ -6,6 +6,7 @@ import FollowersTable from '../tables/followersTable'
 import URITemplate from 'urijs/src/URITemplate'
 import CommentBox from '../../components/CommentBox'
 import TabRoute, {TabConfig} from '../../components/tabRoute'
+import JobsTable from '../tables/offeredJobsTable'
 
 const style = {
   width: 200,
@@ -14,9 +15,10 @@ const style = {
   borderRadius: '50%'
 }
 
-const followersTempl = new URITemplate('/company/{companyUrl}/followers/{followersUrl}')
-const followingTempl = new URITemplate('/company/{companyUrl}/following/{followingUrl}')
+const followersTempl = new URITemplate('/company/{userUrl}/followers/{followersUrl}')
+const followingTempl = new URITemplate('/company/{userUrl}/following/{followingUrl}')
 const ratingFormTempl = new URITemplate('/rate/{url}')
+const offeredJobsTempl = new URITemplate('/company/{userUrl}/offeredJobs/{offeredJobsUrl}')
 
 export default withRouter(({match, auth, history, accountId}) => {
   const FollowButton = class extends React.Component {
@@ -62,51 +64,63 @@ export default withRouter(({match, auth, history, accountId}) => {
   return <HttpRequest url={URI.decode(match.params.url)}
     authorization={auth}
     onResult={json => (
-      <div class='text-center container'>
-        <img style={style} src={json.logoUrl} />
-        <h2>{json.name}</h2>
-        <HttpRequest url={new URI(json._links.followers.href.split('?')[0]).setQuery('accountToCheck', accountId).href()}
-          authorization={auth}
-          onResult={follows => <FollowButton follows={follows}
-            url={json._links.followers.href.split('?')[0]}
+      <div>
+        <div class='text-center container'>
+          <img style={style} src={json.logoUrl} />
+          <h2>{json.name}</h2>
+          <HttpRequest url={new URI(json._links.followers.href.split('?')[0]).setQuery('accountToCheck', accountId).href()}
+            authorization={auth}
+            onResult={follows => <FollowButton follows={follows}
+              url={json._links.followers.href.split('?')[0]}
+            />
+            }
           />
-          }
-        />
-        <h3>{json.description}</h3>
-        <h3>{json.specialization}</h3>
-        <h3>
-          Rating: {json.rating}
-          {json.accountId === accountId ? <div />
-            : <button class='btn btn-success' onClick={() => history.push(ratingFormTempl.expand({
-              url: json._links.ratings.href.split('?')[0]
-            }) + `?type=company&from=${URI.encode(match.url)}&accountIdDest=${json.accountId}`)}>Rate this</button>}
-        </h3>
-        <button class='btn btn-primary bg-dark' onClick={() => window.location.href = json.webpageUrl}>WebPage</button>
-        <br />
-        <TabRoute auth={auth}
-          tabConfigs={[
-            new TabConfig(
-              json._links.followers.href,
-              'Followers',
-              props => <FollowersTable auth={auth} url={URI.decode(props.match.params.followersUrl)} template={followersTempl} {...props} />,
-              followersTempl.expand({
-                companyUrl: json._links.self.href,
-                followersUrl: json._links.followers.href
-              }),
-              '/followers/:followersUrl'
-            ),
-            new TabConfig(
-              json._links.following.href,
-              'Following',
-              props => <FollowersTable auth={auth} url={URI.decode(props.match.params.followingUrl)} template={followingTempl} {...props} />,
-              followingTempl.expand({
-                companyUrl: json._links.self.href,
-                followingUrl: json._links.following.href
-              }),
-              '/following/:followingUrl'
-            )
-          ]}
-        />
+          <h3>{json.description}</h3>
+          <h3>{json.specialization}</h3>
+          <h3>
+            Rating: {json.rating.toFixed(1)}
+            {json.accountId === accountId ? <div />
+              : <button class='btn btn-success' onClick={() => history.push(ratingFormTempl.expand({
+                url: json._links.ratings.href.split('?')[0]
+              }) + `?type=company&from=${URI.encode(match.url)}&accountIdDest=${json.accountId}`)}>Rate this</button>}
+          </h3>
+          <button class='btn btn-primary bg-dark' onClick={() => window.location.href = json.webpageUrl}>WebPage</button>
+          <br />
+          <TabRoute auth={auth}
+            tabConfigs={[
+              new TabConfig(
+                json._links.offered_jobs.href,
+                'Offered Jobs',
+                (props) => <JobsTable auth={auth} {...props} remove={accountId === json.accountId} template={offeredJobsTempl} />,
+                offeredJobsTempl.expand({
+                  userUrl: json._links.self.href,
+                  offeredJobsUrl: json._links.offered_jobs.href
+                }),
+                '/offeredJobs/:offeredJobsUrl'
+              ),
+              new TabConfig(
+                json._links.followers.href,
+                'Followers',
+                props => <FollowersTable auth={auth} url={URI.decode(props.match.params.followersUrl)} template={followersTempl} {...props} />,
+                followersTempl.expand({
+                  userUrl: json._links.self.href,
+                  followersUrl: json._links.followers.href
+                }),
+                '/followers/:followersUrl'
+              ),
+              new TabConfig(
+                json._links.following.href,
+                'Following',
+                props => <FollowersTable auth={auth} url={URI.decode(props.match.params.followingUrl)} template={followingTempl} {...props} />,
+                followingTempl.expand({
+                  userUrl: json._links.self.href,
+                  followingUrl: json._links.following.href
+                }),
+                '/following/:followingUrl'
+              )
+            ]}
+          />
+        </div>
         <CommentBox url={json._links.comments.href} auth={auth} accountIdFrom={accountId} accountIdTo={json.accountId} />
       </div>
     )}

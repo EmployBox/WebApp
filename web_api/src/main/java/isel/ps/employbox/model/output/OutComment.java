@@ -78,12 +78,19 @@ public class OutComment implements OutputDto {
             this.mainCommentId = mainCommentId;
             this.datetime = datetime;
             this.text = text;
+            this._links = new _Links();
         }
     }
 
     private class _Links {
         @JsonProperty
         private _Links.Self self = new _Links.Self();
+
+        @JsonProperty
+        private _Links.account_from account_from = new _Links.account_from();
+
+        @JsonProperty
+        private _Links.account_dest account_dest = new _Links.account_dest();
 
         private class Self {
             @JsonProperty

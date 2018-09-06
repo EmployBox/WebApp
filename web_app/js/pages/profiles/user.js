@@ -70,86 +70,88 @@ export default withRouter(class extends React.Component {
         url={URI.decode(match.params.url)}
         authorization={auth}
         onResult={json => (
-          <div class='container text-center'>
-            <img style={style} src={json.photo_url} />
-            <h2>{json.name}</h2>
-            {json.accountId === accountId ? <div />
-              : <HttpRequest url={new URI(json._links.followers.href.split('?')[0]).setQuery('accountToCheck', accountId).href()}
-                authorization={auth}
-                onResult={follows => <FollowButton follows={follows}
-                  url={json._links.followers.href.split('?')[0]}
+          <div>
+            <div class='container text-center'>
+              <img style={style} src={json.photo_url} />
+              <h2>{json.name}</h2>
+              {json.accountId === accountId ? <div />
+                : <HttpRequest url={new URI(json._links.followers.href.split('?')[0]).setQuery('accountToCheck', accountId).href()}
+                  authorization={auth}
+                  onResult={follows => <FollowButton follows={follows}
+                    url={json._links.followers.href.split('?')[0]}
+                  />
+                  }
                 />
-                }
+              }
+              <h3>{json.summary}</h3>
+              <div class='d-flex flex-row justify-content-center'>
+                <h4>
+                  Rating: {json.rating.toFixed(1)}
+                  {json.accountId === accountId ? <div />
+                    : <button class='btn btn-success' onClick={() => history.push(ratingFormTempl.expand({
+                      url: json._links.ratings.href.split('?')[0]
+                    }) + `?type=user&from=${URI.encode(match.url)}&accountIdDest=${json.accountId}`)}>Rate this</button>
+                  }
+                </h4>
+              </div>
+              <TabRoute auth={auth}
+                tabConfigs={[
+                  new TabConfig(
+                    json._links.offered_jobs.href,
+                    'Offered Jobs',
+                    (props) => <JobsTable auth={auth} {...props} remove={accountId === json.accountId} template={offeredJobsTempl} />,
+                    offeredJobsTempl.expand({
+                      userUrl: json._links.self.href,
+                      offeredJobsUrl: json._links.offered_jobs.href
+                    }),
+                    '/offeredJobs/:offeredJobsUrl'
+                  ),
+                  new TabConfig(
+                    json._links.curricula.href,
+                    'Curriculas',
+                    (props) => <div>
+                      <CurriculasTable auth={auth} {...props} remove={accountId === json.accountId} />
+                      {accountId === json.accountId ? <button class='btn btn-success btn-lg' onClick={() => history.push(createCurriculaTempl.expand({url: json._links.curricula.href.split('?')[0]}))}>New</button> : <div />}
+                    </div>,
+                    curriculasTempl.expand({
+                      userUrl: json._links.self.href,
+                      curriculaUrl: json._links.curricula.href
+                    }),
+                    '/curriculas/:curriculaUrl'
+                  ),
+                  new TabConfig(
+                    json._links.applications.href,
+                    'Applications',
+                    (props) => <ApplicationsTable auth={auth} remove={accountId === json.accountId} {...props} />,
+                    applicationsTempl.expand({
+                      userUrl: json._links.self.href,
+                      applicationUrl: json._links.applications.href
+                    }),
+                    '/applications/:applicationsUrl'
+                  ),
+                  new TabConfig(
+                    json._links.followers.href,
+                    'Followers',
+                    (props) => <FollowersTable auth={auth} url={URI.decode(props.match.params.followersUrl)} template={followersTempl} {...props} />,
+                    followersTempl.expand({
+                      userUrl: json._links.self.href,
+                      followersURL: json._links.followers.href
+                    }),
+                    '/followers/:followersUrl'
+                  ),
+                  new TabConfig(
+                    json._links.following.href,
+                    'Following',
+                    (props) => <FollowersTable auth={auth} url={URI.decode(props.match.params.followingUrl)} template={followingTempl} {...props} />,
+                    followingTempl.expand({
+                      userUrl: json._links.self.href,
+                      followingUrl: json._links.following.href
+                    }),
+                    '/following/:followingUrl'
+                  )
+                ]}
               />
-            }
-            <h3>{json.summary}</h3>
-            <div class='d-flex flex-row justify-content-center'>
-              <h4>
-                Rating: {json.rating}
-                {json.accountId === accountId ? <div />
-                  : <button class='btn btn-success' onClick={() => history.push(ratingFormTempl.expand({
-                    url: json._links.ratings.href.split('?')[0]
-                  }) + `?type=user&from=${URI.encode(match.url)}&accountIdDest=${json.accountId}`)}>Rate this</button>
-                }
-              </h4>
             </div>
-            <TabRoute auth={auth}
-              tabConfigs={[
-                new TabConfig(
-                  json._links.offered_jobs.href,
-                  'Offered Jobs',
-                  (props) => <JobsTable auth={auth} {...props} remove={accountId === json.accountId} />,
-                  offeredJobsTempl.expand({
-                    userUrl: json._links.self.href,
-                    offeredJobsUrl: json._links.offered_jobs.href
-                  }),
-                  '/offeredJobs/:offeredJobsUrl'
-                ),
-                new TabConfig(
-                  json._links.curricula.href,
-                  'Curriculas',
-                  (props) => <div>
-                    <CurriculasTable auth={auth} {...props} remove={accountId === json.accountId} />
-                    {accountId === json.accountId ? <button class='btn btn-success btn-lg' onClick={() => history.push(createCurriculaTempl.expand({url: json._links.curricula.href.split('?')[0]}))}>New</button> : <div />}
-                  </div>,
-                  curriculasTempl.expand({
-                    userUrl: json._links.self.href,
-                    curriculaUrl: json._links.curricula.href
-                  }),
-                  '/curriculas/:curriculaUrl'
-                ),
-                new TabConfig(
-                  json._links.applications.href,
-                  'Applications',
-                  (props) => <ApplicationsTable auth={auth} remove={accountId === json.accountId} {...props} />,
-                  applicationsTempl.expand({
-                    userUrl: json._links.self.href,
-                    applicationUrl: json._links.applications.href
-                  }),
-                  '/applications/:applicationsUrl'
-                ),
-                new TabConfig(
-                  json._links.followers.href,
-                  'Followers',
-                  (props) => <FollowersTable auth={auth} url={URI.decode(props.match.params.followersUrl)} template={followersTempl} {...props} />,
-                  followersTempl.expand({
-                    userUrl: json._links.self.href,
-                    followersURL: json._links.followers.href
-                  }),
-                  '/followers/:followersUrl'
-                ),
-                new TabConfig(
-                  json._links.following.href,
-                  'Following',
-                  (props) => <FollowersTable auth={auth} url={URI.decode(props.match.params.followingUrl)} template={followingTempl} {...props} />,
-                  followingTempl.expand({
-                    userUrl: json._links.self.href,
-                    followingUrl: json._links.following.href
-                  }),
-                  '/following/:followingUrl'
-                )
-              ]}
-            />
             <CommentBox url={json._links.comments.href} auth={auth} accountIdFrom={accountId} accountIdTo={json.accountId} />
           </div>
         )
