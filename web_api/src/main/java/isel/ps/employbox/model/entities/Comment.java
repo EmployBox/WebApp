@@ -75,6 +75,7 @@ public class Comment implements DomainObject<Long> {
         this.accountIdFrom = accountIdFrom;
         this.accountIdDest = accountIdTo;
         this.mainCommentId = parentCommendID;
+        System.out.println("date " + date);
         if(date != null)
             this.datetime = date.toInstant();
         else

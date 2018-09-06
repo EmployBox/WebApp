@@ -3,6 +3,33 @@ import HttpRequest from './httpRequest'
 import URI from 'urijs'
 import GenericForm from './forms/genericForm'
 
+const DateDiff = {
+  inMinutes: (d1, d2) => {
+    const t2 = d2.getTime()
+    const t1 = d1.getTime()
+
+    return parseInt((t2 - t1) / (60 * 1000))
+  },
+
+  inHours: (d1, d2) => {
+    const t2 = d2.getTime()
+    const t1 = d1.getTime()
+
+    return parseInt((t2 - t1) / (60 * 60 * 1000))
+  },
+
+  inDays: (d1, d2) => {
+    const t2 = d2.getTime()
+    const t1 = d1.getTime()
+
+    return parseInt((t2 - t1) / (24 * 3600 * 1000))
+  },
+
+  inYears: (d1, d2) => {
+    return d2.getFullYear() - d1.getFullYear()
+  }
+}
+
 const CommentList = class extends React.Component {
   render () {
     return <div class='commentList'>
@@ -27,12 +54,13 @@ const CommentForm = class extends React.Component {
   onSubmit (inputs) {
     inputs.accountIdFrom = this.props.accountIdFrom
     inputs.accountIdTo = this.props.accountIdTo
+    inputs.datetime = new Date().toISOString().replace(/([^T]+)T([^\\.]+).*/g, '$1 $2')
     this.setState({inputs: inputs})
   }
 
   render () {
     return (
-      <div>
+      <div class='container text-center'>
         <GenericForm
           inputData={[
             {
@@ -56,13 +84,34 @@ const CommentForm = class extends React.Component {
 }
 
 const Comment = ({comment, children}) => (
-  <div class='comment'>
-    <HttpRequest url={}
-      onResult={account => <h3 class='commentAuthor'>{account.name}</h3>}
-    />
-    
-    {children}
-  </div>
+  <HttpRequest url={comment._links.account_from.href}
+    onResult={account => {
+      const curr = new Date()
+      const commentDate = new Date()
+      commentDate.setTime(comment.datetime.epochSecond * 1000)
+      console.log(account)
+      return <div class='row'>
+        <div class='col-sm-1'>
+          <div class='thumbnail'>
+            <HttpRequest url={account._links.self.href}
+              onResult={json =>
+                <img class='img-responsive img-thumbnail' src={account.accountType === 'USR' ? json.photo_url : json.logo_url || 'https://ssl.gstatic.com/accounts/ui/avatar_2x.png'} />}
+            />
+          </div>
+        </div>
+        <div class='col-sm-5'>
+          <div class='panel panel-default'>
+            <div class='panel-heading'>
+              <strong>{account.name}</strong> <span class='text-muted'>commented {DateDiff.inDays(curr, commentDate)} days ago</span>
+            </div>
+            <div class='panel-body'>
+              {children}
+            </div>
+          </div>
+        </div>
+      </div>
+    }}
+  />
 )
 
 export default class extends React.Component {
@@ -76,8 +125,8 @@ export default class extends React.Component {
   }
   render () {
     console.log(this.state.data)
-    return <div class='commentBox'>
-      <h1>Comments</h1>
+    return <div class='container'>
+      <h1 class='text-center'>Comments</h1>
       <CommentForm auth={this.props.auth} url={this.props.url} accountIdFrom={this.props.accountIdFrom} accountIdTo={this.props.accountIdTo} />
       <CommentList data={this.state.data} />
       {this.state.currentUrl
@@ -102,7 +151,7 @@ export default class extends React.Component {
             }}>More</button>
           </div>
         )
-        : <div>No more comments</div>}
+        : <div><br /> <div class='text-center'>No more comments</div></div>}
     </div>
   }
 }
