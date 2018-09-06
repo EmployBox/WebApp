@@ -91,6 +91,7 @@ public class CommentControllerTests {
     public void testGetAllComments() throws IOException {
         ObjectMapper objectMapper = new ObjectMapper();
 
+        //pedido de comentários efetuados á conta userAccount
         String body = new String(webTestClient
                 .get()
                 .uri("/accounts/"+userAccount.getIdentityKey()+"/comments")
@@ -101,8 +102,10 @@ public class CommentControllerTests {
                 .getResponseBody());
 
         JsonNode jsonNode = objectMapper.readTree(body);
+        //esperados 0 comentários
         assertEquals(0, jsonNode.findValue("size").asInt());
 
+        //pedido de comentários efetuados á conta userAccount
         body = new String(webTestClient
                 .get()
                 .uri("/accounts/"+userAccount2.getIdentityKey()+"/comments")
@@ -112,6 +115,7 @@ public class CommentControllerTests {
                 .returnResult()
                 .getResponseBody());
 
+        //esperados 1 cometário
         jsonNode = objectMapper.readTree(body);
         assertEquals(1, jsonNode.findValue("size").asInt());
     }

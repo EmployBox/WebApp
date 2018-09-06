@@ -1,6 +1,11 @@
 package isel.ps.employbox.controllers;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.jayield.rapper.mapper.DataMapper;
+import com.github.jayield.rapper.mapper.conditions.EqualAndCondition;
 import com.github.jayield.rapper.unitofwork.UnitOfWork;
+import isel.ps.employbox.model.entities.Account;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -16,6 +21,9 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
+import java.io.IOException;
+
+import static com.github.jayield.rapper.mapper.MapperRegistry.getMapper;
 import static isel.ps.employbox.DataBaseUtils.prepareDB;
 import static junit.framework.TestCase.assertEquals;
 import static org.springframework.restdocs.webtestclient.WebTestClientRestDocumentation.document;
@@ -33,6 +41,7 @@ public class AccountControllerTests {
 
     private static final Logger logger = LoggerFactory.getLogger(UserAccountControllerTests.class);
     private WebTestClient webTestClient;
+    private Account account;
 
     @Before
     public void setUp() {
@@ -43,6 +52,12 @@ public class AccountControllerTests {
                 .filter(basicAuthentication())
                 .filter(documentationConfiguration(restDocumentation))
                 .build();
+
+        UnitOfWork unitOfWork = new UnitOfWork();
+        DataMapper<Account, Long> accountMapper = getMapper(Account.class, unitOfWork);
+        this.account = accountMapper.find(new EqualAndCondition<>("name", "Maria")).join().get(0);
+
+        unitOfWork.commit().join();
     }
 
     @After
@@ -63,4 +78,24 @@ public class AccountControllerTests {
                 .expectBody()
                 .consumeWith(document("authenticateCredentials"));
     }
+
+    @Test
+    public void testGetAccount() throws IOException {
+        String body = new String(
+                webTestClient
+                        .get()
+                        .uri("/accounts/"+account.getIdentityKey())
+                        .exchange()
+                        .expectStatus().isOk()
+                        .expectBody()
+                        .returnResult()
+                        .getResponseBody()
+        );
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        JsonNode jsonNode = objectMapper.readTree(body);
+        assertEquals("Maria", jsonNode.findValuesAsText("name").get(0));
+    }
 }
+
+

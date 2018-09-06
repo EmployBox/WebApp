@@ -47,7 +47,6 @@ public class FollowService {
         long [] numberOfFolloewEntries = new long[1];
         Condition followsQuery = new EqualAndCondition<>(collumn, followId);
 
-        //todo must
         CompletableFuture future =
                 followMapper.getNumberOfEntries(followsQuery).thenCompose(
                         numberOfEntries -> {
