@@ -12,7 +12,3 @@ Environment="DB_CONNECTION_STRING=jdbc:postgresql://35.197.247.147:5432/postgres
 
 [Install]
 WantedBy=multi-user.target
-
-
-[Install]
-WantedBy=multi-user.target

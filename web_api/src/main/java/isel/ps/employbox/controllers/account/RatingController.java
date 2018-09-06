@@ -40,7 +40,6 @@ public class RatingController {
         return Mono.fromFuture(future);
     }
 
-    //todo put version in outrating
     @GetMapping("/single")
     public Mono<OutRating> getRating(
             @PathVariable long accountId,
@@ -56,11 +55,12 @@ public class RatingController {
     @PutMapping
     public Mono<Void> updateRating(
             @PathVariable long accountId,
-            @RequestBody InRating rating,
+            @RequestBody InRating inRating,
             Authentication authentication
     ){
-        if(accountId != rating.getAccountIdTo()) throw new BadRequestException(BAD_REQUEST_IDS_MISMATCH);
-        return ratingService.updateRating(ratingBinder.bindInput(rating), authentication.getName());
+        if(accountId != inRating.getAccountIdTo())
+            throw new BadRequestException(BAD_REQUEST_IDS_MISMATCH);
+        return ratingService.updateRating(inRating.getAccountType(), ratingBinder.bindInput(inRating), authentication.getName());
     }
 
     @PostMapping
@@ -70,7 +70,7 @@ public class RatingController {
             Authentication authentication)
     {
         if(accountId != inRating.getAccountIdTo()) throw new BadRequestException(BAD_REQUEST_IDS_MISMATCH);
-        return ratingService.createRating( ratingBinder.bindInput(inRating), inRating.getType(), authentication.getName());
+        return ratingService.createRating( ratingBinder.bindInput(inRating), inRating.getAccountType(), authentication.getName());
     }
 
     @DeleteMapping

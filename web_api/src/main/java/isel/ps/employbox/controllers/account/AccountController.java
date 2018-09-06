@@ -6,10 +6,7 @@ import isel.ps.employbox.model.output.Collections.HalCollectionPage;
 import isel.ps.employbox.model.output.OutAccount;
 import isel.ps.employbox.services.AccountService;
 import org.springframework.security.core.Authentication;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
 import java.util.concurrent.CompletableFuture;
@@ -33,6 +30,14 @@ public class AccountController {
             @RequestParam(required = false, defaultValue = "ASC") String orderClause
     ){
         return Mono.fromFuture(accountService.getAllAccounts(page, pageSize, orderColumn,orderClause).thenCompose(res -> accountBinder.bindOutput(res, AccountController.class)) );
+    }
+
+    @GetMapping("/{accountId}")
+    public Mono<OutAccount> getAccount(
+            @PathVariable long accountId
+    ){
+        return Mono.fromFuture( accountService.getAccount(accountId)
+                .thenCompose( res -> accountBinder.bindOutput(res)));
     }
 
 

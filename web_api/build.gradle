@@ -34,8 +34,12 @@ dependencies {
     asciidoctor 'org.springframework.restdocs:spring-restdocs-asciidoctor:2.0.1.RELEASE'
 
     runtime group: 'com.microsoft.sqlserver', name: 'mssql-jdbc', version: '6.5.2.jre8-preview'
+    // https://mvnrepository.com/artifact/org.postgresql/postgresql
+    runtime group: 'org.postgresql', name: 'postgresql', version: '42.2.5'
 
     compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
+    runtime('com.google.cloud:google-cloud-logging-logback:0.46.0-alpha')
+    compile 'com.google.cloud.sql:postgres-socket-factory:1.0.10'
     //compile group: 'org.springframework.boot', name: 'spring-boot-starter-web', version: '2.0.2.RELEASE'
     compile group: 'org.springframework.boot', name: 'spring-boot-starter-webflux', version: '2.0.2.RELEASE'
     compile group: 'org.springframework.boot', name: 'spring-boot-starter-json', version: '2.0.2.RELEASE'

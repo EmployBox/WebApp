@@ -126,8 +126,6 @@ public class RatingControllerTests {
                 .expectBody()
                 .returnResult()
                 .getResponseBody());
-        ObjectMapper objectMapper = new ObjectMapper();
-        JsonNode jsonNode = objectMapper.readTree(body);
     }
 
 
@@ -140,7 +138,7 @@ public class RatingControllerTests {
         inRating.setAccountIdTo(company1.getIdentityKey());
         inRating.setAssiduity(5.0);
         inRating.setCompetence(3.0);
-        inRating.setType("USR");
+        inRating.setAccountType("USR");
 
         ObjectMapper objectMapper = new ObjectMapper();
         String json = objectMapper.writeValueAsString(inRating);
@@ -198,6 +196,9 @@ public class RatingControllerTests {
         inRating.setAccountIdTo(userAccount2.getIdentityKey());
         inRating.setAssiduity(2.0);
         inRating.setCompetence(1.0);
+        inRating.setDemeanor(5.0);
+        inRating.setPontuality(5.0);
+        inRating.setAccountType("USR");
 
         ObjectMapper objectMapper = new ObjectMapper();
         String json = objectMapper.writeValueAsString(inRating);
@@ -214,10 +215,17 @@ public class RatingControllerTests {
                 .consumeWith(document("updateRating"));
 
         DataMapper<Rating, Rating.RatingKey> ratingMapper = getMapper(Rating.class, unitOfWork);
-        Rating rating = ratingMapper.find( new EqualAndCondition<>("accountIdFrom", userAccount.getIdentityKey()),  new EqualAndCondition<>("accountIdTo", userAccount2.getIdentityKey())).join().get(0);
+        DataMapper<Account, Long> accountMapper = getMapper(Account.class, unitOfWork);
+
+        Rating rating = ratingMapper.find( new EqualAndCondition<>("accountIdFrom", userAccount.getIdentityKey()),
+                new EqualAndCondition<>("accountIdTo", userAccount2.getIdentityKey())).join().get(0);
 
         assertEquals(2.0,rating.getAssiduity());
         assertEquals(1.0,rating.getCompetence());
+
+        Account account = accountMapper.find(new EqualAndCondition<>("accountId", userAccount2.getIdentityKey())).join().get(0);
+        // (1+2+5+5) / 4
+        assertEquals(3.25, account.rating);
         unitOfWork.commit().join();
     }
 

@@ -44,18 +44,12 @@ public class JobController {
             @RequestParam(required = false) String offerType,
             @RequestParam(required = false) Integer ratingLow,
             @RequestParam(required = false) Integer ratingHigh,
-            @RequestParam(required = false) String schedules,
             @RequestParam(required = false) String orderColumn,
             @RequestParam(required = false, defaultValue = "ASC") String orderClause
-    ) throws IOException {
-        if (schedules != null) {
-            ObjectMapper objectMapper = new ObjectMapper();
-            TypeFactory typeFactory = objectMapper.getTypeFactory();
-            List<InSchedule> someClassList = objectMapper.readValue(schedules, typeFactory.constructCollectionType(List.class, InSchedule.class));
-        }
-
-        CompletableFuture<HalCollectionPage<Job>> future = jobService.getAllJobs(page, pageSize, address, title, wage, offerType, ratingLow, ratingHigh, orderColumn, orderClause, type)
-                .thenCompose(jobCollectionPage -> jobBinder.bindOutput(jobCollectionPage, this.getClass()));
+    )  {
+        CompletableFuture<HalCollectionPage<Job>> future =
+                jobService.getAllJobs(page, pageSize, address, title, wage, offerType, ratingLow, ratingHigh, orderColumn, orderClause, type)
+                        .thenCompose(jobCollectionPage -> jobBinder.bindOutput(jobCollectionPage, this.getClass()));
 
         return Mono.fromFuture(future);
     }
