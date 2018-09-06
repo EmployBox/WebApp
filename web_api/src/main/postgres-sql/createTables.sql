@@ -37,7 +37,7 @@ CREATE TABLE Curriculum(
 	accountId BIGINT references UserAccount,
 	curriculumId BIGINT identity primary key,
 	title TEXT,
-    version rowversion
+  version rowversion
 );
 
 CREATE TABLE Project (
