@@ -32,7 +32,7 @@ import HttpRequest from './components/httpRequest'
 import { Option, Render } from './searchFormOptions'
 import CreateCurricula from './pages/createCurricula'
 
-const apiURI = 'http://localhost:8080'
+const apiURI = 'http://localhost:8080/'
 
 const auther = new Auther()
 const PrivateRoute = PrivateRouter(auther)

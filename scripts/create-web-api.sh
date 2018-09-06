@@ -21,6 +21,6 @@ do
     gcloud compute ssh $vmName --command "sudo systemctl enable spring"
     gcloud compute ssh $vmName --command "sudo systemctl start spring"
 
-    gcloud compute scp conf/DB_CONNECTION_STRING.sh $vmName:~
-    gcloud compute ssh $vmName --command "sudo mv DB_CONNECTION_STRING.sh /etc/profile.d"
+    # gcloud compute scp conf/DB_CONNECTION_STRING.sh $vmName:~
+    # gcloud compute ssh $vmName --command "sudo mv DB_CONNECTION_STRING.sh /etc/profile.d"
 done
