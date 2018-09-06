@@ -5,9 +5,14 @@ After=syslog.target
 [Service]
 User=spring
 Type=idle
-ExecStart=/usr/bin/java -jar /var/spring/web_api.jar --server.port=8080 --spring.profiles.active=gcp
+ExecStart=/usr/bin/java -Dvertx.disableFileCPResolving=true -jar /var/spring/web_api.jar --server.port=8080 --spring.profiles.active=gcp
 SuccessExitStatus=143
 Restart=always
+Environment="DB_CONNECTION_STRING=jdbc:postgresql://35.197.247.147:5432/postgres%;postgres%;123"
+
+[Install]
+WantedBy=multi-user.target
+
 
 [Install]
 WantedBy=multi-user.target

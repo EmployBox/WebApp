@@ -85,7 +85,7 @@ export default withRouter(class extends React.Component {
             <h3>{json.summary}</h3>
             <div class='d-flex flex-row justify-content-center'>
               <h4>
-                Rating: {json.rating}
+                Rating: {json.rating.toFixed(1)}
                 {json.accountId === accountId ? <div />
                   : <button class='btn btn-success' onClick={() => history.push(ratingFormTempl.expand({
                     url: json._links.ratings.href.split('?')[0]
@@ -98,7 +98,7 @@ export default withRouter(class extends React.Component {
                 new TabConfig(
                   json._links.offered_jobs.href,
                   'Offered Jobs',
-                  (props) => <JobsTable auth={auth} {...props} remove={accountId === json.accountId} />,
+                  (props) => <JobsTable auth={auth} {...props} remove={accountId === json.accountId} template={offeredJobsTempl} />,
                   offeredJobsTempl.expand({
                     userUrl: json._links.self.href,
                     offeredJobsUrl: json._links.offered_jobs.href

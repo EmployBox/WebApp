@@ -7,7 +7,7 @@ const CommentList = class extends React.Component {
   render () {
     return <div class='commentList'>
       {this.props.data.map(comment => (
-        <Comment author={comment.accountIdFrom} key={comment.commentId}>
+        <Comment comment={comment} key={comment.commentId}>
           {comment.text}
         </Comment>
       ))}
@@ -55,9 +55,12 @@ const CommentForm = class extends React.Component {
   }
 }
 
-const Comment = ({author, children}) => (
+const Comment = ({comment, children}) => (
   <div class='comment'>
-    <h2 class='commentAuthor'>{author}</h2>
+    <HttpRequest url={}
+      onResult={account => <h3 class='commentAuthor'>{account.name}</h3>}
+    />
+    
     {children}
   </div>
 )

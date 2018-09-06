@@ -6,6 +6,7 @@ import FollowersTable from '../tables/followersTable'
 import URITemplate from 'urijs/src/URITemplate'
 import CommentBox from '../../components/CommentBox'
 import TabRoute, {TabConfig} from '../../components/tabRoute'
+import JobsTable from '../tables/offeredJobsTable'
 
 const style = {
   width: 200,
@@ -14,9 +15,10 @@ const style = {
   borderRadius: '50%'
 }
 
-const followersTempl = new URITemplate('/company/{companyUrl}/followers/{followersUrl}')
-const followingTempl = new URITemplate('/company/{companyUrl}/following/{followingUrl}')
+const followersTempl = new URITemplate('/company/{userUrl}/followers/{followersUrl}')
+const followingTempl = new URITemplate('/company/{userUrl}/following/{followingUrl}')
 const ratingFormTempl = new URITemplate('/rate/{url}')
+const offeredJobsTempl = new URITemplate('/company/{userUrl}/offeredJobs/{offeredJobsUrl}')
 
 export default withRouter(({match, auth, history, accountId}) => {
   const FollowButton = class extends React.Component {
@@ -75,7 +77,7 @@ export default withRouter(({match, auth, history, accountId}) => {
         <h3>{json.description}</h3>
         <h3>{json.specialization}</h3>
         <h3>
-          Rating: {json.rating}
+          Rating: {json.rating.toFixed(1)}
           {json.accountId === accountId ? <div />
             : <button class='btn btn-success' onClick={() => history.push(ratingFormTempl.expand({
               url: json._links.ratings.href.split('?')[0]
@@ -86,11 +88,21 @@ export default withRouter(({match, auth, history, accountId}) => {
         <TabRoute auth={auth}
           tabConfigs={[
             new TabConfig(
+              json._links.offered_jobs.href,
+              'Offered Jobs',
+              (props) => <JobsTable auth={auth} {...props} remove={accountId === json.accountId} template={offeredJobsTempl} />,
+              offeredJobsTempl.expand({
+                userUrl: json._links.self.href,
+                offeredJobsUrl: json._links.offered_jobs.href
+              }),
+              '/offeredJobs/:offeredJobsUrl'
+            ),
+            new TabConfig(
               json._links.followers.href,
               'Followers',
               props => <FollowersTable auth={auth} url={URI.decode(props.match.params.followersUrl)} template={followersTempl} {...props} />,
               followersTempl.expand({
-                companyUrl: json._links.self.href,
+                userUrl: json._links.self.href,
                 followersUrl: json._links.followers.href
               }),
               '/followers/:followersUrl'
@@ -100,7 +112,7 @@ export default withRouter(({match, auth, history, accountId}) => {
               'Following',
               props => <FollowersTable auth={auth} url={URI.decode(props.match.params.followingUrl)} template={followingTempl} {...props} />,
               followingTempl.expand({
-                companyUrl: json._links.self.href,
+                userUrl: json._links.self.href,
                 followingUrl: json._links.following.href
               }),
               '/following/:followingUrl'
