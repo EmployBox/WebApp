@@ -114,8 +114,6 @@ public class CurriculumService {
         DataMapper<Curriculum, Long> curriculumMapper = getMapper(Curriculum.class, unitOfWork);
         DataMapper<Application, Long> applicationsMapper = getMapper(Application.class, unitOfWork);
 
-
-
         CompletableFuture<Void> future = getCurriculum(userId, cid, email)
                 .thenAccept(curriculum1 -> curriculum.add(0, curriculum1))
                 .thenCompose(aVoid ->
