@@ -67,10 +67,10 @@ class ApplyButton extends React.Component {
     const {auther, history, job} = this.props
     let modalBody
     if (wasClicked) {
+      console.log(isLoggedIn)
       if (!isLoggedIn) modalBody = <Redirect to={auther.loginUrl + '?redirect=' + URI.encode(history.location.pathname)} />
       else if (url) modalBody = <HttpRequest url={url} authorization={auther.auth} onResult={onResult && this.onResult} afterResult={afterResult && this.afterResult} />
     }
-    console.log(job)
     return (
       auther.accountType === 'USR'
         ? <div>

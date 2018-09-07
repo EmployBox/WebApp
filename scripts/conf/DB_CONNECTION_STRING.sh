@@ -1,1 +1,0 @@
-export DB_CONNECTION_STRING="jdbc:postgresql://35.197.247.147:5432/ps-api-database?user=postgres&password=123"

@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
 import javax.xml.crypto.Data;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -131,8 +132,10 @@ public class RatingService {
                     else throw new BadRequestException(ErrorMessages.INVALID_ACCOUNT_TYPE_IN_RATING);
                 }
         );
+        DecimalFormat df = new DecimalFormat("#.#");
         ratingAverage[0] /= list.size();
-        account.rating = ratingAverage[0];
+        account.rating = Double.valueOf(df.format(ratingAverage[0]));
+
         return accountMapper.update(account);
     }
 
