@@ -30,8 +30,6 @@ IF DB_ID ('PS_API_DATABASE') IS NOT NULL
 			DROP TABLE [PreviousJobs];
 		IF OBJECT_ID(N'[AcademicBackground]') IS NOT NULL
 			DROP TABLE [AcademicBackground];
-		IF OBJECT_ID(N'[Local]') IS NOT NULL
-			DROP TABLE [Local];
 		IF OBJECT_ID(N'[Curriculum]') IS NOT NULL
 			DROP TABLE [Curriculum];
 		IF OBJECT_ID(N'[Moderator]') IS NOT NULL

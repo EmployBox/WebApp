@@ -70,40 +70,36 @@ export default withRouter(class extends React.Component {
         url={URI.decode(match.params.url)}
         authorization={auth}
         onResult={json => (
-          <div class='container'>
-            <div class='row'>
-              <div class='col-4'>
-                <center>
-                  <img style={style} src={json.photo_url || 'https://www.cukashmir.ac.in/facultyimages/2316218245609profile-default-male.png'} />
-                  <h2>{json.name}</h2>
-                  {json.accountId !== accountId &&
-                  <HttpRequest url={new URI(json._links.followers.href.split('?')[0]).setQuery('accountToCheck', accountId).href()}
-                    authorization={auth}
-                    onResult={follows => <FollowButton follows={follows}
-                      url={json._links.followers.href.split('?')[0]}
-                    />}
-                  />}
-                </center>
+          <div>
+            <div class='container text-center'>
+              <img style={style} src={json.photo_url} />
+              <h2>{json.name}</h2>
+              {json.accountId === accountId ? <div />
+                : <HttpRequest url={new URI(json._links.followers.href.split('?')[0]).setQuery('accountToCheck', accountId).href()}
+                  authorization={auth}
+                  onResult={follows => <FollowButton follows={follows}
+                    url={json._links.followers.href.split('?')[0]}
+                  />
+                  }
+                />
+              }
+              <h3>{json.summary}</h3>
+              <div class='d-flex flex-row justify-content-center'>
+                <h4>
+                  Rating: {json.rating.toFixed(1)}
+                  {json.accountId === accountId ? <div />
+                    : <button class='btn btn-success' onClick={() => history.push(ratingFormTempl.expand({
+                      url: json._links.ratings.href.split('?')[0]
+                    }) + `?type=user&from=${URI.encode(match.url)}&accountIdDest=${json.accountId}`)}>Rate this</button>
+                  }
+                </h4>
               </div>
-              <div class='col-8'>
-                <h2>Summary</h2>
-                <p>{json.summary || 'No summary available'}</p>
-              </div>
-            </div>
-            <div class='d-flex flex-row justify-content-center'>
-              <h4>Rating: {json.rating}</h4>
-              {json.accountId !== accountId &&
-                <button class='btn btn-success' onClick={() => history.push(ratingFormTempl.expand({
-                  url: json._links.ratings.href.split('?')[0]
-                }) + `?type=user&from=${URI.encode(match.url)}&accountIdDest=${json.accountId}`)}>Rate this</button>}
-            </div>
-            <center>
               <TabRoute auth={auth}
                 tabConfigs={[
                   new TabConfig(
                     json._links.offered_jobs.href,
                     'Offered Jobs',
-                    (props) => <JobsTable auth={auth} {...props} remove={accountId === json.accountId} />,
+                    (props) => <JobsTable auth={auth} {...props} remove={accountId === json.accountId} template={offeredJobsTempl} />,
                     offeredJobsTempl.expand({
                       userUrl: json._links.self.href,
                       offeredJobsUrl: json._links.offered_jobs.href
@@ -155,8 +151,8 @@ export default withRouter(class extends React.Component {
                   )
                 ]}
               />
-              <CommentBox url={json._links.comments.href} auth={auth} accountIdFrom={accountId} accountIdTo={json.accountId} />
-            </center>
+            </div>
+            <CommentBox url={json._links.comments.href} auth={auth} accountIdFrom={accountId} accountIdTo={json.accountId} />
           </div>
         )
         }
