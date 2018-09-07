@@ -121,7 +121,7 @@ export default withRouter(({match, auth, history, accountId}) => {
             ]}
           />
         </div>
-        <CommentBox url={json._links.comments.href} auth={auth} accountIdFrom={accountId} accountIdTo={json.accountId} />
+        <CommentBox url={json._links.comments.href} auth={auth} loggedAccount={accountId} accountIdFrom={accountId} accountIdTo={json.accountId} />
       </div>
     )}
   />

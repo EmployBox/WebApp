@@ -29,7 +29,7 @@ export default withRouter(({match, auth, history, template, url}) => (
             },
             {
               Header: 'Rating',
-              accessor: 'rating'
+              accessor: item => item.rating.toFixed(1)
             }
           ]}
         />

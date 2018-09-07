@@ -152,7 +152,7 @@ export default withRouter(class extends React.Component {
                 ]}
               />
             </div>
-            <CommentBox url={json._links.comments.href} auth={auth} accountIdFrom={accountId} accountIdTo={json.accountId} />
+            <CommentBox url={json._links.comments.href} auth={auth} loggedAccount={accountId} accountIdFrom={accountId} accountIdTo={json.accountId} />
           </div>
         )
         }
