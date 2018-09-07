@@ -71,9 +71,12 @@ const CommentForm = class extends React.Component {
           onSubmitHandler={this.onSubmit}
         />
         {this.state.inputs
-          ? <HttpRequest method={'POST'} url={this.props.url.split('?')[0]} authorization={this.props.auth}
+          ? <HttpRequest method='POST' url={this.props.url.split('?')[0]} authorization={this.props.auth}
             body={this.state.inputs}
-            afterResult={json => { console.log('comentario enviado ' + JSON.stringify(json))/* TODO */ }}
+            afterResult={json => {
+              this.setState({inputs: undefined})
+              this.props.submitComment(json)
+            }}
           />
           : <div />}
       </div>)
@@ -143,9 +146,11 @@ export default class extends React.Component {
     this.state = {
       currentUrl: this.props.url,
       data: [],
-      page: 0
+      page: 0,
+      changeKey: new Date()
     }
     this.deleteComment = this.deleteComment.bind(this)
+    this.submitComment = this.submitComment.bind(this)
   }
 
   deleteComment (link) {
@@ -155,16 +160,23 @@ export default class extends React.Component {
     })
   }
 
+  submitComment (json) {
+    this.setState(oldstate => {
+      oldstate.data.unshift(json)
+      return oldstate
+    })
+  }
+
   render () {
     console.log(this.state.data)
     return <div class='container'>
       <h1 class='text-center'>Comments</h1>
-      <CommentForm auth={this.props.auth} url={this.props.url} accountIdFrom={this.props.accountIdFrom} accountIdTo={this.props.accountIdTo} />
+      <CommentForm auth={this.props.auth} url={this.props.url} accountIdFrom={this.props.accountIdFrom} accountIdTo={this.props.accountIdTo} submitComment={this.submitComment} />
       <CommentList data={this.state.data} auth={this.props.auth} loggedAccount={this.props.loggedAccount} deleteComment={this.deleteComment} />
       {this.state.currentUrl
         ? (
           <div>
-            <HttpRequest url={this.state.currentUrl} authorization={this.props.auth} key={this.state.currentUrl}
+            <HttpRequest url={this.state.currentUrl} authorization={this.props.auth} key={this.state.changeKey}
               afterResult={json => {
                 const {data, currentUrl} = this.state
                 this.setState({
@@ -178,7 +190,8 @@ export default class extends React.Component {
               const {currentUrl, page} = this.state
               const uri = new URI(currentUrl)
               this.setState({
-                currentUrl: uri.setQuery('page', page)
+                currentUrl: uri.setQuery('page', page),
+                changeKey: new Date()
               })
             }}>More</button>
           </div>

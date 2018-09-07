@@ -18,6 +18,7 @@ export default withRouter(({json, history, match, accountTempl}) => {
       },
       {
         Header: 'Rating',
+        id: 'rating',
         accessor: item => item.rating.toFixed(1)
       },
       {
