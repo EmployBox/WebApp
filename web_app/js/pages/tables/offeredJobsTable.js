@@ -1,13 +1,11 @@
 import React from 'react'
-import {withRouter, Link} from 'react-router-dom'
+import {withRouter} from 'react-router-dom'
 import HttpRequest from '../../components/httpRequest'
 import URI from 'urijs'
 import Table from '../../components/tables/halTable'
 import URITemplate from 'urijs/src/URITemplate'
 
 const jobTemplate = new URITemplate('/job/{url}')
-const userTemplate = new URITemplate('/account/{url}')
-const companyTemplate = new URITemplate('/company/{url}')
 
 export default withRouter(class extends React.Component {
   constructor (props) {
