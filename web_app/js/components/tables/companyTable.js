@@ -17,7 +17,7 @@ export default withRouter(({json, history, match, companyTempl}) =>
       },
       {
         Header: '☆',
-        accessor: 'rating'
+        accessor: item => item.rating.toFixed(1)
       },
       {
         Header: 'Specialization',

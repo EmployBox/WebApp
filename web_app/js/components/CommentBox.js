@@ -30,17 +30,14 @@ const DateDiff = {
   }
 }
 
-const CommentList = class extends React.Component {
-  render () {
-    return <div class='commentList'>
-      {this.props.data.map(comment => (
-        <Comment comment={comment} key={comment.commentId}>
-          {comment.text}
-        </Comment>
-      ))}
-    </div>
-  }
-}
+const CommentList = ({data, loggedAccount, deleteComment, auth}) =>
+  <div class='commentList'>
+    {data.map(comment => (
+      <Comment comment={comment} key={comment.commentId} auth={auth} loggedAccount={loggedAccount} deleteComment={deleteComment}>
+        {comment.text}
+      </Comment>
+    ))}
+  </div>
 
 const CommentForm = class extends React.Component {
   constructor (props) {
@@ -83,36 +80,62 @@ const CommentForm = class extends React.Component {
   }
 }
 
-const Comment = ({comment, children}) => (
-  <HttpRequest url={comment._links.account_from.href}
-    onResult={account => {
-      const curr = new Date()
-      const commentDate = new Date()
-      commentDate.setTime(comment.datetime.epochSecond * 1000)
-      console.log(account)
-      return <div class='row'>
-        <div class='col-sm-1'>
-          <div class='thumbnail'>
-            <HttpRequest url={account._links.self.href}
-              onResult={json =>
-                <img class='img-responsive img-thumbnail' src={account.accountType === 'USR' ? json.photo_url : json.logo_url || 'https://ssl.gstatic.com/accounts/ui/avatar_2x.png'} />}
-            />
-          </div>
-        </div>
-        <div class='col-sm-5'>
-          <div class='panel panel-default'>
-            <div class='panel-heading'>
-              <strong>{account.name}</strong> <span class='text-muted'>commented {DateDiff.inDays(curr, commentDate)} days ago</span>
+const Comment = class extends React.Component {
+  constructor (props) {
+    super(props)
+    this.state = {
+      deleteUrl: undefined
+    }
+  }
+  render () {
+    const {comment, children, loggedAccount, auth} = this.props
+    return <div>
+      <HttpRequest url={comment._links.account_from.href}
+        authorization={auth}
+        onResult={account => {
+          const curr = new Date()
+          const commentDate = new Date()
+          commentDate.setTime(comment.datetime.epochSecond * 1000)
+          console.log(account)
+          return <div class='row'>
+            <div class='col-sm-1'>
+              <div class='thumbnail'>
+                <HttpRequest url={account._links.self.href}
+                  authorization={auth}
+                  onResult={json =>
+                    <img class='img-responsive img-thumbnail' src={account.accountType === 'USR' ? json.photo_url : json.logo_url || 'https://ssl.gstatic.com/accounts/ui/avatar_2x.png'} />}
+                />
+              </div>
             </div>
-            <div class='panel-body'>
-              {children}
+            <div class='col-sm-5'>
+              <div class='panel panel-default'>
+                <div class='panel-heading'>
+                  <strong>{account.name}</strong> <span class='text-muted'>commented {DateDiff.inDays(curr, commentDate)} days ago</span>
+                </div>
+                <div class='panel-body'>
+                  {children}
+                </div>
+              </div>
             </div>
+            {loggedAccount === comment.accountIdFrom && <div>
+              <button class='fas fa-trash btn btn-light'
+                type='button'
+                aria-label='Close'
+                onClick={() => this.setState({deleteUrl: comment._links.self.href})} />
+            </div>}
           </div>
-        </div>
-      </div>
-    }}
-  />
-)
+        }}
+      />
+      {this.state.deleteUrl && <HttpRequest url={this.state.deleteUrl}
+        method='DELETE'
+        authorization={auth}
+        afterResult={() => {
+          this.props.deleteComment(this.state.deleteUrl)
+          this.setState({deleteUrl: undefined})
+        }} />}
+    </div>
+  }
+}
 
 export default class extends React.Component {
   constructor (props) {
@@ -122,13 +145,22 @@ export default class extends React.Component {
       data: [],
       page: 0
     }
+    this.deleteComment = this.deleteComment.bind(this)
   }
+
+  deleteComment (link) {
+    this.setState(oldstate => {
+      oldstate.data = oldstate.data.filter(comment => comment._links.self.href !== link)
+      return oldstate
+    })
+  }
+
   render () {
     console.log(this.state.data)
     return <div class='container'>
       <h1 class='text-center'>Comments</h1>
       <CommentForm auth={this.props.auth} url={this.props.url} accountIdFrom={this.props.accountIdFrom} accountIdTo={this.props.accountIdTo} />
-      <CommentList data={this.state.data} />
+      <CommentList data={this.state.data} auth={this.props.auth} loggedAccount={this.props.loggedAccount} deleteComment={this.deleteComment} />
       {this.state.currentUrl
         ? (
           <div>
