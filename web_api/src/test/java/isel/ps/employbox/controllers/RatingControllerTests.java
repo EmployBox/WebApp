@@ -225,7 +225,7 @@ public class RatingControllerTests {
 
         Account account = accountMapper.find(new EqualAndCondition<>("accountId", userAccount2.getIdentityKey())).join().get(0);
         // (1+2+5+5) / 4
-        assertEquals(3.25, account.rating);
+        assertEquals(3.2, account.rating);
         unitOfWork.commit().join();
     }
 

@@ -134,7 +134,7 @@ public class RatingService {
         );
         DecimalFormat df = new DecimalFormat("#.#");
         ratingAverage[0] /= list.size();
-        account.rating = Double.valueOf(df.format(ratingAverage[0]));
+        account.rating = Double.valueOf(df.format(ratingAverage[0]).replaceAll(",", "."));
 
         return accountMapper.update(account);
     }
