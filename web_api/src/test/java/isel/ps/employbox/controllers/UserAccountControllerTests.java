@@ -204,7 +204,6 @@ public class UserAccountControllerTests {
         assertEquals("Zacarias", objectMapper.readTree(body).get("_embedded").get("items").findValuesAsText("name").get(0));
 
     }
-
     @Test
     public void testGetUserAccount() throws IOException{
         String body = new String(webTestClient
