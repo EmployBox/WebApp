@@ -50,8 +50,8 @@ public class RatingService {
                         .thenCompose(account ->
                                 ratingMapper.findById(new Rating.RatingKey(account.getIdentityKey(), accountIdDest))
                                         .thenCompose(ratings -> {
-                                                    ratings.orElseThrow(() -> new ResourceNotFoundException(ErrorMessages.RESOURCE_NOTFOUND_RATING));
-                                                    return unitOfWork.commit().thenApply(__ -> ratings.get());
+                                                    Rating rating = ratings.orElseThrow(() -> new ResourceNotFoundException(ErrorMessages.RESOURCE_NOTFOUND_RATING));
+                                                    return unitOfWork.commit().thenApply(aVoid -> rating);
                                                 }
                                         )
                         );
@@ -69,7 +69,7 @@ public class RatingService {
                         .thenCompose(user -> {
                             if(user.getIdentityKey() != rating.getAccountIdFrom())
                                 throw new ForbiddenException(ErrorMessages.UN_AUTHORIZED_ID_AND_EMAIL_MISMATCH);
-                            return ratingMapper.find(new EqualAndCondition("accountIdFrom", rating.getAccountIdFrom()),
+                            return ratingMapper.find(new EqualAndCondition<>("accountIdFrom", rating.getAccountIdFrom()),
                                     new EqualAndCondition<>("accountIdTo", rating.getAccountIdTo()));
                         })
                         .thenCompose(ratings -> {
@@ -134,7 +134,7 @@ public class RatingService {
         );
         DecimalFormat df = new DecimalFormat("#.#");
         ratingAverage[0] /= list.size();
-        account.rating = Double.valueOf(df.format(ratingAverage[0]).replaceAll(",", "."));
+        account.setRating(Double.valueOf(df.format(ratingAverage[0]).replaceAll(",", ".")));
 
         return accountMapper.update(account);
     }
@@ -148,7 +148,7 @@ public class RatingService {
                 .thenCompose(account -> {
                             if (account.size() != 1)
                                     throw new UnauthorizedException(ErrorMessages.UN_AUTHORIZED);
-                                return ratingMapper.find(new EqualAndCondition("accountIdFrom", account.get(0).getIdentityKey()),
+                                return ratingMapper.find(new EqualAndCondition<>("accountIdFrom", account.get(0).getIdentityKey()),
                                         new EqualAndCondition<>("accountIdTo", accountIdDest));
                         }
                 )

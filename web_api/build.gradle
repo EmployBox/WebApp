@@ -56,8 +56,6 @@ dependencies {
     testRuntime group: 'org.hsqldb', name: 'hsqldb', version: '2.4.0'
     // https://mvnrepository.com/artifact/org.postgresql/postgresql
     compile group: 'org.postgresql', name: 'postgresql', version: '42.2.5'
-
-
 }
 
 compileKotlin {

@@ -19,7 +19,7 @@ public class Account implements DomainObject<Long> {
     protected final String email;
     protected final String password;
     protected final String accountType;
-    public double rating;
+    private double rating;
     @Version
     private final long version;
 
@@ -124,6 +124,10 @@ public class Account implements DomainObject<Long> {
 
     public String getAccountType() {
         return accountType;
+    }
+
+    public void setRating(double rating) {
+        this.rating = rating;
     }
 
     public Function<UnitOfWork, CompletableFuture<List<Job>>> getOfferedJobs() {

@@ -180,7 +180,7 @@ export default class extends React.Component {
               afterResult={json => {
                 const {data, currentUrl} = this.state
                 this.setState({
-                  data: (json._embedded ? json._embedded.items : []).concat(data),
+                  data: data.concat(json._embedded ? json._embedded.items : []),
                   page: json.current_page + 1,
                   currentUrl: json.current_page === json.last_page ? undefined : currentUrl
                 })
