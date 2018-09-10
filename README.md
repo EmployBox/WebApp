@@ -1,4 +1,4 @@
-# Projeto e Seminário 2018/17V 
+# Projeto e Seminário 2017/18V 
 ## Grupo 15
 
 Repositório do projeto **EmployBox**, realizado no âmbito da unidade curricular de Projeto e Seminário. 
