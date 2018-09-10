@@ -38,7 +38,7 @@ public class UserJobApplicationController {
 
     @PostMapping
     public Mono<OutApplication> createApplication(@PathVariable long id, @PathVariable long jid,  @RequestBody InApplication inApplication, Authentication authentication){
-        if(jid != inApplication.getJobId())
+        if(jid != inApplication.getJobId() || inApplication.getAccountId() != id)
             throw new BadRequestException(BAD_REQUEST_IDS_MISMATCH);
         Application application = applicationBinder.bindInput(inApplication);
 

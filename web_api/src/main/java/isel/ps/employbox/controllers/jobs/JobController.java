@@ -37,13 +37,13 @@ public class JobController {
     public Mono<HalCollectionPage<Job>> getAllJobs(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int pageSize,
-            @RequestParam(required = false) String address,
-            @RequestParam(required = false) String title,
+            @RequestParam(required = false, defaultValue = "") String address,
+            @RequestParam(required = false, defaultValue = "") String title,
             @RequestParam(required = false) Integer wage,
-            @RequestParam(required = false) String type,
-            @RequestParam(required = false) String offerType,
-            @RequestParam(required = false) Integer ratingLow,
-            @RequestParam(required = false) Integer ratingHigh,
+            @RequestParam(required = false, defaultValue = "") String type,
+            @RequestParam(required = false, defaultValue = "") String offerType,
+            @RequestParam(required = false, defaultValue = "0") int ratingLow,
+            @RequestParam(required = false, defaultValue = "10") int ratingHigh,
             @RequestParam(required = false) String orderColumn,
             @RequestParam(required = false, defaultValue = "ASC") String orderClause
     )  {

@@ -1,6 +1,7 @@
 package isel.ps.employbox.controllers.jobs;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.jayield.rapper.mapper.DataMapper;
 import com.github.jayield.rapper.mapper.conditions.EqualAndCondition;
@@ -29,6 +30,7 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
+import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
@@ -89,18 +91,36 @@ public class JobControllerTests {
     }
 
     @Test
-    public void testGetAllJobs(){
-        webTestClient
+    public void testGetAllJobs() throws IOException {
+        ObjectMapper objectMapper = new ObjectMapper();
+        String body = new String(webTestClient
                 .get()
                 .uri("/jobs")
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody()
-                .consumeWith(document("getAllJobs"));
+                .returnResult()
+                .getResponseBody()
+        );
+        JsonNode jsonNode = objectMapper.readTree(body);
+        assertEquals(3, jsonNode.get("size").asInt());
+
+        body = new String(webTestClient
+                .get()
+                .uri(uriBuilder -> uriBuilder.path("/jobs/").queryParam("title", "Great Job" ).build())
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody()
+                .returnResult().getResponseBody());
+
+        jsonNode = objectMapper.readTree(body);
+        assertEquals(2, jsonNode.get("size").asInt());
+
     }
 
     @Test
-    public void testGetJob(){
+    public void testGetJob() {
+
         String body = new String(webTestClient
                 .get()
                 .uri("/jobs/" + job.getIdentityKey())
@@ -108,6 +128,7 @@ public class JobControllerTests {
                 .expectStatus().isOk()
                 .expectBody()
                 .returnResult().getResponseBody());
+
     }
 
     @Test
