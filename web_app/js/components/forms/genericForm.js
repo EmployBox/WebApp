@@ -12,7 +12,7 @@ export default class extends Component {
 
   render () {
     return (
-      <form class={this.props.formKlass || 'form-group'}
+      <div class={this.props.formKlass || 'form-group'}
         onKeyPress={event => {
           const code = event.keyCode || event.which
           if (code === 13) this.buttonClick.click()
@@ -26,7 +26,7 @@ export default class extends Component {
             onClick={() => this.props.onSubmitHandler(this.state.inputs)}
             class={this.props.btnKlass || 'btn btn-primary btn-lg btn-block bg-dark'}>Submit</button>
         </div>
-      </form>
+      </div>
     )
   }
 

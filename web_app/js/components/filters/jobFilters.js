@@ -57,18 +57,6 @@ export default (query, onQueryChange) => {
         </div>
       </div>
       <div class='form-group'>
-        <label>Account rating from</label>
-        <div class='row'>
-          <div class='col'>
-            <input type='number' class='form-control' placeholder='#0' value={query.ratingLow || ''} onChange={(event) => handleChange(event.target.value, 'ratingLow')} />
-          </div>
-          <label>to</label>
-          <div class='col'>
-            <input type='number' class='form-control' placeholder='#10' value={query.ratingHigh || ''} onChange={(event) => handleChange(event.target.value, 'ratingHigh')} />
-          </div>
-        </div>
-      </div>
-      <div class='form-group'>
         <label>Contract</label>
         <div class='row'>
           <div class='col'>

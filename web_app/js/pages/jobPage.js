@@ -8,18 +8,21 @@ import {withRouter, Link} from 'react-router-dom'
 
 const userTempl = new URITemplate('/account/{url}')
 const companyTempl = new URITemplate('/company/{url}')
+const curriculaTempl = new URITemplate('/curricula/{url}')
 
 export default withRouter(class extends React.Component {
   constructor (props) {
     super(props)
     this.state = {
       experiences: undefined,
-      showing: false
+      showingExp: false,
+      applications: undefined,
+      showingApp: false
     }
   }
 
   render () {
-    const {auth, match, history} = this.props
+    const {auth, match, history, accountId} = this.props
     return <HttpRequest url={URI.decode(match.params.url)}
       authorization={auth}
       onResult={jobRes =>
@@ -37,9 +40,11 @@ export default withRouter(class extends React.Component {
             </Link>
           </div>
           <h3>Rating: {jobRes._embedded.account.rating}</h3>
+          <h4>{jobRes.type}</h4>
+          {jobRes.address && <h4>Address: {jobRes.address}</h4>}
           <HttpRequest url={this.state.experiences || jobRes._links.experiences.href} authorization={auth}
             onResult={json =>
-              <Toggle text='Experiences' showing={this.state.showing} onToggle={showing => this.setState({showing: showing})}>
+              <Toggle text='Experiences' showing={this.state.showingExp} onToggle={showing => this.setState({showingExp: showing})}>
                 <Table currentUrl={this.state.experiences || jobRes._links.experiences.href} json={json}
                   pushTo={url => this.setState({experiences: url})}
                   columns={[
@@ -56,6 +61,34 @@ export default withRouter(class extends React.Component {
               </Toggle>
             }
           />
+          {accountId === jobRes._embedded.account.accountId && <HttpRequest url={this.state.applications || jobRes._links.applications.href} authorization={auth}
+            onResult={json =>
+              <Toggle text='Applications' showing={this.state.showingApp} onToggle={showing => this.setState({showingApp: showing})}>
+                <Table currentUrl={this.state.applications || jobRes._links.applications.href} json={json}
+                  pushTo={url => this.setState({applications: url})}
+                  onClickRow={({rowInfo, column}) => {
+                    if (column.Header === 'Name') {
+                      history.push((rowInfo.original._embedded.account.accountType === 'USR' ? userTempl : companyTempl).expand({
+                        url: rowInfo.original._embedded.account._links.self.href
+                      }))
+                    } else {
+                      history.push(curriculaTempl.expand({url: rowInfo.original._embedded.curriculum._links.self.href}))
+                    }
+                  }}
+                  columns={[
+                    {
+                      Header: 'Name',
+                      accessor: '_embedded.account.name'
+                    },
+                    {
+                      Header: 'Curriculum',
+                      accessor: '_embedded.curriculum.title'
+                    }
+                  ]}
+                />
+              </Toggle>
+            }
+          />}
         </div>
       }
     />
