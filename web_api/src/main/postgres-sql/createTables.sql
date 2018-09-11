@@ -17,6 +17,7 @@ CREATE TABLE Company (
   accountId BIGINT primary key references Account,
   yearFounded int,
   specialization VARCHAR(20),
+  address VARCHAR(50),
   webPageUrl VARCHAR(200),
   LogoUrl VARCHAR(200),
   description VARCHAR(50),

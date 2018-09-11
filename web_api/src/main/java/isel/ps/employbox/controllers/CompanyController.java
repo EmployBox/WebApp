@@ -27,8 +27,19 @@ public class CompanyController {
     }
 
     @GetMapping
-    public Mono<HalCollectionPage<Company>> getCompanies(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "5") int pageSize){
-        CompletableFuture<HalCollectionPage<Company>> future = companyService.getCompanies(page, pageSize)
+    public Mono<HalCollectionPage<Company>> getCompanies(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "5") int pageSize,
+            @RequestParam(required = false) String name,
+            @RequestParam(required = false) String specialization,
+            @RequestParam(required = false) Integer yearFounded,
+            @RequestParam(required = false) String location,
+            @RequestParam(required = false) Integer ratingLow,
+            @RequestParam(required = false) Integer ratingHigh,
+            @RequestParam(required = false) String orderColumn,
+            @RequestParam(required = false, defaultValue = "ASC") String orderClause
+    ) {
+        CompletableFuture<HalCollectionPage<Company>> future = companyService.getCompanies(page, pageSize,ratingLow, ratingHigh, name, specialization, yearFounded, location, orderColumn, orderClause)
                 .thenCompose(companyCollectionPage -> companyBinder.bindOutput(companyCollectionPage, this.getClass()));
         return Mono.fromFuture(future);
     }

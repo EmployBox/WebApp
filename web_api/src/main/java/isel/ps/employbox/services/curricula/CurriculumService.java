@@ -63,7 +63,7 @@ public class CurriculumService {
 
     public CompletableFuture<CollectionPage<Curriculum>> getCurricula(long accountId, int page, int pageSize, String orderColumn, String orderClause) {
         ArrayList<Condition> conditions = new ArrayList<>();
-        ServiceUtils.evaluateOrderClause(orderColumn,orderClause, conditions);
+        ServiceUtils.evaluateOrderClauseConditions(orderColumn,orderClause, conditions);
         conditions.add( new EqualAndCondition<>("accountId", accountId));
 
 

@@ -35,7 +35,7 @@ public class ScheduleService {
 
         List<Condition> conds = new ArrayList<>();
         conds.add( new EqualAndCondition<>("jobId", jobId));
-        ServiceUtils.evaluateOrderClause(orderColumn, orderClause, conds);
+        ServiceUtils.evaluateOrderClauseConditions(orderColumn, orderClause, conds);
 
         return jobService
                 .getJob(jobId, unitOfWork)

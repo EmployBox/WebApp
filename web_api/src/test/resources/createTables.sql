@@ -15,6 +15,7 @@ create table Company (
   accountId BIGINT primary key references Account,
   yearFounded SMALLINT,
   specialization VARCHAR(20),
+  address VARCHAR (50),
   webPageUrl VARCHAR(50),
   LogoUrl VARCHAR(100),
   description VARCHAR(50),
@@ -103,6 +104,7 @@ create table Job (
   offerBeginDate DATETIME DEFAULT CURRENT_DATE,
   offerEndDate DATETIME,
   offerType VARCHAR(30) NOT NULL,
+  type varchar (30),
   Address VARCHAR(50),
   version bigint default 1,
 

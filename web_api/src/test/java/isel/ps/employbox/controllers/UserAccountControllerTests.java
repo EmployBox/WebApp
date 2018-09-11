@@ -118,7 +118,7 @@ public class UserAccountControllerTests {
     public void testGetAllUserAccounts() throws IOException {
         String body = new String(webTestClient
                 .get()
-                .uri(uriBuilder -> uriBuilder.path("/accounts/users").queryParam("orderColumn","rating").build())
+                .uri(uriBuilder -> uriBuilder.path("/accounts/users").build())
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody()
@@ -129,18 +129,6 @@ public class UserAccountControllerTests {
         List<String> ratings = objectMapper.readTree(body).get("_embedded").get("items").findValuesAsText("rating");
         assertTrue( Double.valueOf(ratings.get(0)) < Double.valueOf(ratings.get(1)) );
 
-
-        body = new String(webTestClient
-                .get()
-                .uri(uriBuilder -> uriBuilder.path("/accounts/users").queryParam("orderColumn","rating").queryParam("orderClause", "DESC").build())
-                .exchange()
-                .expectStatus().isOk()
-                .expectBody()
-                .returnResult()
-                .getResponseBody());
-
-        ratings = objectMapper.readTree(body).get("_embedded").get("items").findValuesAsText("rating");
-        assertTrue( Double.valueOf(ratings.get(0)) > Double.valueOf(ratings.get(1)) );
 
 
         body = new String(webTestClient

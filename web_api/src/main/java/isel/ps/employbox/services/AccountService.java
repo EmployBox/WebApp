@@ -27,7 +27,7 @@ public final class AccountService {
 
     public CompletableFuture<CollectionPage<Account>> getAllAccounts(int page, int pageSize, String orderColumn, String orderClause) {
         List<Condition> conditions = new ArrayList<>();
-        ServiceUtils.evaluateOrderClause(orderColumn, orderClause, conditions);
+        ServiceUtils.evaluateOrderClauseConditions(orderColumn, orderClause, conditions);
         return ServiceUtils.getCollectionPageFuture(Account.class, page, pageSize, conditions.toArray(new Condition[conditions.size()]));
     }
 
@@ -69,7 +69,7 @@ public final class AccountService {
 
     public CompletableFuture<CollectionPage<Job>> getOfferedJob(long accountId, int page, int pageSize, String orderColumn, String orderClause){
         List<Condition> conditions = new ArrayList<>();
-        ServiceUtils.evaluateOrderClause(orderColumn, orderClause, conditions);
+        ServiceUtils.evaluateOrderClauseConditions(orderColumn, orderClause, conditions);
         conditions.add(new EqualAndCondition<>("accountId", accountId));
         return getCollectionPageFuture(Job.class , page, pageSize, conditions.toArray(new Condition[conditions.size()]));
     }

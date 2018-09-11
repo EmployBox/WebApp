@@ -1,16 +1,21 @@
 package isel.ps.employbox.services;
 
 import com.github.jayield.rapper.mapper.DataMapper;
+import com.github.jayield.rapper.mapper.conditions.Condition;
 import com.github.jayield.rapper.mapper.conditions.EqualAndCondition;
+import com.github.jayield.rapper.mapper.conditions.EqualOrCondition;
+import com.github.jayield.rapper.mapper.conditions.LikeCondition;
 import com.github.jayield.rapper.unitofwork.UnitOfWork;
 import isel.ps.employbox.ErrorMessages;
 import isel.ps.employbox.exceptions.ResourceNotFoundException;
 import isel.ps.employbox.model.binders.CollectionPage;
+import isel.ps.employbox.model.entities.Account;
 import isel.ps.employbox.model.entities.Company;
 import isel.ps.employbox.model.entities.Follows;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -18,6 +23,8 @@ import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 import static com.github.jayield.rapper.mapper.MapperRegistry.getMapper;
+import static isel.ps.employbox.services.ServiceUtils.evaluateOrderClauseConditions;
+import static isel.ps.employbox.services.ServiceUtils.evaluateRatingConditions;
 import static isel.ps.employbox.services.ServiceUtils.handleExceptions;
 
 @Service
@@ -28,8 +35,36 @@ public class CompanyService {
         this.accountService = accountService;
     }
 
-    public CompletableFuture<CollectionPage<Company>> getCompanies(int page, int pageSize) {
-        return ServiceUtils.getCollectionPageFuture(Company.class, page, pageSize);
+    public CompletableFuture<CollectionPage<Company>> getCompanies(
+            int page,
+            int pageSize,
+            Integer ratingLow,
+            Integer ratingHigh,
+            String name,
+            String specialization,
+            Integer yearFounded,
+            String address,
+            String orderColumn,
+            String orderClause
+    ) {
+        List<Condition> conds = new ArrayList<>();
+
+        evaluateRatingConditions(ratingLow, ratingHigh, conds);
+        conds.add(new LikeCondition("name", name));
+        conds.add(new LikeCondition("accountType", "CMP"));
+
+        conds.add(new LikeCondition("specialization", specialization));
+        conds.add(new LikeCondition("address", address));
+        conds.add(new EqualAndCondition<>("yearFounded", yearFounded));
+
+        conds = conds.stream()
+                .filter(stringPair -> stringPair.getValue() != null)
+                .collect(Collectors.toList());
+
+        evaluateOrderClauseConditions(orderColumn, orderClause, conds);
+
+        return ServiceUtils.getCollectionPageFuture(Company.class, page, pageSize, conds.toArray(new Condition[conds.size()]));
+
     }
 
     public CompletableFuture<Company> getCompany(long cid) {

@@ -31,7 +31,7 @@ public class CommentService {
 
     public CompletableFuture<CollectionPage<Comment>> getComments(long accountId, int page, int pageSize, String orderColumn, String orderClause) {
         ArrayList<Condition> conditions = new ArrayList<>();
-        ServiceUtils.evaluateOrderClause(orderColumn,orderClause, conditions);
+        ServiceUtils.evaluateOrderClauseConditions(orderColumn,orderClause, conditions);
         conditions.add(new EqualAndCondition<>("accountIdDest", accountId));
 
 
