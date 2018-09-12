@@ -51,7 +51,8 @@ public class ServiceUtils {
                 .thenCompose(voidCompletableFuture -> voidCompletableFuture);
     }
 
-    public static void evaluateOrderClause(String orderColumn, String orderClause, List<Condition> conditionPairs) {
+    public static void evaluateOrderClauseConditions(String orderColumn, String orderClause, List<Condition> conditionPairs) {
+                                    //check table has this orderColumn
         if(orderColumn != null) {
             if (!(orderClause.compareTo("ASC") == 0 || orderClause.compareTo("DESC") == 0))
                 throw new BadRequestException("clause is not equal to ASC or DESC");
@@ -59,6 +60,16 @@ public class ServiceUtils {
                 conditionPairs.add(OrderCondition.asc(orderColumn));
             else
                 conditionPairs.add(OrderCondition.desc(orderColumn));
+        }
+    }
+
+    public static void evaluateRatingConditions(Integer ratingLow, Integer ratingHigh, List<Condition> conditions) {
+        if(ratingLow != null && ratingHigh != null) {
+            if(ratingLow > ratingHigh)
+                throw new BadRequestException("ratingLow cannot be higher than ratingHigh");
+
+            conditions.add(new Condition<>("rating", ">=", ratingLow ));
+            conditions.add(new Condition<>("rating", "<=", ratingHigh ));
         }
     }
 }

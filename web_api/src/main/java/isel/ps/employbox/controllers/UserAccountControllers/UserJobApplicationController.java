@@ -42,7 +42,7 @@ public class UserJobApplicationController {
             throw new BadRequestException(BAD_REQUEST_IDS_MISMATCH);
         Application application = applicationBinder.bindInput(inApplication);
 
-        CompletableFuture<OutApplication> future = userAccountService.createApplication(inApplication.getAccountId(), application, authentication.getName())
+        CompletableFuture<OutApplication> future = userAccountService.createApplication(id, inApplication.getAccountId(), application, authentication.getName())
                 .thenCompose(applicationBinder::bindOutput);
         return Mono.fromFuture(future);
     }

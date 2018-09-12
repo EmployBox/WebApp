@@ -15,7 +15,6 @@ import isel.ps.employbox.model.entities.Rating;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
-import javax.xml.crypto.Data;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
@@ -34,7 +33,7 @@ public class RatingService {
 
     public CompletableFuture<CollectionPage<Rating>> getRatings(long accountId, int page, int pageSize, String orderColumn, String orderClause) {
         ArrayList<Condition> conditions = new ArrayList<>();
-        ServiceUtils.evaluateOrderClause(orderColumn,orderClause, conditions);
+        ServiceUtils.evaluateOrderClauseConditions(orderColumn,orderClause, conditions);
         conditions.add( new EqualAndCondition<>("accountIdTo", accountId));
 
         return ServiceUtils.getCollectionPageFuture(Rating.class, page, pageSize,  conditions.toArray(new Condition[conditions.size()]));

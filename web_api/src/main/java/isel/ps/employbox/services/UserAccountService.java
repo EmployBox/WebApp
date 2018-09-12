@@ -3,6 +3,8 @@ package isel.ps.employbox.services;
 import com.github.jayield.rapper.mapper.DataMapper;
 import com.github.jayield.rapper.mapper.conditions.Condition;
 import com.github.jayield.rapper.mapper.conditions.EqualAndCondition;
+import com.github.jayield.rapper.mapper.conditions.EqualOrCondition;
+import com.github.jayield.rapper.mapper.conditions.LikeCondition;
 import com.github.jayield.rapper.unitofwork.UnitOfWork;
 import isel.ps.employbox.ErrorMessages;
 import isel.ps.employbox.exceptions.*;
@@ -24,7 +26,7 @@ import java.util.stream.Collectors;
 
 import static com.github.jayield.rapper.mapper.MapperRegistry.getMapper;
 import static isel.ps.employbox.ErrorMessages.*;
-import static isel.ps.employbox.services.ServiceUtils.handleExceptions;
+import static isel.ps.employbox.services.ServiceUtils.*;
 
 @Service
 public class UserAccountService {
@@ -33,29 +35,34 @@ public class UserAccountService {
             int page,
             int pageSize,
             String name,
+            String summary,
             Integer ratingLow,
             Integer ratingHigh,
             String orderColumn,
-            String orderClause)
-    {
-        List<Condition> pairs = new ArrayList<>();
-        if(ratingLow != null && ratingHigh != null) {
-            if(ratingLow > ratingHigh)
-                throw new BadRequestException("ratingLow cannot be higher than ratingHigh");
+            String orderClause) {
+        List<Condition> conditions = new ArrayList<>();
 
-            pairs.add(new Condition<>("ratingLow", ">=", ratingLow ));
-            pairs.add(new Condition<>("ratingHigh", "<=", ratingHigh ));
-        }
-        pairs.add(new EqualAndCondition<>("name", name));
+        evaluateRatingConditions(ratingLow, ratingHigh, conditions);
+        conditions.add(new LikeCondition("name", name));
+        conditions.add(new LikeCondition("accountType", "USR"));
 
-        pairs = pairs.stream()
+        conditions = conditions.stream()
                 .filter(stringPair -> stringPair.getValue() != null)
                 .collect(Collectors.toList());
 
-        ServiceUtils.evaluateOrderClause(orderColumn, orderClause, pairs);
+        conditions.add(new LikeCondition("summary", summary));
 
-        return ServiceUtils.getCollectionPageFuture(UserAccount.class, page, pageSize, pairs.toArray(new Condition[pairs.size()]));
+        conditions = conditions.stream()
+                .filter(stringPair -> stringPair.getValue() != null)
+                .collect(Collectors.toList());
+
+        evaluateOrderClauseConditions(orderColumn, orderClause, conditions);
+
+
+        return getCollectionPageFuture(UserAccount.class, page, pageSize, conditions.toArray(new Condition[conditions.size()]));
+
     }
+
 
     public CompletableFuture<UserAccount> getUser(long id, String... email) {
         UnitOfWork unit = new UnitOfWork();
@@ -135,23 +142,32 @@ public class UserAccountService {
         return handleExceptions(future, unit);
     }
 
-    public CompletableFuture<Application> createApplication( long userId, Application application, String email) {
-
-        UnitOfWork unit = new UnitOfWork();
-        DataMapper<Application, Long> applicationMapper = getMapper(Application.class, unit);
+    public CompletableFuture<Application> createApplication(long jobOwnerId, long applicantId, Application application, String email) {
+        UnitOfWork unitOfWork = new UnitOfWork();
+        DataMapper<Application, Long> applicationMapper = getMapper(Application.class, unitOfWork);
+        DataMapper<Job, Long> jobMapper = getMapper(Job.class, unitOfWork);
         AccountService accountService = new AccountService();
-        CompletableFuture<Application> future  = accountService.getAccount(userId, email)
-                .thenCompose( userAccount -> applicationMapper.find(new EqualAndCondition<>("accountId", userAccount.getIdentityKey()),
+
+        CompletableFuture<Application> future  = accountService.getAccount(applicantId, email)
+        	.thenCompose( userAccount -> applicationMapper.find(
+                        new EqualAndCondition<>("accountId", userAccount.getIdentityKey()),
                         new EqualAndCondition<>("jobId", application.getJob().getForeignKey())
-                        ).thenAccept(list -> {
+                        )
+                        .thenAccept(list -> {
                             if(list.size() != 0)
-                                throw new ForbiddenException(ErrorMessages.ALREADY_EXISTS);
+                                throw new ConflictException(ErrorMessages.ALREADY_EXISTS);
                         })
                 )
+                .thenCompose( aVoid -> jobMapper.find(new EqualAndCondition<>("accountId",
+                        jobOwnerId),new EqualAndCondition<>("jobId", application.getJob().getForeignKey()) ))
+                .thenAccept( res -> {
+                    if(res.size() == 0 )
+                        throw new ForbiddenException(ErrorMessages.UN_AUTHORIZED);
+                })
                 .thenCompose(aVoid -> applicationMapper.create( application))
-                .thenCompose(aVoid -> unit.commit())
-                .thenApply(res -> application);
-        return handleExceptions(future, unit);
+                .thenCompose(aVoid -> unitOfWork.commit().thenApply(res -> application));
+
+        return handleExceptions(future, unitOfWork);
     }
 
     public Mono<Void> updateUser(UserAccount userAccount, String email) {

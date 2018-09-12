@@ -66,7 +66,7 @@ public class FollowService {
                                 else
                                     conditionPairs.add(new EqualOrCondition<Long>("accountId", follow.get(i).getAccountIdFollower()));
 
-                            ServiceUtils.evaluateOrderClause(orderColumn, orderClause, conditionPairs);
+                            ServiceUtils.evaluateOrderClauseConditions(orderColumn, orderClause, conditionPairs);
 
                             return accountMapper.find(page, pageSize, conditionPairs.toArray(new Condition[conditionPairs.size()]));
                         }).thenCompose(accountsList -> unitOfWork.commit().thenApply(aVoid -> accountsList))

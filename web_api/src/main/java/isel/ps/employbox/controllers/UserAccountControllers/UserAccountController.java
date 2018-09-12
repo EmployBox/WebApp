@@ -32,12 +32,13 @@ public class UserAccountController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int pageSize,
             @RequestParam(required = false) String name,
+            @RequestParam(required = false) String summary,
             @RequestParam(required = false) Integer ratingLow,
             @RequestParam(required = false) Integer ratingHigh,
             @RequestParam(required = false) String orderColumn,
             @RequestParam(required = false, defaultValue = "ASC") String orderClause
     ){
-        CompletableFuture<HalCollectionPage<UserAccount>> future = userAccountService.getAllUsers(page, pageSize, name, ratingLow, ratingHigh, orderColumn, orderClause)
+        CompletableFuture<HalCollectionPage<UserAccount>> future = userAccountService.getAllUsers(page, pageSize, name,summary, ratingLow, ratingHigh, orderColumn, orderClause)
                 .thenCompose(userAccountCollectionPage -> userBinder.bindOutput(userAccountCollectionPage, this.getClass()));
         return Mono.fromFuture(future);
     }

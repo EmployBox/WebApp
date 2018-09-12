@@ -53,7 +53,7 @@ public class OutApplication implements OutputDto {
         this._outAccount = outAccount;
         this.applicationId = applicationId;
         this.accountId = outAccount.getAccountId();
-        this.curriculumId = outCurriculum.getCurriculumId();
+        this.curriculumId = outCurriculum != null ? outCurriculum.getCurriculumId() : null;
         this.jobId = outJob.getJobId();
         this.date = date;
         this._links = new _Links();

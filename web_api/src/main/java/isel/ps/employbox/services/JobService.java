@@ -3,15 +3,13 @@ package isel.ps.employbox.services;
 import com.github.jayield.rapper.mapper.DataMapper;
 import com.github.jayield.rapper.mapper.conditions.Condition;
 import com.github.jayield.rapper.mapper.conditions.EqualAndCondition;
-import com.github.jayield.rapper.mapper.conditions.EqualOrCondition;
+import com.github.jayield.rapper.mapper.conditions.LikeCondition;
 import com.github.jayield.rapper.unitofwork.UnitOfWork;
 import isel.ps.employbox.ErrorMessages;
-import isel.ps.employbox.exceptions.BadRequestException;
 import isel.ps.employbox.exceptions.ConflictException;
 import isel.ps.employbox.exceptions.ResourceNotFoundException;
 import isel.ps.employbox.exceptions.UnauthorizedException;
 import isel.ps.employbox.model.binders.CollectionPage;
-import isel.ps.employbox.model.entities.Account;
 import isel.ps.employbox.model.entities.jobs.Application;
 import isel.ps.employbox.model.entities.jobs.Job;
 import isel.ps.employbox.model.entities.jobs.JobExperience;
@@ -38,72 +36,28 @@ public class JobService {
             String title,
             Integer wage,
             String offerType,
-            int ratingLow,
-            int ratingHigh,
             String orderColumn,
-            String orderClause,
-            String type)
+            String orderClause)
     {
         UnitOfWork unitOfWork = new UnitOfWork();
-        DataMapper<Account, Long> accountDataMapper = getMapper(Account.class, unitOfWork);
-        DataMapper<Job, Long> jobMapper = getMapper(Job.class, unitOfWork);
 
-        final List<Condition> conditions = new ArrayList<>();
+        List<Condition> conditions = new ArrayList<>();
 
-        if(ratingLow > ratingHigh || (ratingLow< 0)){
-            throw new BadRequestException(ErrorMessages.BAD_REQUEST_INVALID_RATINGS);
-        }
 
-        conditions.add(new Condition<>("rating",">=", ratingLow));
-        conditions.add(new Condition<>("rating","<=", ratingHigh));
+        conditions.add(new LikeCondition("title", title));
+        conditions.add(new LikeCondition("address", address));
+        conditions.add(new LikeCondition("offerType",offerType));
+        conditions.add(new EqualAndCondition("wage", wage));
 
-        return accountDataMapper.find(conditions.toArray(new Condition[conditions.size()]))
-                .thenCompose(accounts -> {
-                            List<Condition> conditions1 = new ArrayList<>();
 
-                            for (int i = 0; i < accounts.size(); i++)
-                                conditions1.add(new EqualOrCondition("accountId", accounts.get(i).getIdentityKey()));
+        conditions = conditions.stream()
+                .filter(stringStringPair -> stringStringPair.getValue() != null)
+                .collect(Collectors.toList());
 
-                        conditions1 = conditions1.stream()
-                            .filter(stringPair -> stringPair.getValue() != null)
-                            .collect(Collectors.toList());
+        ServiceUtils.evaluateOrderClauseConditions(orderColumn, orderClause, conditions);
 
-                            ServiceUtils.evaluateOrderClause(orderColumn, orderClause, conditions);
-
-                            return jobMapper.find(conditions1.toArray(new Condition[conditions1.size()]));
-                        }
-                ).thenApply(
-                        jobs -> {
-                            int numberOfElements;
-                            List<Job> ret = jobs.stream()
-                                    .filter(curr -> {
-                                        boolean fir = false, sec=false, tri=false;
-                                        if (title.compareTo("") != 0)
-                                            fir = String.valueOf(curr.getTitle()).contains(title);
-                                        else if (address.compareTo("") != 0)
-                                            sec = String.valueOf(curr.getAddress()).contains(address);
-
-                                        else if (offerType.compareTo("") != 0)
-                                            tri = String.valueOf(curr.getOfferType()).contains(offerType);
-                                        else
-                                            return true;
-
-                                        return fir || sec || tri;
-                                    })
-                                    .collect(Collectors.toList());
-
-                            numberOfElements = ret.size();
-                            int lastIndex = ret.size();
-                            if (lastIndex != 0)
-                                lastIndex = lastIndex - 1;
-                            if (lastIndex < pageSize - 1)
-                                ret = ret.subList(page * pageSize, lastIndex);
-                            else
-                                ret = ret.subList(page * pageSize, pageSize - 1);
-
-                            return new CollectionPage<Job>(numberOfElements, pageSize, page, ret);
-                        }
-                ).thenCompose(res -> unitOfWork.commit().thenApply(aVoid -> res));
+        return getCollectionPageFuture(Job.class, page, pageSize, conditions.toArray(new Condition[conditions.size()]))
+                .thenCompose(res -> unitOfWork.commit().thenApply(aVoid -> res));
     }
 
     public CompletableFuture<Job> getJob(long jid) {
