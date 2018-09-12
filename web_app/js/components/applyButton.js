@@ -22,6 +22,7 @@ class ApplyButton extends React.Component {
 
     this.afterResult = this.afterResult.bind(this)
     this.onResult = this.onResult.bind(this)
+    console.log(props.job)
   }
 
   static getDerivedStateFromProps (nextProps, prevState) {
@@ -65,6 +66,9 @@ class ApplyButton extends React.Component {
   render () {
     const {url, wasClicked, isLoggedIn, afterResult, onResult} = this.state
     const {auther, history, job} = this.props
+
+    console.log(this.state.body)
+
     let modalBody
     if (wasClicked) {
       console.log(isLoggedIn)
@@ -72,59 +76,40 @@ class ApplyButton extends React.Component {
       else if (url) modalBody = <HttpRequest url={url} authorization={auther.auth} onResult={onResult && this.onResult} afterResult={afterResult && this.afterResult} />
     }
     return (
-      auther.accountType === 'USR'
-        ? <div>
-          <button type='button' class='btn btn-success' data-toggle={isLoggedIn && 'modal'} data-backdrop='static' data-target='#exampleModal' onClick={() => this.setState({wasClicked: true})}>
+      <div>
+        <button type='button' class='btn btn-success' data-toggle={isLoggedIn && 'modal'} data-backdrop='static' data-target={`#${job.jobId}`} onClick={() => this.setState({wasClicked: true})}>
             Apply Now
-          </button>
+        </button>
 
-          <div class='modal fade' id='exampleModal' tabIndex='-1' role='dialog' aria-labelledby='exampleModalLabel' aria-hidden='true'>
-            <div class='modal-dialog' role='document'>
-              <div class='modal-content'>
-                <div class='modal-header'>
-                  <h5 class='modal-title' id='exampleModalLabel'>Apply to {job.title}</h5>
-                  <button type='button' class='close' data-dismiss='modal' aria-label='Close' onClick={() => this.setState({wasClicked: false})}>
-                    <span aria-hidden='true'>&times;</span>
-                  </button>
-                </div>
-                <div class='modal-body'>
-                  {modalBody}
-                  {this.state.err && <div class='alert alert-danger' role='alert'>{this.state.err}</div>}
-                </div>
-                <div class='modal-footer'>
-                  <button type='button' class='btn btn-secondary' data-dismiss='modal' onClick={() => this.setState({wasClicked: false})}>Close</button>
-                  {this.state.body
-                    ? <HttpRequest url={job._links.apply.href} authorization={auther.auth} method='POST' body={this.state.body} />
-                    : <button
-                      class='btn btn-success'
-                      onClick={() => {
-                        this.setState(prevState => {
-                          return {body: {accountId: auther.accountId, jobId: 1, curriculumId: prevState.selectedCV}}
-                        })
-                      }}>Send</button>}
-                </div>
+        <div class='modal fade' id={job.jobId} tabIndex='-1' role='dialog' aria-labelledby='exampleModalLabel' aria-hidden='true'>
+          <div class='modal-dialog' role='document'>
+            <div class='modal-content'>
+              <div class='modal-header'>
+                <h5 class='modal-title' id='exampleModalLabel'>Apply to {job.title}</h5>
+                <button type='button' class='close' data-dismiss='modal' aria-label='Close' onClick={() => this.setState({wasClicked: false})}>
+                  <span aria-hidden='true'>&times;</span>
+                </button>
+              </div>
+              <div class='modal-body'>
+                {modalBody}
+                {this.state.err && <div class='alert alert-danger' role='alert'>{this.state.err}</div>}
+              </div>
+              <div class='modal-footer'>
+                <button type='button' class='btn btn-secondary' data-dismiss='modal' onClick={() => this.setState({wasClicked: false})}>Close</button>
+                {this.state.body
+                  ? <HttpRequest url={job._links.apply.href} authorization={auther.auth} method='POST' body={this.state.body} />
+                  : <button
+                    class='btn btn-success'
+                    onClick={() => {
+                      this.setState(prevState => {
+                        return {body: {accountId: auther.accountId, jobId: job.jobId, curriculumId: prevState.selectedCV}}
+                      })
+                    }}>Send</button>}
               </div>
             </div>
           </div>
         </div>
-        : this.state.body
-          ? <HttpRequest
-            url={job._links.apply.href}
-            authorization={auther.auth}
-            method='POST'
-            body={this.state.body}
-            onError={err => {
-              console.log(err)
-              setTimeout(() => this.setState({body: undefined}), 1000)
-              return <p>ERROR!</p>
-            }} />
-          : <button
-            class='btn btn-success'
-            onClick={() => {
-              this.setState(prevState => {
-                return {body: {accountId: auther.accountId, jobId: 1, curriculumId: prevState.selectedCV}}
-              })
-            }}>Apply Now</button>
+      </div>
     )
   }
 }

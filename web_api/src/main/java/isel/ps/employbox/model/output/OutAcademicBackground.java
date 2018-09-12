@@ -62,7 +62,7 @@ public class OutAcademicBackground implements OutputDto {
     @JsonIgnore
     @Override
     public Object getCollectionItemOutput() {
-        return new AcademicBackgroundItemOutput(institution, degree);
+        return new AcademicBackgroundItemOutput(institution, degree, studyArea);
     }
 
     class AcademicBackgroundItemOutput {
@@ -73,11 +73,15 @@ public class OutAcademicBackground implements OutputDto {
         private final String degree;
 
         @JsonProperty
+        private final String studyArea;
+
+        @JsonProperty
         private _Links _links = new _Links();
 
-        AcademicBackgroundItemOutput(String institution, String degree) {
+        AcademicBackgroundItemOutput(String institution, String degree, String studyArea) {
             this.institution = institution;
             this.degree = degree;
+            this.studyArea = studyArea;
         }
 
         private class _Links {

@@ -7,7 +7,7 @@ import java.sql.Timestamp;
 public class InApplication {
     private long accountId;
     private long jobId;
-    private long curriculumId;
+    private Long curriculumId;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm")
     private Timestamp date;
@@ -30,7 +30,7 @@ public class InApplication {
         this.jobId = jobId;
     }
 
-    public long getCurriculumId() {
+    public Long getCurriculumId() {
         return curriculumId;
     }
 

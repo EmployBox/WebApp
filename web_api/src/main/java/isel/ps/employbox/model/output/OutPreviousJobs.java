@@ -63,10 +63,25 @@ public class OutPreviousJobs implements OutputDto {
     @JsonIgnore
     @Override
     public Object getCollectionItemOutput() {
-        return new PreviousItemOutput();
+        return new PreviousItemOutput(companyName, workload, role);
     }
 
     class PreviousItemOutput {
+
+        @JsonProperty
+        private final String companyName;
+
+        @JsonProperty
+        private final String workload;
+
+        @JsonProperty
+        private final String role;
+
+        public PreviousItemOutput(String companyName, String workload, String role) {
+            this.companyName = companyName;
+            this.workload = workload;
+            this.role = role;
+        }
 
         @JsonProperty
         private final _Links _links = new _Links();

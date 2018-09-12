@@ -76,4 +76,18 @@ public class InCurriculum {
     public void setVersion(long version) {
         this.version = version;
     }
+
+    @Override
+    public String toString() {
+        return "InCurriculum{" +
+                "accountId=" + accountId +
+                ", curriculumId=" + curriculumId +
+                ", title='" + title + '\'' +
+                ", experiences=" + experiences +
+                ", previousJobs=" + previousJobs +
+                ", projects=" + projects +
+                ", academicBackground=" + academicBackground +
+                ", version=" + version +
+                '}';
+    }
 }

@@ -23,19 +23,11 @@ export default withRouter(({auth, history, match}) =>
           },
           {
             Header: 'Work Load',
-            accessor: 'workLoad'
+            accessor: 'workload'
           },
           {
             Header: 'Role',
             accessor: 'role'
-          },
-          {
-            Header: 'Begin Date',
-            accessor: 'beginDate'
-          },
-          {
-            Header: 'End Date',
-            accessor: 'endDate'
           }
         ]}
       />

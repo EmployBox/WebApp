@@ -28,15 +28,7 @@ export default withRouter(({auth, history, match}) =>
             },
             {
               Header: 'Degree',
-              accessor: 'degreeObtained'
-            },
-            {
-              Header: 'Begin Date',
-              accessor: 'beginDate'
-            },
-            {
-              Header: 'End Date',
-              accessor: 'endDate'
+              accessor: 'degree'
             }
           ]}
         />
