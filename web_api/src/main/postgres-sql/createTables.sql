@@ -1,7 +1,5 @@
-CREATE SEQUENCE Account_seq;
-
 CREATE TABLE Account (
-  accountId BIGINT DEFAULT NEXTVAL ('Account_seq') PRIMARY KEY NOT NULL,
+  accountId serial PRIMARY KEY NOT NULL,
   name VARCHAR(40) not null,
   email VARCHAR(25) UNIQUE NOT NULL,
   rating double precision default(0.0),
@@ -35,19 +33,15 @@ CREATE TABLE UserAccount (
   version BIGINT DEFAULT(1)
 );
 
-CREATE SEQUENCE Curriculum_seq;
-
 CREATE TABLE Curriculum(
   accountId BIGINT references UserAccount,
-  curriculumId BIGINT default nextval ('Curriculum_seq') primary key,
+  curriculumId serial primary key,
   title varchar(50),
   version BIGINT DEFAULT(1)
 );
 
-CREATE SEQUENCE Project_seq;
-
 CREATE TABLE Project (
-  projectId BIGINT DEFAULT NEXTVAL ('Project_seq') PRIMARY KEY,
+  projectId serial PRIMARY KEY,
   accountId BIGINT NOT NULL,
   curriculumId BIGINT NOT NULL,
   name VARCHAR(15),
@@ -58,10 +52,8 @@ CREATE TABLE Project (
   FOREIGN KEY (accountId) REFERENCES Account
 );
 
-CREATE SEQUENCE AcademicBackground_seq;
-
 CREATE TABLE AcademicBackground(
-  academicBackgroundKey BIGINT DEFAULT NEXTVAL ('AcademicBackground_seq') PRIMARY KEY,
+  academicBackgroundKey serial PRIMARY KEY,
   accountId BIGINT NOT NULL,
   curriculumId BIGINT NOT NULL,
   beginDate TIMESTAMP(3) DEFAULT(NOW()),
@@ -73,14 +65,12 @@ CREATE TABLE AcademicBackground(
 
   FOREIGN KEY (accountId) REFERENCES Account,
   FOREIGN KEY (curriculumId) REFERENCES Curriculum(curriculumId),
-  check (endDate < beginDate),
+  check (endDate > beginDate),
   check (degreeObtained in ('basic level 1', 'basic level 2', 'basic level 3', 'secundary', 'bachelor', 'master', 'PHD'))
 );
 
-CREATE SEQUENCE PreviousJobs_seq;
-
 CREATE TABLE PreviousJobs(
-  previousJobId BIGINT DEFAULT NEXTVAL ('PreviousJobs_seq') PRIMARY KEY,
+  previousJobId serial PRIMARY KEY,
   accountId BIGINT NOT NULL,
   curriculumId BIGINT NOT NULL,
   beginDate TIMESTAMP(3) DEFAULT(NOW()),
@@ -94,10 +84,8 @@ CREATE TABLE PreviousJobs(
   CHECK(workLoad = 'partial' OR workLoad = 'total')
 );
 
-CREATE SEQUENCE Job_seq;
-
 CREATE TABLE Job(
-  jobId BIGINT default nextval ('Job_seq') primary key,
+  jobId serial primary key,
   title varchar(50) not null,
   accountId BIGINT ,
   schedule VARCHAR(20),
@@ -118,10 +106,8 @@ CREATE TABLE Job(
   check(offerType = 'Looking for work' OR offerType = 'Looking for Worker')
 );
 
-CREATE SEQUENCE CurriculumExperience_seq;
-
 CREATE TABLE CurriculumExperience(
-  curriculumExperienceId BIGINT DEFAULT NEXTVAL ('CurriculumExperience_seq') PRIMARY KEY,
+  curriculumExperienceId serial PRIMARY KEY,
   accountId BIGINT NOT NULL,
   curriculumId BIGINT NOT NULL,
   competence VARCHAR(50),
@@ -132,10 +118,8 @@ CREATE TABLE CurriculumExperience(
   FOREIGN KEY (accountId) REFERENCES Account
 );
 
-CREATE SEQUENCE JobExperience_seq;
-
 CREATE TABLE JobExperience(
-  jobExperienceId BIGINT DEFAULT NEXTVAL ('JobExperience_seq') PRIMARY KEY,
+  jobExperienceId serial PRIMARY KEY,
   jobId BIGINT NOT NULL,
   competence VARCHAR(50),
   years SMALLINT,
@@ -144,10 +128,8 @@ CREATE TABLE JobExperience(
   FOREIGN KEY (jobId) REFERENCES Job
 );
 
-CREATE SEQUENCE Application_seq;
-
 CREATE TABLE Application(
-  applicationId BIGINT DEFAULT NEXTVAL ('Application_seq') PRIMARY KEY,
+  applicationId serial PRIMARY KEY,
   accountId BIGINT,
   curriculumId BIGINT,
   jobId BIGINT,
@@ -178,10 +160,8 @@ CREATE TABLE Rating(
   PRIMARY KEY(AccountIdFrom , AccountIdTo)
 );
 
-CREATE SEQUENCE Chat_seq;
-
 CREATE TABLE Chat(
-  chatId BIGINT DEFAULT NEXTVAL ('Chat_seq') PRIMARY KEY,
+  chatId serial PRIMARY KEY,
   accountIdFirst BIGINT,
   accountIdSecond BIGINT,
   version BIGINT DEFAULT(1),
@@ -191,11 +171,9 @@ CREATE TABLE Chat(
   UNIQUE (AccountIdFirst, AccountIdSecond)
 );
 
-CREATE SEQUENCE Message_seq;
-
 CREATE TABLE Message(
   accountId BIGINT,
-  messageId BIGINT DEFAULT NEXTVAL ('Message_seq') primary key,
+  messageId serial primary key,
   chatId BIGINT,
   text VARCHAR(200),
   datetime timestamp(3) default(now()),
@@ -205,10 +183,8 @@ CREATE TABLE Message(
   FOREIGN KEY (accountId) REFERENCES Account ON DELETE CASCADE
 );
 
-CREATE SEQUENCE Schedule_seq;
-
 CREATE TABLE Schedule(
-  scheduleId BIGINT DEFAULT NEXTVAL ('Schedule_seq') primary key,
+  scheduleId serial primary key,
   jobId BIGINT,
   repeats VARCHAR(25),
   date TIMESTAMP(3),
@@ -219,10 +195,8 @@ CREATE TABLE Schedule(
   FOREIGN KEY (jobId) REFERENCES Job
 );
 
-CREATE SEQUENCE Comment_seq;
-
 CREATE TABLE Comment (
-  commentId BIGINT default nextval ('Comment_seq') primary key,
+  commentId serial primary key,
   accountIdFrom BIGINT,
   accountIdDest BIGINT,
   datetime TIMESTAMP(3) default(now()),

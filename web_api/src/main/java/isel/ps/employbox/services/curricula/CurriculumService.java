@@ -48,14 +48,14 @@ public class CurriculumService {
 
         CompletableFuture<Curriculum> future = userAccountService.getUser(userId,unitOfWork, email)
                 .thenCompose(userAccount -> curriculumMapper.create(curriculum))
-                //.thenCompose(aVoid -> curriculum.getExperiences().apply(unitOfWork))
-                //.thenCompose(curriculumExperienceMapper::createAll)
+                .thenCompose(aVoid -> curriculum.getExperiences().apply(unitOfWork))
+                .thenCompose(curriculumExperienceMapper::createAll)
                 .thenCompose(aVoid -> curriculum.getAcademicBackground().apply(unitOfWork))
                 .thenCompose(academicBackgoundMappper::createAll)
-                //.thenCompose(aVoid -> curriculum.getPreviousJobs().apply(unitOfWork))
-                //.thenAccept(previousJobsMapper::createAll)
-                //.thenCompose(aVoid -> curriculum.getProjects().apply(unitOfWork))
-                //.thenAccept(projectMapper::createAll)
+                .thenCompose(aVoid -> curriculum.getPreviousJobs().apply(unitOfWork))
+                .thenAccept(previousJobsMapper::createAll)
+                .thenCompose(aVoid -> curriculum.getProjects().apply(unitOfWork))
+                .thenAccept(projectMapper::createAll)
                 .thenCompose(res -> unitOfWork.commit().thenApply(aVoid -> curriculum));
 
         return handleExceptions(future, unitOfWork);
