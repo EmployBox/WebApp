@@ -10,12 +10,14 @@ import isel.ps.employbox.exceptions.UnauthorizedException;
 import isel.ps.employbox.model.binders.CollectionPage;
 import isel.ps.employbox.model.entities.Account;
 import isel.ps.employbox.model.entities.jobs.Job;
+import isel.ps.employbox.model.output.OutAccount;
 import org.springframework.stereotype.Service;
 
 import java.security.InvalidParameterException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionStage;
 
 import static com.github.jayield.rapper.mapper.MapperRegistry.getMapper;
 import static isel.ps.employbox.ErrorMessages.RESOURCE_NOTFOUND_ACCOUNT;
@@ -72,5 +74,16 @@ public final class AccountService {
         ServiceUtils.evaluateOrderClauseConditions(orderColumn, orderClause, conditions);
         conditions.add(new EqualAndCondition<>("accountId", accountId));
         return getCollectionPageFuture(Job.class , page, pageSize, conditions.toArray(new Condition[conditions.size()]));
+    }
+
+    public CompletableFuture<Account> getAccount(long userId, String email, UnitOfWork unit) {
+        DataMapper<Account, Long> accountMapper = getMapper(Account.class, unit);
+        return accountMapper.findById(userId)
+                .thenApply(oacc -> oacc.orElseThrow(() -> new ResourceNotFoundException(RESOURCE_NOTFOUND_ACCOUNT)))
+                .thenApply(account -> {
+                    if (account.getEmail().compareTo(email)!=0)
+                        throw new UnauthorizedException(ErrorMessages.UN_AUTHORIZED_ID_AND_EMAIL_MISMATCH);
+                    return account;
+                });
     }
 }
