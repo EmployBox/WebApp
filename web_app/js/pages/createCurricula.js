@@ -25,7 +25,9 @@ export default withRouter(class extends React.Component {
         <input type='text' class='form-control' value={this.state.title} onChange={event => this.setState({ title: event.target.value })} />
         <br />
         <ListForm title='Academic Background'
-          submit={inputs => this.setState({academicBackground: inputs})}
+          submit={inputs => {
+            this.setState({academicBackground: inputs})
+          }}
           row={({institution, studyArea, degreeObtained}) => `${degreeObtained} - ${studyArea} - ${institution}`}
           inputData={[
             {
@@ -88,7 +90,9 @@ export default withRouter(class extends React.Component {
         />
         <br />
         <ListForm title='Previuos Jobs'
-          submit={inputs => this.setState({previousJobs: inputs})}
+          submit={inputs => {
+            this.setState({previousJobs: inputs})
+          }}
           row={({companyName, role}) => `${role} in ${companyName}`}
           inputData={[
             {
@@ -152,6 +156,7 @@ export default withRouter(class extends React.Component {
         <h4 class='btn-primary bg-dark btn-lg btn-block' />
         <center>
           <button type='button' class='btn btn-success btn-lg' onClick={() => {
+            console.log(this.state)
             const body = Object.assign({accountId: this.props.accountId}, this.state)
             delete body.body
             this.setState({body: body})
@@ -161,6 +166,7 @@ export default withRouter(class extends React.Component {
         </center>
         {this.state.body
           ? <HttpRequest url={URI.decode(this.props.match.params.url)}
+            key={new Date()}
             method='POST'
             authorization={this.props.auth}
             body={this.state.body}

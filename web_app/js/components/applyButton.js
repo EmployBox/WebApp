@@ -22,6 +22,7 @@ class ApplyButton extends React.Component {
 
     this.afterResult = this.afterResult.bind(this)
     this.onResult = this.onResult.bind(this)
+    console.log(props.job)
   }
 
   static getDerivedStateFromProps (nextProps, prevState) {
@@ -74,11 +75,10 @@ class ApplyButton extends React.Component {
     return (
       auther.accountType === 'USR'
         ? <div>
-          <button type='button' class='btn btn-success' data-toggle={isLoggedIn && 'modal'} data-backdrop='static' data-target='#exampleModal' onClick={() => this.setState({wasClicked: true})}>
+          <button type='button' class='btn btn-success' data-toggle={isLoggedIn && 'modal'} data-backdrop='static' data-target={'#exampleModal' + job.jobId} onClick={() => this.setState({wasClicked: true})}>
             Apply Now
           </button>
-
-          <div class='modal fade' id='exampleModal' tabIndex='-1' role='dialog' aria-labelledby='exampleModalLabel' aria-hidden='true'>
+          <div class='modal fade' id={'exampleModal' + job.jobId} tabIndex='-1' role='dialog' aria-labelledby='exampleModalLabel' aria-hidden='true'>
             <div class='modal-dialog' role='document'>
               <div class='modal-content'>
                 <div class='modal-header'>
@@ -99,7 +99,7 @@ class ApplyButton extends React.Component {
                       class='btn btn-success'
                       onClick={() => {
                         this.setState(prevState => {
-                          return {body: {accountId: auther.accountId, jobId: 1, curriculumId: prevState.selectedCV}}
+                          return {body: {accountId: auther.accountId, jobId: job.jobId, curriculumId: prevState.selectedCV}}
                         })
                       }}>Send</button>}
                 </div>
@@ -122,7 +122,7 @@ class ApplyButton extends React.Component {
             class='btn btn-success'
             onClick={() => {
               this.setState(prevState => {
-                return {body: {accountId: auther.accountId, jobId: 1, curriculumId: prevState.selectedCV}}
+                return {body: {accountId: auther.accountId, jobId: job.jobId, curriculumId: prevState.selectedCV}}
               })
             }}>Apply Now</button>
     )

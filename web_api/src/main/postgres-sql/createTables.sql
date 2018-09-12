@@ -71,7 +71,7 @@ CREATE TABLE AcademicBackground(
   version BIGINT DEFAULT(1),
 
   FOREIGN KEY (accountId) REFERENCES Account,
-  FOREIGN KEY (curriculumId) REFERENCES curriculum(curriculumId),
+  FOREIGN KEY (curriculumId) REFERENCES Curriculum(curriculumId),
   check (endDate < beginDate),
   check (degreeObtained in ('basic level 1', 'basic level 2', 'basic level 3', 'secundary', 'bachelor', 'master', 'PHD'))
 );

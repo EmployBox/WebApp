@@ -52,6 +52,7 @@ public class CurriculumController {
 
     @PostMapping
     public Mono<OutCurriculum> createCurriculum( @PathVariable long id, @RequestBody InCurriculum inCurriculum, Authentication authentication){
+        System.out.println(inCurriculum);
         CompletableFuture<OutCurriculum> future = curriculumService.createCurriculum(id, curriculumBinder.bindInput(inCurriculum), authentication.getName())
                 .thenCompose(curriculumBinder::bindOutput);
         return Mono.fromFuture(future);

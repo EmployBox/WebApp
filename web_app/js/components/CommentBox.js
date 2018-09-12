@@ -1,6 +1,5 @@
 import React from 'react'
 import HttpRequest from './httpRequest'
-import URI from 'urijs'
 import GenericForm from './forms/genericForm'
 
 const DateDiff = {
@@ -31,9 +30,9 @@ const DateDiff = {
 }
 
 const CommentList = ({data, loggedAccount, deleteComment, auth}) =>
-  <div class='commentList'>
+  <div>
     {data.map(comment => (
-      <Comment comment={comment} key={comment.commentId} auth={auth} loggedAccount={loggedAccount} deleteComment={deleteComment}>
+      <Comment comment={comment} auth={auth} loggedAccount={loggedAccount} deleteComment={deleteComment} key={comment.commmentId}>
         {comment.text}
       </Comment>
     ))}
@@ -90,6 +89,7 @@ const Comment = class extends React.Component {
       deleteUrl: undefined
     }
   }
+
   render () {
     const {comment, children, loggedAccount, auth} = this.props
     return <div>
@@ -99,14 +99,13 @@ const Comment = class extends React.Component {
           const curr = new Date()
           const commentDate = new Date()
           commentDate.setTime(comment.datetime.epochSecond * 1000)
-          console.log(account)
           return <div class='row'>
             <div class='col-sm-1'>
               <div class='thumbnail'>
                 <HttpRequest url={account._links.self.href}
                   authorization={auth}
                   onResult={json =>
-                    <img class='img-responsive img-thumbnail' src={account.accountType === 'USR' ? json.photo_url : json.logo_url || 'https://ssl.gstatic.com/accounts/ui/avatar_2x.png'} />}
+                    <img class='img-responsive img-thumbnail' src={(account.accountType === 'USR' ? json.photo_url : json.logo_url) || 'https://ssl.gstatic.com/accounts/ui/avatar_2x.png'} />}
                 />
               </div>
             </div>
@@ -146,11 +145,11 @@ export default class extends React.Component {
     this.state = {
       currentUrl: this.props.url,
       data: [],
-      page: 0,
-      changeKey: new Date()
+      loadMore: true
     }
     this.deleteComment = this.deleteComment.bind(this)
     this.submitComment = this.submitComment.bind(this)
+    this.loadNewEntries = this.loadNewEntries.bind(this)
   }
 
   deleteComment (link) {
@@ -167,35 +166,31 @@ export default class extends React.Component {
     })
   }
 
+  loadNewEntries (json) {
+    const {data} = this.state
+    json._embedded && json._embedded.items ? this.setState({
+      data: data.concat(json._embedded.items),
+      currentUrl: json._links.next ? json._links.next.href : undefined,
+      loadMore: false
+    }) : this.setState({currentUrl: undefined, loadMore: false})
+  }
+
   render () {
-    console.log(this.state.data)
     return <div class='container'>
       <h1 class='text-center'>Comments</h1>
       <CommentForm auth={this.props.auth} url={this.props.url} accountIdFrom={this.props.accountIdFrom} accountIdTo={this.props.accountIdTo} submitComment={this.submitComment} />
       <CommentList data={this.state.data} auth={this.props.auth} loggedAccount={this.props.loggedAccount} deleteComment={this.deleteComment} />
+      {this.state.loadMore && <HttpRequest url={this.state.currentUrl}
+        authorization={this.props.auth}
+        afterResult={this.loadNewEntries}
+        onResult={() => <div />}
+      />}
       {this.state.currentUrl
-        ? (
-          <div>
-            <HttpRequest url={this.state.currentUrl} authorization={this.props.auth} key={this.state.changeKey}
-              afterResult={json => {
-                const {data, currentUrl} = this.state
-                this.setState({
-                  data: data.concat(json._embedded ? json._embedded.items : []),
-                  page: json.current_page + 1,
-                  currentUrl: json.current_page === json.last_page ? undefined : currentUrl
-                })
-              }
-              } />
-            <button onClick={() => {
-              const {currentUrl, page} = this.state
-              const uri = new URI(currentUrl)
-              this.setState({
-                currentUrl: uri.setQuery('page', page),
-                changeKey: new Date()
-              })
-            }}>More</button>
-          </div>
-        )
+        ? <button type='submit' onClick={() => {
+          this.setState({
+            loadMore: true
+          })
+        }}>More</button>
         : <div><br /> <div class='text-center'>No more comments</div></div>}
     </div>
   }
