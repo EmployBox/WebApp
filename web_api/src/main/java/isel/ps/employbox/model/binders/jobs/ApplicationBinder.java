@@ -1,9 +1,11 @@
 package isel.ps.employbox.model.binders.jobs;
 
+import com.github.jayield.rapper.mapper.externals.Foreign;
 import com.github.jayield.rapper.unitofwork.UnitOfWork;
 import isel.ps.employbox.model.binders.AccountBinder;
 import isel.ps.employbox.model.binders.ModelBinder;
 import isel.ps.employbox.model.binders.curricula.CurriculumBinder;
+import isel.ps.employbox.model.entities.Curriculum;
 import isel.ps.employbox.model.entities.jobs.Application;
 import isel.ps.employbox.model.input.InApplication;
 import isel.ps.employbox.model.output.OutApplication;
@@ -30,18 +32,29 @@ public class ApplicationBinder implements ModelBinder<Application,OutApplication
                                 .getForeignObject(unitOfWork)
                                 .thenCompose(jobBinder::bindOutput)
                                 .thenCompose(outJob ->
-                                        application.getCurriculum()
-                                                    .getForeignObject(unitOfWork)
-                                                    .thenCompose(curriculumBinder::bindOutput)
-                                                    .thenApply( outCurriculum ->
-                                        new OutApplication(
-                                                outCurriculum,
-                                                outJob,
-                                                outAccount,
-                                                application.getIdentityKey(),
-                                                application.getDatetime())
-                                ))
-                .thenCompose(res -> unitOfWork.commit().thenApply(aVoid -> res)));
+                                {
+                                    Foreign<Curriculum, Long> curriculum = application.getCurriculum();
+                                    return curriculum != null
+                                            ? curriculum
+                                            .getForeignObject(unitOfWork)
+                                            .thenCompose(curriculumBinder::bindOutput)
+                                            .thenApply(outCurriculum ->
+                                                    new OutApplication(
+                                                            outCurriculum,
+                                                            outJob,
+                                                            outAccount,
+                                                            application.getIdentityKey(),
+                                                            application.getDatetime())
+                                            )
+                                            : CompletableFuture.completedFuture(new OutApplication(
+                                            null,
+                                            outJob,
+                                            outAccount,
+                                            application.getIdentityKey(),
+                                            application.getDatetime())
+                                    );
+                                })
+                                .thenCompose(res -> unitOfWork.commit().thenApply(aVoid -> res)));
     }
 
     @Override

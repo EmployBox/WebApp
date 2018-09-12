@@ -46,7 +46,7 @@ public class Application implements DomainObject<Long> {
             long applicationId,
             long accountId,
             long jobId,
-            long curriculumId,
+            Long curriculumId,
             Timestamp datetime,
             long version) {
         UnitOfWork unitOfWork = new UnitOfWork();
@@ -66,9 +66,11 @@ public class Application implements DomainObject<Long> {
                 .thenCompose( res -> unitOfWork.commit().thenApply( __-> res))
                 .thenApply(job1 -> job1.orElseThrow(() -> new ResourceNotFoundException("Job not Found"))));
 
-        this.curriculum = new Foreign<>(curriculumId, unit -> getMapper(Curriculum.class, unitOfWork).findById( curriculumId)
-                .thenCompose( res -> unitOfWork.commit().thenApply( __-> res))
-                .thenApply(curriculum -> curriculum.orElseThrow(() -> new ResourceNotFoundException("Curriculum not Found"))));
+        this.curriculum = curriculumId != null
+                ? new Foreign<>(curriculumId, unit -> getMapper(Curriculum.class, unitOfWork).findById(curriculumId)
+                .thenCompose(res -> unitOfWork.commit().thenApply(aVoid -> res))
+                .thenApply(optional -> optional.orElseThrow(() -> new ResourceNotFoundException("Curriculum not Found"))))
+                : null;
     }
 
     @Override

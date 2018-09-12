@@ -148,9 +148,11 @@ public class UserAccountService {
         DataMapper<Application, Long> applicationMapper = getMapper(Application.class, unit);
         AccountService accountService = new AccountService();
         CompletableFuture<Application> future  = accountService.getAccount(userId, email)
-                .thenCompose( userAccount -> applicationMapper.find(new EqualAndCondition<>("accountId", userAccount.getIdentityKey()),
+                .thenCompose( userAccount -> applicationMapper.find(
+                        new EqualAndCondition<>("accountId", userAccount.getIdentityKey()),
                         new EqualAndCondition<>("jobId", application.getJob().getForeignKey())
-                        ).thenAccept(list -> {
+                        )
+                        .thenAccept(list -> {
                             if(list.size() != 0)
                                 throw new ForbiddenException(ErrorMessages.ALREADY_EXISTS);
                         })
