@@ -59,6 +59,20 @@ public class RatingService {
 
     public Mono<Void> updateRating(String accountType, Rating rating, String email) {
 
+        if(rating.getWorkEnviroment() > 10
+                || rating.getWorkLoad()> 10
+                || rating.getPonctuality() > 10
+                || rating.getDemeanor() > 10
+                || rating.getCompetence() > 10
+                || rating.getWage() > 10
+                || rating.getWorkEnviroment() < 0
+                || rating.getWorkLoad() < 0
+                || rating.getPonctuality() <0
+                || rating.getDemeanor() <0
+                || rating.getCompetence() <0
+                || rating.getWage() <0 )
+            throw new BadRequestException(ErrorMessages.BAD_REQUEST_INVALID_RATINGS);
+
         UnitOfWork unitOfWork = new UnitOfWork();
         DataMapper<Rating, Rating.RatingKey> ratingMapper = getMapper(Rating.class, unitOfWork);
         DataMapper<Account, Long> accountMapper = getMapper(Account.class, unitOfWork);
@@ -90,6 +104,20 @@ public class RatingService {
 
 
     public Mono<Rating> createRating(Rating rating,String accountType, String email) {
+        if(rating.getWorkEnviroment() > 10
+                || rating.getWorkLoad()> 10
+                || rating.getPonctuality() > 10
+                || rating.getDemeanor() > 10
+                || rating.getCompetence() > 10
+                || rating.getWage() > 10
+                || rating.getWorkEnviroment() < 0
+                || rating.getWorkLoad() < 0
+                || rating.getPonctuality() <0
+                || rating.getDemeanor() <0
+                || rating.getCompetence() <0
+                || rating.getWage() <0 )
+            throw new BadRequestException(ErrorMessages.BAD_REQUEST_INVALID_RATINGS);
+
         UnitOfWork unitOfWork = new UnitOfWork();
         DataMapper<Rating, Rating.RatingKey> ratingMapper = getMapper(Rating.class, unitOfWork);
         DataMapper<Account, Long> accountMapper = getMapper(Account.class, unitOfWork);

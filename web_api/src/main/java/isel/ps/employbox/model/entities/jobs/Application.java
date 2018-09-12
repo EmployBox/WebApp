@@ -49,7 +49,7 @@ public class Application implements DomainObject<Long> {
             long curriculumId,
             Timestamp datetime,
             long version) {
-        UnitOfWork unitOfWork = new UnitOfWork();
+            UnitOfWork unitOfWork = new UnitOfWork();
 
         this.applicationId = applicationId;
         if(datetime != null)
@@ -66,8 +66,9 @@ public class Application implements DomainObject<Long> {
                 .thenCompose( res -> unitOfWork.commit().thenApply( __-> res))
                 .thenApply(job1 -> job1.orElseThrow(() -> new ResourceNotFoundException("Job not Found"))));
 
-        this.curriculum = new Foreign<>(curriculumId, unit -> getMapper(Curriculum.class, unitOfWork).findById( curriculumId)
-                .thenCompose( res -> unitOfWork.commit().thenApply( __-> res))
+
+        this.curriculum = new Foreign<>(curriculumId, unit -> getMapper(Curriculum.class, unitOfWork).findById(curriculumId)
+                .thenCompose(res -> unitOfWork.commit().thenApply(__ -> res))
                 .thenApply(curriculum -> curriculum.orElseThrow(() -> new ResourceNotFoundException("Curriculum not Found"))));
     }
 
