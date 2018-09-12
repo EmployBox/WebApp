@@ -142,25 +142,32 @@ public class UserAccountService {
         return handleExceptions(future, unit);
     }
 
-    public CompletableFuture<Application> createApplication( long userId, Application application, String email) {
-
-        UnitOfWork unit = new UnitOfWork();
-        DataMapper<Application, Long> applicationMapper = getMapper(Application.class, unit);
+    public CompletableFuture<Application> createApplication(long jobOwnerId, long applicantId, Application application, String email) {
+        UnitOfWork unitOfWork = new UnitOfWork();
+        DataMapper<Application, Long> applicationMapper = getMapper(Application.class, unitOfWork);
+        DataMapper<Job, Long> jobMapper = getMapper(Job.class, unitOfWork);
         AccountService accountService = new AccountService();
-        CompletableFuture<Application> future  = accountService.getAccount(userId, email)
-                .thenCompose( userAccount -> applicationMapper.find(
+
+        CompletableFuture<Application> future  = accountService.getAccount(applicantId, email)
+        	.thenCompose( userAccount -> applicationMapper.find(
                         new EqualAndCondition<>("accountId", userAccount.getIdentityKey()),
                         new EqualAndCondition<>("jobId", application.getJob().getForeignKey())
                         )
                         .thenAccept(list -> {
                             if(list.size() != 0)
-                                throw new ForbiddenException(ErrorMessages.ALREADY_EXISTS);
+                                throw new ConflictException(ErrorMessages.ALREADY_EXISTS);
                         })
                 )
+                .thenCompose( aVoid -> jobMapper.find(new EqualAndCondition<>("accountId",
+                        jobOwnerId),new EqualAndCondition<>("jobId", application.getJob().getForeignKey()) ))
+                .thenAccept( res -> {
+                    if(res.size() == 0 )
+                        throw new ForbiddenException(ErrorMessages.UN_AUTHORIZED);
+                })
                 .thenCompose(aVoid -> applicationMapper.create( application))
-                .thenCompose(aVoid -> unit.commit())
-                .thenApply(res -> application);
-        return handleExceptions(future, unit);
+                .thenCompose(aVoid -> unitOfWork.commit().thenApply(res -> application));
+
+        return handleExceptions(future, unitOfWork);
     }
 
     public Mono<Void> updateUser(UserAccount userAccount, String email) {

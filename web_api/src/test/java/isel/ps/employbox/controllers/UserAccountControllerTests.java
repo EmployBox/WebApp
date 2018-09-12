@@ -86,7 +86,7 @@ public class UserAccountControllerTests {
         assertEquals(1, jobs.size());
         jobId2 = jobs.get(0).getIdentityKey();
 
-        jobs = jobRepo.find(new EqualAndCondition<>("title", "Not so Great Job")).join();
+        jobs = jobRepo.find(new EqualAndCondition<>("title", "Bad Job")).join();
         assertEquals(1, jobs.size());
         jobId3 = jobs.get(0).getIdentityKey();
 
@@ -269,10 +269,10 @@ public class UserAccountControllerTests {
     }
 
     @Test
-    @WithMockUser(username =  "carlos@gmail.com")
+    @WithMockUser(username =  "lol@hotmail.com")
     public void testCreateApplication() throws Exception {
         InApplication inApplication = new InApplication();
-        inApplication.setAccountId(userAccount3.getIdentityKey());
+        inApplication.setAccountId(userAccount2.getIdentityKey());
         inApplication.setJobId(jobId3);
         inApplication.setCurriculumId(curriculum3.getIdentityKey());
 
@@ -291,7 +291,7 @@ public class UserAccountControllerTests {
 
         UnitOfWork unitOfWork = new UnitOfWork();
         DataMapper<Application, Long> applicationRepo = getMapper(Application.class, unitOfWork);
-        assertEquals(1, applicationRepo.find(new EqualAndCondition<>("accountId", userAccount3.getIdentityKey()), new EqualAndCondition<>("jobId", jobId3)).join().size());
+        assertEquals(1, applicationRepo.find(new EqualAndCondition<>("accountId", userAccount2.getIdentityKey()), new EqualAndCondition<>("jobId", jobId3)).join().size());
         unitOfWork.commit().join();
     }
 

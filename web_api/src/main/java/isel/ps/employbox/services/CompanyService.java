@@ -64,7 +64,6 @@ public class CompanyService {
         evaluateOrderClauseConditions(orderColumn, orderClause, conds);
 
         return ServiceUtils.getCollectionPageFuture(Company.class, page, pageSize, conds.toArray(new Condition[conds.size()]));
-
     }
 
     public CompletableFuture<Company> getCompany(long cid) {

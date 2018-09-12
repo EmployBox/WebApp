@@ -102,7 +102,7 @@ CREATE TABLE Job(
   accountId BIGINT ,
   schedule VARCHAR(20),
   type VARCHAR(25),
-  wage INT check(wage > 0),
+  wage INT check(wage >= 0),
   description VARCHAR(50),
   offerBeginDate TIMESTAMP(3) DEFAULT(NOW()),
   offerEndDate TIMESTAMP(3),

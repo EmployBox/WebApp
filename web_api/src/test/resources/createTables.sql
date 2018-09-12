@@ -99,7 +99,7 @@ create table Job (
   title varchar(50) not null,
   accountId BIGINT ,
   accountType varchar(50),
-  wage INT check(wage > 0),
+  wage INT check(wage >= 0),
   description VARCHAR(50),
   offerBeginDate DATETIME DEFAULT CURRENT_DATE,
   offerEndDate DATETIME,
