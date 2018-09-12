@@ -49,7 +49,7 @@ public class Application implements DomainObject<Long> {
             Long curriculumId,
             Timestamp datetime,
             long version) {
-        UnitOfWork unitOfWork = new UnitOfWork();
+            UnitOfWork unitOfWork = new UnitOfWork();
 
         this.applicationId = applicationId;
         if(datetime != null)
