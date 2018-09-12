@@ -66,15 +66,15 @@ export default withRouter(({match, auth, history, accountId}) => {
     onResult={json => (
       <div>
         <div class='text-center container'>
-          <img style={style} src={json.logoUrl} />
+          <img style={style} src={json.logoUrl || 'https://openjobs.me/assets/ico-company-default-96f4ffcb9967f09089dae7656368a5ec5489cd028f5236192e21095006cc86e1.png'} />
           <h2>{json.name}</h2>
+          {json.accountId !== accountId &&
           <HttpRequest url={new URI(json._links.followers.href.split('?')[0]).setQuery('accountToCheck', accountId).href()}
             authorization={auth}
             onResult={follows => <FollowButton follows={follows}
               url={json._links.followers.href.split('?')[0]}
-            />
-            }
-          />
+            />}
+          />}
           <h3>{json.description}</h3>
           <h3>{json.specialization}</h3>
           <h3>

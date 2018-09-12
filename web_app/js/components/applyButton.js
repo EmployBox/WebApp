@@ -67,8 +67,6 @@ class ApplyButton extends React.Component {
     const {url, wasClicked, isLoggedIn, afterResult, onResult} = this.state
     const {auther, history, job} = this.props
 
-    console.log(this.state.body)
-
     let modalBody
     if (wasClicked) {
       console.log(isLoggedIn)

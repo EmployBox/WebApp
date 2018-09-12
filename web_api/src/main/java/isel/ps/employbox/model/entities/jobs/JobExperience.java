@@ -33,7 +33,7 @@ public class JobExperience implements DomainObject<Long> {
 
     public JobExperience(long jobExperienceId, long jobId, String competences,  short years, long version){
         UnitOfWork unitOfWork = new UnitOfWork();
-        this.job = new Foreign(jobId, unit -> getMapper(Job.class, unitOfWork).findById( jobId)
+        this.job = new Foreign<>(jobId, unit -> getMapper(Job.class, unitOfWork).findById( jobId)
                 .thenCompose( res -> unitOfWork.commit().thenApply( __-> res))
                 .thenApply(job1 -> job1.orElseThrow(() -> new ResourceNotFoundException("Job not Found"))));
 

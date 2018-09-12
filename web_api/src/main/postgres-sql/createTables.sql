@@ -34,8 +34,8 @@ CREATE TABLE UserAccount (
 );
 
 CREATE TABLE Curriculum(
-  accountId BIGINT references UserAccount,
   curriculumId serial primary key,
+  accountId BIGINT references UserAccount,
   title varchar(50),
   version BIGINT DEFAULT(1)
 );
@@ -172,8 +172,8 @@ CREATE TABLE Chat(
 );
 
 CREATE TABLE Message(
-  accountId BIGINT,
   messageId serial primary key,
+  accountId BIGINT,
   chatId BIGINT,
   text VARCHAR(200),
   datetime timestamp(3) default(now()),

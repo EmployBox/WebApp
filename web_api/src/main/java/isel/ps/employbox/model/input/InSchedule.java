@@ -7,7 +7,7 @@ import java.sql.Timestamp;
 public class InSchedule{
     private long scheduleId;
     private long jobId;
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     private Timestamp date;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "HH:mm")
     private Timestamp startHour;

@@ -47,7 +47,7 @@ public class JobService {
         conditions.add(new LikeCondition("title", title));
         conditions.add(new LikeCondition("address", address));
         conditions.add(new LikeCondition("offerType",offerType));
-        conditions.add(new EqualAndCondition("wage", wage));
+        conditions.add(new EqualAndCondition<>("wage", wage));
 
 
         conditions = conditions.stream()

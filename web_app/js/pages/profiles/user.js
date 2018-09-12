@@ -72,7 +72,7 @@ export default withRouter(class extends React.Component {
         onResult={json => (
           <div>
             <div class='container text-center'>
-              <img style={style} src={json.photo_url} />
+              <img style={style} src={json.photo_url || 'https://www.cukashmir.ac.in/facultyimages/2316218245609profile-default-male.png'} />
               <h2>{json.name}</h2>
               {json.accountId === accountId ? <div />
                 : <HttpRequest url={new URI(json._links.followers.href.split('?')[0]).setQuery('accountToCheck', accountId).href()}
