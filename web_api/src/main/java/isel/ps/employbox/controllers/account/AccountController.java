@@ -33,13 +33,10 @@ public class AccountController {
     }
 
     @GetMapping("/{accountId}")
-    public Mono<OutAccount> getAccount(
-            @PathVariable long accountId
-    ){
+    public Mono<OutAccount> getAccount(@PathVariable long accountId){
         return Mono.fromFuture( accountService.getAccount(accountId)
-                .thenCompose( res -> accountBinder.bindOutput(res)));
+                .thenCompose(accountBinder::bindOutput));
     }
-
 
     @GetMapping("/self")
     public Mono<OutAccount> getAccount(Authentication authentication){

@@ -25,7 +25,7 @@ public class RepositoryReactiveUserDetailsService implements ReactiveUserDetails
 
         return Mono.fromFuture(
                 accountMapper
-                        .find( new EqualAndCondition<String>("email", username))
+                        .find(new EqualAndCondition<>("email", username))
                         .thenCompose( res -> unitOfWork.commit().thenApply( aVoid -> res))
                         .thenApply(accounts -> {
                             if (!accounts.isEmpty())

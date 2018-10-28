@@ -19,7 +19,8 @@ public class WebFluxConfig implements WebFluxConfigurer {
         registry.addMapping("/**")
                 .allowedOrigins("*")
                 .allowedMethods("GET", "POST", "OPTIONS", "PUT", "DELETE")
-                .allowedHeaders("Access-Control-Allow-Origin", "Authorization", "Content-Type");
+                .allowedHeaders("Access-Control-Allow-Origin", "Authorization", "Content-Type")
+                .exposedHeaders("Access-Control-Allow-Origin");
     }
 
     @Override
@@ -30,12 +31,4 @@ public class WebFluxConfig implements WebFluxConfigurer {
         configurer.defaultCodecs().jackson2JsonDecoder(new Jackson2JsonDecoder(new ObjectMapper()
                 .enable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)));
     }
-    /*
-    @Override
-    public void configureViewResolvers(ViewResolverRegistry registry) {
-        registry.freeMarker();
-
-        Jackson2JsonEncoder encoder = new Jackson2JsonEncoder();
-        registry.defaultViews(new HttpMessageWriterView(encoder));
-    }*/
 }

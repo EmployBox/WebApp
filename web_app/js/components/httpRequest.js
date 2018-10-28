@@ -64,12 +64,10 @@ export default class extends React.Component {
 
     if (body !== undefined) obj.headers['Content-Type'] = 'application/json'
 
-    // console.log(`${method} - ${url}`)
-
     if (this.promise) {
       this.promise.cancel()
     }
-    // console.log(obj)
+
     this.promise = makeCancellable(
       fetch(url, obj)
         .then(resp => {
@@ -77,7 +75,6 @@ export default class extends React.Component {
           if (resp.status >= 400) {
             ok = false
           }
-          // text.json().then(json => [json, ok])
           return resp.text().then(text => text ? [JSON.parse(text), ok] : ['', ok])
         })
         .then(([json, ok]) => {

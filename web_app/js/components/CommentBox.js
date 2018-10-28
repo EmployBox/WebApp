@@ -56,8 +56,8 @@ const CommentForm = class extends React.Component {
 
   render () {
     return (
-      <div class='container text-center'>
-        <GenericForm
+      <div class='container'>
+        {/* <GenericForm
           inputData={[
             {
               type: 'textbox',
@@ -68,7 +68,16 @@ const CommentForm = class extends React.Component {
           ]}
           klass='form-group'
           onSubmitHandler={this.onSubmit}
-        />
+        /> */}
+        <textarea class='form-control' value={this.state.commentText} onChange={event => this.setState({ commentText: event.target.value })} placeholder='Insert your comment here' />
+        <div class='row'>
+          <div class='col-12'>
+            <button
+              type='button'
+              onClick={() => this.onSubmit({text: this.state.commentText})}
+              class='float-right btn btn-dark'>Submit</button>
+          </div>
+        </div>
         {this.state.inputs
           ? <HttpRequest method='POST' url={this.props.url.split('?')[0]} authorization={this.props.auth}
             body={this.state.inputs}
@@ -105,7 +114,7 @@ const Comment = class extends React.Component {
                 <HttpRequest url={account._links.self.href}
                   authorization={auth}
                   onResult={json =>
-                    <img class='img-responsive img-thumbnail' src={(account.accountType === 'USR' ? json.photo_url : json.logo_url) || 'https://ssl.gstatic.com/accounts/ui/avatar_2x.png'} />}
+                    <img class='img-responsive img-thumbnail' src={(account.accountType === 'USR' ? json.photo_url : json.logo_url) || 'https://www.cukashmir.ac.in/facultyimages/2316218245609profile-default-male.png'} />}
                 />
               </div>
             </div>
@@ -177,7 +186,7 @@ export default class extends React.Component {
 
   render () {
     return <div class='container'>
-      <h1 class='text-center'>Comments</h1>
+      <h3>Comments</h3>
       <CommentForm auth={this.props.auth} url={this.props.url} accountIdFrom={this.props.accountIdFrom} accountIdTo={this.props.accountIdTo} submitComment={this.submitComment} />
       <CommentList data={this.state.data} auth={this.props.auth} loggedAccount={this.props.loggedAccount} deleteComment={this.deleteComment} />
       {this.state.loadMore && <HttpRequest url={this.state.currentUrl}
