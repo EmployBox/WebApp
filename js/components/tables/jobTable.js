@@ -4,7 +4,7 @@ import URI from 'urijs'
 import URITemplate from 'urijs/src/URITemplate'
 
 import Table from './halTable'
-import ApplyButton from '../applyButton'
+import ApplyButton from '../buttons/applyButton'
 
 const searchTemplate = new URITemplate('/search/{url}')
 

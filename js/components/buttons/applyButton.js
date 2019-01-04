@@ -2,8 +2,8 @@ import React from 'react'
 import {Redirect, withRouter} from 'react-router-dom'
 import URI from 'urijs'
 
-import HalTable from '../components/tables/halTable'
-import HttpRequest from './httpRequest'
+import HalTable from '../tables/halTable'
+import HttpRequest from '../httpRequest'
 
 class ApplyButton extends React.Component {
   constructor (props) {
