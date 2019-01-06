@@ -1,39 +1,67 @@
 import React from 'react'
+import fetch from 'isomorphic-fetch'
+import URI from 'urijs'
 
 export default class extends React.Component {
   constructor (props) {
     super(props)
     this.state = {
-      text: props.follows.size === 0 ? 'Follow' : 'Following',
-      method: props.follows.size === 0 ? 'PUT' : 'DELETE',
-      flag: false
+      isLoading: true,
+      isFollowing: false
     }
-    this.changeState = this.changeState.bind(this)
-    this.onClick = this.onClick.bind(this)
+    this.toggleFollow = this.toggleFollow.bind(this)
   }
-  changeState (json) {
-    this.setState(oldstate => {
-      oldstate.text = oldstate.text === 'Follow' ? 'Folowing' : 'Follow'
-      oldstate.method = oldstate.method === 'PUT' ? 'DELETE' : 'PUT'
-      oldstate.flag = false
-      return oldstate
-    })
+
+  componentDidMount () {
+    const { accountId, auth, url } = this.props
+
+    let requestURL = new URI(url).setQuery('accountToCheck', accountId).href()
+    fetch(requestURL, { method: 'GET', headers: { authorization: auth } })
+      .then(this.parseResponse)
+      .then(follows => this.setState({ isFollowing: follows.size !== 0, isLoading: false }))
+      .catch(error => {
+        console.log(`FollowButton request error - ${error.message}`)
+        this.setState({ isLoading: false })
+      })
   }
-  onClick () {
-    this.setState(oldstate => {
-      oldstate.flag = !oldstate.flag
-      return oldstate
-    })
+
+  async parseResponse (resp) {
+    let respText = await resp.text()
+    if (!resp.ok) throw new Error(respText)
+    return JSON.parse(respText)
   }
+
+  toggleFollow () {
+    const { isFollowing } = this.state
+    const { auth } = this.props
+
+    this.setState({ isLoading: true })
+
+    fetch(this.props.url, { method: isFollowing ? 'DELETE' : 'PUT', headers: { authorization: auth } })
+      .then(async resp => {
+        let respText = await resp.text()
+        if (resp.ok) this.setState({ isFollowing: !isFollowing, isLoading: false })
+        else {
+          this.setState({ isLoading: false })
+          throw new Error(respText)
+        }
+      })
+      .catch(error => {
+        console.log(`FollowButton request error - ${error.message}`)
+        this.setState({ isLoading: false })
+      })
+  }
+
   render () {
-    return (<div>
-      <button class='btn btn-block btn-primary bg-dark' onClick={this.onClick} >{this.state.text}</button>
-      {this.state.flag
-        ? <HttpRequest method={this.state.method} url={this.props.url} authorization={auth}
-          afterResult={this.changeState}
-        />
-        : <div />}
-    </div>
+    const { isLoading, isFollowing } = this.state
+    const { className, style } = this.props
+
+    return (
+      <div>
+        <button class={className} style={style} onClick={this.toggleFollow} disabled={isLoading}>{isFollowing ? 'Following' : 'Follow'}</button>
+        {isLoading &&
+          <p>Loading...</p>}
+      </div>
     )
   }
 }
