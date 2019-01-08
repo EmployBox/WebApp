@@ -1,6 +1,7 @@
 import React from 'react'
 import fetch from 'isomorphic-fetch'
 import URI from 'urijs'
+import {checkAndParseResponse} from '../../utils/httpResponseHelper'
 
 export default class extends React.Component {
   constructor (props) {
@@ -10,6 +11,7 @@ export default class extends React.Component {
       isFollowing: false
     }
     this.toggleFollow = this.toggleFollow.bind(this)
+    this.errorHandler = this.errorHandler.bind(this)
   }
 
   componentDidMount () {
@@ -17,18 +19,14 @@ export default class extends React.Component {
 
     let requestURL = new URI(url).setQuery('accountToCheck', accountId).href()
     fetch(requestURL, { method: 'GET', headers: { authorization: auth } })
-      .then(this.parseResponse)
+      .then(checkAndParseResponse)
       .then(follows => this.setState({ isFollowing: follows.size !== 0, isLoading: false }))
-      .catch(error => {
-        console.log(`FollowButton request error - ${error.message}`)
-        this.setState({ isLoading: false })
-      })
+      .catch(this.errorHandler)
   }
 
-  async parseResponse (resp) {
-    let respText = await resp.text()
-    if (!resp.ok) throw new Error(respText)
-    return JSON.parse(respText)
+  errorHandler (error) {
+    console.log(`FollowButton request error - ${error.message}`)
+    this.setState({ isLoading: false })
   }
 
   toggleFollow () {
@@ -46,10 +44,7 @@ export default class extends React.Component {
           throw new Error(respText)
         }
       })
-      .catch(error => {
-        console.log(`FollowButton request error - ${error.message}`)
-        this.setState({ isLoading: false })
-      })
+      .catch(this.errorHandler)
   }
 
   render () {

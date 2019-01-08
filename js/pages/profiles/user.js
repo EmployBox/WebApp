@@ -10,6 +10,7 @@ import CurriculasTable from '../tables/curriculasTable'
 import CommentBox from '../../components/CommentBox'
 import TabRoute, {TabConfig} from '../../components/tabRoute'
 import FollowButton from '../../components/buttons/followButton'
+import {parseResponseToJson} from '../../utils/httpResponseHelper'
 
 const offeredJobsTempl = new URITemplate('/account/{userUrl}/offeredJobs/{offeredJobsUrl}')
 const curriculasTempl = new URITemplate('/account/{userUrl}/curriculas/{curriculaUrl}')
@@ -33,15 +34,9 @@ export default withRouter(class extends React.Component {
     const {auth, match} = this.props
 
     fetch(URI.decode(match.params.url), { method: 'GET', headers: { authorization: auth } })
-      .then(this.parseResponse)
+      .then(parseResponseToJson)
       .then(async user => this.setState({ user, isLoading: false }))
       .catch(error => this.setState({ error, isLoading: false }))
-  }
-
-  async parseResponse (resp) {
-    let respText = await resp.text()
-    if (!resp.ok) throw new Error(respText)
-    return JSON.parse(respText)
   }
 
   rateOnClick () {

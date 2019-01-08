@@ -9,9 +9,10 @@ export default ({json, columns, currentUrl, pushTo, onClickRow}) => {
 
   return (
     <div>
-      {json.size === 0
-        ? <p>No Items</p>
-        : <ReactTable columns={columns}
+      {json.size === 0 ? (
+        <p>No Items</p>
+      ) : (
+        <ReactTable columns={columns}
           manual
           data={json._embedded.items}
           pages={json.last_page + 1}
@@ -38,7 +39,8 @@ export default ({json, columns, currentUrl, pushTo, onClickRow}) => {
               })
             }
           }}
-        />}
+        />
+      )}
     </div>
   )
 }
