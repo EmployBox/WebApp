@@ -3,19 +3,20 @@ import {Redirect, withRouter} from 'react-router-dom'
 import fetch from 'isomorphic-fetch'
 import URI from 'urijs'
 
-import HalTable from '../tables/halTable'
+// import HalTable from '../tables/halTable'
+import ReactTable from 'react-table'
 import {checkAndParseResponse} from '../../utils/httpResponseHelper'
 
 class ApplyButton extends React.Component {
   constructor (props) {
     super(props)
-    const { auther } = props
+    const { auther, resumesUrl } = props
 
     this.state = {
       userSelf: auther.accountType === 'USR' ? auther.self : undefined,
       isLoggedIn: auther.accountType !== undefined,
       isLoading: false,
-      resumesUrl: undefined,
+      resumesUrl: resumesUrl,
       resumes: undefined,
       selectedResume: undefined,
       error: undefined
@@ -23,12 +24,16 @@ class ApplyButton extends React.Component {
 
     this.submitApplication = this.submitApplication.bind(this)
     this.errorHandler = this.errorHandler.bind(this)
+    this.fetchResumes = this.fetchResumes.bind(this)
     console.log(this.state.userSelf)
   }
 
   static getDerivedStateFromProps (nextProps, prevState) {
-    if (nextProps.auther.accountType) return null
-    return {isLoggedIn: false}
+    if (nextProps.auther.accountType && nextProps.resumesUrl === prevState.resumesUrl) return null
+    return {
+      isLoggedIn: nextProps.auther.accountType !== undefined,
+      resumesUrl: nextProps.resumesUrl
+    }
   }
 
   errorHandler (error) {
@@ -36,36 +41,34 @@ class ApplyButton extends React.Component {
     this.setState({ isLoading: false, error: error })
   }
 
-  fetchResumes () {
-    const { isLoading, userSelf } = this.state
+  fetchResumes (state) {
+    const { isLoading, resumesUrl } = this.state
     const { auther } = this.props
 
-    if (isLoading) return
+    if (isLoading || !resumesUrl) return
     this.setState({ isLoading: true })
 
-    fetch(userSelf, {
+    console.log(state)
+    const uri = new URI(resumesUrl)
+    if (state) {
+      const {id, desc} = state.sorted
+      uri.setQuery('page', state.page)
+        .setQuery('pageSize', state.pageSize)
+        .setQuery('orderColumn', id).setQuery('orderClause', desc ? 'DESC' : 'ASC')
+    }
+
+    fetch(uri.href(), {
       method: 'GET',
       headers: {
         'Authorization': auther.auth
       }
     })
       .then(checkAndParseResponse)
-      .then(user => fetchResumesFromUser(user))
+      .then(userResumes => this.setState({
+        isLoading: false,
+        resumes: userResumes
+      }))
       .catch(this.errorHandler)
-
-    const fetchResumesFromUser = user => {
-      let resumesUrl = user._links.curricula.href
-
-      fetch(resumesUrl, {
-        method: 'GET',
-        headers: {
-          'Authorization': auther.auth
-        }
-      })
-        .then(checkAndParseResponse)
-        .then(userResumes => this.setState({ isLoading: false, resumesUrl: resumesUrl, resumes: userResumes }))
-        .catch(this.errorHandler)
-    }
   }
 
   submitApplication () {
@@ -91,8 +94,15 @@ class ApplyButton extends React.Component {
   }
 
   render () {
-    const {isLoggedIn, resumes, resumesUrl, isLoading, selectedResume, error} = this.state
+    const {isLoggedIn, resumes, isLoading, resumesUrl, selectedResume, error} = this.state
     const {auther, history, job} = this.props
+
+    let pageSize = 10
+    if (resumesUrl) {
+      const uri = new URI(resumesUrl)
+      const query = URI.parseQuery(uri.query())
+      pageSize = query.pageSize
+    }
 
     return (
       <div>
@@ -111,37 +121,35 @@ class ApplyButton extends React.Component {
               </div>
               <div class='modal-body'>
                 {!isLoggedIn && <Redirect to={auther.loginUrl + '?redirect=' + URI.encode(history.location.pathname)} />}
-                {isLoading ? (
-                  <p>Loading...</p>
-                ) : (
-                  resumesUrl && resumes &&
-                  <div>
-                    <p>Select the curriculum to send</p>
-                    <HalTable
-                      currentUrl={resumesUrl}
-                      json={resumes}
-                      onClickRow={() => {}}
-                      pushTo={url => this.setState({resumesUrl: url})}
-                      columns={[
-                        {
-                          Header: 'Title',
-                          accessor: 'title'
-                        },
-                        {
-                          Cell: ({original}) => {
-                            return (
-                              <button
-                                className='btn btn-primary'
-                                disabled={selectedResume === original.curriculumId}
-                                onClick={() => this.setState({selectedResume: original.curriculumId})}>
-                                Send this
-                              </button>
-                            )
-                          }
+                <div>
+                  <p>Select the curriculum to send</p>
+                  <ReactTable
+                    columns={[
+                      {
+                        Header: 'Title',
+                        accessor: 'title'
+                      },
+                      {
+                        Cell: ({original}) => {
+                          return (
+                            <button
+                              className='btn btn-primary'
+                              disabled={selectedResume === original.curriculumId}
+                              onClick={() => this.setState({selectedResume: original.curriculumId})}>
+                              Send this
+                            </button>
+                          )
                         }
-                      ]} />
-                  </div>
-                )}
+                      }
+                    ]}
+                    manual
+                    data={resumes ? resumes._embedded.items : []}
+                    pages={resumes ? resumes.last_page + 1 : 0}
+                    pageSize={Number(pageSize)}
+                    loading={isLoading}
+                    onFetchData={this.fetchResumes}
+                  />
+                </div>
                 {error && <div class='alert alert-danger' role='alert'>{error.message}</div>}
               </div>
               <div class='modal-footer'>
